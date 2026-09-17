@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ChevronLeft, ChevronRight, CalendarDays, ArrowUpDown, Check, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, ArrowUpDown, Check, Plus, Download } from "lucide-react";
 import type { TaskSortBy } from "@open-sunsama/types";
 import {
   Button,
@@ -48,6 +48,8 @@ interface KanbanBoardToolbarProps {
   onNavigateNext: () => void;
   onNavigateToday: () => void;
   onAddTask: () => void;
+  /** Opens the paste-a-link import dialog. Omit to hide the button. */
+  onImportTask?: () => void;
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
   /** Substring filter applied to task titles/notes across the day columns. */
@@ -83,6 +85,7 @@ export function KanbanBoardToolbar({
   onNavigateNext,
   onNavigateToday,
   onAddTask,
+  onImportTask,
   sortBy,
   onSortChange,
   searchQuery,
@@ -134,6 +137,20 @@ export function KanbanBoardToolbar({
           onChange={onSearchQueryChange}
           placeholder="Search tasks…"
         />
+
+        {/* Import from a connected source */}
+        {onImportTask && (
+          <Button
+            onClick={onImportTask}
+            variant="outline"
+            size="sm"
+            className="gap-1.5 h-8 px-2.5"
+            title="Import a task by pasting its link"
+          >
+            <Download className="h-4 w-4" />
+            <span className="hidden sm:inline">Import</span>
+          </Button>
+        )}
 
         {/* Primary Add Task action */}
         <Button

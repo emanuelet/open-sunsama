@@ -107,11 +107,7 @@ export function useKanbanRangePrefetch(options: RangePrefetchOptions = {}) {
 
   const queryKey = React.useMemo(
     () =>
-      [
-        ...taskKeys.lists(),
-        "range",
-        { from: fromString, to: toString },
-      ] as const,
+      taskKeys.range(fromString, toString),
     [fromString, toString]
   );
 
@@ -119,7 +115,13 @@ export function useKanbanRangePrefetch(options: RangePrefetchOptions = {}) {
     queryKey,
     queryFn: async (): Promise<{
       tasks: Task[];
-      subtasksByTaskId: Map<string, Subtask[]>;
+      /**
+       * Plain record, not a Map: this query's result is persisted to
+       * localStorage, and a Map does not survive JSON round-tripping —
+       * it comes back as `{}` and every consumer that iterates it
+       * throws on the next page load.
+       */
+      subtasksByTaskId: Record<string, Subtask[]>;
       truncated: boolean;
     }> => {
       const api = getApi();
@@ -152,11 +154,11 @@ export function useKanbanRangePrefetch(options: RangePrefetchOptions = {}) {
       // Strip subtasks off the task object before we put it in the per-day
       // cache. We seed the subtask caches separately below.
       const tasks: Task[] = [];
-      const subtasksByTaskId = new Map<string, Subtask[]>();
+      const subtasksByTaskId: Record<string, Subtask[]> = {};
       for (const t of raw) {
         const { subtasks: embedded, ...rest } = t;
         tasks.push(rest as Task);
-        if (embedded) subtasksByTaskId.set(t.id, embedded);
+        if (embedded) subtasksByTaskId[t.id] = embedded;
       }
 
       // A task created or deleted between pages shifts the offsets, so the
@@ -238,7 +240,9 @@ export function useKanbanRangePrefetch(options: RangePrefetchOptions = {}) {
     // Seed the per-task subtask caches too, so the kanban's subtask
     // batcher never has to fire — `useSubtasks(taskId)` will read from
     // these fresh cache entries (within the 60s default staleTime).
-    for (const [taskId, list] of data.subtasksByTaskId) {
+    // `?? {}` guards a cache entry persisted by an older build, where
+    // this field was a Map and rehydrates as undefined or a bare object.
+    for (const [taskId, list] of Object.entries(data.subtasksByTaskId ?? {})) {
       const cacheKey = subtaskKeys.list(taskId);
       const existing = queryClient.getQueryData<Subtask[]>(cacheKey);
       // Don't clobber a list that contains an in-flight optimistic insert.

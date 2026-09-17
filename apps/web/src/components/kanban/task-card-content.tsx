@@ -14,6 +14,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { TaskTimeBadge } from "./task-time-badge";
+import { TaskSourceChips } from "./task-source-chip";
 
 interface TaskCardContentProps {
   task: Task;
@@ -379,18 +380,24 @@ export function TaskCardContent({
           </div>
         )}
 
-      {/* Bottom row: Tag/Project (right-aligned) */}
-      {tag && (
-        <div className="flex justify-end">
-          <span
-            className="text-[11px] px-1.5 py-0.5 rounded"
-            style={{
-              color: tagColor || "hsl(var(--muted-foreground))",
-              backgroundColor: tagColor ? `${tagColor}15` : "transparent",
-            }}
-          >
-            # {tag}
-          </span>
+      {/* Bottom row: source chips (left) + tag/project (right).
+          Both stay visible when the task is complete — completing a
+          card must not hide its fields. */}
+      {(tag || task.externalLinks?.length) && (
+        <div className="flex items-center justify-between gap-2">
+          <TaskSourceChips links={task.externalLinks} className="min-w-0" />
+
+          {tag && (
+            <span
+              className="text-[11px] px-1.5 py-0.5 rounded ml-auto"
+              style={{
+                color: tagColor || "hsl(var(--muted-foreground))",
+                backgroundColor: tagColor ? `${tagColor}15` : "transparent",
+              }}
+            >
+              # {tag}
+            </span>
+          )}
         </div>
       )}
     </div>

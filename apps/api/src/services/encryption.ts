@@ -4,9 +4,14 @@ const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
 
 function getEncryptionKey(): Buffer {
-  const key = process.env.CALENDAR_ENCRYPTION_KEY;
+  // This module now protects task-source integration credentials as well
+  // as calendar tokens, so `ENCRYPTION_KEY` is the name going forward.
+  // `CALENDAR_ENCRYPTION_KEY` stays as a fallback so existing
+  // deployments keep decrypting their stored calendar tokens without a
+  // re-auth — the two names must resolve to the same key.
+  const key = process.env.ENCRYPTION_KEY || process.env.CALENDAR_ENCRYPTION_KEY;
   if (!key) {
-    throw new Error('CALENDAR_ENCRYPTION_KEY environment variable is required');
+    throw new Error('ENCRYPTION_KEY environment variable is required');
   }
   // Key should be 32 bytes (64 hex chars)
   return Buffer.from(key, 'hex');

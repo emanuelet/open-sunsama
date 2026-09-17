@@ -7,6 +7,7 @@ import {
   CalendarDays,
   Columns3,
   Square,
+  Download,
 } from "lucide-react";
 import { format, isToday } from "date-fns";
 import type { BoardMode } from "./kanban-board";
@@ -67,6 +68,7 @@ interface KanbanBoardToolbarProps {
   /** Board (several days) or Today (one day). */
   mode: BoardMode;
   onModeChange: (mode: BoardMode) => void;
+  onImportTask: () => void;
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
   /** Substring filter applied to task titles/notes across the day columns. */
@@ -105,6 +107,7 @@ export function KanbanBoardToolbar({
   firstVisibleDate,
   mode,
   onModeChange,
+  onImportTask,
   sortBy,
   onSortChange,
   searchQuery,
@@ -231,6 +234,17 @@ export function KanbanBoardToolbar({
           onChange={onSearchQueryChange}
           placeholder="Search tasks…"
         />
+
+        <Button
+          onClick={onImportTask}
+          variant="outline"
+          size="sm"
+          className="h-8 gap-1.5 px-2.5"
+          title="Import a task by pasting its link"
+        >
+          <Download className="h-4 w-4" />
+          <span className="hidden sm:inline">Import</span>
+        </Button>
 
         {/* Sort Dropdown */}
         <DropdownMenu>

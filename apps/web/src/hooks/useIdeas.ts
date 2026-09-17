@@ -574,6 +574,8 @@ export function usePromoteIdea(boardId: string | undefined) {
       }
       // The promote created a real task — refresh task lists.
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
+      // The kanban range prefetch lives outside lists(); refresh it too.
+      queryClient.invalidateQueries({ queryKey: taskKeys.rangeAll() });
       const scheduled = result.task.scheduledDate;
       const today = new Date().toISOString().slice(0, 10);
       const title = !scheduled

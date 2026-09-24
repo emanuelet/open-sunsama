@@ -155,7 +155,8 @@ export { ClickUpProvider };
 /**
  * Provider registry. Adding a task source means implementing
  * `TaskProvider`, adding it here, and adding its id to
- * `INTEGRATION_PROVIDERS` in the database schema.
+ * this registry. Database rows deliberately store provider ids as strings so
+ * adding one never requires a schema migration.
  */
 const PROVIDERS: Record<string, TaskProvider> = {
   clickup: new ClickUpProvider(),
@@ -167,6 +168,10 @@ export function getTaskProvider(id: string): TaskProvider {
     throw new Error(`Unknown task provider: ${id}`);
   }
   return provider;
+}
+
+export function hasTaskProvider(id: string): boolean {
+  return id in PROVIDERS;
 }
 
 export function listTaskProviders(): TaskProvider[] {

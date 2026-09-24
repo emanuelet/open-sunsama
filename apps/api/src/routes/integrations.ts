@@ -31,6 +31,7 @@ import {
 } from "../validation/integrations.js";
 import {
   getTaskProvider,
+  hasTaskProvider,
   listTaskProviders,
   ProviderCredentialError,
   ProviderRateLimitError,
@@ -129,6 +130,19 @@ integrationsRouter.post(
     const userId = c.get("userId");
     const { provider: providerId, credentials } = c.req.valid("json");
     const db = getDb();
+
+    if (!hasTaskProvider(providerId)) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "INVALID_PROVIDER",
+            message: `Unknown task provider: ${providerId}`,
+          },
+        },
+        400
+      );
+    }
 
     const provider = getTaskProvider(providerId);
 

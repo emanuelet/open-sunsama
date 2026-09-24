@@ -5,6 +5,7 @@
  * entry here plus its backend implementation.
  */
 import * as React from "react";
+import { Plug } from "lucide-react";
 
 export function ClickUpIcon({ className }: { className?: string }) {
   return (
@@ -55,7 +56,7 @@ export function getIntegrationProviderConfig(
   return (
     INTEGRATION_PROVIDER_CONFIG[provider] ?? {
       name: provider,
-      icon: ClickUpIcon,
+      icon: Plug,
       chipColor: "#6366F1",
       blurb: "",
     }

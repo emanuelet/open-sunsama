@@ -20,14 +20,8 @@ import { integrationAccounts } from "./integration-accounts";
  * different kinds at once — the ClickUp task it came from plus the
  * Gitea pull request that closes it.
  */
-export const EXTERNAL_LINK_KINDS = [
-  "task",
-  "issue",
-  "pull_request",
-  "commit",
-  "document",
-] as const;
-export type ExternalLinkKind = (typeof EXTERNAL_LINK_KINDS)[number];
+/** Providers may use their own object taxonomy, such as a ticket or incident. */
+export type ExternalLinkKind = string;
 
 /**
  * `source` — this link created the task and owns its synced fields.
@@ -138,7 +132,7 @@ export const insertTaskExternalLinkSchema = createInsertSchema(
     provider: z.string().min(1).max(32),
     externalId: z.string().min(1).max(255),
     externalUrl: z.string().url().optional(),
-    kind: z.enum(EXTERNAL_LINK_KINDS).optional(),
+    kind: z.string().min(1).max(32).optional(),
     role: z.enum(EXTERNAL_LINK_ROLES).optional(),
     status: z.enum(EXTERNAL_LINK_STATUSES).optional(),
   }

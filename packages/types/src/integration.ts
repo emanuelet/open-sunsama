@@ -33,12 +33,8 @@ export interface IntegrationAccount {
   updatedAt: string;
 }
 
-export type ExternalLinkKind =
-  | 'task'
-  | 'issue'
-  | 'pull_request'
-  | 'commit'
-  | 'document';
+/** Providers may expose object kinds beyond the initial task/issue/PR set. */
+export type ExternalLinkKind = string;
 
 export type ExternalLinkRole = 'source' | 'reference';
 export type ExternalLinkStatus = 'active' | 'orphaned';

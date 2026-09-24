@@ -2,17 +2,14 @@
  * Validation schemas for task-source integration routes.
  */
 import { z } from "zod";
-import {
-  EXTERNAL_LINK_KINDS,
-  INTEGRATION_PROVIDERS,
-} from "@open-sunsama/database";
 
 export const integrationAccountIdParamSchema = z.object({
   id: z.string().uuid("Invalid account id"),
 });
 
 export const createIntegrationAccountSchema = z.object({
-  provider: z.enum(INTEGRATION_PROVIDERS),
+  // The task-provider registry is authoritative; the route verifies this id.
+  provider: z.string().min(1).max(32),
   /**
    * Provider-specific credential object. Validated a second time by the
    * provider's own `credentialSchema` before any network call, because
@@ -44,7 +41,7 @@ export const createTaskLinkSchema = z.object({
   provider: z.string().min(1).max(32),
   externalId: z.string().min(1).max(255),
   externalUrl: z.string().url().max(2000),
-  kind: z.enum(EXTERNAL_LINK_KINDS).default("pull_request"),
+  kind: z.string().min(1).max(32).default("pull_request"),
   label: z.string().max(255).optional(),
 });
 

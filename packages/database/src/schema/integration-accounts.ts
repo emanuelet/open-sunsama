@@ -22,8 +22,8 @@ import { taskExternalLinks } from "./task-external-links";
  * Nothing polls: there is no sync state here because there is no
  * background sync.
  */
-export const INTEGRATION_PROVIDERS = ["clickup"] as const;
-export type IntegrationProvider = (typeof INTEGRATION_PROVIDERS)[number];
+/** Provider ids are owned by the API provider registry, not the database. */
+export type IntegrationProvider = string;
 
 export const integrationAccounts = pgTable(
   "integration_accounts",
@@ -56,7 +56,7 @@ export const integrationAccounts = pgTable(
   },
   (table) => [
     index("integration_accounts_user_id_idx").on(table.userId),
-    // Reconnecting the same ClickUp user must update the existing row
+    // Reconnecting the same provider user must update the existing row
     // rather than silently creating a second account that double-imports
     // every task.
     uniqueIndex("integration_accounts_user_provider_account_idx").on(
@@ -81,7 +81,7 @@ export const integrationAccountsRelations = relations(
 export const insertIntegrationAccountSchema = createInsertSchema(
   integrationAccounts,
   {
-    provider: z.enum(INTEGRATION_PROVIDERS),
+    provider: z.string().min(1).max(32),
     providerAccountId: z.string().min(1).max(255),
     label: z.string().min(1).max(255),
     credentialsEncrypted: z.string().min(1),

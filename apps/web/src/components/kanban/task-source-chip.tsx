@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 /**
  * Where a task came from, and what else is attached to it.
  *
- * A task can carry several links at once — the ClickUp task it was
+ * A task can carry several links at once — the Todoist task it was
  * imported from plus a pull request someone attached by hand — so this
  * renders a row of chips rather than a single source label.
  *

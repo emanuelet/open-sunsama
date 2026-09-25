@@ -17,7 +17,7 @@ import { integrationAccounts } from "./integration-accounts";
 
 /**
  * What the external object *is*. A task may carry several links of
- * different kinds at once — the ClickUp task it came from plus the
+ * different kinds at once — the Todoist task it came from plus the
  * Gitea pull request that closes it.
  */
 /** Providers may use their own object taxonomy, such as a ticket or incident. */
@@ -45,7 +45,7 @@ export type ExternalLinkStatus = (typeof EXTERNAL_LINK_STATUSES)[number];
  * row. Refreshed whenever the user pulls the task again.
  */
 export interface ExternalLinkMeta {
-  /** ClickUp list / Gitea repo — rendered as the card's source chip. */
+  /** Todoist project / Gitea repo — rendered as the card's source chip. */
   containerName?: string | null;
   /** Remote status label, e.g. "in progress". */
   statusName?: string | null;

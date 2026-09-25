@@ -44,7 +44,7 @@ export const integrationAccounts = pgTable(
 
     /**
      * AES-256-GCM blob holding a JSON credential object. Shaped per
-     * provider (ClickUp: `{ token, teamIds }`), which is what lets a
+      * provider (Todoist: `{ token }`), which is what lets a
      * future OAuth strategy drop in beside token auth without a
      * migration. Never leaves the API — routes return `hasCredentials`.
      */

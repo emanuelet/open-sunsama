@@ -47,7 +47,7 @@ export interface ExternalLinkMeta {
 
 /**
  * A pointer from a local task to an object in an external system. A
- * task may carry several at once — the ClickUp task it came from plus
+ * task may carry several at once — the Todoist task it came from plus
  * the pull request that closes it.
  */
 export interface TaskExternalLink {

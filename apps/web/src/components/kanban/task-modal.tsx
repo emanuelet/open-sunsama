@@ -1123,7 +1123,7 @@ export function TaskModal({ task, open, onOpenChange }: TaskModalProps) {
               )}
             </div>
             </div>
-            {/* Source chips — open the task in ClickUp, or pull its
+            {/* Source chips — open the task in its external source, or pull its
                 current values down again. The modal has the room the
                 board card doesn't, so refresh is enabled here. */}
             {renderTask.externalLinks?.length ? (

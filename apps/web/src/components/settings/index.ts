@@ -31,7 +31,7 @@ export { IntegrationsSettings } from "./integrations-settings";
 export { ConnectIntegrationDialog } from "./connect-integration-dialog";
 export { IntegrationAccountCard } from "./integration-account-card";
 export {
-  ClickUpIcon,
+  TodoistIcon,
   INTEGRATION_PROVIDER_CONFIG,
   getIntegrationProviderConfig,
 } from "./integration-provider-icons";

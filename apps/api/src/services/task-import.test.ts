@@ -9,7 +9,7 @@ import type { ExternalTask } from "./task-providers/index";
 
 function external(overrides: Partial<ExternalTask> = {}): ExternalTask {
   return {
-    externalId: "86abc1234",
+    externalId: "6cF5Q2gH9P3",
     title: "Ship the thing",
     description: "Do the work",
     priority: "P1",
@@ -17,7 +17,7 @@ function external(overrides: Partial<ExternalTask> = {}): ExternalTask {
     isCompleted: false,
     statusName: "in progress",
     dueDate: null,
-    url: "https://app.clickup.com/t/86abc1234",
+    url: "https://app.todoist.com/app/task/6cF5Q2gH9P3",
     containerName: "Engineering",
     remoteUpdatedAt: new Date("2026-09-01T10:00:00Z"),
     subtasks: [],

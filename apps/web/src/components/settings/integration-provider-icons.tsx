@@ -7,7 +7,7 @@
 import * as React from "react";
 import { Plug } from "lucide-react";
 
-export function ClickUpIcon({ className }: { className?: string }) {
+export function TodoistIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -16,14 +16,8 @@ export function ClickUpIcon({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <path
-        d="M2 18.44 5.69 15.6c1.96 2.56 4.04 3.74 6.36 3.74 2.3 0 4.33-1.17 6.2-3.71L22 18.4C19.3 22.07 15.94 24 12.05 24 8.17 24 4.78 22.08 2 18.44Z"
-        fill="#FF02F0"
-      />
-      <path
-        d="M12.04 5.42 5.47 11.1 2.5 7.65 12.05 0l9.47 7.66-2.99 3.43-6.49-5.67Z"
-        fill="#00F0C3"
-      />
+      <circle cx="12" cy="12" r="10" fill="#E44332" />
+      <path d="m7 12 3 3 7-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -41,12 +35,12 @@ export const INTEGRATION_PROVIDER_CONFIG: Record<
   string,
   IntegrationProviderConfig
 > = {
-  clickup: {
-    name: "ClickUp",
-    icon: ClickUpIcon,
-    chipColor: "#7B68EE",
+  todoist: {
+    name: "Todoist",
+    icon: TodoistIcon,
+    chipColor: "#E44332",
     blurb:
-      "Import tasks assigned to you. They land in your backlog — nothing is ever written back to ClickUp.",
+      "Import tasks one at a time. They land in your backlog — nothing is ever written back to Todoist.",
   },
 };
 

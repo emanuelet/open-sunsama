@@ -33,7 +33,7 @@ export interface ExternalTask {
    */
   dueDate: Date | null;
   url: string;
-  /** ClickUp list / Gitea repo. Rendered as the card's source chip. */
+  /** Todoist project / Gitea repo. Rendered as the card's source chip. */
   containerName: string | null;
   remoteUpdatedAt: Date;
   subtasks: ExternalSubtask[];
@@ -53,8 +53,8 @@ export interface VerifiedAccount {
   label: string;
   /**
    * The credential object to encrypt and store. Providers return this so
-   * they can enrich what the user typed (ClickUp appends the workspace
-   * ids it discovered) without the route layer knowing the shape.
+    * they can validate or enrich what the user typed without the route
+    * layer knowing the credential shape.
    */
   credentials: unknown;
 }
@@ -119,8 +119,7 @@ export class ProviderTaskNotFoundError extends Error {
 }
 
 /**
- * The provider is rate-limiting us (429). ClickUp allows 100 requests
- * per minute per token.
+ * The provider is rate-limiting us (429).
  */
 export class ProviderRateLimitError extends Error {
   readonly code = "PROVIDER_RATE_LIMITED" as const;
@@ -148,9 +147,9 @@ export class ProviderRequestError extends Error {
   }
 }
 
-import { ClickUpProvider } from "./clickup.js";
+import { TodoistProvider } from "./todoist.js";
 
-export { ClickUpProvider };
+export { TodoistProvider };
 
 /**
  * Provider registry. Adding a task source means implementing
@@ -159,7 +158,7 @@ export { ClickUpProvider };
  * adding one never requires a schema migration.
  */
 const PROVIDERS: Record<string, TaskProvider> = {
-  clickup: new ClickUpProvider(),
+  todoist: new TodoistProvider(),
 };
 
 export function getTaskProvider(id: string): TaskProvider {

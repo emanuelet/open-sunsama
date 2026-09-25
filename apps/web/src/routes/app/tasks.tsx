@@ -1,11 +1,12 @@
 import * as React from "react";
-import { Search, Plus, AlertCircle } from "lucide-react";
+import { Search, Plus, AlertCircle, Download } from "lucide-react";
 import { format, isToday, isTomorrow, isPast, parseISO } from "date-fns";
 import type { Task } from "@open-sunsama/types";
 import { useInfiniteSearchTasks } from "@/hooks/useInfiniteSearchTasks";
 import { useCompleteTask, useReorderTasks } from "@/hooks/useTasks";
 import { TaskModal } from "@/components/kanban/task-modal.lazy";
 import { AddTaskModal } from "@/components/kanban/add-task-modal.lazy";
+import { ImportTaskDialog } from "@/components/kanban/import-task-dialog";
 import { TaskGroup } from "@/components/tasks/task-group";
 import { TaskShortcutsHandler } from "@/components/task-shortcuts-handler";
 import { Button } from "@/components/ui";
@@ -108,6 +109,7 @@ function TasksListPageDesktop() {
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("active");
   const [selectedTask, setSelectedTask] = React.useState<Task | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = React.useState(false);
   const [activeTask, setActiveTask] = React.useState<Task | null>(null);
   const [activeOverGroup, setActiveOverGroup] = React.useState<string | null>(null);
   const completeTask = useCompleteTask();
@@ -408,6 +410,18 @@ function TasksListPageDesktop() {
           {/* Task count */}
           <span className="text-xs text-muted-foreground">{totalTasks} tasks</span>
 
+          {/* Import from a connected source */}
+          <Button
+            onClick={() => setIsImportModalOpen(true)}
+            size="sm"
+            variant="outline"
+            className="h-7 gap-1 text-xs px-2.5"
+            title="Import a task by pasting its link"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Import
+          </Button>
+
           {/* New Task */}
           <Button onClick={() => setIsAddModalOpen(true)} size="sm" variant="default" className="h-7 gap-1 text-xs px-2.5">
             <Plus className="h-3.5 w-3.5" />
@@ -534,6 +548,10 @@ function TasksListPageDesktop() {
           open={isAddModalOpen}
           onOpenChange={setIsAddModalOpen}
           scheduledDate={todayStr}
+        />
+        <ImportTaskDialog
+          open={isImportModalOpen}
+          onOpenChange={setIsImportModalOpen}
         />
       </div>
 

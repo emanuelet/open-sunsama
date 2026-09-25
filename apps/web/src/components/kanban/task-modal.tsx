@@ -95,6 +95,7 @@ import { SortableSubtaskItem } from "./sortable-subtask-item";
 import { NotesField } from "./task-modal-form";
 import { TaskAttachments } from "./task-attachments";
 import { TaskSeriesBanner } from "./task-series-banner";
+import { TaskSourceChips } from "./task-source-chip";
 import { RepeatConfigDialog } from "./repeat-config-popover";
 import { InlinePrioritySelector } from "./priority-selector";
 import { useCreateTaskSeries } from "@/hooks/useTaskSeries";
@@ -843,6 +844,8 @@ export function TaskModal({ task, open, onOpenChange }: TaskModalProps) {
     queryClient.invalidateQueries({ queryKey: timerKeys.active() });
     queryClient.invalidateQueries({ queryKey: taskKeys.detail(task.id) });
     queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
+    // The kanban range prefetch lives outside lists(); refresh it too.
+    queryClient.invalidateQueries({ queryKey: taskKeys.rangeAll() });
   }, [task, queryClient]);
 
   // Keep the ref in sync so keyboard handler always calls latest version
@@ -1120,6 +1123,18 @@ export function TaskModal({ task, open, onOpenChange }: TaskModalProps) {
               )}
             </div>
             </div>
+            {/* Source chips — open the task in its external source, or pull its
+                current values down again. The modal has the room the
+                board card doesn't, so refresh is enabled here. */}
+            {renderTask.externalLinks?.length ? (
+              <>
+                <div className="w-px h-3.5 bg-border/60 mx-1" />
+                <TaskSourceChips
+                  links={renderTask.externalLinks}
+                  showRefresh
+                />
+              </>
+            ) : null}
             {/* Actions group — pinned right on desktop, wraps to its own
                 full line on mobile (keeps tap targets uncramped) */}
             <div className="ml-auto flex items-center gap-1.5">
@@ -1271,11 +1286,18 @@ export function TaskModal({ task, open, onOpenChange }: TaskModalProps) {
         Uses onPointerDown instead of onClick because Radix Dialog's FocusScope
         traps focus at the document level — it intercepts between pointerdown
         and click, yanking focus back into the dialog before click fires.
-        onPointerDown fires before the focus trap kicks in. */}
+        onPointerDown fires before the focus trap kicks in.
+
+        `pointer-events-auto` is load-bearing: the parent Dialog is modal, so
+        react-remove-scroll sets `pointer-events: none` on <body> while it is
+        open and only re-enables it inside the Radix content. Portalling to
+        document.body escapes the focus trap but also lands us under that
+        rule, so without this the whole confirmation — Delete included — is
+        visible but inert. */}
       {showDeleteConfirm &&
         createPortal(
           <div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50"
+            className="pointer-events-auto fixed inset-0 z-[100] flex items-center justify-center bg-black/50"
             onPointerDown={() => setShowDeleteConfirm(false)}
           >
             <div

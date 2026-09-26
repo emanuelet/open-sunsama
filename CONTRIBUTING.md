@@ -43,8 +43,8 @@ Looking for a place to start? Check out issues labeled:
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/) v1.0+ (recommended) or Node.js 20+
-- PostgreSQL 15+
+- [Bun](https://bun.sh/) 1.4.2 (run `mise install` when using mise)
+- PostgreSQL 15+ (Homebrew's `postgresql@17`, or a hosted database such as Neon or Supabase)
 - Git
 
 ### Setup
@@ -59,20 +59,15 @@ cd open-sunsama
 # 3. Add upstream remote
 git remote add upstream https://github.com/ShadowWalker2014/open-sunsama.git
 
-# 4. Install dependencies
+# 4. Install the pinned Bun version
+mise install
+
+# 5. Install dependencies
 bun install
 
-# 5. Set up environment
-cp .env.example .env
-cp apps/api/.env.example apps/api/.env
-# Both default to the PostgreSQL from step 6; edit DATABASE_URL to use your own
-
-# 6. Start PostgreSQL and create the tables
-docker compose up -d postgres
-bun run db:migrate
-
-# 7. Start development servers
-bun run dev
+# 6. Start the API (:3001) and web app (:3000) against your PostgreSQL.
+#    Tables are created on start. Redis, email, background jobs and OAuth stay off.
+DEV_DATABASE_URL=postgresql://localhost:5432/opensunsama bun run dev:local
 ```
 
 ### Project Structure

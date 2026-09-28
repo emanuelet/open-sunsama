@@ -1,6 +1,6 @@
 {
-  "id": "c1dc75db-4477-4c1b-94ea-80b8f44e67bc",
-  "prevId": "31a76861-cabf-4e27-8588-0e5aae80e355",
+  "id": "fb4ee47b-4584-4f7c-9790-b8e24c7d1a2d",
+  "prevId": "f930760c-f252-47b6-84c7-a3758d250b18",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -530,6 +530,18 @@
         "response_status": {
           "name": "response_status",
           "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "attendees": {
+          "name": "attendees",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "conference_url": {
+          "name": "conference_url",
+          "type": "varchar(1000)",
           "primaryKey": false,
           "notNull": false
         },
@@ -2465,6 +2477,31 @@
         },
         "position": {
           "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "estimated_mins": {
+          "name": "estimated_mins",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actual_mins": {
+          "name": "actual_mins",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "timer_started_at": {
+          "name": "timer_started_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "timer_accumulated_seconds": {
+          "name": "timer_accumulated_seconds",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,

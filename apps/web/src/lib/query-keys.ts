@@ -25,10 +25,6 @@ export const taskKeys = {
   // the value. Anything shaped differently needs a key outside this prefix.
   lists: () => [...taskKeys.all, "list"] as const,
   list: (filters: TaskFilterInput) => [...taskKeys.lists(), filters] as const,
-  // The kanban's range prefetch (`useKanbanRangePrefetch`) caches an object,
-  // not a Task[], so it lives beside `lists()` rather than under it.
-  range: (from: string, to: string) =>
-    [...taskKeys.all, "range", { from, to }] as const,
   details: () => [...taskKeys.all, "detail"] as const,
   detail: (id: string) => [...taskKeys.details(), id] as const,
   /**

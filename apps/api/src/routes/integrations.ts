@@ -158,6 +158,8 @@ integrationsRouter.get(
           dueDate: task.dueDate?.toISOString().slice(0, 10) ?? null,
           url: task.url,
           containerName: task.containerName,
+          projectName: task.projectName ?? null,
+          sectionName: task.sectionName ?? null,
         })),
       });
     } catch (error) {

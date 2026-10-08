@@ -41,6 +41,10 @@ export interface ExternalTask {
   url: string;
   /** External project or list, rendered on the card's source chip. */
   containerName: string | null;
+  /** Provider-specific project/list name, when separately available. */
+  projectName?: string | null;
+  /** Provider-specific section name, when separately available. */
+  sectionName?: string | null;
   remoteUpdatedAt: Date;
   subtasks: ExternalSubtask[];
 }

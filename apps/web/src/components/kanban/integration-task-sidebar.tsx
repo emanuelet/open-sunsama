@@ -6,6 +6,7 @@ import type {
   IntegrationAccount,
 } from "@open-sunsama/types";
 import { Button } from "@/components/ui";
+import { renderInlineMarkdown } from "@/components/ui/inline-markdown";
 import { Link } from "@tanstack/react-router";
 import {
   useIntegrationAccounts,
@@ -47,7 +48,7 @@ function PickerTask({
     >
       <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       <span className={isDragging ? "opacity-40" : "min-w-0"}>
-        <span className="line-clamp-2 block font-medium">{task.title}</span>
+        <span className="line-clamp-2 block font-medium">{renderInlineMarkdown(task.title)}</span>
         {(task.containerName || task.dueDate) && (
           <span className="mt-0.5 block truncate text-[11px] text-muted-foreground">
             {[task.containerName, task.dueDate ? `Due ${task.dueDate}` : null]
@@ -112,13 +113,13 @@ function AccountTasks({ account }: { account: IntegrationAccount }) {
   const projects = [
     ...new Set(
       openTasks
-        .map((task) => task.containerName)
+        .map((task) => task.projectName ?? task.containerName)
         .filter((name): name is string => name !== null)
     ),
   ].sort((a, b) => a.localeCompare(b));
   const filteredTasks = openTasks.filter(
     (task) =>
-      (project === "all" || task.containerName === project) &&
+      (project === "all" || (task.projectName ?? task.containerName) === project) &&
       task.title.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())
   );
 

@@ -43,6 +43,8 @@ export interface ExternalTaskSummary {
   dueDate: string | null;
   url: string;
   containerName: string | null;
+  projectName?: string | null;
+  sectionName?: string | null;
 }
 
 /** Providers may expose object kinds beyond the initial task/issue/PR set. */

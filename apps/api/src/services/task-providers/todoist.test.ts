@@ -44,6 +44,22 @@ describe("Todoist API v1 adapter", () => {
     ]);
   });
 
+  it("lists open tasks for the source picker", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify([{
+      id, project_id: "1234567890", content: "Pick me", description: "",
+      priority: 1, checked: false, completed_at: null,
+      updated_at: "2026-09-01T10:00:00Z", due: null, duration: null,
+    }]), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(new TodoistProvider().listTasks(credentials)).resolves.toMatchObject([{
+      externalId: id, title: "Pick me", statusName: "open",
+    }]);
+    expect(fetchMock).toHaveBeenCalledWith("https://api.todoist.com/api/v1/tasks", {
+      headers: { Authorization: `Bearer ${credentials.token}` },
+    });
+  });
+
   it("maps rejected tokens and unavailable tasks to provider errors", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("Unauthorized", { status: 401 })));
     await expect(new TodoistProvider().verifyCredentials(credentials)).rejects.toBeInstanceOf(ProviderCredentialError);

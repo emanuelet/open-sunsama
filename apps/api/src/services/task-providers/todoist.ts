@@ -58,6 +58,12 @@ export class TodoistProvider implements TaskProvider {
     return normalizeTask(task, project);
   }
 
+  async listTasks(credentials: unknown): Promise<ExternalTask[]> {
+    const { token } = todoistCredentialSchema.parse(credentials);
+    const tasks = await this.request<TodoistTask[]>(token, "/tasks");
+    return tasks.map((task) => normalizeTask(task, null));
+  }
+
   private async request<T>(token: string, path: string): Promise<T> {
     const response = await fetch(`${TODOIST_API}${path}`, {
       headers: { Authorization: `Bearer ${token}` },

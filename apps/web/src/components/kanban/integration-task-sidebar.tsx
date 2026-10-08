@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useDraggable } from "@dnd-kit/core";
-import { GripVertical, Plug, RefreshCw } from "lucide-react";
+import { GripVertical, Plug, RefreshCw, Search } from "lucide-react";
 import type {
   ExternalTaskSummary,
   IntegrationAccount,
@@ -68,6 +68,13 @@ function AccountTasks({ account }: { account: IntegrationAccount }) {
     refetch,
     isFetching,
   } = useIntegrationTasks(account.id);
+  const [query, setQuery] = React.useState("");
+  const [project, setProject] = React.useState("all");
+
+  React.useEffect(() => {
+    setQuery("");
+    setProject("all");
+  }, [account.id]);
 
   if (isLoading)
     return (
@@ -102,6 +109,19 @@ function AccountTasks({ account }: { account: IntegrationAccount }) {
       </p>
     );
 
+  const projects = [
+    ...new Set(
+      openTasks
+        .map((task) => task.containerName)
+        .filter((name): name is string => name !== null)
+    ),
+  ].sort((a, b) => a.localeCompare(b));
+  const filteredTasks = openTasks.filter(
+    (task) =>
+      (project === "all" || task.containerName === project) &&
+      task.title.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())
+  );
+
   return (
     <div className="space-y-1.5 px-2 pb-2">
       <div className="flex items-center justify-between px-0.5 text-[11px] text-muted-foreground">
@@ -117,7 +137,35 @@ function AccountTasks({ account }: { account: IntegrationAccount }) {
           />
         </button>
       </div>
-      {openTasks.map((task) => (
+      <div className="space-y-1.5">
+        <label className="relative block">
+          <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search tasks"
+            aria-label="Search Todoist tasks"
+            className="h-8 w-full rounded-md border bg-background pl-7 pr-2 text-xs outline-none placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </label>
+        <select
+          value={project}
+          onChange={(event) => setProject(event.target.value)}
+          aria-label="Todoist project"
+          className="h-8 w-full rounded-md border bg-background px-2 text-xs outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <option value="all">All projects</option>
+          {projects.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+        </select>
+      </div>
+      {filteredTasks.length === 0 && (
+        <p className="px-0.5 py-2 text-xs text-muted-foreground">No matching tasks.</p>
+      )}
+      {filteredTasks.map((task) => (
         <PickerTask key={task.externalId} accountId={account.id} task={task} />
       ))}
     </div>

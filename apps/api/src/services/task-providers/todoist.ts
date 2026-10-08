@@ -17,6 +17,11 @@ import {
 
 const TODOIST_API = "https://api.todoist.com/api/v1";
 
+interface TodoistTaskPage {
+  results: TodoistTask[];
+  next_cursor?: string | null;
+}
+
 export class TodoistProvider implements TaskProvider {
   readonly id = "todoist";
   readonly displayName = "Todoist";
@@ -60,7 +65,20 @@ export class TodoistProvider implements TaskProvider {
 
   async listTasks(credentials: unknown): Promise<ExternalTask[]> {
     const { token } = todoistCredentialSchema.parse(credentials);
-    const tasks = await this.request<TodoistTask[]>(token, "/tasks");
+    const tasks: TodoistTask[] = [];
+    let cursor: string | null | undefined;
+
+    do {
+      const params = new URLSearchParams({ limit: "200" });
+      if (cursor) params.set("cursor", cursor);
+      const page = await this.request<TodoistTaskPage>(token, `/tasks?${params}`);
+      if (!Array.isArray(page.results)) {
+        throw new ProviderRequestError(this.displayName, 200, "Unexpected task-list response");
+      }
+      tasks.push(...page.results);
+      cursor = page.next_cursor;
+    } while (cursor);
+
     return tasks.map((task) => normalizeTask(task, null));
   }
 

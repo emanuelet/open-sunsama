@@ -1,4 +1,4 @@
-# Full stack: postgres -> redis -> api -> web
+# Full stack:  api -> web
 #
 # Self-hosting:  docker compose up -d --build
 #   Then open http://localhost:3000. The API applies database migrations on
@@ -9,39 +9,6 @@
 #   PostgreSQL only, on localhost:5431, for `bun run dev`.
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-opensunsama}
-      # Only read when the volume is first created
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-opensunsama}
-      POSTGRES_DB: ${POSTGRES_DB:-opensunsama}
-    # Port 5431 avoids a system PostgreSQL on 5432. Bound to localhost so the
-    # database is never exposed to the internet.
-    ports:
-      - "127.0.0.1:5431:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-opensunsama}" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  # WebSocket pub/sub fan-out
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
   api:
     build:

@@ -59,6 +59,7 @@
     "build": "turbo run build",
     "build:mobile:ios": "turbo run build:ios --filter=@open-sunsama/mobile",
     "build:mobile:android": "turbo run build:android --filter=@open-sunsama/mobile",
+    "build:desktop": "turbo run --filter=@open-sunsama/desktop build",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint -- --fix",
     "test": "turbo run test",

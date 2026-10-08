@@ -114,6 +114,7 @@ authRouter.patch('/me', auth, zValidator('json', updateProfileSchema), async (c)
   // Get current user to check for avatar changes
   let oldAvatarUrl: string | null = null;
   let timezoneManuallySet = false;
+  let setTimezoneManually = false;
   let currentPreferences: typeof users.$inferSelect.preferences = null;
   if (updates.avatarUrl !== undefined || updates.timezone !== undefined) {
     const [currentUser] = await db
@@ -143,17 +144,17 @@ authRouter.patch('/me', auth, zValidator('json', updateProfileSchema), async (c)
       updateData.timezone = updates.timezone;
       const manuallySet = updates.timezoneManuallySet ?? true;
       if (manuallySet) {
-        updateData.preferences = {
-          ...currentPreferences,
-          timezoneManuallySet: true,
-        };
+        setTimezoneManually = true;
         changedFields.push('timezoneManuallySet');
       }
       changedFields.push('timezone');
     }
   }
-  if (updates.preferences !== undefined) {
-    updateData.preferences = updates.preferences;
+  if (updates.preferences !== undefined || setTimezoneManually) {
+    updateData.preferences = {
+      ...(updates.preferences ?? currentPreferences),
+      ...(setTimezoneManually ? { timezoneManuallySet: true } : {}),
+    };
     changedFields.push('preferences');
   }
 

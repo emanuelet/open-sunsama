@@ -57,6 +57,8 @@ export function DesktopReminderRunner({ userId }: { userId: string }) {
   const { data: timeBlocks = [] } = useTimeBlocks(range, {
     enabled: !!preferences?.taskRemindersEnabled,
     refetchInterval: POLL_INTERVAL_MS,
+    // The Tauri window is hidden while the tray app remains responsible for reminders.
+    refetchIntervalInBackground: true,
   });
 
   React.useEffect(() => {

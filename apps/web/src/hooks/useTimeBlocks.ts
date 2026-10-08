@@ -12,7 +12,11 @@ export { timeBlockKeys };
  */
 export function useTimeBlocks(
   filters?: TimeBlockFilterInput,
-  options?: { enabled?: boolean; refetchInterval?: number | false }
+  options?: {
+    enabled?: boolean;
+    refetchInterval?: number | false;
+    refetchIntervalInBackground?: boolean;
+  }
 ) {
   return useQuery({
     queryKey: timeBlockKeys.list(filters ?? {}),
@@ -22,6 +26,7 @@ export function useTimeBlocks(
     },
     enabled: options?.enabled ?? true,
     refetchInterval: options?.refetchInterval,
+    refetchIntervalInBackground: options?.refetchIntervalInBackground,
   });
 }
 

@@ -65,8 +65,8 @@
       "dependencies": {
         "@tauri-apps/api": "catalog:",
         "@tauri-apps/plugin-autostart": "^2.7.0",
-        "@tauri-apps/plugin-global-shortcut": "^2.4.0",
-        "@tauri-apps/plugin-notification": "^2.5.1",
+        "@tauri-apps/plugin-global-shortcut": "^2.4.1",
+        "@tauri-apps/plugin-notification": "^2.7.0",
         "@tauri-apps/plugin-store": "^2.5.0",
       },
       "devDependencies": {
@@ -305,7 +305,7 @@
     "@tanstack/react-query": "^5.104.5",
     "@tauri-apps/api": "^2.12.1",
     "@tauri-apps/cli": "^2.12.1",
-    "dotenv": "^17.4.2",
+    "dotenv": "^18.0.0",
     "typescript": "^5.9.3",
     "vitest": "^5.0.5",
     "zod": "^4.6.5",
@@ -1497,7 +1497,7 @@
 
     "dompurify": ["dompurify@3.4.17", "", { "optionalDependencies": { "@types/trusted-types": "^2.0.7" } }, "sha512-B/pSlYVHQ58kqISD/yDjuJ1yfzI34m1gF4lAod2bwSRhiN4K5Cl3H8Af7hqB2PmTL911tdEudnnXn5FnhRoz0w=="],
 
-    "dotenv": ["dotenv@17.4.2", "", {}, "sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw=="],
+    "dotenv": ["dotenv@18.0.8", "", { "bin": { "dotenv": "dist/index.cjs" } }, "sha512-2KDeoFoK/zRtcnbunCDlLG5VWVMcyqeQc6iK65o231nfNAcuGrKoqUQfJFUtBI+QlShk5HKIHxwebBtUl3rEfA=="],
 
     "drizzle-kit": ["drizzle-kit@0.28.1", "", { "dependencies": { "@drizzle-team/brocli": "^0.10.2", "@esbuild-kit/esm-loader": "^2.5.5", "esbuild": "^0.19.7", "esbuild-register": "^3.5.0" }, "bin": { "drizzle-kit": "bin.cjs" } }, "sha512-JimOV+ystXTWMgZkLHYHf2w3oS28hxiH1FR0dkmJLc7GHzdGJoJAQtQS5DRppnabsRZwE2U1F6CuezVBgmsBBQ=="],
 

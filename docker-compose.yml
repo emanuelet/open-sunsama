@@ -12,6 +12,7 @@ services:
   postgres:
     image: postgres:18-alpine
     restart: unless-stopped
+    container_name: opensunsama_postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-opensunsama}
       # Only read when the volume is first created
@@ -22,7 +23,8 @@ services:
     ports:
       - "127.0.0.1:5431:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      # PostgreSQL 18 stores cluster data in a versioned subdirectory.
+      - postgres_data:/var/lib/postgresql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-opensunsama}" ]
       interval: 5s
@@ -33,6 +35,7 @@ services:
   redis:
     image: redis:8-alpine
     restart: unless-stopped
+    container_name: opensunsama_redis
     ports:
       - "127.0.0.1:6379:6379"
     volumes:
@@ -47,6 +50,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
+    container_name: opensunsama_api
     # Generates JWT_SECRET and CALENDAR_ENCRYPTION_KEY on first start unless .env sets them
     command: [ "sh", "docker-start.sh" ]
     # Optional integrations (Google/Microsoft calendar, Resend email, S3 uploads,
@@ -88,6 +92,7 @@ services:
       args:
         # Baked into the JavaScript at build time: rebuild after changing API_URL
         VITE_API_URL: ${API_URL:-http://localhost:3001}
+    container_name: opensunsama_web
     ports:
       - "3000:3000"
     depends_on:

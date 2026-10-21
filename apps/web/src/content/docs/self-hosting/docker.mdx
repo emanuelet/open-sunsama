@@ -109,14 +109,14 @@ Docker Compose reads `.env` from the repository root. After you change it, run `
 
 ### Core settings
 
-| Variable                  | Default                 | Description                                                                                                                  |
-| ------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Variable                  | Default                 | Description                                                                                                                    |
+| ------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `API_URL`                 | `http://localhost:3001` | Public API URL. The web app calls it, and it is the OAuth issuer for MCP connectors, so your connector URL is `${API_URL}/mcp` |
-| `WEB_APP_URL`             | `http://localhost:3000` | Public web app URL. Used for CORS, email links, and the MCP consent screen                                                  |
-| `POSTGRES_PASSWORD`       | `opensunsama`           | Database password, read when the volume is first created                                                                     |
-| `JWT_SECRET`              | generated               | Signs login tokens. Set your own with `openssl rand -base64 32`                                                              |
-| `CALENDAR_ENCRYPTION_KEY` | generated               | Encrypts stored calendar credentials. Set your own with `openssl rand -hex 32`                                              |
-| `ROLLOVER_ENABLED`        | `true`                  | Moves unfinished tasks to the next day at midnight                                                                           |
+| `WEB_APP_URL`             | `http://localhost:3000` | Public web app URL. Used for CORS, email links, and the MCP consent screen                                                     |
+| `POSTGRES_PASSWORD`       | `opensunsama`           | Database password, read when the volume is first created                                                                       |
+| `JWT_SECRET`              | generated               | Signs login tokens. Set your own with `openssl rand -base64 32`                                                                |
+| `CALENDAR_ENCRYPTION_KEY` | generated               | Encrypts stored calendar credentials. Set your own with `openssl rand -hex 32`                                                 |
+| `ROLLOVER_ENABLED`        | `true`                  | Moves unfinished tasks to the next day at midnight                                                                             |
 
 If you set `JWT_SECRET` or `CALENDAR_ENCRYPTION_KEY` yourself, the generated values are ignored. Changing `JWT_SECRET` signs everyone out. Changing `CALENDAR_ENCRYPTION_KEY` means reconnecting calendars.
 
@@ -124,20 +124,39 @@ If you set `JWT_SECRET` or `CALENDAR_ENCRYPTION_KEY` yourself, the generated val
 
 Tasks, time blocks, focus mode, rollover, the REST API and the MCP connector work without any keys. These features call outside services:
 
-| Feature                        | Variables                                                                                                    |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Google Calendar sync           | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`. The redirect URI is `${API_URL}/calendar/oauth/google/callback`   |
+| Feature                         | Variables                                                                                                                                                                                                         |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Google Calendar sync            | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`. The redirect URI is `${API_URL}/calendar/oauth/google/callback`                                                                                                       |
 | Instant Google Calendar updates | `WEBHOOK_BASE_URL` (defaults to `API_URL`). Google sends change notifications to `${WEBHOOK_BASE_URL}/webhooks/google/calendar`. Without a public `https://` URL, the server polls Google every 5 minutes instead |
-| Outlook Calendar sync          | `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`. The redirect URI is `${API_URL}/calendar/oauth/outlook/callback` |
-| Email (reminders and summaries) | `RESEND_API_KEY`, `FROM_EMAIL`                                                                              |
-| File uploads                   | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_S3_BUCKET_NAME`, `AWS_ENDPOINT_URL`, `AWS_DEFAULT_REGION` (any S3-compatible storage) |
-| Push notifications             | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (generate with `npx web-push generate-vapid-keys`)   |
+| Outlook Calendar sync           | `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`. The redirect URI is `${API_URL}/calendar/oauth/outlook/callback`                                                                                                |
+| Email (reminders and summaries) | `RESEND_API_KEY`, `FROM_EMAIL`                                                                                                                                                                                    |
+| File uploads                    | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_S3_BUCKET_NAME`, `AWS_ENDPOINT_URL`, `AWS_DEFAULT_REGION` (any S3-compatible storage)                                                                          |
+| Push notifications              | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (generate with `npx web-push generate-vapid-keys`)                                                                                                       |
 
 ## Desktop and Mobile Apps
 
 The desktop and mobile apps on the [download page](/download) connect only to `https://api.opensunsama.com`. Their API address is fixed when they are built, so they can't sign in to your server. Use the web app in your browser instead.
 
-To run the desktop app against your server, build it yourself: set `VITE_API_URL` (and `VITE_WS_URL`, for example `wss://api.tasks.your-domain.com`) when you build `apps/desktop`, and add your API's `https://` and `wss://` URLs to the `http:default` allow list in `apps/desktop/src-tauri/capabilities/default.json`.
+To run the desktop app against your server, build it yourself. The desktop build loads the optional repository-root `.env` with the dotenv CLI. These variables are compiled into the desktop bundle at build time, so changing them requires a rebuild. Values supplied by your shell or CI take precedence over `.env`:
+
+Use `apps/desktop/.env.example` as the template for the desktop values in your root `.env`.
+
+| Variable       | Required | Default                     | Description                                                                                                                          |
+| -------------- | -------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `VITE_API_URL` | Yes      | `http://localhost:3001`     | Public HTTPS URL of your API, such as `https://api.tasks.your-domain.com`.                                                           |
+| `VITE_WS_URL`  | No       | Derived from `VITE_API_URL` | Public WebSocket URL, such as `wss://api.tasks.your-domain.com`. Set this only when the WebSocket endpoint differs from the API URL. |
+
+Signed release builds also need `TAURI_SIGNING_PRIVATE_KEY`, set to the absolute path of your private updater signing key. It is not needed for local development builds.
+
+For example:
+
+```bash
+VITE_API_URL=https://api.tasks.your-domain.com \
+VITE_WS_URL=wss://api.tasks.your-domain.com \
+bun run build:desktop
+```
+
+Also add your API's `https://` and `wss://` URLs to the `http:default` allow list in `apps/desktop/src-tauri/capabilities/default.json` before building. The prebuilt desktop app always connects to `https://api.opensunsama.com`.
 
 AI agents work with your server too. Add `${API_URL}/mcp` as a connector. Claude and ChatGPT need it served over public HTTPS.
 

@@ -18,6 +18,7 @@ concurrency:
 env:
   BUN_VERSION: 1.4.3
   NODE_VERSION: 24
+  MOBILE_NODE_VERSION: 22.13.0
   TURBO_TELEMETRY_DISABLED: 1
 
 jobs:
@@ -72,6 +73,54 @@ jobs:
 
       - name: Desktop bundle stays under 60 MB
         run: node apps/desktop/scripts/prepare-frontend.mjs
+
+  mobile-export:
+    name: Mobile exports
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CI: true
+      EXPO_NO_TELEMETRY: 1
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.MOBILE_NODE_VERSION }}
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ env.MOBILE_NODE_VERSION }}-${{ hashFiles('bun.lock') }}
+          restore-keys: bun-${{ runner.os }}-${{ env.MOBILE_NODE_VERSION }}-
+
+      - name: Install (lockfile must match package.json)
+        run: bun install --frozen-lockfile
+
+      - name: Check Expo dependency compatibility
+        working-directory: apps/expo-mobile
+        run: bunx expo install --check
+
+      - name: Export iOS bundle
+        working-directory: apps/expo-mobile
+        run: bunx expo export --platform ios --output-dir dist/ios
+
+      - name: Export Android bundle
+        working-directory: apps/expo-mobile
+        run: bunx expo export --platform android --output-dir dist/android
+
+      - name: Upload mobile exports
+        if: success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mobile-exports-${{ github.run_id }}
+          path: |
+            apps/expo-mobile/dist/ios
+            apps/expo-mobile/dist/android
+          if-no-files-found: warn
+          retention-days: 7
 
   e2e:
     name: End-to-end

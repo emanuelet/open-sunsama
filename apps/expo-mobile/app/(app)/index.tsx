@@ -57,6 +57,10 @@ export default function TasksScreen() {
     setIsCreateModalVisible(false);
   }, []);
 
+  const handleRefresh = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
   // Sort tasks: incomplete first (by position), then completed
   const sortedTasks = tasks?.slice().sort((a, b) => {
     if (a.completedAt && !b.completedAt) return 1;
@@ -108,7 +112,7 @@ export default function TasksScreen() {
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}
-            onRefresh={refetch}
+            onRefresh={handleRefresh}
             tintColor={colors.accent}
           />
         }
@@ -120,7 +124,7 @@ export default function TasksScreen() {
                 Tap the + button to add a task
               </Text>
             </View>
-          ) : null
+          ) : undefined
         }
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />

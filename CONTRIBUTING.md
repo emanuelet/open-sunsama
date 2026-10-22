@@ -43,7 +43,7 @@ Looking for a place to start? Check out issues labeled:
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/) 1.4.2 (run `mise install` when using mise)
+- [Bun](https://bun.sh/) 1.4.3 (run `mise install` when using mise)
 - PostgreSQL 15+ (Homebrew's `postgresql@17`, or a hosted database such as Neon or Supabase)
 - Git
 

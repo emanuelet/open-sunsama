@@ -24,4 +24,10 @@ ensure_secret() {
 ensure_secret JWT_SECRET base64
 ensure_secret CALENDAR_ENCRYPTION_KEY hex
 
+# Compose does not permit nesting variable defaults, so assemble the local
+# Postgres connection string here only when the user did not provide one.
+if [ -z "$DATABASE_URL" ]; then
+  export DATABASE_URL="postgresql://${POSTGRES_USER:-opensunsama}:${POSTGRES_PASSWORD:-opensunsama}@postgres:5432/${POSTGRES_DB:-opensunsama}"
+fi
+
 exec node dist/index.js

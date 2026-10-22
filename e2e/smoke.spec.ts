@@ -527,6 +527,7 @@ test("view shortcuts and priority shortcuts work without changing typed text", a
   await title.press("Enter");
   await expect(page.getByRole("dialog")).toBeHidden();
   await todayColumn(page).getByText("Priority keyboard test", { exact: true }).click();
+  await page.getByRole("button", { name: "Edit task title", exact: true }).click();
   await title.press("Alt+Shift+0");
   await expect(page.getByRole("button", { name: "Priority: P0 Urgent", exact: true })).toBeVisible();
   await expect(title).toHaveValue("Priority keyboard test");

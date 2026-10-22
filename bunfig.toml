@@ -1,2 +1,4 @@
 [install]
 registry = "https://registry.npmjs.org"
+# Keep native Expo modules as single physical installations for autolinking.
+linker = "hoisted"

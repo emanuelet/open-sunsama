@@ -1,5 +1,5 @@
 # Build stage
-FROM oven/bun:1.4.2 AS builder
+FROM oven/bun:1.4.3 AS builder
 
 WORKDIR /app
 
@@ -39,7 +39,7 @@ RUN bun run build --filter=@open-sunsama/types --filter=@open-sunsama/utils --fi
 RUN bun build apps/web/server.ts --target=bun --outfile=apps/web/server.js
 
 # Production stage - serve static files
-FROM oven/bun:1.4.2-slim
+FROM oven/bun:1.4.3-slim
 
 WORKDIR /app
 

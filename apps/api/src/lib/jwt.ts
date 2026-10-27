@@ -3,11 +3,12 @@
  * Handles token signing and verification
  */
 
-import jwt from 'jsonwebtoken';
-import type { Secret, SignOptions } from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
+import type { Secret, SignOptions } from "jsonwebtoken";
 
-const JWT_SECRET: Secret = process.env.JWT_SECRET || 'open-sunsama-dev-secret-change-in-production';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+const JWT_SECRET: Secret =
+  process.env.JWT_SECRET || "open-sunsama-dev-secret-change-in-production";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 
 /**
  * How long after an access token expires it can still be exchanged for a
@@ -28,6 +29,7 @@ const REFRESH_LEEWAY_SECONDS = JWT_REFRESH_LEEWAY_DAYS * 24 * 60 * 60;
 
 export interface JwtPayload {
   userId: string;
+  authTime?: number;
   iat?: number;
   exp?: number;
 }
@@ -37,12 +39,19 @@ export interface JwtPayload {
  * @param userId - The user ID to include in the token
  * @returns The signed JWT token
  */
-export function signToken(userId: string): string {
+export function signToken(
+  userId: string,
+  authTime: number | undefined = Math.floor(Date.now() / 1000)
+): string {
   // Cast to any to bypass strict type checking on expiresIn
   // The string format like '7d' is valid at runtime
-  return jwt.sign({ userId }, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN as string,
-  } as SignOptions);
+  return jwt.sign(
+    { userId, ...(authTime === undefined ? {} : { authTime }) },
+    JWT_SECRET,
+    {
+      expiresIn: JWT_EXPIRES_IN as string,
+    } as SignOptions
+  );
 }
 
 /**
@@ -51,9 +60,12 @@ export function signToken(userId: string): string {
  * @returns The decoded payload containing userId
  * @throws Error if token is invalid or expired
  */
-export function verifyToken(token: string): { userId: string } {
+export function verifyToken(token: string): {
+  userId: string;
+  authTime?: number;
+} {
   const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
-  return { userId: decoded.userId };
+  return { userId: decoded.userId, authTime: decoded.authTime };
 }
 
 /**
@@ -69,7 +81,10 @@ export function verifyToken(token: string): { userId: string } {
  * @returns The decoded payload containing userId
  * @throws Error if the token cannot be refreshed
  */
-export function verifyTokenForRefresh(token: string): { userId: string } {
+export function verifyTokenForRefresh(token: string): {
+  userId: string;
+  authTime?: number;
+} {
   let decoded: JwtPayload;
   try {
     // Fast path: a token that is still within its normal lifetime.
@@ -80,8 +95,10 @@ export function verifyTokenForRefresh(token: string): { userId: string } {
     if (!(error instanceof jwt.TokenExpiredError)) {
       throw error;
     }
-    decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true }) as JwtPayload;
-    if (typeof decoded.exp !== 'number') {
+    decoded = jwt.verify(token, JWT_SECRET, {
+      ignoreExpiration: true,
+    }) as JwtPayload;
+    if (typeof decoded.exp !== "number") {
       throw error;
     }
     const expiredForSeconds = Math.floor(Date.now() / 1000) - decoded.exp;
@@ -91,9 +108,9 @@ export function verifyTokenForRefresh(token: string): { userId: string } {
   }
 
   if (!decoded.userId) {
-    throw new Error('Token is missing userId claim');
+    throw new Error("Token is missing userId claim");
   }
-  return { userId: decoded.userId };
+  return { userId: decoded.userId, authTime: decoded.authTime };
 }
 
 /**
@@ -103,7 +120,7 @@ export function verifyTokenForRefresh(token: string): { userId: string } {
  */
 export function decodeToken(token: string): JwtPayload | null {
   const decoded = jwt.decode(token);
-  if (decoded && typeof decoded === 'object' && 'userId' in decoded) {
+  if (decoded && typeof decoded === "object" && "userId" in decoded) {
     return decoded as JwtPayload;
   }
   return null;

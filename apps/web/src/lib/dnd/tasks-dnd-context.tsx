@@ -13,6 +13,7 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { snapCenterToCursor } from "@dnd-kit/modifiers";
+import { liftAboveCursor } from "./lift-above-cursor";
 import type { Task, Idea } from "@open-sunsama/types";
 import { addMinutes } from "date-fns";
 import { useMoveTask, useReorderTasks, taskKeys } from "@/hooks/useTasks";
@@ -65,9 +66,12 @@ export function TasksDndProvider({ children }: TasksDndProviderProps) {
   React.useEffect(() => {
     // Capture before the drag sensor handles release. Its delta includes
     // scrolling, and its rendered rectangle may be one frame behind.
-    const trackMouse = (event: MouseEvent) => { pointerY.current = event.clientY; };
+    const trackMouse = (event: MouseEvent) => {
+      pointerY.current = event.clientY;
+    };
     const trackTouch = (event: TouchEvent) => {
-      pointerY.current = event.touches[0]?.clientY ?? event.changedTouches[0]?.clientY ?? null;
+      pointerY.current =
+        event.touches[0]?.clientY ?? event.changedTouches[0]?.clientY ?? null;
     };
     document.addEventListener("mousemove", trackMouse, true);
     document.addEventListener("mouseup", trackMouse, true);
@@ -88,6 +92,7 @@ export function TasksDndProvider({ children }: TasksDndProviderProps) {
   const [activeOverColumn, setActiveOverColumn] = React.useState<string | null>(
     null
   );
+  const [overCalendar, setOverCalendar] = React.useState(false);
 
   const [activeIdea, setActiveIdea] = React.useState<Idea | null>(null);
   const promoteIdea = usePromoteIdea(activeIdea?.boardId);
@@ -158,9 +163,14 @@ export function TasksDndProvider({ children }: TasksDndProviderProps) {
   const handleDragStart = React.useCallback((event: DragStartEvent) => {
     const { active } = event;
     setActiveIdea(active.data.current?.idea ?? null);
-    setActiveExternalTask(active.data.current?.externalTask
-      ? { accountId: active.data.current.accountId, externalTask: active.data.current.externalTask }
-      : null);
+    setActiveExternalTask(
+      active.data.current?.externalTask
+        ? {
+            accountId: active.data.current.accountId,
+            externalTask: active.data.current.externalTask,
+          }
+        : null
+    );
     const task = active.data.current?.task as Task | undefined;
     if (task) {
       setActiveTask(task);
@@ -171,6 +181,7 @@ export function TasksDndProvider({ children }: TasksDndProviderProps) {
   const handleDragOver = React.useCallback(
     (event: DragOverEvent) => {
       const { over } = event;
+      setOverCalendar(over?.data.current?.type === "calendar");
       if (!over) {
         setActiveOverColumn(null);
         return;
@@ -194,34 +205,39 @@ export function TasksDndProvider({ children }: TasksDndProviderProps) {
     (event: DragEndEvent) => {
       const { active, over } = event;
       const dropTarget = over?.data.current as CalendarDropData | undefined;
-      const calendarStart = dropTarget?.type === "calendar" && pointerY.current !== null
-        ? dropTarget.timeAt(pointerY.current)
-        : null;
+      const calendarStart =
+        dropTarget?.type === "calendar" && pointerY.current !== null
+          ? dropTarget.timeAt(pointerY.current)
+          : null;
 
-        setActiveTask(null);
-        setActiveIdea(null);
-        setActiveExternalTask(null);
-        setActiveOverColumn(null);
+      setActiveTask(null);
+      setActiveIdea(null);
+      setActiveExternalTask(null);
+      setOverCalendar(false);
+      setActiveOverColumn(null);
 
-        if (!over) return;
+      if (!over) return;
 
-        const external = active.data.current?.externalTask as { externalId: string; title: string } | undefined;
-        const accountId = active.data.current?.accountId as string | undefined;
-        if (external && accountId) {
-          const target = over.data.current;
-          const calendar = target as CalendarDropData | undefined;
-          const date = calendar?.type === "calendar"
+      const external = active.data.current?.externalTask as
+        { externalId: string; title: string } | undefined;
+      const accountId = active.data.current?.accountId as string | undefined;
+      if (external && accountId) {
+        const target = over.data.current;
+        const calendar = target as CalendarDropData | undefined;
+        const date =
+          calendar?.type === "calendar"
             ? calendar.date
             : (findTargetColumnDate(over.id) ?? target?.columnId);
-          void importTask.mutateAsync({ accountId, externalId: external.externalId })
-            .then(({ task }) => {
-              if (date && date !== "backlog") {
-                moveTask.mutate({ id: task.id, targetDate: String(date) });
-              }
-            })
-            .catch(() => {});
-          return;
-        }
+        void importTask
+          .mutateAsync({ accountId, externalId: external.externalId })
+          .then(({ task }) => {
+            if (date && date !== "backlog") {
+              moveTask.mutate({ id: task.id, targetDate: String(date) });
+            }
+          })
+          .catch(() => {});
+        return;
+      }
 
       const taskId = String(active.id);
       const task = active.data.current?.task as Task | undefined;
@@ -461,8 +477,8 @@ export function TasksDndProvider({ children }: TasksDndProviderProps) {
     },
     [
       findTargetColumnDate,
-        moveTask,
-        importTask,
+      moveTask,
+      importTask,
       reorderTasks,
       createTimeBlock,
       activeIdea,
@@ -474,10 +490,11 @@ export function TasksDndProvider({ children }: TasksDndProviderProps) {
     ]
   );
 
-    const handleDragCancel = React.useCallback(() => {
-      setActiveIdea(null);
-      setActiveTask(null);
-      setActiveExternalTask(null);
+  const handleDragCancel = React.useCallback(() => {
+    setActiveIdea(null);
+    setActiveTask(null);
+    setActiveExternalTask(null);
+    setOverCalendar(false);
     setActiveOverColumn(null);
   }, []);
 
@@ -486,9 +503,9 @@ export function TasksDndProvider({ children }: TasksDndProviderProps) {
       activeTask,
       activeOverColumn,
       pointerY,
-        isDragging: !!activeTask || !!activeIdea || !!activeExternalTask,
+      isDragging: !!activeTask || !!activeIdea || !!activeExternalTask,
     }),
-      [activeTask, activeIdea, activeExternalTask, activeOverColumn]
+    [activeTask, activeIdea, activeExternalTask, activeOverColumn]
   );
 
   return (
@@ -509,22 +526,34 @@ export function TasksDndProvider({ children }: TasksDndProviderProps) {
         {children}
 
         {/* Drag Overlay - follows cursor with fixed width matching column */}
-        <DragOverlay modifiers={[snapCenterToCursor]} dropAnimation={null}>
+        <DragOverlay
+          modifiers={
+            overCalendar
+              ? [snapCenterToCursor, liftAboveCursor]
+              : [snapCenterToCursor]
+          }
+          dropAnimation={null}
+        >
           {activeIdea && (
             <div className="pointer-events-none w-[264px] rounded-lg bg-card p-3 text-sm shadow-lg">
               {activeIdea.title}
             </div>
           )}
-            {activeTask && (
+          {activeTask && overCalendar && (
+            <div className="pointer-events-none max-w-[220px] truncate rounded-md border bg-card px-2.5 py-1 text-xs font-medium shadow-lg">
+              {activeTask.title}
+            </div>
+          )}
+          {activeTask && !overCalendar && (
             <div className="w-[264px] pointer-events-none">
               <TaskCard task={activeTask} onSelect={() => {}} isDragging />
             </div>
-            )}
-            {activeExternalTask && (
-              <div className="w-[220px] rounded-md border bg-card p-2 text-sm shadow-lg">
-                {activeExternalTask.externalTask.title}
-              </div>
-            )}
+          )}
+          {activeExternalTask && (
+            <div className="w-[220px] rounded-md border bg-card p-2 text-sm shadow-lg">
+              {activeExternalTask.externalTask.title}
+            </div>
+          )}
         </DragOverlay>
       </DndContext>
     </TasksDndContext.Provider>

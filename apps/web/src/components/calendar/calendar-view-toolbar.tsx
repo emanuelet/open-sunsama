@@ -1,5 +1,9 @@
 import { format, isWithinInterval, startOfDay, endOfDay } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Calendar as CalendarIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui";
 import type { TimeBlock, CalendarViewMode } from "@open-sunsama/types";
 import { cn } from "@/lib/utils";
@@ -40,7 +44,8 @@ const VIEW_MODES: CalendarViewMode[] = ["day", "3-day", "week", "month"];
 function describeRange(
   rangeStart: Date,
   rangeEnd: Date,
-  viewMode: CalendarViewMode
+  viewMode: CalendarViewMode,
+  selectedDate: Date
 ): { primary: string; secondary: string } {
   if (viewMode === "day") {
     return {
@@ -51,8 +56,8 @@ function describeRange(
 
   if (viewMode === "month") {
     return {
-      primary: format(rangeStart, "MMMM"),
-      secondary: format(rangeStart, "yyyy"),
+      primary: format(selectedDate, "MMMM"),
+      secondary: format(selectedDate, "yyyy"),
     };
   }
 
@@ -76,7 +81,7 @@ function describeRange(
 }
 
 export function CalendarViewToolbar({
-  selectedDate: _selectedDate,
+  selectedDate,
   rangeStart,
   rangeEnd,
   viewMode,
@@ -95,7 +100,12 @@ export function CalendarViewToolbar({
     start: startOfDay(rangeStart),
     end: endOfDay(rangeEnd),
   });
-  const { primary, secondary } = describeRange(rangeStart, rangeEnd, viewMode);
+  const { primary, secondary } = describeRange(
+    rangeStart,
+    rangeEnd,
+    viewMode,
+    selectedDate
+  );
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-3 sm:px-4 py-2 sm:py-3 gap-2 sm:gap-4">

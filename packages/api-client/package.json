@@ -29,11 +29,11 @@
   "dependencies": {
     "@open-sunsama/types": "workspace:*",
     "@simplewebauthn/browser": "^14.0.0",
-    "ky": "^1.14.3"
+    "ky": "^2.2.0"
   },
   "devDependencies": {
     "@tanstack/react-query": "catalog:",
-    "@types/node": "^24.0.0",
+    "@types/node": "catalog:",
     "@types/react": "~19.3.0",
     "react": "19.3.0",
     "typescript": "catalog:",

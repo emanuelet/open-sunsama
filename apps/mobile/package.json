@@ -16,8 +16,8 @@
   "dependencies": {
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-haptics": "^2.4.1",
-    "@tauri-apps/plugin-notification": "^2.5.1",
-    "@tauri-apps/plugin-store": "^2.5.0",
+    "@tauri-apps/plugin-notification": "catalog:",
+    "@tauri-apps/plugin-store": "catalog:",
     "@tauri-apps/plugin-deep-link": "^2.6.1",
     "@tauri-apps/plugin-biometric": "^2.4.1"
   },

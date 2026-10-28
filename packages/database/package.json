@@ -38,15 +38,15 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^0.9.5",
+    "@neondatabase/serverless": "^1.2.0",
     "dotenv": "catalog:",
-    "drizzle-orm": "^0.45.4",
+    "drizzle-orm": "catalog:",
     "drizzle-zod": "^0.8.3",
     "postgres": "^3.4.9",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^24.0.0",
+    "@types/node": "catalog:",
     "drizzle-kit": "^0.31.11",
     "typescript": "catalog:"
   },

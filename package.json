@@ -45,6 +45,11 @@
       "dotenv": "^18.0.9",
       "@tauri-apps/api": "^2.12.1",
       "@tauri-apps/cli": "^2.12.1",
+      "@tauri-apps/plugin-store": "^2.5.0",
+      "@tauri-apps/plugin-notification": "^2.8.0",
+      "@modelcontextprotocol/server": "2.3.1",
+      "date-fns": "^4.4.0",
+      "drizzle-orm": "^0.45.4",
       "vitest": "^5.0.5"
     }
   },

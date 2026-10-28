@@ -3,7 +3,7 @@
  * @module @open-sunsama/api-client/client
  */
 
-import ky, { type KyInstance, type Options as KyOptions } from "ky";
+import ky, { isHTTPError, type KyInstance, type Options as KyOptions } from "ky";
 import { ApiError } from "./errors.js";
 
 /**
@@ -115,7 +115,7 @@ export function createApiClient(config: ApiClientConfig): KyInstance {
   };
 
   const client = ky.create({
-    prefixUrl: baseUrl,
+    prefix: baseUrl,
     timeout,
     ...(customFetch ? { fetch: customFetch } : {}),
     retry: {
@@ -125,7 +125,7 @@ export function createApiClient(config: ApiClientConfig): KyInstance {
     },
     hooks: {
       beforeRequest: [
-        async (request) => {
+        async ({ request }) => {
           // Default headers — don't clobber an explicit per-request value.
           for (const [key, value] of Object.entries(defaultHeaders)) {
             if (!request.headers.has(key)) {
@@ -133,10 +133,7 @@ export function createApiClient(config: ApiClientConfig): KyInstance {
             }
           }
 
-          // Auth header — set authoritatively. ky re-runs beforeRequest on each
-          // (re)try, so when a 401 triggers a refresh + forced retry below, this
-          // overwrites the now-stale Authorization with the freshly refreshed
-          // token instead of leaving the old one in place.
+          // Auth header — set authoritatively on the initial request.
           for (const [key, value] of Object.entries(getAuthHeader())) {
             request.headers.set(key, value);
           }
@@ -148,20 +145,22 @@ export function createApiClient(config: ApiClientConfig): KyInstance {
         },
       ],
       afterResponse: [
-        async (_request, _options, response, state) => {
+        async ({ request, response, retryCount }) => {
           // Transparently refresh on 401: ask the caller for a fresh token and,
           // if we get one, force ky to replay the original request (body and
-          // all) with the new token applied by beforeRequest. The retryCount
+          // all) with the new token. The retryCount
           // guard limits this to a single refresh attempt so a token that is
           // still rejected can't spin in a loop.
           if (
             response.status === 401 &&
             onUnauthorized &&
-            state.retryCount === 0
+            retryCount === 0
           ) {
             const newToken = await onUnauthorized();
             if (newToken) {
-              return ky.retry();
+              const headers = new Headers(request.headers);
+              headers.set("Authorization", `Bearer ${newToken}`);
+              return ky.retry({ request: new Request(request, { headers }), delay: 0 });
             }
           }
 
@@ -172,9 +171,9 @@ export function createApiClient(config: ApiClientConfig): KyInstance {
         },
       ],
       beforeError: [
-        async (error) => {
+        async ({ error }) => {
           // Transform ky errors into ApiError
-          const { response } = error;
+          const response = isHTTPError(error) ? error.response : undefined;
           if (response) {
             const apiError = await ApiError.fromResponse(response);
             if (onError) {

@@ -63,24 +63,11 @@ export function UnscheduledTasksDrawer({
   return (
     <>
       {/* Header */}
-      <SheetHeader className="border-b p-4 shrink-0">
-        <div className="flex items-center justify-between">
-          <div>
-            <SheetTitle className="text-lg">Unscheduled Tasks</SheetTitle>
-            <p className="text-sm text-muted-foreground">
-              {tasks.length} task{tasks.length !== 1 ? "s" : ""}
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-10 w-10"
-            onClick={() => setIsAddingTask(true)}
-          >
-            <Plus className="h-5 w-5" />
-            <span className="sr-only">Add task</span>
-          </Button>
-        </div>
+      <SheetHeader className="shrink-0 border-b p-4 pr-14 text-left">
+        <SheetTitle className="text-lg">Unscheduled Tasks</SheetTitle>
+        <p className="text-sm text-muted-foreground">
+          {tasks.length} task{tasks.length !== 1 ? "s" : ""}
+        </p>
       </SheetHeader>
 
       {/* Quick Add Form */}
@@ -153,14 +140,18 @@ export function UnscheduledTasksDrawer({
         </div>
       </ScrollArea>
 
-      {/* Footer hint */}
-      {!isLoading && tasks.length > 0 && (
-        <div className="border-t p-3 shrink-0">
+      <div className="shrink-0 space-y-2 border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        {!isAddingTask && (
+          <Button variant="outline" className="h-11 w-full gap-2" onClick={() => setIsAddingTask(true)}>
+            <Plus className="h-4 w-4" /> Add task
+          </Button>
+        )}
+        {!isLoading && tasks.length > 0 && (
           <p className="text-xs text-center text-muted-foreground">
             Tap a task to view details
           </p>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 }

@@ -377,7 +377,7 @@ export function MobileCalendarView({
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="w-full max-w-sm p-0 flex flex-col"
+              className="w-full max-w-sm p-0 flex flex-col [&>button:last-child]:right-2 [&>button:last-child]:top-4 [&>button:last-child]:flex [&>button:last-child]:h-10 [&>button:last-child]:w-10 [&>button:last-child]:items-center [&>button:last-child]:justify-center"
             >
               <UnscheduledTasksDrawer
                 tasks={unscheduledTasks}

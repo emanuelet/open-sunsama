@@ -30,7 +30,7 @@
     "open-source",
     "self-hosted"
   ],
-  "packageManager": "bun@1.4.3",
+  "packageManager": "bun@1.4.4",
   "workspaces": {
     "packages": [
       "apps/*",

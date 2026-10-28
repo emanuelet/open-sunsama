@@ -11,9 +11,11 @@ interface PasswordRequirementsListProps {
   password: string;
 }
 
-export function PasswordRequirementsList({ password }: PasswordRequirementsListProps) {
+export function PasswordRequirementsList({
+  password,
+}: PasswordRequirementsListProps) {
   if (!password) return null;
-  
+
   return (
     <div className="mt-2 space-y-1">
       {PASSWORD_REQUIREMENTS.map((req, index) => {

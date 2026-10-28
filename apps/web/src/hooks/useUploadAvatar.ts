@@ -24,7 +24,10 @@ const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 /**
  * Validate the uploaded file
  */
-export function validateAvatarFile(file: File): { valid: boolean; error?: string } {
+export function validateAvatarFile(file: File): {
+  valid: boolean;
+  error?: string;
+} {
   if (!ALLOWED_TYPES.includes(file.type)) {
     return {
       valid: false,
@@ -107,7 +110,8 @@ export function useUploadAvatar() {
       toast({
         variant: "destructive",
         title: "Upload failed",
-        description: error instanceof Error ? error.message : "Could not upload avatar",
+        description:
+          error instanceof Error ? error.message : "Could not upload avatar",
       });
     },
   });

@@ -99,11 +99,11 @@ export function useUpdateIdeaSubtask() {
       const key = ideaSubtaskKeys.list(ideaId);
       await queryClient.cancelQueries({ queryKey: key });
       const previous = queryClient.getQueryData<IdeaSubtask[]>(key);
-      const prevCompleted = previous?.find((s) => s.id === subtaskId)?.completed;
+      const prevCompleted = previous?.find(
+        (s) => s.id === subtaskId
+      )?.completed;
       queryClient.setQueryData<IdeaSubtask[]>(key, (old) =>
-        (old ?? []).map((s) =>
-          s.id === subtaskId ? { ...s, ...input } : s
-        )
+        (old ?? []).map((s) => (s.id === subtaskId ? { ...s, ...input } : s))
       );
       return { previous, prevCompleted };
     },

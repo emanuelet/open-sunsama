@@ -10,12 +10,12 @@ import type {
   RsvpResponse,
   SyncOptions,
   SyncResult,
-} from './index';
+} from "./index";
 import {
   ProviderAuthError,
   ProviderReadOnlyError,
   ProviderEventNotFoundError,
-} from './index';
+} from "./index";
 import {
   getClientId,
   getClientSecret,
@@ -26,27 +26,27 @@ import {
   type OutlookEventsResponse,
   type OutlookTokenResponse,
   type OutlookCalendarListResponse,
-} from './outlook-helpers';
+} from "./outlook-helpers";
 
-const MICROSOFT_AUTH_URL = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
-const MICROSOFT_TOKEN_URL = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
-const GRAPH_API = 'https://graph.microsoft.com/v1.0';
+const MICROSOFT_AUTH_URL =
+  "https://login.microsoftonline.com/common/oauth2/v2.0/authorize";
+const MICROSOFT_TOKEN_URL =
+  "https://login.microsoftonline.com/common/oauth2/v2.0/token";
+const GRAPH_API = "https://graph.microsoft.com/v1.0";
 
-const SCOPES = [
-  'Calendars.Read',
-  'Calendars.ReadWrite',
-  'offline_access',
-].join(' ');
+const SCOPES = ["Calendars.Read", "Calendars.ReadWrite", "offline_access"].join(
+  " "
+);
 
 export class OutlookCalendarProvider implements CalendarProvider {
   getAuthUrl(state: string, redirectUri: string): string {
     const params = new URLSearchParams({
       client_id: getClientId(),
       redirect_uri: redirectUri,
-      response_type: 'code',
+      response_type: "code",
       scope: SCOPES,
       state,
-      response_mode: 'query',
+      response_mode: "query",
     });
 
     return `${MICROSOFT_AUTH_URL}?${params.toString()}`;
@@ -54,15 +54,15 @@ export class OutlookCalendarProvider implements CalendarProvider {
 
   async exchangeCode(code: string, redirectUri: string): Promise<OAuthTokens> {
     const response = await fetch(MICROSOFT_TOKEN_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
         client_id: getClientId(),
         client_secret: getClientSecret(),
         code,
-        grant_type: 'authorization_code',
+        grant_type: "authorization_code",
         redirect_uri: redirectUri,
       }),
     });
@@ -83,15 +83,15 @@ export class OutlookCalendarProvider implements CalendarProvider {
 
   async refreshTokens(refreshToken: string): Promise<OAuthTokens> {
     const response = await fetch(MICROSOFT_TOKEN_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
         client_id: getClientId(),
         client_secret: getClientSecret(),
         refresh_token: refreshToken,
-        grant_type: 'refresh_token',
+        grant_type: "refresh_token",
         scope: SCOPES,
       }),
     });
@@ -110,7 +110,7 @@ export class OutlookCalendarProvider implements CalendarProvider {
         response.status === 401 ||
         response.status === 403
       ) {
-        throw new ProviderAuthError('outlook');
+        throw new ProviderAuthError("outlook");
       }
       const error = await response.text();
       throw new Error(`Failed to refresh token: ${error}`);
@@ -137,7 +137,7 @@ export class OutlookCalendarProvider implements CalendarProvider {
       // Surface as the typed error so the route layer's mapping fires
       // and the UI shows a clean "Reconnect" toast.
       if (response.status === 401 || response.status === 403) {
-        throw new ProviderAuthError('outlook');
+        throw new ProviderAuthError("outlook");
       }
       const error = await response.text();
       throw new Error(`Failed to list calendars: ${error}`);
@@ -150,7 +150,7 @@ export class OutlookCalendarProvider implements CalendarProvider {
       let color: string | null = null;
       if (cal.color) {
         const mappedColor = OUTLOOK_COLORS[cal.color];
-        color = mappedColor !== undefined ? mappedColor : '#0078D4';
+        color = mappedColor !== undefined ? mappedColor : "#0078D4";
       }
       return {
         externalId: cal.id,
@@ -176,13 +176,14 @@ export class OutlookCalendarProvider implements CalendarProvider {
       url = options.syncToken;
     } else {
       const params = new URLSearchParams({
-        $top: '250',
-        $select: 'id,subject,body,location,start,end,isAllDay,recurrence,seriesMasterId,showAs,responseStatus,attendees,organizer,isOrganizer,onlineMeeting,onlineMeetingUrl,webLink,changeKey',
+        $top: "250",
+        $select:
+          "id,subject,body,location,start,end,isAllDay,recurrence,seriesMasterId,showAs,responseStatus,attendees,organizer,isOrganizer,onlineMeeting,onlineMeetingUrl,webLink,changeKey",
       });
 
       if (options.timeMin && options.timeMax) {
-        params.set('startDateTime', options.timeMin.toISOString());
-        params.set('endDateTime', options.timeMax.toISOString());
+        params.set("startDateTime", options.timeMin.toISOString());
+        params.set("endDateTime", options.timeMax.toISOString());
         // calendarView/delta — NOT calendarView. The plain endpoint
         // returns "current state" with no `@removed` markers, so
         // events deleted upstream become permanent ghosts in our DB
@@ -202,20 +203,20 @@ export class OutlookCalendarProvider implements CalendarProvider {
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          Prefer: 'odata.maxpagesize=250',
+          Prefer: "odata.maxpagesize=250",
         },
       });
 
       if (!response.ok) {
         if (response.status === 410 || response.status === 400) {
-          throw new Error('SYNC_TOKEN_INVALID');
+          throw new Error("SYNC_TOKEN_INVALID");
         }
         // 401/403: token rejected or scope rescinded — typed error
         // so the route layer + worker write a clean "Reconnect"
         // message instead of dumping raw Microsoft Graph JSON into
         // the sync-status row.
         if (response.status === 401 || response.status === 403) {
-          throw new ProviderAuthError('outlook');
+          throw new ProviderAuthError("outlook");
         }
         const error = await response.text();
         throw new Error(`Failed to list events: ${error}`);
@@ -224,7 +225,7 @@ export class OutlookCalendarProvider implements CalendarProvider {
       const data = (await response.json()) as OutlookEventsResponse;
 
       for (const item of data.value || []) {
-        if (item['@removed']) {
+        if (item["@removed"]) {
           deleted.push(item.id);
         } else {
           const event = parseOutlookEvent(item);
@@ -234,8 +235,8 @@ export class OutlookCalendarProvider implements CalendarProvider {
         }
       }
 
-      nextLink = data['@odata.nextLink'] ?? null;
-      deltaLink = data['@odata.deltaLink'] ?? null;
+      nextLink = data["@odata.nextLink"] ?? null;
+      deltaLink = data["@odata.deltaLink"] ?? null;
 
       if (nextLink) {
         url = nextLink;
@@ -259,7 +260,7 @@ export class OutlookCalendarProvider implements CalendarProvider {
       payload.startTime === undefined ||
       payload.endTime === undefined
     ) {
-      throw new Error('createEvent requires title, startTime, and endTime');
+      throw new Error("createEvent requires title, startTime, and endTime");
     }
 
     const body = buildOutlookEventBody({
@@ -275,23 +276,23 @@ export class OutlookCalendarProvider implements CalendarProvider {
     const response = await fetch(
       `${GRAPH_API}/me/calendars/${encodeURIComponent(calendarId)}/events`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
       }
     );
 
     if (!response.ok) {
-      throw await mapOutlookError('createEvent', response);
+      throw await mapOutlookError("createEvent", response);
     }
 
     const data = (await response.json()) as OutlookEvent;
     const parsed = parseOutlookEvent(data);
     if (!parsed) {
-      throw new Error('Outlook returned an event that could not be parsed');
+      throw new Error("Outlook returned an event that could not be parsed");
     }
     return parsed;
   }
@@ -309,16 +310,16 @@ export class OutlookCalendarProvider implements CalendarProvider {
     }
     if (patch.description !== undefined) {
       body.body = {
-        contentType: 'text',
-        content: patch.description ?? '',
+        contentType: "text",
+        content: patch.description ?? "",
       };
     }
     if (patch.location !== undefined) {
-      body.location = { displayName: patch.location ?? '' };
+      body.location = { displayName: patch.location ?? "" };
     }
     if (patch.startTime !== undefined || patch.endTime !== undefined) {
       if (patch.startTime === undefined || patch.endTime === undefined) {
-        throw new Error('startTime and endTime must be supplied together');
+        throw new Error("startTime and endTime must be supplied together");
       }
       if (patch.isAllDay) {
         // Microsoft Graph all-day: isAllDay=true, dateTime at 00:00
@@ -326,11 +327,11 @@ export class OutlookCalendarProvider implements CalendarProvider {
         body.isAllDay = true;
         body.start = {
           dateTime: toUtcDateOnlyDateTime(patch.startTime),
-          timeZone: 'UTC',
+          timeZone: "UTC",
         };
         body.end = {
           dateTime: toUtcDateOnlyDateTime(patch.endTime),
-          timeZone: 'UTC',
+          timeZone: "UTC",
         };
       } else {
         // Send the UTC instant directly. Graph reads `dateTime` as
@@ -348,11 +349,11 @@ export class OutlookCalendarProvider implements CalendarProvider {
         body.isAllDay = false;
         body.start = {
           dateTime: patch.startTime.toISOString(),
-          timeZone: 'UTC',
+          timeZone: "UTC",
         };
         body.end = {
           dateTime: patch.endTime.toISOString(),
-          timeZone: 'UTC',
+          timeZone: "UTC",
         };
       }
     }
@@ -365,23 +366,23 @@ export class OutlookCalendarProvider implements CalendarProvider {
     const response = await fetch(
       `${GRAPH_API}/me/events/${encodeURIComponent(eventId)}`,
       {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
       }
     );
 
     if (!response.ok) {
-      throw await mapOutlookError('updateEvent', response);
+      throw await mapOutlookError("updateEvent", response);
     }
 
     const data = (await response.json()) as OutlookEvent;
     const parsed = parseOutlookEvent(data);
     if (!parsed) {
-      throw new Error('Outlook returned an event that could not be parsed');
+      throw new Error("Outlook returned an event that could not be parsed");
     }
     return parsed;
   }
@@ -395,7 +396,7 @@ export class OutlookCalendarProvider implements CalendarProvider {
     const response = await fetch(
       `${GRAPH_API}/me/events/${encodeURIComponent(eventId)}`,
       {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -404,7 +405,7 @@ export class OutlookCalendarProvider implements CalendarProvider {
 
     // 404 / 410 = already gone — treat as success.
     if (!response.ok && response.status !== 404 && response.status !== 410) {
-      throw await mapOutlookError('deleteEvent', response);
+      throw await mapOutlookError("deleteEvent", response);
     }
   }
 
@@ -416,25 +417,27 @@ export class OutlookCalendarProvider implements CalendarProvider {
   ): Promise<ExternalEvent> {
     void calendarId; // Outlook resolves by event id alone (see updateEvent).
     const action = {
-      accepted: 'accept',
-      declined: 'decline',
-      tentative: 'tentativelyAccept',
+      accepted: "accept",
+      declined: "decline",
+      tentative: "tentativelyAccept",
     }[response];
     const eventUrl = `${GRAPH_API}/me/events/${encodeURIComponent(eventId)}`;
-    const before = await fetch(eventUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
-    if (!before.ok) throw await mapOutlookError('respondToEvent', before);
+    const before = await fetch(eventUrl, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!before.ok) throw await mapOutlookError("respondToEvent", before);
     const original = (await before.json()) as OutlookEvent;
-    if (original.isOrganizer) throw new ProviderReadOnlyError('outlook');
+    if (original.isOrganizer) throw new ProviderReadOnlyError("outlook");
     const answered = await fetch(`${eventUrl}/${action}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ sendResponse: true }),
     });
     if (!answered.ok) {
-      throw await mapOutlookError('respondToEvent', answered);
+      throw await mapOutlookError("respondToEvent", answered);
     }
 
     // The answer endpoints return 202 with no body; read the event back.
@@ -443,11 +446,16 @@ export class OutlookCalendarProvider implements CalendarProvider {
     });
     // Declining can remove the event from this calendar. The accepted
     // response is still successful even when the follow-up read is gone.
-    const removed = response === 'declined' && (current.status === 404 || current.status === 410);
-    if (!current.ok && !removed) throw await mapOutlookError('respondToEvent', current);
-    const parsed = parseOutlookEvent(removed ? original : (await current.json()) as OutlookEvent);
+    const removed =
+      response === "declined" &&
+      (current.status === 404 || current.status === 410);
+    if (!current.ok && !removed)
+      throw await mapOutlookError("respondToEvent", current);
+    const parsed = parseOutlookEvent(
+      removed ? original : ((await current.json()) as OutlookEvent)
+    );
     if (!parsed) {
-      throw new Error('Outlook returned an event that could not be parsed');
+      throw new Error("Outlook returned an event that could not be parsed");
     }
     return { ...parsed, responseStatus: response };
   }
@@ -473,22 +481,22 @@ function buildOutlookEventBody(input: {
   };
   if (input.description !== undefined) {
     body.body = {
-      contentType: 'text',
-      content: input.description ?? '',
+      contentType: "text",
+      content: input.description ?? "",
     };
   }
   if (input.location !== undefined) {
-    body.location = { displayName: input.location ?? '' };
+    body.location = { displayName: input.location ?? "" };
   }
   body.isAllDay = !!input.isAllDay;
   if (input.isAllDay) {
     body.start = {
       dateTime: toUtcDateOnlyDateTime(input.startTime),
-      timeZone: 'UTC',
+      timeZone: "UTC",
     };
     body.end = {
       dateTime: toUtcDateOnlyDateTime(input.endTime),
-      timeZone: 'UTC',
+      timeZone: "UTC",
     };
   } else {
     // See updateEvent for the full reasoning: send the UTC instant
@@ -496,11 +504,11 @@ function buildOutlookEventBody(input: {
     // `input.timezone` is intentionally unused here.
     body.start = {
       dateTime: input.startTime.toISOString(),
-      timeZone: 'UTC',
+      timeZone: "UTC",
     };
     body.end = {
       dateTime: input.endTime.toISOString(),
-      timeZone: 'UTC',
+      timeZone: "UTC",
     };
   }
   return body;
@@ -513,8 +521,8 @@ function buildOutlookEventBody(input: {
  */
 function toUtcDateOnlyDateTime(d: Date): string {
   const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const dd = String(d.getUTCDate()).padStart(2, '0');
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(d.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${dd}T00:00:00.0000000`;
 }
 
@@ -523,15 +531,12 @@ function toUtcDateOnlyDateTime(d: Date): string {
  * error so the route layer can produce a clean toast (matching the
  * Google provider's pattern).
  */
-async function mapOutlookError(
-  op: string,
-  response: Response
-): Promise<Error> {
+async function mapOutlookError(op: string, response: Response): Promise<Error> {
   if (response.status === 404 || response.status === 410) {
-    return new ProviderEventNotFoundError('outlook');
+    return new ProviderEventNotFoundError("outlook");
   }
   if (response.status === 401 || response.status === 403) {
-    return new ProviderAuthError('outlook');
+    return new ProviderAuthError("outlook");
   }
   const text = await response.text();
   return new Error(`Outlook ${op} failed (${response.status}): ${text}`);

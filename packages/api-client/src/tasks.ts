@@ -35,7 +35,10 @@ export interface TasksApi {
    * @param filters Optional filter criteria
    * @returns Array of tasks matching the filters
    */
-  list(filters?: TaskFilterInput, options?: RequestOptions): Promise<TasksListResponse>;
+  list(
+    filters?: TaskFilterInput,
+    options?: RequestOptions
+  ): Promise<TasksListResponse>;
 
   /**
    * Create a new task
@@ -97,7 +100,10 @@ export interface TasksApi {
    * @param filters Optional filter criteria
    * @returns Task statistics
    */
-  getStats(filters?: TaskFilterInput, options?: RequestOptions): Promise<TaskStats>;
+  getStats(
+    filters?: TaskFilterInput,
+    options?: RequestOptions
+  ): Promise<TaskStats>;
 
   /**
    * Batch create multiple tasks
@@ -172,9 +178,11 @@ function filtersToSearchParams(
     from: filters.scheduledDateFrom,
     to: filters.scheduledDateTo,
     // API uses string 'true'/'false' for completed filter
-    completed: filters.completed !== undefined ? String(filters.completed) : undefined,
+    completed:
+      filters.completed !== undefined ? String(filters.completed) : undefined,
     // API uses 'backlog' for unscheduled tasks
-    backlog: filters.backlog !== undefined ? String(filters.backlog) : undefined,
+    backlog:
+      filters.backlog !== undefined ? String(filters.backlog) : undefined,
     // Priority filter (P0, P1, P2, P3)
     priority: filters.priority,
     // Sort by field
@@ -235,12 +243,19 @@ export function createTasksApi(client: OpenSunsamaClient): TasksApi {
       input: CreateTaskInput,
       options?: RequestOptions
     ): Promise<Task> {
-      const response = await client.post<ApiResponseWrapper<Task>>("tasks", input, options);
+      const response = await client.post<ApiResponseWrapper<Task>>(
+        "tasks",
+        input,
+        options
+      );
       return response.data;
     },
 
     async get(id: string, options?: RequestOptions): Promise<Task> {
-      const response = await client.get<ApiResponseWrapper<Task>>(`tasks/${id}`, options);
+      const response = await client.get<ApiResponseWrapper<Task>>(
+        `tasks/${id}`,
+        options
+      );
       return response.data;
     },
 
@@ -249,7 +264,11 @@ export function createTasksApi(client: OpenSunsamaClient): TasksApi {
       input: UpdateTaskInput,
       options?: RequestOptions
     ): Promise<Task> {
-      const response = await client.patch<ApiResponseWrapper<Task>>(`tasks/${id}`, input, options);
+      const response = await client.patch<ApiResponseWrapper<Task>>(
+        `tasks/${id}`,
+        input,
+        options
+      );
       return response.data;
     },
 
@@ -270,12 +289,20 @@ export function createTasksApi(client: OpenSunsamaClient): TasksApi {
     },
 
     async complete(id: string, options?: RequestOptions): Promise<Task> {
-      const response = await client.post<ApiResponseWrapper<Task>>(`tasks/${id}/complete`, undefined, options);
+      const response = await client.post<ApiResponseWrapper<Task>>(
+        `tasks/${id}/complete`,
+        undefined,
+        options
+      );
       return response.data;
     },
 
     async uncomplete(id: string, options?: RequestOptions): Promise<Task> {
-      const response = await client.post<ApiResponseWrapper<Task>>(`tasks/${id}/uncomplete`, undefined, options);
+      const response = await client.post<ApiResponseWrapper<Task>>(
+        `tasks/${id}/uncomplete`,
+        undefined,
+        options
+      );
       return response.data;
     },
 
@@ -284,10 +311,13 @@ export function createTasksApi(client: OpenSunsamaClient): TasksApi {
       options?: RequestOptions
     ): Promise<TaskStats> {
       const searchParams = filtersToSearchParams(filters);
-      const response = await client.get<ApiResponseWrapper<TaskStats>>("tasks/stats", {
-        ...options,
-        searchParams: { ...options?.searchParams, ...searchParams },
-      });
+      const response = await client.get<ApiResponseWrapper<TaskStats>>(
+        "tasks/stats",
+        {
+          ...options,
+          searchParams: { ...options?.searchParams, ...searchParams },
+        }
+      );
       return response.data;
     },
 
@@ -295,7 +325,11 @@ export function createTasksApi(client: OpenSunsamaClient): TasksApi {
       inputs: CreateTaskInput[],
       options?: RequestOptions
     ): Promise<Task[]> {
-      const response = await client.post<ApiResponseWrapper<Task[]>>("tasks/batch", { tasks: inputs }, options);
+      const response = await client.post<ApiResponseWrapper<Task[]>>(
+        "tasks/batch",
+        { tasks: inputs },
+        options
+      );
       return response.data;
     },
 
@@ -303,7 +337,11 @@ export function createTasksApi(client: OpenSunsamaClient): TasksApi {
       updates: Array<{ id: string; input: UpdateTaskInput }>,
       options?: RequestOptions
     ): Promise<Task[]> {
-      const response = await client.patch<ApiResponseWrapper<Task[]>>("tasks/batch", { updates }, options);
+      const response = await client.patch<ApiResponseWrapper<Task[]>>(
+        "tasks/batch",
+        { updates },
+        options
+      );
       return response.data;
     },
 

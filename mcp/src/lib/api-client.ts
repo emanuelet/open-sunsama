@@ -177,7 +177,11 @@ export class ApiClient {
   }
 
   async createIdeaBoard(data: CreateIdeaBoardInput) {
-    return this.request<IdeaBoard & { columns: IdeaColumn[] }>("POST", "/ideas/boards", data);
+    return this.request<IdeaBoard & { columns: IdeaColumn[] }>(
+      "POST",
+      "/ideas/boards",
+      data
+    );
   }
 
   async updateIdeaBoard(id: string, data: Partial<CreateIdeaBoardInput>) {
@@ -189,18 +193,25 @@ export class ApiClient {
   }
 
   async reorderIdeaBoards(boardIds: string[]) {
-    return this.request<IdeaBoard[]>("POST", "/ideas/boards/reorder", { boardIds });
+    return this.request<IdeaBoard[]>("POST", "/ideas/boards/reorder", {
+      boardIds,
+    });
   }
 
   async listIdeaColumns(boardId: string) {
-    return this.request<IdeaColumn[]>("GET", "/ideas/columns", undefined, { boardId });
+    return this.request<IdeaColumn[]>("GET", "/ideas/columns", undefined, {
+      boardId,
+    });
   }
 
   async createIdeaColumn(data: CreateIdeaColumnInput) {
     return this.request<IdeaColumn>("POST", "/ideas/columns", data);
   }
 
-  async updateIdeaColumn(id: string, data: Partial<Pick<IdeaColumn, "name" | "position">>) {
+  async updateIdeaColumn(
+    id: string,
+    data: Partial<Pick<IdeaColumn, "name" | "position">>
+  ) {
     return this.request<IdeaColumn>("PATCH", `/ideas/columns/${id}`, data);
   }
 
@@ -209,15 +220,25 @@ export class ApiClient {
   }
 
   async reorderIdeaColumns(boardId: string, columnIds: string[]) {
-    return this.request<IdeaColumn[]>("POST", "/ideas/columns/reorder", { boardId, columnIds });
+    return this.request<IdeaColumn[]>("POST", "/ideas/columns/reorder", {
+      boardId,
+      columnIds,
+    });
   }
 
-  async listIdeas(filters: { boardId?: string; columnId?: string; completed?: boolean }) {
+  async listIdeas(filters: {
+    boardId?: string;
+    columnId?: string;
+    completed?: boolean;
+  }) {
     return this.request<Idea[]>("GET", "/ideas", undefined, filters);
   }
 
   async getIdea(id: string) {
-    return this.request<Idea & { subtasks: IdeaSubtask[] }>("GET", `/ideas/${id}`);
+    return this.request<Idea & { subtasks: IdeaSubtask[] }>(
+      "GET",
+      `/ideas/${id}`
+    );
   }
 
   async createIdea(data: CreateIdeaInput) {
@@ -233,11 +254,18 @@ export class ApiClient {
   }
 
   async reorderIdeas(columnId: string, ideaIds: string[]) {
-    return this.request<Idea[]>("POST", "/ideas/reorder", { columnId, ideaIds });
+    return this.request<Idea[]>("POST", "/ideas/reorder", {
+      columnId,
+      ideaIds,
+    });
   }
 
   async promoteIdea(id: string, scheduledDate?: string | null) {
-    return this.request<{ idea: Idea; task: Task }>("POST", `/ideas/${id}/promote`, { scheduledDate });
+    return this.request<{ idea: Idea; task: Task }>(
+      "POST",
+      `/ideas/${id}/promote`,
+      { scheduledDate }
+    );
   }
 
   async listIdeaSubtasks(ideaId: string) {
@@ -248,8 +276,16 @@ export class ApiClient {
     return this.request<IdeaSubtask>("POST", `/ideas/${ideaId}/subtasks`, data);
   }
 
-  async updateIdeaSubtask(ideaId: string, id: string, data: UpdateIdeaSubtaskInput) {
-    return this.request<IdeaSubtask>("PATCH", `/ideas/${ideaId}/subtasks/${id}`, data);
+  async updateIdeaSubtask(
+    ideaId: string,
+    id: string,
+    data: UpdateIdeaSubtaskInput
+  ) {
+    return this.request<IdeaSubtask>(
+      "PATCH",
+      `/ideas/${ideaId}/subtasks/${id}`,
+      data
+    );
   }
 
   async deleteIdeaSubtask(ideaId: string, id: string) {
@@ -257,7 +293,11 @@ export class ApiClient {
   }
 
   async reorderIdeaSubtasks(ideaId: string, subtaskIds: string[]) {
-    return this.request<IdeaSubtask[]>("POST", `/ideas/${ideaId}/subtasks/reorder`, { subtaskIds });
+    return this.request<IdeaSubtask[]>(
+      "POST",
+      `/ideas/${ideaId}/subtasks/reorder`,
+      { subtaskIds }
+    );
   }
 
   // Time Blocks
@@ -296,12 +336,21 @@ export class ApiClient {
   }
 
   // Calendar events (synced from Google, Outlook, iCloud; read-only)
-  async listCalendarEvents(params: { date?: string; from?: string; to?: string }) {
-    return this.request<CalendarEvent[], CalendarEventsMeta>("GET", "/calendar-events", undefined, {
-      date: params.date,
-      from: params.from,
-      to: params.to,
-    });
+  async listCalendarEvents(params: {
+    date?: string;
+    from?: string;
+    to?: string;
+  }) {
+    return this.request<CalendarEvent[], CalendarEventsMeta>(
+      "GET",
+      "/calendar-events",
+      undefined,
+      {
+        date: params.date,
+        from: params.from,
+        to: params.to,
+      }
+    );
   }
 
   // User

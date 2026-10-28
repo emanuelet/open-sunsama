@@ -72,7 +72,9 @@ describe("findDueOccurrence", () => {
   });
 
   it("returns null for a pattern that never advances", () => {
-    expect(due("2026-09-01", { ...daily, frequency: 0 }, "2026-09-24")).toBeNull();
+    expect(
+      due("2026-09-01", { ...daily, frequency: 0 }, "2026-09-24")
+    ).toBeNull();
   });
 });
 
@@ -135,7 +137,8 @@ describe.skipIf(!testDbUrl)("insertSeriesInstance against Postgres", () => {
 
   it("generates today's instance and skips jobs for past dates", async () => {
     process.env.DATABASE_URL = testDbUrl;
-    const { processGenerateRecurringTask } = await import("../task-generator.js");
+    const { processGenerateRecurringTask } =
+      await import("../task-generator.js");
     const run = (targetDate: string) =>
       processGenerateRecurringTask({
         data: { seriesId, targetDate, instanceNumber: 3 },

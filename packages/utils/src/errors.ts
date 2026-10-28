@@ -12,7 +12,7 @@ export class AppError extends Error {
 
   constructor(
     message: string,
-    code: string = 'APP_ERROR',
+    code: string = "APP_ERROR",
     statusCode: number = 500,
     isOperational: boolean = true
   ) {
@@ -43,7 +43,7 @@ export class ValidationError extends AppError {
   public readonly errors: Record<string, string[]>;
 
   constructor(message: string, errors: Record<string, string[]> = {}) {
-    super(message, 'VALIDATION_ERROR', 400);
+    super(message, "VALIDATION_ERROR", 400);
     this.errors = errors;
   }
 
@@ -59,8 +59,8 @@ export class ValidationError extends AppError {
  * Error thrown when authentication fails
  */
 export class AuthenticationError extends AppError {
-  constructor(message: string = 'Authentication required') {
-    super(message, 'AUTHENTICATION_ERROR', 401);
+  constructor(message: string = "Authentication required") {
+    super(message, "AUTHENTICATION_ERROR", 401);
   }
 }
 
@@ -68,8 +68,8 @@ export class AuthenticationError extends AppError {
  * Error thrown when authorization fails
  */
 export class AuthorizationError extends AppError {
-  constructor(message: string = 'Access denied') {
-    super(message, 'AUTHORIZATION_ERROR', 403);
+  constructor(message: string = "Access denied") {
+    super(message, "AUTHORIZATION_ERROR", 403);
   }
 }
 
@@ -84,7 +84,7 @@ export class NotFoundError extends AppError {
     const message = resourceId
       ? `${resource} with id '${resourceId}' not found`
       : `${resource} not found`;
-    super(message, 'NOT_FOUND_ERROR', 404);
+    super(message, "NOT_FOUND_ERROR", 404);
     this.resource = resource;
     this.resourceId = resourceId;
   }
@@ -105,14 +105,16 @@ export class ConflictError extends AppError {
   public readonly conflictField: string | undefined;
 
   constructor(message: string, conflictField?: string) {
-    super(message, 'CONFLICT_ERROR', 409);
+    super(message, "CONFLICT_ERROR", 409);
     this.conflictField = conflictField;
   }
 
   toJSON() {
     return {
       ...super.toJSON(),
-      ...(this.conflictField !== undefined && { conflictField: this.conflictField }),
+      ...(this.conflictField !== undefined && {
+        conflictField: this.conflictField,
+      }),
     };
   }
 }
@@ -123,8 +125,8 @@ export class ConflictError extends AppError {
 export class RateLimitError extends AppError {
   public readonly retryAfter: number | undefined;
 
-  constructor(message: string = 'Rate limit exceeded', retryAfter?: number) {
-    super(message, 'RATE_LIMIT_ERROR', 429);
+  constructor(message: string = "Rate limit exceeded", retryAfter?: number) {
+    super(message, "RATE_LIMIT_ERROR", 429);
     this.retryAfter = retryAfter;
   }
 
@@ -140,8 +142,8 @@ export class RateLimitError extends AppError {
  * Error thrown for internal server errors
  */
 export class InternalError extends AppError {
-  constructor(message: string = 'Internal server error') {
-    super(message, 'INTERNAL_ERROR', 500, false);
+  constructor(message: string = "Internal server error") {
+    super(message, "INTERNAL_ERROR", 500, false);
   }
 }
 

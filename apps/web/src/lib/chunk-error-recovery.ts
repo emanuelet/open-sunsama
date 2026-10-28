@@ -72,7 +72,10 @@ export function installChunkErrorRecovery(): void {
     window.location.reload();
   };
 
-  window.addEventListener("vite:preloadError", handleChunkError as EventListener);
+  window.addEventListener(
+    "vite:preloadError",
+    handleChunkError as EventListener
+  );
 
   // Belt-and-suspenders: also catch unhandled `ChunkLoadError`/`Loading chunk`
   // promise rejections from `React.lazy` failures that didn't go through the

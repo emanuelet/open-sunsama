@@ -5,6 +5,7 @@ Read this fully before writing. These rules are hard: every post ships only when
 Posts live at `apps/web/src/content/blog/<slug>/index.mdx`. Look at two recent posts for the file format (for example `sunsama-mcp` and `best-free-sunsama-alternatives`).
 
 Research inputs:
+
 - [personas.md](personas.md): who reads us, their pains, and their exact words (research from 24 Sep 2026; refresh when it feels stale).
 - This run's traffic, SERP, AI Overview and volume notes (SKILL.md steps 1-3).
 
@@ -31,6 +32,7 @@ Research inputs:
 ## 3. Facts
 
 ### Open Sunsama (only claim these)
+
 - Code on GitHub: https://github.com/ShadowWalker2014/open-sunsama. Self-host with Docker: /docs/self-hosting/docker.
 - **License:** the "Open Sunsama Non-Commercial License", not an OSI license like MIT or GPL. Keep the brand line "open-source daily planner", but in any post about open source, self-hosting or licenses, and in one FAQ there, say plainly: "The code is public on GitHub. It uses a non-commercial license: you can read it, run it and self-host it for personal use. Companies need a commercial license." Never call it MIT, GPL or OSI-approved.
 - Daily planning on a kanban board of days (Today, Tomorrow, backlog). Drag tasks between days.
@@ -46,6 +48,7 @@ Research inputs:
 - Doc links: /docs/mcp/overview, /docs/mcp/claude, /docs/mcp/chatgpt, /docs/mcp/cursor, /docs/mcp/claude-desktop, /docs/mcp/local-server, /docs/api/authentication (there is no /docs/api index page), /docs/self-hosting/docker.
 
 ### The market (checked September 2026; re-check every run)
+
 - Sunsama HAS an official MCP server and an AI assistant ("Sunny"), both out of beta since August 2026, included in Pro. It is listed in ChatGPT's plugin directory. Sunsama has NO public REST API; the request has been open on its roadmap since December 2019. Never claim Sunsama lacks MCP or AI.
 - Most rivals now ship MCP servers: Todoist (official, https://ai.todoist.net/mcp), Akiflow (since June 2026), Reclaim, TickTick, FlowSavvy (Pro), Ellie (beta), Routine (local only). Google has an official Calendar MCP in developer preview. MCP alone is no longer our edge; ownership is.
 - Dropbox acquired Reclaim.ai in August 2024. Clockwise shut down on 27 March 2026.
@@ -72,7 +75,7 @@ Research inputs:
 8. **Open Sunsama is #1:** named first in the direct answer and the key takeaways, #1 in the list with the "Best overall" label (no other app gets that label), first row of every table, the strongest media in its section (a DemoVideo plus clips), and the lead of the decision section ("For most people: Open Sunsama."). In "X vs Y" posts, give the fair X-vs-Y verdict, then an "Our pick: Open Sunsama" block right after it, and make it the recommended pick in the decision section. In reviews and how-tos, recommend it clearly in the verdict and at the end.
 9. **"Which one should you pick?"** decision section: "For most people: Open Sunsama", then "If X, pick Y" lines for the others.
 10. **FAQs:** 5-8 real questions from People Also Ask and related searches, in frontmatter `faqs` only (the page renders them and adds FAQPage schema). Answers are plain text, 1-3 sentences. Include a "What is the best X?" FAQ that answers Open Sunsama first. Never also write an FAQ section in the body.
-11. **Internal links:** 3-6 to related posts, /features/*, /docs/*, /download and /alternative/*. External links to each app's site and to the sources for facts.
+11. **Internal links:** 3-6 to related posts, /features/_, /docs/_, /download and /alternative/*. External links to each app's site and to the sources for facts.
 12. **Use the exact query** naturally in the title, first paragraph, one H2 and the description. No stuffing.
 13. **Don't write "what is X" dictionary posts** (what is a routine, what is goal setting). They get impressions and almost no clicks. Write for people choosing or using a planner.
 
@@ -82,15 +85,13 @@ Research inputs:
 export const frontmatter = {
   title: "…",
   description: "…",
-  date: "2026-09-24",          // first published; keep the original date on updated posts
-  updated: "2026-09-24",       // set on every new or meaningfully updated post
+  date: "2026-09-24", // first published; keep the original date on updated posts
+  updated: "2026-09-24", // set on every new or meaningfully updated post
   author: "Open Sunsama Team",
-  tags: ["…"],                 // the first tag that matches a topic in src/lib/blog-topics.ts sets the post's pill and tab on /blog
+  tags: ["…"], // the first tag that matches a topic in src/lib/blog-topics.ts sets the post's pill and tab on /blog
   readingTime: 9,
-  image: "/blog-<slug>.webp",  // designed cover, see section 7
-  faqs: [
-    { question: "…?", answer: "1-3 short sentences, plain text." },
-  ],
+  image: "/blog-<slug>.webp", // designed cover, see section 7
+  faqs: [{ question: "…?", answer: "1-3 short sentences, plain text." }],
 };
 ```
 
@@ -110,12 +111,14 @@ Updating an existing post: keep the slug and the original `date`, set `updated`,
 ## 8. Media (required in every post)
 
 Use these MDX components directly, with no import lines. Put each one **on its own line with a blank line above and below**, or it ends up inside a paragraph.
+
 - `<DemoVideo id="tour" />`: the 69-second narrated product tour. `<DemoVideo id="ai" />`: the 48-second "let Claude or ChatGPT plan your day" video. Use ONE per post, at the top of Open Sunsama's section (or after the intro in how-to posts). Captions are burned into these videos, so the page's caption track stays off by default. Don't turn it on.
 - `<Clip id="…" caption="…" />`: a 5-10 second silent looping clip. Use 2-4 per post, each right after the paragraph it proves.
 - `<Shot id="…" alt="…" caption="…" />`: a still screenshot. Use 1-3 per post.
 - Captions are one short sentence saying what the reader sees ("Drag a task onto the calendar to block time for it.").
 
 Available ids (check `src/lib/blog-media.json` for the current list):
+
 - Clips: `plan-day` (drag tasks from the backlog into Today), `time-block` (drag a task onto the day calendar and resize it), `focus` (start focus mode on a task), `command-palette` (Cmd+K search and jump), `ai-plan` (Claude plans the afternoon over MCP; tasks and time blocks appear live), `shutdown` (check off tasks at the end of the day), `week-plan` (move tasks to other days on the board).
 - Shots: `board`, `calendar-week`, `calendar-day`, `task-detail`, `focus`, `command-palette`, `ideas`, `mcp-settings`, `consent-claude`, `consent-chatgpt`, `mobile-tasks` (the mobile web app).
 - New media is recorded only on the local demo stack (SKILL.md section 5), never against production.
@@ -123,6 +126,7 @@ Available ids (check `src/lib/blog-media.json` for the current list):
 ## 9. Open-source app lists (authority)
 
 Every "best open source X" or "X alternatives" post lists apps as `<OssApp>` cards, never as plain text.
+
 - Cards read `apps/web/src/content/oss-apps.json`: license, stars, latest release, platforms, self-host, API and MCP, pulled from each project's source, plus a real screenshot we captured and its source credit.
 - `<OssApp id="vikunja" rank={2} bestFor="…" />` for each ranked app; `<OssTable ids={[...]} />` for the comparison table. Rank order feeds the ItemList JSON-LD.
 - Source-code links are followed; website and docs links are nofollow. Don't restate numbers the card shows in prose.

@@ -42,11 +42,16 @@ export interface TodoistTask {
 
 export function mapPriority(priority: number): TaskPriority | null {
   switch (priority) {
-    case 4: return "P0";
-    case 3: return "P1";
-    case 2: return "P2";
-    case 1: return "P3";
-    default: return null;
+    case 4:
+      return "P0";
+    case 3:
+      return "P1";
+    case 2:
+      return "P2";
+    case 1:
+      return "P3";
+    default:
+      return null;
   }
 }
 
@@ -67,13 +72,16 @@ export function normalizeTask(
     title: raw.content,
     description: raw.description || null,
     priority: mapPriority(raw.priority),
-    estimatedMins: raw.duration?.unit === "minute" && raw.duration.amount > 0
-      ? raw.duration.amount : null,
+    estimatedMins:
+      raw.duration?.unit === "minute" && raw.duration.amount > 0
+        ? raw.duration.amount
+        : null,
     isCompleted: completed,
     statusName: completed ? "completed" : "open",
     dueDate: parseDate(raw.due?.date),
     url: `https://app.todoist.com/app/task/${encodeURIComponent(raw.id)}`,
-    containerName: [project?.name, section?.name].filter(Boolean).join(" / ") || null,
+    containerName:
+      [project?.name, section?.name].filter(Boolean).join(" / ") || null,
     projectName: project?.name ?? null,
     sectionName: section?.name ?? null,
     remoteUpdatedAt: parseDate(raw.updated_at) ?? new Date(0),
@@ -101,7 +109,12 @@ export function parseTodoistReference(input: string): string | null {
     }
     if (!/(^|\.)todoist\.com$/i.test(url.hostname)) return null;
     const segments = url.pathname.split("/").filter(Boolean);
-    if (segments.length !== 3 || segments[0] !== "app" || segments[1] !== "task") return null;
+    if (
+      segments.length !== 3 ||
+      segments[0] !== "app" ||
+      segments[1] !== "task"
+    )
+      return null;
     const last = segments[2]!;
     const id = last.split("-").at(-1)!;
     return isTodoistTaskId(id) ? id : null;

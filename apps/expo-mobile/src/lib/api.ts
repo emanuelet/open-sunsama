@@ -1,10 +1,15 @@
-import { createApi, createOpenSunsamaClient, type OpenSunsamaClient } from '@open-sunsama/api-client';
-import * as SecureStore from 'expo-secure-store';
+import {
+  createApi,
+  createOpenSunsamaClient,
+  type OpenSunsamaClient,
+} from "@open-sunsama/api-client";
+import * as SecureStore from "expo-secure-store";
 
 // API URL from environment or default to production
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://api.opensunsama.com';
+const API_URL =
+  process.env.EXPO_PUBLIC_API_URL || "https://api.opensunsama.com";
 
-const AUTH_TOKEN_KEY = 'open_sunsama_token';
+const AUTH_TOKEN_KEY = "open_sunsama_token";
 
 /**
  * Get stored auth token from SecureStore

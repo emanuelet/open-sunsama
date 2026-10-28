@@ -9,7 +9,10 @@ interface SortableMobileTaskCardProps {
   onTaskClick: (task: Task) => void;
 }
 
-export function SortableMobileTaskCard({ task, onTaskClick }: SortableMobileTaskCardProps) {
+export function SortableMobileTaskCard({
+  task,
+  onTaskClick,
+}: SortableMobileTaskCardProps) {
   const {
     attributes,
     listeners,
@@ -37,10 +40,7 @@ export function SortableMobileTaskCard({ task, onTaskClick }: SortableMobileTask
       style={style}
       {...attributes}
       {...listeners}
-      className={cn(
-        "touch-manipulation",
-        isDragging && "opacity-50 z-50"
-      )}
+      className={cn("touch-manipulation", isDragging && "opacity-50 z-50")}
     >
       <MobileTaskCardWithActualTime
         task={task}

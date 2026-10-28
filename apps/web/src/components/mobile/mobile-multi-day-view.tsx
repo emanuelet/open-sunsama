@@ -1,11 +1,5 @@
 import * as React from "react";
-import {
-  endOfDay,
-  format,
-  isSameDay,
-  isToday,
-  startOfDay,
-} from "date-fns";
+import { endOfDay, format, isSameDay, isToday, startOfDay } from "date-fns";
 import type { CalendarEvent, TimeBlock } from "@open-sunsama/types";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui";

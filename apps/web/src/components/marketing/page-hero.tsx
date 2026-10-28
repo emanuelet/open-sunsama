@@ -9,11 +9,21 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Play, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FloatingChip, WORKS_WITH } from "@/components/landing/hero";
-import { HeadlineReveal, introStyle, useIntro, useReducedMotion, useScrollProgress } from "@/components/landing/motion";
+import {
+  HeadlineReveal,
+  introStyle,
+  useIntro,
+  useReducedMotion,
+  useScrollProgress,
+} from "@/components/landing/motion";
 import { BrowserFrame } from "@/components/landing/product-shot";
 import { getVideo, VideoLightbox } from "@/components/landing/video-lightbox";
 import { BLOG_MEDIA, clockDuration } from "@/lib/blog-media";
-import type { HeroChip, MediaRef, PageHeroContent } from "@/content/marketing/types";
+import type {
+  HeroChip,
+  MediaRef,
+  PageHeroContent,
+} from "@/content/marketing/types";
 import { cn } from "@/lib/utils";
 import { ClipPlayer } from "./clip-player";
 import { RichText } from "./rich-text";
@@ -37,11 +47,26 @@ function HeroFrameMedia({ media }: { media: MediaRef }) {
   if ("shot" in media) {
     const shot = BLOG_MEDIA.shots[media.shot];
     if (!shot) return null;
-    const common = { width: shot.width, height: shot.height, alt: media.alt, decoding: "async" as const };
+    const common = {
+      width: shot.width,
+      height: shot.height,
+      alt: media.alt,
+      decoding: "async" as const,
+    };
     return (
       <>
-        <img {...common} src={shot.light} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-top dark:hidden" />
-        <img {...common} src={shot.dark} loading="lazy" className="absolute inset-0 hidden h-full w-full object-cover object-top dark:block" />
+        <img
+          {...common}
+          src={shot.light}
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover object-top dark:hidden"
+        />
+        <img
+          {...common}
+          src={shot.dark}
+          loading="lazy"
+          className="absolute inset-0 hidden h-full w-full object-cover object-top dark:block"
+        />
       </>
     );
   }
@@ -49,8 +74,19 @@ function HeroFrameMedia({ media }: { media: MediaRef }) {
   if (!video) return null;
   return (
     <VideoLightbox id={media.video}>
-      <button type="button" aria-label={`Play video: ${video.title}`} className="group absolute inset-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
-        <img src={video.poster} alt="" width={video.width} height={video.height} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover" />
+      <button
+        type="button"
+        aria-label={`Play video: ${video.title}`}
+        className="group absolute inset-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+      >
+        <img
+          src={video.poster}
+          alt=""
+          width={video.width}
+          height={video.height}
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-black/20 transition-transform group-hover:scale-105">
           <Play className="h-7 w-7 translate-x-0.5 fill-current" />
         </span>
@@ -71,9 +107,14 @@ function ChipBody({ chip }: { chip: HeroChip }) {
     return (
       <div
         className="w-[210px] rounded-md border-l-[3px] px-2 py-1"
-        style={{ backgroundColor: "rgba(239,68,68,0.15)", borderColor: "rgba(239,68,68,0.6)" }}
+        style={{
+          backgroundColor: "rgba(239,68,68,0.15)",
+          borderColor: "rgba(239,68,68,0.6)",
+        }}
       >
-        <p className="truncate text-sm font-medium text-foreground">{chip.title}</p>
+        <p className="truncate text-sm font-medium text-foreground">
+          {chip.title}
+        </p>
         <p className="truncate text-xs text-muted-foreground">{chip.detail}</p>
       </div>
     );
@@ -82,8 +123,12 @@ function ChipBody({ chip }: { chip: HeroChip }) {
     return (
       <>
         <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_3px_rgb(16_185_129/0.18)]" />
-        <span className="font-mono text-[13px] font-semibold tabular-nums text-foreground">{chip.title}</span>
-        <span className="ml-1 text-[11px] text-muted-foreground">{chip.detail}</span>
+        <span className="font-mono text-[13px] font-semibold tabular-nums text-foreground">
+          {chip.title}
+        </span>
+        <span className="ml-1 text-[11px] text-muted-foreground">
+          {chip.detail}
+        </span>
       </>
     );
   }
@@ -93,22 +138,39 @@ function ChipBody({ chip }: { chip: HeroChip }) {
         <Sparkles className="h-3.5 w-3.5" />
       </span>
       <span className="leading-tight">
-        <span className="block text-[12px] font-semibold text-foreground">{chip.title}</span>
-        <span className="block text-[11px] text-muted-foreground">{chip.detail}</span>
+        <span className="block text-[12px] font-semibold text-foreground">
+          {chip.title}
+        </span>
+        <span className="block text-[11px] text-muted-foreground">
+          {chip.detail}
+        </span>
       </span>
     </>
   );
 }
 
-export function PageHero({ hero, before }: { hero: PageHeroContent; before?: React.ReactNode }) {
+export function PageHero({
+  hero,
+  before,
+}: {
+  hero: PageHeroContent;
+  before?: React.ReactNode;
+}) {
   const ready = useIntro();
   const reduced = useReducedMotion();
   const tiltRef = useScrollProgress<HTMLDivElement>("page", { distance: 560 });
-  const secondary = hero.secondary ?? { video: "tour" as const, label: "Watch the 1-minute tour" };
-  const secondaryVideo = "video" in secondary ? getVideo(secondary.video) : undefined;
+  const secondary = hero.secondary ?? {
+    video: "tour" as const,
+    label: "Watch the 1-minute tour",
+  };
+  const secondaryVideo =
+    "video" in secondary ? getVideo(secondary.video) : undefined;
 
   return (
-    <section className="relative pb-20 pt-8 md:pb-28 md:pt-12" aria-labelledby="page-title">
+    <section
+      className="relative pb-20 pt-8 md:pb-28 md:pt-12"
+      aria-labelledby="page-title"
+    >
       <div className="container mx-auto max-w-6xl px-4">
         {before}
         <div className="text-center">
@@ -127,7 +189,11 @@ export function PageHero({ hero, before }: { hero: PageHeroContent; before?: Rea
             id="page-title"
             className="mx-auto mt-6 max-w-4xl text-balance text-[34px] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[52px] md:text-[62px]"
           >
-            <HeadlineReveal lines={headlineLines(hero.title, hero.accent)} ready={ready} reduced={reduced} />
+            <HeadlineReveal
+              lines={headlineLines(hero.title, hero.accent)}
+              ready={ready}
+              reduced={reduced}
+            />
           </h1>
 
           <p
@@ -141,7 +207,11 @@ export function PageHero({ hero, before }: { hero: PageHeroContent; before?: Rea
             className="mt-8 flex flex-col items-center justify-center gap-2.5 sm:flex-row"
             style={introStyle(ready, 600, reduced)}
           >
-            <Button size="lg" className={cn(PRIMARY_CTA, "w-full sm:w-auto")} asChild>
+            <Button
+              size="lg"
+              className={cn(PRIMARY_CTA, "w-full sm:w-auto")}
+              asChild
+            >
               <Link to="/register">
                 Get started
                 <ArrowRight className="h-4 w-4" />
@@ -166,7 +236,12 @@ export function PageHero({ hero, before }: { hero: PageHeroContent; before?: Rea
                 </Button>
               </VideoLightbox>
             ) : (
-              <Button variant="outline" size="lg" className="h-11 w-full rounded-lg bg-background/70 px-5 text-[14px] backdrop-blur-sm sm:w-auto" asChild>
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-11 w-full rounded-lg bg-background/70 px-5 text-[14px] backdrop-blur-sm sm:w-auto"
+                asChild
+              >
                 <Link to={secondary.href}>{secondary.label}</Link>
               </Button>
             )}
@@ -195,7 +270,8 @@ export function PageHero({ hero, before }: { hero: PageHeroContent; before?: Rea
             reduced
               ? undefined
               : {
-                  transition: "opacity 1000ms cubic-bezier(0.2,0.8,0.2,1), transform 1200ms cubic-bezier(0.2,0.8,0.2,1)",
+                  transition:
+                    "opacity 1000ms cubic-bezier(0.2,0.8,0.2,1), transform 1200ms cubic-bezier(0.2,0.8,0.2,1)",
                   transitionDelay: "480ms",
                   opacity: ready ? 1 : 0,
                   transform: ready ? "none" : "translateY(40px)",
@@ -214,7 +290,9 @@ export function PageHero({ hero, before }: { hero: PageHeroContent; before?: Rea
                     }
               }
             >
-              <div className={cn(SUNRISE_GLOW, "-inset-x-16 -top-16 bottom-[20%]")} />
+              <div
+                className={cn(SUNRISE_GLOW, "-inset-x-16 -top-16 bottom-[20%]")}
+              />
               <BrowserFrame className="relative">
                 <div className="relative aspect-16/10 w-full overflow-hidden">
                   <HeroFrameMedia media={hero.media} />
@@ -238,7 +316,9 @@ export function PageHero({ hero, before }: { hero: PageHeroContent; before?: Rea
             </div>
           </div>
           {"clip" in hero.media && hero.media.caption && (
-            <p className="mt-5 text-center text-[13px] text-muted-foreground">{hero.media.caption}</p>
+            <p className="mt-5 text-center text-[13px] text-muted-foreground">
+              {hero.media.caption}
+            </p>
           )}
         </div>
       </div>

@@ -19,8 +19,11 @@ import { trackAICrawlerResponse } from "@datafast/ai-crawl";
 const DIST_DIR = path.resolve(import.meta.dir, "dist");
 const PORT = 3000;
 
-const COMPRESSIBLE = /\.(html|js|mjs|css|json|svg|xml|txt|vtt|webmanifest|map)$/;
-const IMMUTABLE_DIRS = ["assets", "blog-media"].map((dir) => path.join(DIST_DIR, dir) + path.sep);
+const COMPRESSIBLE =
+  /\.(html|js|mjs|css|json|svg|xml|txt|vtt|webmanifest|map)$/;
+const IMMUTABLE_DIRS = ["assets", "blog-media"].map(
+  (dir) => path.join(DIST_DIR, dir) + path.sep
+);
 const gzipCache = new Map<string, { mtime: number; body: Uint8Array }>();
 
 async function findFile(pathname: string) {
@@ -112,8 +115,14 @@ async function respond(req: Request) {
     return new Response(null, { status: 416, headers });
   }
   if (range) {
-    headers.set("Content-Range", `bytes ${range.start}-${range.end}/${file.size}`);
-    return new Response(file.slice(range.start, range.end + 1), { status: 206, headers });
+    headers.set(
+      "Content-Range",
+      `bytes ${range.start}-${range.end}/${file.size}`
+    );
+    return new Response(file.slice(range.start, range.end + 1), {
+      status: 206,
+      headers,
+    });
   }
   return new Response(file, { headers });
 }

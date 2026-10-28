@@ -17,7 +17,10 @@ interface EmailNotificationsDialogProps {
   onOpenChange: (open: boolean) => void;
   emailNotificationsEnabled: boolean;
   dailySummaryEnabled: boolean;
-  onSave: (emailNotificationsEnabled: boolean, dailySummaryEnabled: boolean) => Promise<void>;
+  onSave: (
+    emailNotificationsEnabled: boolean,
+    dailySummaryEnabled: boolean
+  ) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -29,7 +32,9 @@ export function EmailNotificationsDialog({
   onSave,
   isLoading = false,
 }: EmailNotificationsDialogProps) {
-  const [emailEnabled, setEmailEnabled] = React.useState(emailNotificationsEnabled);
+  const [emailEnabled, setEmailEnabled] = React.useState(
+    emailNotificationsEnabled
+  );
   const [dailySummary, setDailySummary] = React.useState(dailySummaryEnabled);
   const [isSaving, setIsSaving] = React.useState(false);
 

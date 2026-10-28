@@ -3,7 +3,7 @@
  * @module @open-sunsama/types/time-block
  */
 
-import type { Task } from './task.js';
+import type { Task } from "./task.js";
 
 /**
  * Represents a time block in the Open Sunsama system.
@@ -22,19 +22,19 @@ export interface TimeBlock {
   /** Title/label for the time block */
   title: string;
 
-  /** 
+  /**
    * Start time of the time block.
    * Stored as ISO 8601 datetime string in UTC.
    */
   startTime: Date;
 
-  /** 
+  /**
    * End time of the time block.
    * Stored as ISO 8601 datetime string in UTC.
    */
   endTime: Date;
 
-  /** 
+  /**
    * Color code for visual distinction (hex format, e.g., "#FF5733").
    * Used in calendar UI for categorization.
    */
@@ -60,13 +60,13 @@ export interface CreateTimeBlockInput {
   /** Title/label for the time block */
   title: string;
 
-  /** 
+  /**
    * Start time of the time block.
    * Can be Date object or ISO 8601 string.
    */
   startTime: Date | string;
 
-  /** 
+  /**
    * End time of the time block.
    * Can be Date object or ISO 8601 string.
    */
@@ -144,7 +144,7 @@ export interface QuickScheduleInput {
   /** Start time for the time block */
   startTime: Date | string;
 
-  /** 
+  /**
    * Duration in minutes.
    * If omitted, uses the task's estimated minutes or a default value.
    */

@@ -14,7 +14,10 @@ export default defineMarketingPage({
     description:
       "Open Sunsama is a personal kanban app for daily planning. Each day is a column with its planned hours. Drag tasks from the backlog to Today or ask an AI agent.",
   },
-  breadcrumbs: [{ label: "Features", href: "/#features" }, { label: "Kanban board" }],
+  breadcrumbs: [
+    { label: "Features", href: "/#features" },
+    { label: "Kanban board" },
+  ],
 
   hero: {
     badge: "Feature",
@@ -28,8 +31,16 @@ export default defineMarketingPage({
       alt: "Tasks dragged from the backlog into the Today column of the Open Sunsama board",
     },
     chips: [
-      { tone: "block", title: "Today · 4:45 planned", detail: "8 tasks, 2 done" },
-      { tone: "agent", title: "Claude connected", detail: "Moved 3 tasks to Friday" },
+      {
+        tone: "block",
+        title: "Today · 4:45 planned",
+        detail: "8 tasks, 2 done",
+      },
+      {
+        tone: "agent",
+        title: "Claude connected",
+        detail: "Moved 3 tasks to Friday",
+      },
       { tone: "timer", title: "0:42 / 1:30", detail: "Finalize Q4 roadmap" },
     ],
   },
@@ -39,7 +50,8 @@ export default defineMarketingPage({
       kind: "answer",
       id: "answer",
       eyebrow: "The short answer",
-      heading: "A kanban board for daily planning gives every day its own column",
+      heading:
+        "A kanban board for daily planning gives every day its own column",
       body: [
         "A kanban board for daily planning in Open Sunsama has one column per day: Today, Tomorrow, then the rest of the week. Your backlog sits to the side for everything without a date.",
         "You drag a task into the day you will do it. Each column adds up your time estimates, so you see a full day before you start it.",
@@ -74,7 +86,10 @@ export default defineMarketingPage({
           title: "Spread the rest across the week",
           body: "Drag a task from Today to Thursday, or back to the backlog. On a busy day, press D on a task to push it to tomorrow.",
           clip: "week-plan",
-          link: { label: "See every shortcut", href: "/features/command-palette" },
+          link: {
+            label: "See every shortcut",
+            href: "/features/command-palette",
+          },
         },
         {
           icon: "check",
@@ -106,7 +121,8 @@ export default defineMarketingPage({
           media: {
             shot: "board",
             alt: "Open Sunsama board with Today, Tomorrow and weekend columns, time totals per day and the calendar on the right",
-            caption: "Today holds 4:45 of planned work. Your calendar sits on the right.",
+            caption:
+              "Today holds 4:45 of planned work. Your calendar sits on the right.",
           },
         },
         {
@@ -118,9 +134,13 @@ export default defineMarketingPage({
           media: {
             clip: "time-block",
             alt: "A task dragged from the list onto the day calendar in Open Sunsama, then resized to fit",
-            caption: "Drop a task on the calendar, then drag its edge to set how long it takes.",
+            caption:
+              "Drop a task on the calendar, then drag its edge to set how long it takes.",
           },
-          link: { label: "How time blocking works", href: "/features/time-blocking" },
+          link: {
+            label: "How time blocking works",
+            href: "/features/time-blocking",
+          },
         },
         {
           title: "Open a card to see everything about the task",
@@ -131,7 +151,8 @@ export default defineMarketingPage({
           media: {
             shot: "task-detail",
             alt: "An Open Sunsama task open with its notes, subtasks, priority and time estimate",
-            caption: "One card holds the notes, subtasks and files for the task.",
+            caption:
+              "One card holds the notes, subtasks and files for the task.",
           },
         },
       ],
@@ -151,9 +172,16 @@ export default defineMarketingPage({
         "Put my three P0 tasks at the top of today.",
         "Look at my backlog and spread the P1 tasks across this week.",
       ],
-      tools: ["list_tasks", "schedule_task", "reorder_tasks", "create_task", "update_task"],
+      tools: [
+        "list_tasks",
+        "schedule_task",
+        "reorder_tasks",
+        "create_task",
+        "update_task",
+      ],
       clip: "ai-plan",
-      clipCaption: "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
+      clipCaption:
+        "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
       links: [
         { label: "Claude setup", href: "/docs/mcp/claude" },
         { label: "ChatGPT setup", href: "/docs/mcp/chatgpt" },
@@ -247,7 +275,10 @@ export default defineMarketingPage({
           ],
         },
         { feature: "Public REST API", cells: ["yes", "no", "yes", "yes"] },
-        { feature: "Code you can read and self-host", cells: ["yes", "no", "no", "no"] },
+        {
+          feature: "Code you can read and self-host",
+          cells: ["yes", "no", "no", "no"],
+        },
         {
           feature: "Phone",
           cells: [
@@ -292,7 +323,10 @@ export default defineMarketingPage({
         question: "What is the best kanban board for daily planning?",
         answer:
           "We build Open Sunsama, and we think it is the best pick for most people. Each day is a column, your calendar sits beside it, and any AI agent can move tasks for you. Pick Trello if you want boards for projects, not days.",
-        link: { label: "How to plan your day", href: "/blog/how-to-plan-your-day" },
+        link: {
+          label: "How to plan your day",
+          href: "/blog/how-to-plan-your-day",
+        },
       },
       {
         question: "What is a personal kanban board?",
@@ -303,7 +337,10 @@ export default defineMarketingPage({
         question: "How do I plan my week on the board?",
         answer:
           "Drag tasks from the backlog into the days they belong to. Each column shows its total planned time, so you can even out heavy days before they start.",
-        link: { label: "Weekly review guide", href: "/blog/how-to-weekly-review" },
+        link: {
+          label: "Weekly review guide",
+          href: "/blog/how-to-weekly-review",
+        },
       },
       {
         question: "What happens to tasks I don't finish?",
@@ -325,7 +362,10 @@ export default defineMarketingPage({
         question: "Is Open Sunsama open source?",
         answer:
           "The code is public on GitHub. It uses a non-commercial license: you can read it, run it and self-host it for personal use. Companies need a commercial license.",
-        link: { label: "See the code", href: "https://github.com/ShadowWalker2014/open-sunsama" },
+        link: {
+          label: "See the code",
+          href: "https://github.com/ShadowWalker2014/open-sunsama",
+        },
       },
     ],
   },
@@ -367,7 +407,8 @@ export default defineMarketingPage({
       {
         kind: "persona",
         title: "For ADHD",
-        description: "A short Today column and rollover that forgives bad days.",
+        description:
+          "A short Today column and rollover that forgives bad days.",
         href: "/for/adhd",
       },
       {
@@ -389,7 +430,8 @@ export default defineMarketingPage({
     heading: "Plan tomorrow in one column",
     body: "Drag tomorrow's tasks into place before you log off, then let the AI agent you already use keep the board in order.",
     shot: "board",
-    shotAlt: "Open Sunsama board with a column for each day and the calendar beside it",
+    shotAlt:
+      "Open Sunsama board with a column for each day and the calendar beside it",
   },
 
   software: {

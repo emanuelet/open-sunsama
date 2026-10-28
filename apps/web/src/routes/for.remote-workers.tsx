@@ -9,7 +9,9 @@ import type { CustomSection } from "@/content/marketing/types";
  * crawlers (scripts/prerender-marketing.ts).
  */
 
-const typical = page.sections.find((s): s is CustomSection => s.kind === "custom" && s.id === "typical-day")!;
+const typical = page.sections.find(
+  (s): s is CustomSection => s.kind === "custom" && s.id === "typical-day"
+)!;
 
 export default function RemoteWorkersPage() {
   return (

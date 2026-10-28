@@ -191,7 +191,10 @@ export function findDueOccurrence(
 ): Date | null {
   let next = calculateNextOccurrence(lastGeneratedStr, series);
   while (isBefore(next, today)) {
-    const following = calculateNextOccurrence(format(next, "yyyy-MM-dd"), series);
+    const following = calculateNextOccurrence(
+      format(next, "yyyy-MM-dd"),
+      series
+    );
     // Guard against a pattern that doesn't advance (e.g. frequency 0)
     if (!isAfter(following, next)) return null;
     next = following;

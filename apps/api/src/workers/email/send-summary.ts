@@ -2,15 +2,15 @@
  * Send daily summary email handler
  * Fetches user's tasks and sends the daily summary email
  */
-import type { Job } from 'pg-boss';
-import { getDb, eq, and } from '@open-sunsama/database';
-import { users, tasks } from '@open-sunsama/database/schema';
-import type { SendDailySummaryPayload } from './daily-summary.js';
-import { 
-  sendDailySummaryEmail, 
+import type { Job } from "pg-boss";
+import { getDb, eq, and } from "@open-sunsama/database";
+import { users, tasks } from "@open-sunsama/database/schema";
+import type { SendDailySummaryPayload } from "./daily-summary.js";
+import {
+  sendDailySummaryEmail,
   getThemeHexColor,
-  type EmailTaskItem 
-} from '../../lib/email/index.js';
+  type EmailTaskItem,
+} from "../../lib/email/index.js";
 
 /**
  * Process a single user's daily summary email
@@ -42,18 +42,13 @@ export async function processSendDailySummary(
         completedAt: tasks.completedAt,
       })
       .from(tasks)
-      .where(
-        and(
-          eq(tasks.userId, userId),
-          eq(tasks.scheduledDate, date)
-        )
-      )
+      .where(and(eq(tasks.userId, userId), eq(tasks.scheduledDate, date)))
       .orderBy(tasks.position);
 
     // Convert to email task items
     const emailTasks: EmailTaskItem[] = userTasks.map((task) => ({
       title: task.title,
-      priority: task.priority as EmailTaskItem['priority'],
+      priority: task.priority as EmailTaskItem["priority"],
       estimatedMins: task.estimatedMins ?? undefined,
       isCompleted: task.completedAt !== null,
     }));
@@ -78,7 +73,7 @@ export async function processSendDailySummary(
   } catch (error) {
     const durationMs = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
+
     console.error(
       `[Daily Summary] Failed to send email for user ${userId} (${durationMs}ms):`,
       errorMessage

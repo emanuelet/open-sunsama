@@ -1,36 +1,49 @@
-import { pgTable, uuid, varchar, timestamp, integer, date, index } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
-import { users } from './users';
-import { tasks } from './tasks';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  timestamp,
+  integer,
+  date,
+  index,
+} from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
+import { users } from "./users";
+import { tasks } from "./tasks";
 
 export const timeBlocks = pgTable(
-  'time_blocks',
+  "time_blocks",
   {
-    id: uuid('id').primaryKey().defaultRandom(),
-    userId: uuid('user_id')
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
       .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    taskId: uuid('task_id').references(() => tasks.id, { onDelete: 'set null' }),
-    title: varchar('title', { length: 255 }).notNull(),
-    description: varchar('description', { length: 1000 }),
-    date: date('date').notNull(),
-    startTime: varchar('start_time', { length: 5 }).notNull(), // HH:MM format
-    endTime: varchar('end_time', { length: 5 }).notNull(), // HH:MM format
-    durationMins: integer('duration_mins').notNull(),
-    color: varchar('color', { length: 7 }).default('#3B82F6'), // Hex color
-    position: integer('position').notNull().default(0),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+      .references(() => users.id, { onDelete: "cascade" }),
+    taskId: uuid("task_id").references(() => tasks.id, {
+      onDelete: "set null",
+    }),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: varchar("description", { length: 1000 }),
+    date: date("date").notNull(),
+    startTime: varchar("start_time", { length: 5 }).notNull(), // HH:MM format
+    endTime: varchar("end_time", { length: 5 }).notNull(), // HH:MM format
+    durationMins: integer("duration_mins").notNull(),
+    color: varchar("color", { length: 7 }).default("#3B82F6"), // Hex color
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => ({
     // Time-block listings filter by `(user_id, date)` (calendar view) or
     // `(user_id, taskId)` (task modal). The user_id+date composite index
     // covers both common range queries; the task_id index covers the
     // modal's "all blocks for this task" lookup.
-    userDateIdx: index('time_blocks_user_date_idx').on(table.userId, table.date),
-    taskIdIdx: index('time_blocks_task_id_idx').on(table.taskId),
+    userDateIdx: index("time_blocks_user_date_idx").on(
+      table.userId,
+      table.date
+    ),
+    taskIdIdx: index("time_blocks_task_id_idx").on(table.taskId),
   })
 );
 
@@ -50,15 +63,26 @@ const timeFormatRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 // Zod schemas for validation
 export const insertTimeBlockSchema = createInsertSchema(timeBlocks, {
-  title: z.string().min(1, { error: 'Title is required' }).max(255),
+  title: z.string().min(1, { error: "Title is required" }).max(255),
   description: z.string().max(1000).optional(),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { error: 'Invalid date format (YYYY-MM-DD)' }),
-  startTime: z.string().regex(timeFormatRegex, { error: 'Invalid time format (HH:MM)' }),
-  endTime: z.string().regex(timeFormatRegex, { error: 'Invalid time format (HH:MM)' }),
-  durationMins: z.number().int().positive({ error: 'Duration must be positive' }),
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, {
+      error: "Invalid date format (YYYY-MM-DD)",
+    }),
+  startTime: z
+    .string()
+    .regex(timeFormatRegex, { error: "Invalid time format (HH:MM)" }),
+  endTime: z
+    .string()
+    .regex(timeFormatRegex, { error: "Invalid time format (HH:MM)" }),
+  durationMins: z
+    .number()
+    .int()
+    .positive({ error: "Duration must be positive" }),
   color: z
     .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/, { error: 'Invalid hex color' })
+    .regex(/^#[0-9A-Fa-f]{6}$/, { error: "Invalid hex color" })
     .optional(),
   position: z.number().int().nonnegative().optional(),
 });
@@ -66,7 +90,9 @@ export const insertTimeBlockSchema = createInsertSchema(timeBlocks, {
 export const selectTimeBlockSchema = createSelectSchema(timeBlocks);
 
 // Partial update schema (all fields optional except userId)
-export const updateTimeBlockSchema = insertTimeBlockSchema.partial().omit({ userId: true });
+export const updateTimeBlockSchema = insertTimeBlockSchema
+  .partial()
+  .omit({ userId: true });
 
 // Type exports
 export type TimeBlock = typeof timeBlocks.$inferSelect;

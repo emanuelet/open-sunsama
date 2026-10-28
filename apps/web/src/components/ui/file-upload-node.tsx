@@ -42,7 +42,9 @@ export function ImageNodeView({ node, deleteNode, selected }: NodeViewProps) {
         )}
         {hasError ? (
           <div className="flex items-center justify-center h-32 bg-muted rounded-lg border border-dashed border-muted-foreground/30">
-            <p className="text-sm text-muted-foreground">Failed to load image</p>
+            <p className="text-sm text-muted-foreground">
+              Failed to load image
+            </p>
           </div>
         ) : (
           <img
@@ -115,13 +117,17 @@ export function VideoNodeView({ node, deleteNode, selected }: NodeViewProps) {
           <div className="absolute inset-0 flex items-center justify-center bg-muted/50 animate-pulse z-10">
             <div className="flex flex-col items-center gap-2">
               <Play className="h-8 w-8 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Loading video...</span>
+              <span className="text-sm text-muted-foreground">
+                Loading video...
+              </span>
             </div>
           </div>
         )}
         {hasError ? (
           <div className="flex items-center justify-center h-48 bg-muted rounded-lg border border-dashed border-muted-foreground/30">
-            <p className="text-sm text-muted-foreground">Failed to load video</p>
+            <p className="text-sm text-muted-foreground">
+              Failed to load video
+            </p>
           </div>
         ) : (
           <video
@@ -159,7 +165,11 @@ export function VideoNodeView({ node, deleteNode, selected }: NodeViewProps) {
  * File Attachment Node View Component
  * Renders non-media files as downloadable cards
  */
-export function FileAttachmentNodeView({ node, deleteNode, selected }: NodeViewProps) {
+export function FileAttachmentNodeView({
+  node,
+  deleteNode,
+  selected,
+}: NodeViewProps) {
   const { src, filename, contentType, size } = node.attrs;
   const icon = getFileIcon(contentType);
   const lightbox = useLightbox();
@@ -171,7 +181,11 @@ export function FileAttachmentNodeView({ node, deleteNode, selected }: NodeViewP
 
   const openPreview = () => {
     lightbox.open([
-      { url: src, filename: filename || "File", contentType: contentType || "" },
+      {
+        url: src,
+        filename: filename || "File",
+        contentType: contentType || "",
+      },
     ]);
   };
 
@@ -251,7 +265,9 @@ export function UploadPlaceholderNodeView({ node }: NodeViewProps) {
       >
         <Loader2 className="h-5 w-5 animate-spin text-primary" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm truncate text-muted-foreground">{filename || "Uploading..."}</p>
+          <p className="text-sm truncate text-muted-foreground">
+            {filename || "Uploading..."}
+          </p>
           <p className="text-xs text-muted-foreground">Please wait...</p>
         </div>
       </div>
@@ -269,7 +285,11 @@ interface DragDropZoneProps {
   className?: string;
 }
 
-export function DragDropZone({ children, onFileDrop, className }: DragDropZoneProps) {
+export function DragDropZone({
+  children,
+  onFileDrop,
+  className,
+}: DragDropZoneProps) {
   const [isDragging, setIsDragging] = React.useState(false);
   const dragCounter = React.useRef(0);
 

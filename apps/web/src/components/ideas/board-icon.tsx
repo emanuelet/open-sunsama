@@ -10,7 +10,12 @@ interface BoardIconProps {
 }
 
 /** A board glyph: a lucide icon tinted onto a soft colored square. */
-export function BoardIcon({ icon, color, size = 22, className }: BoardIconProps) {
+export function BoardIcon({
+  icon,
+  color,
+  size = 22,
+  className,
+}: BoardIconProps) {
   const Icon = getIdeaIcon(icon);
   return (
     <span

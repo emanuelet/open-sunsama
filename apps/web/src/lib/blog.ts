@@ -100,7 +100,7 @@ export function getBlogPostsByTag(tag: string): BlogPost[] {
  */
 export function getAllTags(): string[] {
   const tags = new Set<string>();
-  
+
   for (const post of getAllBlogPosts()) {
     for (const tag of post.tags) {
       tags.add(tag);
@@ -118,7 +118,7 @@ export function getRelatedPosts(currentSlug: string, limit = 3): BlogPost[] {
   if (!currentPost) return [];
 
   const allPosts = getAllBlogPosts().filter((p) => p.slug !== currentSlug);
-  
+
   // Score posts by number of shared tags
   const scoredPosts = allPosts.map((post) => {
     const sharedTags = post.tags.filter((tag) =>

@@ -11,18 +11,19 @@ const SearchContext = React.createContext<SearchContextValue | null>(null);
 
 export function SearchProvider({ children }: { children: React.ReactNode }) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
-  
-  const value = React.useMemo(() => ({
-    isSearchOpen,
-    openSearch: () => setIsSearchOpen(true),
-    closeSearch: () => setIsSearchOpen(false),
-    toggleSearch: () => setIsSearchOpen(prev => !prev),
-  }), [isSearchOpen]);
-  
+
+  const value = React.useMemo(
+    () => ({
+      isSearchOpen,
+      openSearch: () => setIsSearchOpen(true),
+      closeSearch: () => setIsSearchOpen(false),
+      toggleSearch: () => setIsSearchOpen((prev) => !prev),
+    }),
+    [isSearchOpen]
+  );
+
   return (
-    <SearchContext.Provider value={value}>
-      {children}
-    </SearchContext.Provider>
+    <SearchContext.Provider value={value}>{children}</SearchContext.Provider>
   );
 }
 

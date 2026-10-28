@@ -35,9 +35,7 @@ export function ConnectIntegrationDialog({
   const [error, setError] = React.useState<string | null>(null);
 
   const connectMutation = useConnectIntegration();
-  const config = provider
-    ? getIntegrationProviderConfig(provider.id)
-    : null;
+  const config = provider ? getIntegrationProviderConfig(provider.id) : null;
 
   const reset = React.useCallback(() => {
     setValues({});

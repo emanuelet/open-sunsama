@@ -5,7 +5,10 @@ import { subtaskKeys } from "@/lib/query-keys";
 
 // Re-export types for convenience
 export type { Subtask };
-export type { CreateSubtaskInput, UpdateSubtaskInput } from "@open-sunsama/types";
+export type {
+  CreateSubtaskInput,
+  UpdateSubtaskInput,
+} from "@open-sunsama/types";
 
 // Re-export the canonical key factory.
 export { subtaskKeys };

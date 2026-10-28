@@ -131,7 +131,9 @@ export function renderPage(template: string, page: PageMeta): string {
   let html = template;
   for (const tag of REPLACED_TAGS) {
     if (!tag.test(html)) {
-      throw new Error(`index.html no longer contains ${tag}; update this script`);
+      throw new Error(
+        `index.html no longer contains ${tag}; update this script`
+      );
     }
     html = html.replace(tag, "");
   }
@@ -139,8 +141,14 @@ export function renderPage(template: string, page: PageMeta): string {
   html = html.replace(/\n[ \t]*(?=\n)/g, "");
   const charset = '<meta charset="UTF-8" />';
   const root = '<div id="root"></div>';
-  if (!html.includes(charset) || !html.includes(root) || !html.includes("</head>")) {
-    throw new Error("index.html no longer has the charset tag, </head> or #root");
+  if (
+    !html.includes(charset) ||
+    !html.includes(root) ||
+    !html.includes("</head>")
+  ) {
+    throw new Error(
+      "index.html no longer has the charset tag, </head> or #root"
+    );
   }
   // Replacer functions, so a "$" in post text is never read as a pattern
   html = html.replace(charset, () => `${charset}\n    ${renderTags(page)}`);
@@ -151,10 +159,16 @@ export function renderPage(template: string, page: PageMeta): string {
       `<script type="application/ld+json" id="${id}">${JSON.stringify(data).replace(/</g, "\\u003c")}</script>`
   );
   if (scripts.length) {
-    html = html.replace("</head>", () => `  ${scripts.join("\n    ")}\n  </head>`);
+    html = html.replace(
+      "</head>",
+      () => `  ${scripts.join("\n    ")}\n  </head>`
+    );
   }
   if (page.noscript) {
-    html = html.replace(root, () => `${root}\n    <noscript>${page.noscript}</noscript>`);
+    html = html.replace(
+      root,
+      () => `${root}\n    <noscript>${page.noscript}</noscript>`
+    );
   }
   return html;
 }

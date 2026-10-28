@@ -30,14 +30,21 @@ function protectedResourceMetadata() {
   };
 }
 
-wellKnownRouter.get("/oauth-protected-resource", (c) => c.json(protectedResourceMetadata(), 200, CACHE));
+wellKnownRouter.get("/oauth-protected-resource", (c) =>
+  c.json(protectedResourceMetadata(), 200, CACHE)
+);
 wellKnownRouter.get("/oauth-protected-resource/mcp", (c) =>
   c.json(protectedResourceMetadata(), 200, CACHE)
 );
 
 wellKnownRouter.get("/oauth-authorization-server", (c) => {
   const issuer = getIssuer();
-  const authMethods = ["none", "client_secret_basic", "client_secret_post", "private_key_jwt"];
+  const authMethods = [
+    "none",
+    "client_secret_basic",
+    "client_secret_post",
+    "private_key_jwt",
+  ];
   return c.json(
     {
       issuer,
@@ -50,7 +57,12 @@ wellKnownRouter.get("/oauth-authorization-server", (c) => {
       grant_types_supported: ["authorization_code", "refresh_token"],
       code_challenge_methods_supported: ["S256"],
       token_endpoint_auth_methods_supported: authMethods,
-      token_endpoint_auth_signing_alg_values_supported: ["RS256", "ES256", "PS256", "EdDSA"],
+      token_endpoint_auth_signing_alg_values_supported: [
+        "RS256",
+        "ES256",
+        "PS256",
+        "EdDSA",
+      ],
       revocation_endpoint_auth_methods_supported: authMethods,
       scopes_supported: SUPPORTED_SCOPES,
       client_id_metadata_document_supported: true,

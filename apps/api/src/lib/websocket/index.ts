@@ -4,12 +4,16 @@
  * Falls back to direct broadcasting for local development without Redis
  */
 
-import { WebSocketServer, type WebSocket } from 'ws';
-import type { Server } from 'http';
-import { wsManager } from './manager.js';
-import { authenticateWebSocket } from './auth.js';
-import { getUserChannel, type WebSocketEvent, type WebSocketEventType } from './events.js';
-import { getRedisSubscriber, getRedisPublisher } from '../redis.js';
+import { WebSocketServer, type WebSocket } from "ws";
+import type { Server } from "http";
+import { wsManager } from "./manager.js";
+import { authenticateWebSocket } from "./auth.js";
+import {
+  getUserChannel,
+  type WebSocketEvent,
+  type WebSocketEventType,
+} from "./events.js";
+import { getRedisSubscriber, getRedisPublisher } from "../redis.js";
 
 let wss: WebSocketServer | null = null;
 
@@ -27,16 +31,16 @@ const subscribedChannels = new Set<string>();
 export function initWebSocket(server: Server): WebSocketServer {
   wss = new WebSocketServer({
     server,
-    path: '/ws',
+    path: "/ws",
   });
 
-  wss.on('connection', (ws: WebSocket, req) => {
+  wss.on("connection", (ws: WebSocket, req) => {
     // Authenticate connection using JWT from query string
-    const url = req.url || '';
+    const url = req.url || "";
     const auth = authenticateWebSocket(url);
 
     if (!auth.success || !auth.userId) {
-      ws.close(4001, auth.error || 'Unauthorized');
+      ws.close(4001, auth.error || "Unauthorized");
       return;
     }
 
@@ -49,16 +53,16 @@ export function initWebSocket(server: Server): WebSocketServer {
     subscribeToUserChannel(userId);
 
     // Handle ping/pong for connection health
-    ws.on('pong', () => {
+    ws.on("pong", () => {
       // Connection is alive - could track last pong time here
     });
 
-    ws.on('close', () => {
+    ws.on("close", () => {
       wsManager.removeConnection(ws);
       // Note: Redis subscription persists (shared across all connections for this user)
     });
 
-    ws.on('error', (error) => {
+    ws.on("error", (error) => {
       console.error(`[WS] Error for user ${userId}:`, error);
       wsManager.removeConnection(ws);
     });
@@ -66,7 +70,7 @@ export function initWebSocket(server: Server): WebSocketServer {
     // Send connection confirmation
     ws.send(
       JSON.stringify({
-        type: 'connected',
+        type: "connected",
         payload: { userId },
         timestamp: new Date().toISOString(),
       })
@@ -82,11 +86,11 @@ export function initWebSocket(server: Server): WebSocketServer {
     });
   }, 30000);
 
-  wss.on('close', () => {
+  wss.on("close", () => {
     clearInterval(heartbeatInterval);
   });
 
-  console.log('[WS] WebSocket server initialized at /ws');
+  console.log("[WS] WebSocket server initialized at /ws");
   return wss;
 }
 
@@ -125,7 +129,7 @@ export function initRedisSubscriber(): boolean {
   try {
     const subscriber = getRedisSubscriber();
 
-    subscriber.on('message', (channel: string, message: string) => {
+    subscriber.on("message", (channel: string, message: string) => {
       // Extract userId from channel name (user:{userId}:events)
       const match = channel.match(/^user:([^:]+):events$/);
       if (!match || !match[1]) return;
@@ -136,15 +140,15 @@ export function initRedisSubscriber(): boolean {
         const event = JSON.parse(message) as WebSocketEvent;
         wsManager.broadcastToUser(userId, event);
       } catch (error) {
-        console.error('[WS] Failed to parse Redis message:', error);
+        console.error("[WS] Failed to parse Redis message:", error);
       }
     });
 
     redisEnabled = true;
-    console.log('[WS] Redis subscriber initialized');
+    console.log("[WS] Redis subscriber initialized");
     return true;
   } catch {
-    console.log('[WS] Redis not available, using direct broadcast mode');
+    console.log("[WS] Redis not available, using direct broadcast mode");
     redisEnabled = false;
     return false;
   }
@@ -179,7 +183,10 @@ export async function publishEvent(
       const channel = getUserChannel(userId);
       await publisher.publish(channel, JSON.stringify(event));
     } catch (error) {
-      console.error('[WS] Redis publish failed, falling back to direct broadcast:', error);
+      console.error(
+        "[WS] Redis publish failed, falling back to direct broadcast:",
+        error
+      );
       // Fallback to direct broadcast
       wsManager.broadcastToUser(userId, event);
     }
@@ -198,5 +205,10 @@ export function getWebSocketServer(): WebSocketServer | null {
 }
 
 // Re-export types and utilities for convenience
-export type { WebSocketEvent, WebSocketEventType } from './events.js';
-export type { TaskEvent, TaskReorderedEvent, TimeBlockEvent, UserEvent } from './events.js';
+export type { WebSocketEvent, WebSocketEventType } from "./events.js";
+export type {
+  TaskEvent,
+  TaskReorderedEvent,
+  TimeBlockEvent,
+  UserEvent,
+} from "./events.js";

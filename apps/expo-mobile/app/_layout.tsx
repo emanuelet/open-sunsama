@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StyleSheet, useColorScheme } from 'react-native';
-import { AuthProvider, useAuth } from '@/lib/auth';
+import { useEffect } from "react";
+import { Stack, useRouter, useSegments } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { StyleSheet, useColorScheme } from "react-native";
+import { AuthProvider, useAuth } from "@/lib/auth";
 
 // Create a query client for React Query
 const queryClient = new QueryClient({
@@ -27,14 +27,14 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === '(auth)';
+    const inAuthGroup = segments[0] === "(auth)";
 
     if (!isAuthenticated && !inAuthGroup) {
       // Redirect to login if not authenticated
-      router.replace('/(auth)/login');
+      router.replace("/(auth)/login");
     } else if (isAuthenticated && inAuthGroup) {
       // Redirect to app if authenticated
-      router.replace('/(app)');
+      router.replace("/(app)");
     }
   }, [isAuthenticated, isLoading, segments]);
 
@@ -46,10 +46,12 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
  */
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = colorScheme === "dark";
 
   return (
-    <GestureHandlerRootView style={[styles.container, isDark && styles.containerDark]}>
+    <GestureHandlerRootView
+      style={[styles.container, isDark && styles.containerDark]}
+    >
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <AuthGuard>
@@ -58,7 +60,7 @@ export default function RootLayout() {
               <Stack.Screen name="(app)" options={{ headerShown: false }} />
             </Stack>
           </AuthGuard>
-          <StatusBar style={isDark ? 'light' : 'dark'} />
+          <StatusBar style={isDark ? "light" : "dark"} />
         </AuthProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
@@ -68,9 +70,9 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
   },
   containerDark: {
-    backgroundColor: '#111827',
+    backgroundColor: "#111827",
   },
 });

@@ -24,7 +24,9 @@ export function MobileTasksView() {
     }
   });
   const [sortBy, setSortBy] = useSortPreference();
-  const [selectedDate, setSelectedDate] = React.useState(() => startOfDay(new Date()));
+  const [selectedDate, setSelectedDate] = React.useState(() =>
+    startOfDay(new Date())
+  );
 
   const changeViewMode = React.useCallback((mode: MobileTasksViewMode) => {
     setViewMode(mode);

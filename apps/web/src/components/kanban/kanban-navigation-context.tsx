@@ -9,7 +9,8 @@ export interface KanbanNavigationContextValue {
   selectTask: (task: Task) => void;
 }
 
-const KanbanNavigationContext = React.createContext<KanbanNavigationContextValue | null>(null);
+const KanbanNavigationContext =
+  React.createContext<KanbanNavigationContextValue | null>(null);
 
 export function KanbanNavigationProvider({
   children,
@@ -28,7 +29,9 @@ export function KanbanNavigationProvider({
 export function useKanbanNavigation() {
   const context = React.useContext(KanbanNavigationContext);
   if (!context) {
-    throw new Error("useKanbanNavigation must be used within KanbanNavigationProvider");
+    throw new Error(
+      "useKanbanNavigation must be used within KanbanNavigationProvider"
+    );
   }
   return context;
 }

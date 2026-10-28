@@ -30,8 +30,16 @@ export function Shot({ id, alt, caption }: ShotProps) {
   return (
     <figure className="blog-media my-8">
       <div className={FRAME_CLASS} style={frameSize(shot.width, shot.height)}>
-        <img {...common} src={shot.light} className="block h-auto w-full dark:hidden" />
-        <img {...common} src={shot.dark} className="hidden h-auto w-full dark:block" />
+        <img
+          {...common}
+          src={shot.light}
+          className="block h-auto w-full dark:hidden"
+        />
+        <img
+          {...common}
+          src={shot.dark}
+          className="hidden h-auto w-full dark:block"
+        />
       </div>
       {caption && <figcaption className={CAPTION_CLASS}>{caption}</figcaption>}
     </figure>

@@ -1,8 +1,22 @@
-import { Bot, CalendarClock, CheckCheck, CloudOff, LayoutGrid, Timer, Users } from "lucide-react";
+import {
+  Bot,
+  CalendarClock,
+  CheckCheck,
+  CloudOff,
+  LayoutGrid,
+  Timer,
+  Users,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Reveal } from "@/components/landing/motion";
 import { RichText, SmartLink } from "@/components/marketing/rich-text";
-import { BODY, CONTAINER, EYEBROW, H2, SECTION } from "@/components/marketing/tokens";
+import {
+  BODY,
+  CONTAINER,
+  EYEBROW,
+  H2,
+  SECTION,
+} from "@/components/marketing/tokens";
 import type { DayEntry, DayTone } from "@/content/marketing/for/typical-day";
 import type { TextLink } from "@/content/marketing/types";
 import { cn } from "@/lib/utils";
@@ -38,7 +52,9 @@ function DayBlock({ entry }: { entry: DayEntry }) {
     <div
       className={cn(
         "relative min-w-0 rounded-md px-4 py-3.5",
-        slip ? "border border-dashed border-border bg-transparent" : "border-l-[3px]"
+        slip
+          ? "border border-dashed border-border bg-transparent"
+          : "border-l-[3px]"
       )}
       style={
         slip
@@ -53,12 +69,15 @@ function DayBlock({ entry }: { entry: DayEntry }) {
       }
     >
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <h3 className={cn("text-[15.5px] font-semibold leading-snug tracking-[-0.01em]", slip && "text-muted-foreground")}>
+        <h3
+          className={cn(
+            "text-[15.5px] font-semibold leading-snug tracking-[-0.01em]",
+            slip && "text-muted-foreground"
+          )}
+        >
           {entry.title}
         </h3>
-        <span
-          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-background/70 px-2 py-0.5 text-[11.5px] font-medium text-foreground/75 ring-1 ring-inset ring-border/60"
-        >
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-background/70 px-2 py-0.5 text-[11.5px] font-medium text-foreground/75 ring-1 ring-inset ring-border/60">
           <Icon className="h-3 w-3" style={{ color: tone.color }} aria-hidden />
           {entry.tag}
         </span>
@@ -102,7 +121,11 @@ export function TypicalDay({
                 <RichText text={lead} />
               </p>
             )}
-            {note && <p className="mt-4 text-[13px] leading-relaxed text-muted-foreground/80">{note}</p>}
+            {note && (
+              <p className="mt-4 text-[13px] leading-relaxed text-muted-foreground/80">
+                {note}
+              </p>
+            )}
             {links && links.length > 0 && (
               <p className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-[14px]">
                 {links.map((link) => (
@@ -120,30 +143,44 @@ export function TypicalDay({
 
           <div className="relative min-w-0">
             {/* The hour rail, like the app's day view */}
-            <span aria-hidden className="absolute bottom-3 left-[76px] top-3 w-px bg-border/80 sm:left-[88px]" />
+            <span
+              aria-hidden
+              className="absolute bottom-3 left-[76px] top-3 w-px bg-border/80 sm:left-[88px]"
+            />
             <ol className="relative" aria-label="An example day, hour by hour">
-            {entries.map((entry, i) => (
-              <Reveal
-                as="li"
-                key={`${entry.time}-${entry.title}`}
-                delay={Math.min(i, 4) * 60}
-                className="relative grid grid-cols-[64px_minmax(0,1fr)] gap-x-6 pb-4 last:pb-0 sm:grid-cols-[76px_minmax(0,1fr)]"
-              >
-                <p className="pt-3.5 text-right font-mono text-[12.5px] tabular-nums leading-snug text-muted-foreground sm:text-[13px]">
-                  {entry.time.split(" - ").map((part, j) => (
-                    <span key={part} className={cn("block", j > 0 && "text-muted-foreground/60")}>
-                      {part}
-                    </span>
-                  ))}
-                </p>
-                <span
-                  aria-hidden
-                  className="absolute left-[72px] top-[18px] h-2 w-2 rounded-full ring-4 ring-background sm:left-[84px]"
-                  style={{ backgroundColor: entry.tone === "slip" ? "hsl(var(--border))" : TONES[entry.tone].color }}
-                />
-                <DayBlock entry={entry} />
-              </Reveal>
-            ))}
+              {entries.map((entry, i) => (
+                <Reveal
+                  as="li"
+                  key={`${entry.time}-${entry.title}`}
+                  delay={Math.min(i, 4) * 60}
+                  className="relative grid grid-cols-[64px_minmax(0,1fr)] gap-x-6 pb-4 last:pb-0 sm:grid-cols-[76px_minmax(0,1fr)]"
+                >
+                  <p className="pt-3.5 text-right font-mono text-[12.5px] tabular-nums leading-snug text-muted-foreground sm:text-[13px]">
+                    {entry.time.split(" - ").map((part, j) => (
+                      <span
+                        key={part}
+                        className={cn(
+                          "block",
+                          j > 0 && "text-muted-foreground/60"
+                        )}
+                      >
+                        {part}
+                      </span>
+                    ))}
+                  </p>
+                  <span
+                    aria-hidden
+                    className="absolute left-[72px] top-[18px] h-2 w-2 rounded-full ring-4 ring-background sm:left-[84px]"
+                    style={{
+                      backgroundColor:
+                        entry.tone === "slip"
+                          ? "hsl(var(--border))"
+                          : TONES[entry.tone].color,
+                    }}
+                  />
+                  <DayBlock entry={entry} />
+                </Reveal>
+              ))}
             </ol>
           </div>
         </div>

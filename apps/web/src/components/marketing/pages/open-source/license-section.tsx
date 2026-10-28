@@ -20,10 +20,25 @@ export function LicenseSection({ section }: { section: CustomSection }) {
   const caveat = section.body?.at(-1);
 
   return (
-    <section id={section.id} className={SECTION} aria-labelledby={`${section.id}-heading`}>
-      <div className={cn(CONTAINER, "grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-14")}>
+    <section
+      id={section.id}
+      className={SECTION}
+      aria-labelledby={`${section.id}-heading`}
+    >
+      <div
+        className={cn(
+          CONTAINER,
+          "grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-14"
+        )}
+      >
         <div className="min-w-0">
-          <SectionHeading id={`${section.id}-heading`} eyebrow={section.eyebrow} heading={section.heading} lead={section.lead} align="left" />
+          <SectionHeading
+            id={`${section.id}-heading`}
+            eyebrow={section.eyebrow}
+            heading={section.heading}
+            lead={section.lead}
+            align="left"
+          />
           {caveat && (
             <Reveal delay={80}>
               <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-muted-foreground">
@@ -31,15 +46,32 @@ export function LicenseSection({ section }: { section: CustomSection }) {
               </p>
             </Reveal>
           )}
-          <Reveal delay={120} className="mt-7 flex flex-col gap-2.5 sm:flex-row">
-            <Button variant="outline" className="h-10 rounded-lg px-4 text-[13.5px]" asChild>
-              <a href={openSource.licenseUrl} target="_blank" rel="noopener noreferrer">
+          <Reveal
+            delay={120}
+            className="mt-7 flex flex-col gap-2.5 sm:flex-row"
+          >
+            <Button
+              variant="outline"
+              className="h-10 rounded-lg px-4 text-[13.5px]"
+              asChild
+            >
+              <a
+                href={openSource.licenseUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <FileText className="h-4 w-4" />
                 Read the LICENSE file
               </a>
             </Button>
-            <Button variant="ghost" className="h-10 rounded-lg px-4 text-[13.5px]" asChild>
-              <a href={`mailto:${openSource.licenseContact}?subject=Open%20Sunsama%20company%20license`}>
+            <Button
+              variant="ghost"
+              className="h-10 rounded-lg px-4 text-[13.5px]"
+              asChild
+            >
+              <a
+                href={`mailto:${openSource.licenseContact}?subject=Open%20Sunsama%20company%20license`}
+              >
                 <Mail className="h-4 w-4" />
                 Ask about a company license
               </a>
@@ -48,7 +80,12 @@ export function LicenseSection({ section }: { section: CustomSection }) {
         </div>
 
         <Reveal delay={100} y={24} className="min-w-0">
-          <figure className={cn(CARD, "overflow-hidden shadow-[0_24px_64px_-32px_hsl(var(--shadow-color)/0.35)]")}>
+          <figure
+            className={cn(
+              CARD,
+              "overflow-hidden shadow-[0_24px_64px_-32px_hsl(var(--shadow-color)/0.35)]"
+            )}
+          >
             <div className="flex items-center justify-between gap-3 border-b border-border/60 bg-muted/40 px-4 py-2.5 dark:border-white/6">
               <span className="flex min-w-0 items-center gap-2 font-jetbrains text-[12px] text-muted-foreground">
                 <FileText className="h-3.5 w-3.5 shrink-0" aria-hidden />
@@ -66,9 +103,16 @@ export function LicenseSection({ section }: { section: CustomSection }) {
                 </p>
                 <ul className="mt-4 space-y-3">
                   {allowed.map((item) => (
-                    <li key={item} className="flex gap-2.5 text-[14.5px] leading-snug text-foreground/90">
+                    <li
+                      key={item}
+                      className="flex gap-2.5 text-[14.5px] leading-snug text-foreground/90"
+                    >
                       <span className="mt-px flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-emerald-500/12 text-emerald-600 dark:text-emerald-400">
-                        <Check className="h-3 w-3" strokeWidth={3} aria-hidden />
+                        <Check
+                          className="h-3 w-3"
+                          strokeWidth={3}
+                          aria-hidden
+                        />
                       </span>
                       {item}
                     </li>
@@ -81,7 +125,10 @@ export function LicenseSection({ section }: { section: CustomSection }) {
                 </p>
                 <ul className="mt-4 space-y-3">
                   {needsLicense.map((item) => (
-                    <li key={item} className="flex gap-2.5 text-[14.5px] leading-snug text-foreground/90">
+                    <li
+                      key={item}
+                      className="flex gap-2.5 text-[14.5px] leading-snug text-foreground/90"
+                    >
                       <span className="mt-px flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
                         <Building2 className="h-3 w-3" aria-hidden />
                       </span>

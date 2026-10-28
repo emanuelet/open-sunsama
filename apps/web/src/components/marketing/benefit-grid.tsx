@@ -20,13 +20,18 @@ export function BenefitGrid({ items }: { items: BenefitItem[] }) {
   return (
     <div className="grid gap-px overflow-hidden rounded-2xl border border-border/70 bg-border/70 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item, i) => {
-        const Icon = typeof item.icon === "string" ? ICONS[item.icon] : item.icon;
+        const Icon =
+          typeof item.icon === "string" ? ICONS[item.icon] : item.icon;
         const color = item.color ?? SUNRISE[i % SUNRISE.length]!;
         const body = (
           <>
             <span
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:-translate-y-0.5"
-              style={{ backgroundColor: `${color}1f`, color, boxShadow: `inset 0 0 0 1px ${color}33` }}
+              style={{
+                backgroundColor: `${color}1f`,
+                color,
+                boxShadow: `inset 0 0 0 1px ${color}33`,
+              }}
             >
               <Icon className="h-[18px] w-[18px]" />
             </span>
@@ -44,7 +49,11 @@ export function BenefitGrid({ items }: { items: BenefitItem[] }) {
           </>
         );
         return (
-          <Reveal key={item.title} delay={i * 50} className="h-full min-w-0 bg-background">
+          <Reveal
+            key={item.title}
+            delay={i * 50}
+            className="h-full min-w-0 bg-background"
+          >
             {item.href ? (
               <SmartLink
                 href={item.href}
@@ -53,7 +62,9 @@ export function BenefitGrid({ items }: { items: BenefitItem[] }) {
                 {body}
               </SmartLink>
             ) : (
-              <div className="group relative flex h-full items-start gap-4 p-5 sm:block sm:p-6">{body}</div>
+              <div className="group relative flex h-full items-start gap-4 p-5 sm:block sm:p-6">
+                {body}
+              </div>
             )}
           </Reveal>
         );
@@ -79,7 +90,12 @@ export function BenefitsSection({
   return (
     <section id={id} className={SECTION} aria-labelledby={`${id}-heading`}>
       <div className={CONTAINER}>
-        <SectionHeading id={`${id}-heading`} eyebrow={eyebrow} heading={heading} lead={lead} />
+        <SectionHeading
+          id={`${id}-heading`}
+          eyebrow={eyebrow}
+          heading={heading}
+          lead={lead}
+        />
         <div className="mt-12">
           <BenefitGrid items={items} />
         </div>

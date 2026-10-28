@@ -49,10 +49,10 @@ export function useCreateSubtask() {
         updatedAt: nowIso,
       };
 
-      queryClient.setQueryData<Subtask[]>(
-        subtaskKeys.list(taskId),
-        (old) => [...(old ?? []), optimistic]
-      );
+      queryClient.setQueryData<Subtask[]>(subtaskKeys.list(taskId), (old) => [
+        ...(old ?? []),
+        optimistic,
+      ]);
 
       return { previous, tempId };
     },
@@ -67,24 +67,21 @@ export function useCreateSubtask() {
       });
     },
     onSuccess: (newSubtask, { taskId }, context) => {
-      queryClient.setQueryData<Subtask[]>(
-        subtaskKeys.list(taskId),
-        (old) => {
-          if (!old) return [newSubtask];
-          if (context?.tempId) {
-            const idx = old.findIndex((st) => st.id === context.tempId);
-            if (idx >= 0) {
-              const next = old.slice();
-              next[idx] = newSubtask;
-              return next;
-            }
+      queryClient.setQueryData<Subtask[]>(subtaskKeys.list(taskId), (old) => {
+        if (!old) return [newSubtask];
+        if (context?.tempId) {
+          const idx = old.findIndex((st) => st.id === context.tempId);
+          if (idx >= 0) {
+            const next = old.slice();
+            next[idx] = newSubtask;
+            return next;
           }
-          // Fallback if optimistic entry was not present
-          return old.some((st) => st.id === newSubtask.id)
-            ? old
-            : [...old, newSubtask];
         }
-      );
+        // Fallback if optimistic entry was not present
+        return old.some((st) => st.id === newSubtask.id)
+          ? old
+          : [...old, newSubtask];
+      });
     },
   });
 }

@@ -56,9 +56,16 @@ export function TaskSettings() {
 
   const handleRolloverDestinationChange = async (value: string) => {
     try {
-      await updatePreferences.mutateAsync({ rolloverDestination: value as RolloverDestination });
-      const label = ROLLOVER_DESTINATION_OPTIONS.find((o) => o.value === value)?.label ?? value;
-      toast({ title: "Rollover destination updated", description: `Tasks will now rollover to: ${label}` });
+      await updatePreferences.mutateAsync({
+        rolloverDestination: value as RolloverDestination,
+      });
+      const label =
+        ROLLOVER_DESTINATION_OPTIONS.find((o) => o.value === value)?.label ??
+        value;
+      toast({
+        title: "Rollover destination updated",
+        description: `Tasks will now rollover to: ${label}`,
+      });
     } catch {
       // Error toast is handled by the mutation's onError callback
     }
@@ -66,9 +73,16 @@ export function TaskSettings() {
 
   const handleRolloverPositionChange = async (value: string) => {
     try {
-      await updatePreferences.mutateAsync({ rolloverPosition: value as RolloverPosition });
-      const label = ROLLOVER_POSITION_OPTIONS.find((o) => o.value === value)?.label ?? value;
-      toast({ title: "Rollover position updated", description: `Rolled-over tasks will appear at the ${label.toLowerCase()} of the list` });
+      await updatePreferences.mutateAsync({
+        rolloverPosition: value as RolloverPosition,
+      });
+      const label =
+        ROLLOVER_POSITION_OPTIONS.find((o) => o.value === value)?.label ??
+        value;
+      toast({
+        title: "Rollover position updated",
+        description: `Rolled-over tasks will appear at the ${label.toLowerCase()} of the list`,
+      });
     } catch {
       // Error toast is handled by the mutation's onError callback
     }
@@ -109,7 +123,9 @@ export function TaskSettings() {
         </CardHeader>
         <CardContent>
           <div className="text-center py-4">
-            <p className="text-destructive text-[13px]">Failed to load task settings</p>
+            <p className="text-destructive text-[13px]">
+              Failed to load task settings
+            </p>
             <p className="text-xs text-muted-foreground mt-1">
               {error instanceof Error ? error.message : "Unknown error"}
             </p>

@@ -1,21 +1,21 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type {
   Task,
   CreateTaskInput,
   UpdateTaskInput,
   TaskFilterInput,
-} from '@open-sunsama/types';
-import { getApi } from '@/lib/api';
-import * as Haptics from 'expo-haptics';
+} from "@open-sunsama/types";
+import { getApi } from "@/lib/api";
+import * as Haptics from "expo-haptics";
 
 /**
  * Query key factory for tasks
  */
 export const taskKeys = {
-  all: ['tasks'] as const,
-  lists: () => [...taskKeys.all, 'list'] as const,
+  all: ["tasks"] as const,
+  lists: () => [...taskKeys.all, "list"] as const,
   list: (filters: TaskFilterInput) => [...taskKeys.lists(), filters] as const,
-  details: () => [...taskKeys.all, 'detail'] as const,
+  details: () => [...taskKeys.all, "detail"] as const,
   detail: (id: string) => [...taskKeys.details(), id] as const,
 };
 
@@ -61,10 +61,10 @@ export function useCreateTask() {
     onSuccess: (newTask) => {
       // Invalidate and refetch task lists
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
-      
+
       // Optionally add the new task to the cache
       queryClient.setQueryData(taskKeys.detail(newTask.id), newTask);
-      
+
       // Haptic feedback
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     },
@@ -82,14 +82,20 @@ export function useUpdateTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: UpdateTaskInput }): Promise<Task> => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateTaskInput;
+    }): Promise<Task> => {
       const api = getApi();
       return await api.tasks.update(id, data);
     },
     onSuccess: (updatedTask) => {
       // Update the task in cache
       queryClient.setQueryData(taskKeys.detail(updatedTask.id), updatedTask);
-      
+
       // Invalidate lists to ensure consistency
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
     },
@@ -114,10 +120,10 @@ export function useDeleteTask() {
     onSuccess: (deletedId) => {
       // Remove from cache
       queryClient.removeQueries({ queryKey: taskKeys.detail(deletedId) });
-      
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
-      
+
       // Haptic feedback
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     },
@@ -134,7 +140,13 @@ export function useCompleteTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, completed }: { id: string; completed: boolean }): Promise<Task> => {
+    mutationFn: async ({
+      id,
+      completed,
+    }: {
+      id: string;
+      completed: boolean;
+    }): Promise<Task> => {
       const api = getApi();
       if (completed) {
         return await api.tasks.complete(id);
@@ -147,20 +159,25 @@ export function useCompleteTask() {
       await queryClient.cancelQueries({ queryKey: taskKeys.lists() });
 
       // Optimistic update
-      const previousLists = queryClient.getQueriesData({ queryKey: taskKeys.lists() });
-      
-      queryClient.setQueriesData<Task[]>({ queryKey: taskKeys.lists() }, (old) => {
-        if (!old) return old;
-        return old.map((task) => {
-          if (task.id === id) {
-            return {
-              ...task,
-              completedAt: completed ? new Date() : null,
-            };
-          }
-          return task;
-        });
+      const previousLists = queryClient.getQueriesData({
+        queryKey: taskKeys.lists(),
       });
+
+      queryClient.setQueriesData<Task[]>(
+        { queryKey: taskKeys.lists() },
+        (old) => {
+          if (!old) return old;
+          return old.map((task) => {
+            if (task.id === id) {
+              return {
+                ...task,
+                completedAt: completed ? new Date() : null,
+              };
+            }
+            return task;
+          });
+        }
+      );
 
       // Haptic feedback
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);

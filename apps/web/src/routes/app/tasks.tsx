@@ -107,7 +107,8 @@ export default function TasksListPage() {
 function TasksListPageDesktop() {
   const { data: providers = [] } = useIntegrationProviders();
   const [query, setQuery] = React.useState("");
-  const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("active");
+  const [statusFilter, setStatusFilter] =
+    React.useState<StatusFilter>("active");
   const [selectedTask, setSelectedTask] = React.useState<Task | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = React.useState(false);
@@ -129,23 +130,38 @@ function TasksListPageDesktop() {
   );
 
   // Helper to check if an ID is a group (not a task)
-  const isGroupId = React.useCallback((id: string | number | undefined): boolean => {
-    if (!id) return false;
-    const idStr = String(id);
-    return idStr.startsWith("group-");
-  }, []);
+  const isGroupId = React.useCallback(
+    (id: string | number | undefined): boolean => {
+      if (!id) return false;
+      const idStr = String(id);
+      return idStr.startsWith("group-");
+    },
+    []
+  );
 
   // Helper to extract dateKey from group ID
-  const getDateKeyFromGroupId = React.useCallback((id: string | number | undefined): string | null => {
-    if (!id) return null;
-    const idStr = String(id);
-    if (idStr.startsWith("group-")) {
-      return idStr.replace("group-", "") || null;
-    }
-    return null;
-  }, []);
+  const getDateKeyFromGroupId = React.useCallback(
+    (id: string | number | undefined): string | null => {
+      if (!id) return null;
+      const idStr = String(id);
+      if (idStr.startsWith("group-")) {
+        return idStr.replace("group-", "") || null;
+      }
+      return null;
+    },
+    []
+  );
 
-  const { data, isLoading, isError, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteSearchTasks({
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteSearchTasks({
     query: deferredQuery,
     status: statusFilter,
     limit: 100,
@@ -234,9 +250,13 @@ function TasksListPageDesktop() {
           return groupedTasks.tomorrow;
         }
         // Check if it's in overdue (could be any past date)
-        const overdueTask = groupedTasks.overdue.find((t) => t.scheduledDate === dateKey);
+        const overdueTask = groupedTasks.overdue.find(
+          (t) => t.scheduledDate === dateKey
+        );
         if (overdueTask) {
-          return groupedTasks.overdue.filter((t) => t.scheduledDate === dateKey);
+          return groupedTasks.overdue.filter(
+            (t) => t.scheduledDate === dateKey
+          );
         }
         // Check future dates
         return groupedTasks.future.get(dateKey) || [];
@@ -256,7 +276,9 @@ function TasksListPageDesktop() {
 
         if (overTask && overTask.id !== taskId && !isGroupId(over.id)) {
           // Dropped on a specific task - insert at that position
-          const overIndex = pendingDestTasks.findIndex((t) => t.id === overTask.id);
+          const overIndex = pendingDestTasks.findIndex(
+            (t) => t.id === overTask.id
+          );
 
           if (overIndex !== -1) {
             // Insert before the target task
@@ -275,12 +297,10 @@ function TasksListPageDesktop() {
         }
 
         // Use reorderTasks which handles both moving and positioning
-        reorderTasks.mutate(
-          {
-            date: destinationDateKey,
-            taskIds: newTaskIds,
-          }
-        );
+        reorderTasks.mutate({
+          date: destinationDateKey,
+          taskIds: newTaskIds,
+        });
 
         return;
       }
@@ -296,8 +316,12 @@ function TasksListPageDesktop() {
 
         if (pendingSourceTasks.length > 0) {
           // Find indices of active and over tasks in pending-only list
-          const activeIndex = pendingSourceTasks.findIndex((t) => t.id === taskId);
-          const overIndex = pendingSourceTasks.findIndex((t) => t.id === overId);
+          const activeIndex = pendingSourceTasks.findIndex(
+            (t) => t.id === taskId
+          );
+          const overIndex = pendingSourceTasks.findIndex(
+            (t) => t.id === overId
+          );
 
           if (
             activeIndex !== -1 &&
@@ -305,22 +329,32 @@ function TasksListPageDesktop() {
             activeIndex !== overIndex
           ) {
             // Reorder using arrayMove
-            const reorderedTasks = arrayMove(pendingSourceTasks, activeIndex, overIndex);
+            const reorderedTasks = arrayMove(
+              pendingSourceTasks,
+              activeIndex,
+              overIndex
+            );
             const reorderedIds = reorderedTasks.map((t) => t.id);
 
             // Call reorder API
-            const dateParam = sourceDateKey === "backlog" ? "backlog" : sourceDateKey;
-            reorderTasks.mutate(
-              {
-                date: dateParam,
-                taskIds: reorderedIds,
-              }
-            );
+            const dateParam =
+              sourceDateKey === "backlog" ? "backlog" : sourceDateKey;
+            reorderTasks.mutate({
+              date: dateParam,
+              taskIds: reorderedIds,
+            });
           }
         }
       }
     },
-    [groupedTasks, todayStr, tomorrowStr, isGroupId, getDateKeyFromGroupId, reorderTasks]
+    [
+      groupedTasks,
+      todayStr,
+      tomorrowStr,
+      isGroupId,
+      getDateKeyFromGroupId,
+      reorderTasks,
+    ]
   );
 
   const handleDragCancel = React.useCallback(() => {
@@ -333,7 +367,10 @@ function TasksListPageDesktop() {
   }, [groupedTasks.future]);
 
   const handleComplete = async (task: Task) => {
-    await completeTask.mutateAsync({ id: task.id, completed: !task.completedAt });
+    await completeTask.mutateAsync({
+      id: task.id,
+      completed: !task.completedAt,
+    });
   };
 
   const totalTasks = tasks.length;
@@ -385,22 +422,31 @@ function TasksListPageDesktop() {
           <div className="flex-1" />
 
           {/* Task count */}
-          <span className="text-xs text-muted-foreground">{data?.pages[0]?.meta?.total ?? totalTasks} tasks</span>
+          <span className="text-xs text-muted-foreground">
+            {data?.pages[0]?.meta?.total ?? totalTasks} tasks
+          </span>
 
           {/* Import from a connected source */}
-          {providers.length > 0 && <Button
-            onClick={() => setIsImportModalOpen(true)}
-            size="sm"
-            variant="outline"
-            className="h-7 gap-1 text-xs px-2.5"
-            title="Import a task by pasting its link"
-          >
-            <Download className="h-3.5 w-3.5" />
-            Import
-          </Button>}
+          {providers.length > 0 && (
+            <Button
+              onClick={() => setIsImportModalOpen(true)}
+              size="sm"
+              variant="outline"
+              className="h-7 gap-1 text-xs px-2.5"
+              title="Import a task by pasting its link"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Import
+            </Button>
+          )}
 
           {/* New Task */}
-          <Button onClick={() => setIsAddModalOpen(true)} size="sm" variant="ghost" className="h-7 gap-1 text-xs px-2.5">
+          <Button
+            onClick={() => setIsAddModalOpen(true)}
+            size="sm"
+            variant="ghost"
+            className="h-7 gap-1 text-xs px-2.5"
+          >
             <Plus className="h-3.5 w-3.5" />
             New
           </Button>
@@ -411,7 +457,9 @@ function TasksListPageDesktop() {
           {isError ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <AlertCircle className="h-8 w-8 text-destructive/70 mb-3" />
-              <p className="text-sm font-medium text-destructive">Failed to load tasks</p>
+              <p className="text-sm font-medium text-destructive">
+                Failed to load tasks
+              </p>
               <p className="text-xs text-muted-foreground mt-1">
                 {error instanceof Error ? error.message : "Please try again"}
               </p>
@@ -425,10 +473,7 @@ function TasksListPageDesktop() {
           ) : isLoading ? (
             <div className="space-y-2 py-2">
               {Array.from({ length: 4 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="rounded-lg bg-surface p-3"
-                >
+                <div key={index} className="rounded-lg bg-surface p-3">
                   <div className="mb-2 h-4 w-28 animate-pulse rounded bg-muted" />
                   <div className="space-y-1">
                     <div className="h-8 animate-pulse rounded bg-muted/70" />
@@ -444,12 +489,21 @@ function TasksListPageDesktop() {
             </div>
           ) : (
             <div className="max-w-4xl mx-auto">
-              {[...new Set(groupedTasks.overdue.map((t) => t.scheduledDate!))].sort().map((date) => (
-                <TaskGroup key={date} label={`${formatFutureDate(date)}${statusFilter === "active" ? " · Overdue" : ""}`}
-                  tasks={groupedTasks.overdue.filter((t) => t.scheduledDate === date)}
-                  isOverdue={statusFilter === "active"} dateKey={date}
-                  onSelectTask={setSelectedTask} onCompleteTask={handleComplete} />
-              ))}
+              {[...new Set(groupedTasks.overdue.map((t) => t.scheduledDate!))]
+                .sort()
+                .map((date) => (
+                  <TaskGroup
+                    key={date}
+                    label={`${formatFutureDate(date)}${statusFilter === "active" ? " · Overdue" : ""}`}
+                    tasks={groupedTasks.overdue.filter(
+                      (t) => t.scheduledDate === date
+                    )}
+                    isOverdue={statusFilter === "active"}
+                    dateKey={date}
+                    onSelectTask={setSelectedTask}
+                    onCompleteTask={handleComplete}
+                  />
+                ))}
 
               {/* Today */}
               {groupedTasks.today.length > 0 && (
@@ -500,7 +554,11 @@ function TasksListPageDesktop() {
           )}
           {hasNextPage && (
             <div className="flex justify-center py-5">
-              <Button variant="ghost" disabled={isFetchingNextPage} onClick={() => void fetchNextPage()}>
+              <Button
+                variant="ghost"
+                disabled={isFetchingNextPage}
+                onClick={() => void fetchNextPage()}
+              >
                 {isFetchingNextPage ? "Loading…" : "Load more tasks"}
               </Button>
             </div>

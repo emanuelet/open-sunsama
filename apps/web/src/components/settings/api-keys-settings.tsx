@@ -8,8 +8,16 @@ import {
   CardTitle,
   Button,
 } from "@/components/ui";
-import { useApiKeys, useCreateApiKey, useRevokeApiKey } from "@/hooks/useApiKeys";
-import type { ApiKey, CreateApiKeyInput, CreateApiKeyResponse } from "@open-sunsama/types";
+import {
+  useApiKeys,
+  useCreateApiKey,
+  useRevokeApiKey,
+} from "@/hooks/useApiKeys";
+import type {
+  ApiKey,
+  CreateApiKeyInput,
+  CreateApiKeyResponse,
+} from "@open-sunsama/types";
 import { ApiKeyCard } from "./api-key-card";
 import { CreateApiKeyDialog } from "./create-api-key-dialog";
 import { RevokeKeyDialog } from "./revoke-key-dialog";
@@ -27,7 +35,9 @@ export function ApiKeysSettings() {
   const createMutation = useCreateApiKey();
   const revokeMutation = useRevokeApiKey();
 
-  const handleCreateKey = async (data: CreateApiKeyInput): Promise<CreateApiKeyResponse> => {
+  const handleCreateKey = async (
+    data: CreateApiKeyInput
+  ): Promise<CreateApiKeyResponse> => {
     return createMutation.mutateAsync(data);
   };
 
@@ -64,7 +74,8 @@ export function ApiKeysSettings() {
         <div>
           <CardTitle>API Keys</CardTitle>
           <CardDescription>
-            Manage API keys for external integrations and third-party applications
+            Manage API keys for external integrations and third-party
+            applications
           </CardDescription>
         </div>
         <Button
@@ -84,9 +95,10 @@ export function ApiKeysSettings() {
             <div className="space-y-1">
               <p className="text-sm font-medium">API Key Security</p>
               <p className="text-xs text-muted-foreground">
-                API keys grant access to your Open Sunsama data. Keep them secure and
-                never share them publicly. Keys are only shown once at creation -
-                store them safely. Revoked keys cannot be restored.
+                API keys grant access to your Open Sunsama data. Keep them
+                secure and never share them publicly. Keys are only shown once
+                at creation - store them safely. Revoked keys cannot be
+                restored.
               </p>
             </div>
           </div>
@@ -105,7 +117,8 @@ export function ApiKeysSettings() {
             <div className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-destructive" />
               <p className="text-sm text-destructive">
-                Failed to load API keys: {error instanceof Error ? error.message : "Unknown error"}
+                Failed to load API keys:{" "}
+                {error instanceof Error ? error.message : "Unknown error"}
               </p>
             </div>
           </div>
@@ -120,10 +133,7 @@ export function ApiKeysSettings() {
               You haven't created any API keys yet. Create one to integrate with
               external applications.
             </p>
-            <Button
-              className="mt-4"
-              onClick={() => setCreateDialogOpen(true)}
-            >
+            <Button className="mt-4" onClick={() => setCreateDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Create Your First Key
             </Button>
@@ -147,8 +157,6 @@ export function ApiKeysSettings() {
             </div>
           </div>
         )}
-
-
       </CardContent>
 
       {/* Dialogs */}

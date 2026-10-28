@@ -1,7 +1,7 @@
 /**
  * iCloud Calendar (CalDAV) provider implementation
  */
-import { DAVClient, type DAVCalendar } from 'tsdav';
+import { DAVClient, type DAVCalendar } from "tsdav";
 import type {
   CalendarProvider,
   OAuthTokens,
@@ -10,20 +10,17 @@ import type {
   EventPatch,
   SyncOptions,
   SyncResult,
-} from './index';
-import {
-  ProviderAuthError,
-  ProviderEventNotFoundError,
-} from './index';
+} from "./index";
+import { ProviderAuthError, ProviderEventNotFoundError } from "./index";
 import {
   buildVCalendar,
   parseCalDavEvent,
   parseCalDavEventWithRaw,
-} from './icloud-helpers';
+} from "./icloud-helpers";
 // Node's built-in randomUUID — used when generating UIDs for new events.
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from "node:crypto";
 
-const ICLOUD_CALDAV_URL = 'https://caldav.icloud.com';
+const ICLOUD_CALDAV_URL = "https://caldav.icloud.com";
 
 export interface CalDavCredentials {
   username: string; // Apple ID email
@@ -44,8 +41,8 @@ export async function validateCalDavCredentials(
         username: credentials.username,
         password: credentials.password,
       },
-      authMethod: 'Basic',
-      defaultAccountType: 'caldav',
+      authMethod: "Basic",
+      defaultAccountType: "caldav",
     });
 
     await client.login();
@@ -53,17 +50,22 @@ export async function validateCalDavCredentials(
     const calendars = await client.fetchCalendars();
 
     if (!calendars || calendars.length === 0) {
-      return { valid: false, error: 'No calendars found. Check your Apple ID and app-specific password.' };
+      return {
+        valid: false,
+        error:
+          "No calendars found. Check your Apple ID and app-specific password.",
+      };
     }
 
     return { valid: true };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
+    const message = error instanceof Error ? error.message : "Unknown error";
 
-    if (message.includes('401') || message.includes('Unauthorized')) {
+    if (message.includes("401") || message.includes("Unauthorized")) {
       return {
         valid: false,
-        error: 'Invalid credentials. Make sure you are using an app-specific password, not your Apple ID password.',
+        error:
+          "Invalid credentials. Make sure you are using an app-specific password, not your Apple ID password.",
       };
     }
 
@@ -83,8 +85,8 @@ export async function listCalDavCalendars(
       username: credentials.username,
       password: credentials.password,
     },
-    authMethod: 'Basic',
-    defaultAccountType: 'caldav',
+    authMethod: "Basic",
+    defaultAccountType: "caldav",
   });
 
   await client.login();
@@ -92,7 +94,10 @@ export async function listCalDavCalendars(
 
   return calendars.map((cal: DAVCalendar) => ({
     externalId: cal.url,
-    name: typeof cal.displayName === 'string' ? cal.displayName : 'Unnamed Calendar',
+    name:
+      typeof cal.displayName === "string"
+        ? cal.displayName
+        : "Unnamed Calendar",
     color: cal.calendarColor ?? null,
     isReadOnly: false,
   }));
@@ -112,8 +117,8 @@ export async function listCalDavEvents(
       username: credentials.username,
       password: credentials.password,
     },
-    authMethod: 'Basic',
-    defaultAccountType: 'caldav',
+    authMethod: "Basic",
+    defaultAccountType: "caldav",
   });
 
   await client.login();
@@ -122,12 +127,13 @@ export async function listCalDavEvents(
     calendar: {
       url: calendarUrl,
     },
-    timeRange: options.timeMin && options.timeMax
-      ? {
-          start: options.timeMin.toISOString(),
-          end: options.timeMax.toISOString(),
-        }
-      : undefined,
+    timeRange:
+      options.timeMin && options.timeMax
+        ? {
+            start: options.timeMin.toISOString(),
+            end: options.timeMax.toISOString(),
+          }
+        : undefined,
   });
 
   const events: ExternalEvent[] = [];
@@ -164,24 +170,25 @@ export class ICloudCalendarProvider implements CalendarProvider {
 
   getAuthUrl(): string {
     throw new Error(
-      'iCloud does not use OAuth. Use app-specific passwords with CalDAV instead.'
+      "iCloud does not use OAuth. Use app-specific passwords with CalDAV instead."
     );
   }
 
   exchangeCode(): Promise<OAuthTokens> {
     throw new Error(
-      'iCloud does not use OAuth. Use app-specific passwords with CalDAV instead.'
+      "iCloud does not use OAuth. Use app-specific passwords with CalDAV instead."
     );
   }
 
   refreshTokens(): Promise<OAuthTokens> {
     throw new Error(
-      'iCloud does not use OAuth tokens. CalDAV credentials do not expire.'
+      "iCloud does not use OAuth tokens. CalDAV credentials do not expire."
     );
   }
 
   async listCalendars(accessToken: string): Promise<ExternalCalendar[]> {
-    const credentials = this.credentials || JSON.parse(accessToken) as CalDavCredentials;
+    const credentials =
+      this.credentials || (JSON.parse(accessToken) as CalDavCredentials);
     return listCalDavCalendars(credentials);
   }
 
@@ -190,7 +197,8 @@ export class ICloudCalendarProvider implements CalendarProvider {
     calendarId: string,
     options: SyncOptions
   ): Promise<SyncResult> {
-    const credentials = this.credentials || JSON.parse(accessToken) as CalDavCredentials;
+    const credentials =
+      this.credentials || (JSON.parse(accessToken) as CalDavCredentials);
     return listCalDavEvents(credentials, calendarId, options);
   }
 
@@ -204,7 +212,7 @@ export class ICloudCalendarProvider implements CalendarProvider {
       payload.startTime === undefined ||
       payload.endTime === undefined
     ) {
-      throw new Error('createEvent requires title, startTime, and endTime');
+      throw new Error("createEvent requires title, startTime, and endTime");
     }
     const credentials =
       this.credentials || (JSON.parse(accessToken) as CalDavCredentials);
@@ -232,10 +240,10 @@ export class ICloudCalendarProvider implements CalendarProvider {
         iCalString: ics,
       })) as unknown as Response;
     } catch (err) {
-      throw mapCalDavError('createEvent', err);
+      throw mapCalDavError("createEvent", err);
     }
     if (!response.ok) {
-      throw await mapCalDavHttpError('createEvent', response);
+      throw await mapCalDavHttpError("createEvent", response);
     }
     // tsdav doesn't return the parsed event — refetch by UID via
     // a single calendar-object query. The new object's URL is the
@@ -252,10 +260,10 @@ export class ICloudCalendarProvider implements CalendarProvider {
       timezone: null,
       recurrenceRule: null,
       recurringEventId: null,
-      status: 'confirmed',
+      status: "confirmed",
       responseStatus: null,
       htmlLink: eventUrl,
-      etag: response.headers.get('ETag'),
+      etag: response.headers.get("ETag"),
       attendees: null,
       conferenceUrl: null,
     };
@@ -270,7 +278,7 @@ export class ICloudCalendarProvider implements CalendarProvider {
     if (!patch.eventUrl) {
       // No URL stored locally → row predates the htmlLink-stores-URL
       // change. Tell the user to re-sync rather than guessing.
-      throw new ProviderEventNotFoundError('icloud');
+      throw new ProviderEventNotFoundError("icloud");
     }
     const credentials =
       this.credentials || (JSON.parse(accessToken) as CalDavCredentials);
@@ -288,7 +296,7 @@ export class ICloudCalendarProvider implements CalendarProvider {
       patch.eventUrl
     );
     if (!existingPair) {
-      throw new ProviderEventNotFoundError('icloud');
+      throw new ProviderEventNotFoundError("icloud");
     }
     const { event: existing, raw } = existingPair;
     const merged = mergePatchIntoEvent(existing, patch);
@@ -315,14 +323,14 @@ export class ICloudCalendarProvider implements CalendarProvider {
         calendarObject: {
           url: patch.eventUrl,
           data: ics,
-          etag: existing.etag ?? '',
+          etag: existing.etag ?? "",
         },
       })) as unknown as Response;
     } catch (err) {
-      throw mapCalDavError('updateEvent', err);
+      throw mapCalDavError("updateEvent", err);
     }
     if (!response.ok) {
-      throw await mapCalDavHttpError('updateEvent', response);
+      throw await mapCalDavHttpError("updateEvent", response);
     }
     return {
       externalId: existing.externalId,
@@ -340,7 +348,7 @@ export class ICloudCalendarProvider implements CalendarProvider {
       status: existing.status,
       responseStatus: existing.responseStatus,
       htmlLink: patch.eventUrl,
-      etag: response.headers.get('ETag') ?? existing.etag,
+      etag: response.headers.get("ETag") ?? existing.etag,
       attendees: existing.attendees,
       conferenceUrl: existing.conferenceUrl,
     };
@@ -354,7 +362,7 @@ export class ICloudCalendarProvider implements CalendarProvider {
   ): Promise<void> {
     const eventUrl = extra?.eventUrl;
     if (!eventUrl) {
-      throw new ProviderEventNotFoundError('icloud');
+      throw new ProviderEventNotFoundError("icloud");
     }
     const credentials =
       this.credentials || (JSON.parse(accessToken) as CalDavCredentials);
@@ -363,19 +371,15 @@ export class ICloudCalendarProvider implements CalendarProvider {
       const response = (await client.deleteCalendarObject({
         calendarObject: {
           url: eventUrl,
-          etag: extra.etag ?? '',
+          etag: extra.etag ?? "",
         },
       })) as unknown as Response;
       // 404/410 = already gone. Anything else non-2xx is real.
-      if (
-        !response.ok &&
-        response.status !== 404 &&
-        response.status !== 410
-      ) {
-        throw await mapCalDavHttpError('deleteEvent', response);
+      if (!response.ok && response.status !== 404 && response.status !== 410) {
+        throw await mapCalDavHttpError("deleteEvent", response);
       }
     } catch (err) {
-      throw mapCalDavError('deleteEvent', err);
+      throw mapCalDavError("deleteEvent", err);
     }
   }
 }
@@ -390,8 +394,8 @@ async function getCalDavClient(
       username: credentials.username,
       password: credentials.password,
     },
-    authMethod: 'Basic',
-    defaultAccountType: 'caldav',
+    authMethod: "Basic",
+    defaultAccountType: "caldav",
   });
   await client.login();
   return client;
@@ -437,9 +441,10 @@ function mergePatchIntoEvent(
   return {
     title: patch.title ?? existing.title,
     description:
-      patch.description !== undefined ? patch.description : existing.description,
-    location:
-      patch.location !== undefined ? patch.location : existing.location,
+      patch.description !== undefined
+        ? patch.description
+        : existing.description,
+    location: patch.location !== undefined ? patch.location : existing.location,
     startTime: patch.startTime ?? existing.startTime,
     endTime: patch.endTime ?? existing.endTime,
     isAllDay: patch.isAllDay ?? existing.isAllDay,
@@ -463,7 +468,7 @@ function mapCalDavError(op: string, err: unknown): Error {
   ) {
     return err;
   }
-  const message = err instanceof Error ? err.message : 'Unknown error';
+  const message = err instanceof Error ? err.message : "Unknown error";
   // tsdav's error messages vary across versions and code paths
   // (network-level, response-status, parse failures). Match a wider
   // set of auth-related patterns including the WWW-Authenticate
@@ -473,29 +478,34 @@ function mapCalDavError(op: string, err: unknown): Error {
       message
     )
   ) {
-    return new ProviderAuthError('icloud');
+    return new ProviderAuthError("icloud");
   }
   if (/404|410|Not Found|Gone/i.test(message)) {
-    return new ProviderEventNotFoundError('icloud');
+    return new ProviderEventNotFoundError("icloud");
   }
   return new Error(`iCloud ${op} failed: ${message}`);
 }
 
 /** Map a non-2xx Response from a tsdav call to a typed error. */
-async function mapCalDavHttpError(op: string, response: Response): Promise<Error> {
+async function mapCalDavHttpError(
+  op: string,
+  response: Response
+): Promise<Error> {
   if (response.status === 404 || response.status === 410) {
-    return new ProviderEventNotFoundError('icloud');
+    return new ProviderEventNotFoundError("icloud");
   }
   if (response.status === 401 || response.status === 403) {
-    return new ProviderAuthError('icloud');
+    return new ProviderAuthError("icloud");
   }
-  let body = '';
+  let body = "";
   try {
     body = await response.text();
   } catch {
     /* ignore */
   }
-  return new Error(`iCloud ${op} failed (${response.status}): ${body.slice(0, 200)}`);
+  return new Error(
+    `iCloud ${op} failed (${response.status}): ${body.slice(0, 200)}`
+  );
 }
 
 /**
@@ -510,6 +520,6 @@ async function mapCalDavHttpError(op: string, response: Response): Promise<Error
 function joinUrl(base: string, filename: string): string {
   // `new URL(filename, base)` requires `base` to end with `/` to
   // resolve as a directory; ensure that.
-  const baseWithSlash = base.endsWith('/') ? base : `${base}/`;
+  const baseWithSlash = base.endsWith("/") ? base : `${base}/`;
   return new URL(filename, baseWithSlash).href;
 }

@@ -113,7 +113,8 @@ export function IdeasPlannerTray() {
                   setColumn(columns[next]!.id);
                   event.currentTarget.parentElement
                     ?.querySelectorAll<HTMLButtonElement>("[role=tab]")
-                    .item(next)?.focus();
+                    .item(next)
+                    ?.focus();
                 }}
                 onClick={() => setColumn(c.id)}
                 className={cn(

@@ -173,10 +173,17 @@ ideaSubtasksRouter.post(
     const idea = await getOwnedIdea(userId, ideaId);
     const db = getDb();
 
-    const existing = await db.select({ id: ideaSubtasks.id }).from(ideaSubtasks)
+    const existing = await db
+      .select({ id: ideaSubtasks.id })
+      .from(ideaSubtasks)
       .where(eq(ideaSubtasks.ideaId, ideaId));
-    if (existing.length !== subtaskIds.length || existing.some((subtask) => !subtaskIds.includes(subtask.id))) {
-      throw new ValidationError("Supply every subtask on this idea exactly once");
+    if (
+      existing.length !== subtaskIds.length ||
+      existing.some((subtask) => !subtaskIds.includes(subtask.id))
+    ) {
+      throw new ValidationError(
+        "Supply every subtask on this idea exactly once"
+      );
     }
 
     await Promise.all(

@@ -4,12 +4,27 @@ import { pickFocusTarget } from "./focus-target";
 
 const now = new Date("2026-09-24T15:00:00Z");
 
-function task(id: string, position: number, overrides: Partial<Task> = {}): Task {
-  return { id, position, completedAt: null, timerStartedAt: null, ...overrides } as Task;
+function task(
+  id: string,
+  position: number,
+  overrides: Partial<Task> = {}
+): Task {
+  return {
+    id,
+    position,
+    completedAt: null,
+    timerStartedAt: null,
+    ...overrides,
+  } as Task;
 }
 
 function block(taskId: string | null, start: string, end: string): TimeBlock {
-  return { id: `b-${taskId}`, taskId, startTime: new Date(start), endTime: new Date(end) } as TimeBlock;
+  return {
+    id: `b-${taskId}`,
+    taskId,
+    startTime: new Date(start),
+    endTime: new Date(end),
+  } as TimeBlock;
 }
 
 describe("pickFocusTarget", () => {
@@ -19,7 +34,9 @@ describe("pickFocusTarget", () => {
       pickFocusTarget({
         activeTimerTask: running,
         todayTasks: [task("a", 0), running],
-        todayTimeBlocks: [block("a", "2026-09-24T14:00:00Z", "2026-09-24T16:00:00Z")],
+        todayTimeBlocks: [
+          block("a", "2026-09-24T14:00:00Z", "2026-09-24T16:00:00Z"),
+        ],
         now,
       })
     ).toEqual({ kind: "task", taskId: "running" });
@@ -28,7 +45,10 @@ describe("pickFocusTarget", () => {
   it("ignores a running timer on a completed task", () => {
     expect(
       pickFocusTarget({
-        activeTimerTask: task("done", 0, { completedAt: now, timerStartedAt: now }),
+        activeTimerTask: task("done", 0, {
+          completedAt: now,
+          timerStartedAt: now,
+        }),
         todayTasks: [task("a", 1)],
         todayTimeBlocks: [],
         now,
@@ -55,8 +75,14 @@ describe("pickFocusTarget", () => {
     expect(
       pickFocusTarget({
         activeTimerTask: null,
-        todayTasks: [task("done", 0, { completedAt: now }), task("next", 3), task("later", 7)],
-        todayTimeBlocks: [block("done", "2026-09-24T14:30:00Z", "2026-09-24T15:30:00Z")],
+        todayTasks: [
+          task("done", 0, { completedAt: now }),
+          task("next", 3),
+          task("later", 7),
+        ],
+        todayTimeBlocks: [
+          block("done", "2026-09-24T14:30:00Z", "2026-09-24T15:30:00Z"),
+        ],
         now,
       })
     ).toEqual({ kind: "task", taskId: "next" });
@@ -66,7 +92,11 @@ describe("pickFocusTarget", () => {
     expect(
       pickFocusTarget({
         activeTimerTask: null,
-        todayTasks: [task("b", 2), task("a", 1), task("done", 0, { completedAt: now })],
+        todayTasks: [
+          task("b", 2),
+          task("a", 1),
+          task("done", 0, { completedAt: now }),
+        ],
         todayTimeBlocks: [],
         now,
       })
@@ -86,7 +116,12 @@ describe("pickFocusTarget", () => {
 
   it("reports nothing planned when today is empty", () => {
     expect(
-      pickFocusTarget({ activeTimerTask: null, todayTasks: [], todayTimeBlocks: [], now })
+      pickFocusTarget({
+        activeTimerTask: null,
+        todayTasks: [],
+        todayTimeBlocks: [],
+        now,
+      })
     ).toEqual({ kind: "nothing-planned" });
   });
 });

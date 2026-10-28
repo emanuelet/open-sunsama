@@ -15,7 +15,11 @@ import {
   Repeat,
   Flag,
 } from "lucide-react";
-import type { Task, CreateTaskSeriesInput, TaskPriority } from "@open-sunsama/types";
+import type {
+  Task,
+  CreateTaskSeriesInput,
+  TaskPriority,
+} from "@open-sunsama/types";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -92,7 +96,7 @@ export function TaskContextMenu({
     let currentTime: string | undefined;
     if (isToday) {
       const now = new Date();
-      currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      currentTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
     }
     await autoSchedule.mutateAsync({ taskId: task.id, currentTime });
   };
@@ -148,7 +152,10 @@ export function TaskContextMenu({
     const referenceDate = task.scheduledDate
       ? new Date(task.scheduledDate + "T00:00:00")
       : new Date();
-    const nextMonday = addDays(startOfWeek(referenceDate, { weekStartsOn: 1 }), 7);
+    const nextMonday = addDays(
+      startOfWeek(referenceDate, { weekStartsOn: 1 }),
+      7
+    );
     const nextMondayStr = format(nextMonday, "yyyy-MM-dd");
 
     await updateTask.mutateAsync({

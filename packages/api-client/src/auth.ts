@@ -13,8 +13,10 @@ import type {
 } from "@open-sunsama/types";
 import type { OpenSunsamaClient, RequestOptions } from "./client.js";
 import type {
-  PublicKeyCredentialCreationOptionsJSON, PublicKeyCredentialRequestOptionsJSON,
-  RegistrationResponseJSON, AuthenticationResponseJSON,
+  PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialRequestOptionsJSON,
+  RegistrationResponseJSON,
+  AuthenticationResponseJSON,
 } from "@simplewebauthn/browser";
 
 export interface PasskeySummary {
@@ -30,16 +32,32 @@ export interface PasskeySummary {
 export interface AuthApi {
   listPasskeys(): Promise<PasskeySummary[]>;
   deletePasskey(id: string): Promise<void>;
-  passkeyRegistrationOptions(): Promise<{ options: PublicKeyCredentialCreationOptionsJSON; challengeId: string }>;
-  verifyPasskeyRegistration(input: { challengeId: string; response: RegistrationResponseJSON; name: string }): Promise<void>;
-  passkeyLoginOptions(): Promise<{ options: PublicKeyCredentialRequestOptionsJSON; challengeId: string }>;
-  verifyPasskeyLogin(input: { challengeId: string; response: AuthenticationResponseJSON }): Promise<AuthResponse>;
+  passkeyRegistrationOptions(): Promise<{
+    options: PublicKeyCredentialCreationOptionsJSON;
+    challengeId: string;
+  }>;
+  verifyPasskeyRegistration(input: {
+    challengeId: string;
+    response: RegistrationResponseJSON;
+    name: string;
+  }): Promise<void>;
+  passkeyLoginOptions(): Promise<{
+    options: PublicKeyCredentialRequestOptionsJSON;
+    challengeId: string;
+  }>;
+  verifyPasskeyLogin(input: {
+    challengeId: string;
+    response: AuthenticationResponseJSON;
+  }): Promise<AuthResponse>;
   /**
    * Register a new user account
    * @param input User registration data
    * @returns The created user and authentication token
    */
-  register(input: CreateUserInput, options?: RequestOptions): Promise<AuthResponse>;
+  register(
+    input: CreateUserInput,
+    options?: RequestOptions
+  ): Promise<AuthResponse>;
 
   /**
    * Log in with email and password
@@ -70,7 +88,10 @@ export interface AuthApi {
    * Change the current user's password
    * @param input Current and new password
    */
-  changePassword(input: ChangePasswordInput, options?: RequestOptions): Promise<void>;
+  changePassword(
+    input: ChangePasswordInput,
+    options?: RequestOptions
+  ): Promise<void>;
 
   /**
    * Request a password reset email
@@ -121,28 +142,53 @@ interface ApiResponseWrapper<T> {
 export function createAuthApi(client: OpenSunsamaClient): AuthApi {
   return {
     async listPasskeys() {
-      return (await client.get<ApiResponseWrapper<PasskeySummary[]>>("auth/passkeys")).data;
+      return (
+        await client.get<ApiResponseWrapper<PasskeySummary[]>>("auth/passkeys")
+      ).data;
     },
     async deletePasskey(id) {
       await client.delete(`auth/passkeys/${encodeURIComponent(id)}`);
     },
     async passkeyRegistrationOptions() {
-      return (await client.post<ApiResponseWrapper<{ options: PublicKeyCredentialCreationOptionsJSON; challengeId: string }>>("auth/passkeys/register/options", {})).data;
+      return (
+        await client.post<
+          ApiResponseWrapper<{
+            options: PublicKeyCredentialCreationOptionsJSON;
+            challengeId: string;
+          }>
+        >("auth/passkeys/register/options", {})
+      ).data;
     },
     async verifyPasskeyRegistration(input) {
       await client.post("auth/passkeys/register/verify", input);
     },
     async passkeyLoginOptions() {
-      return (await client.post<ApiResponseWrapper<{ options: PublicKeyCredentialRequestOptionsJSON; challengeId: string }>>("auth/passkeys/login/options", {})).data;
+      return (
+        await client.post<
+          ApiResponseWrapper<{
+            options: PublicKeyCredentialRequestOptionsJSON;
+            challengeId: string;
+          }>
+        >("auth/passkeys/login/options", {})
+      ).data;
     },
     async verifyPasskeyLogin(input) {
-      return (await client.post<ApiResponseWrapper<AuthResponse>>("auth/passkeys/login/verify", input)).data;
+      return (
+        await client.post<ApiResponseWrapper<AuthResponse>>(
+          "auth/passkeys/login/verify",
+          input
+        )
+      ).data;
     },
     async register(
       input: CreateUserInput,
       options?: RequestOptions
     ): Promise<AuthResponse> {
-      const response = await client.post<ApiResponseWrapper<AuthResponse>>("auth/register", input, options);
+      const response = await client.post<ApiResponseWrapper<AuthResponse>>(
+        "auth/register",
+        input,
+        options
+      );
       return response.data;
     },
 
@@ -150,7 +196,11 @@ export function createAuthApi(client: OpenSunsamaClient): AuthApi {
       input: LoginInput,
       options?: RequestOptions
     ): Promise<AuthResponse> {
-      const response = await client.post<ApiResponseWrapper<AuthResponse>>("auth/login", input, options);
+      const response = await client.post<ApiResponseWrapper<AuthResponse>>(
+        "auth/login",
+        input,
+        options
+      );
       return response.data;
     },
 
@@ -159,7 +209,10 @@ export function createAuthApi(client: OpenSunsamaClient): AuthApi {
     },
 
     async getMe(options?: RequestOptions): Promise<User> {
-      const response = await client.get<ApiResponseWrapper<User>>("auth/me", options);
+      const response = await client.get<ApiResponseWrapper<User>>(
+        "auth/me",
+        options
+      );
       return response.data;
     },
 
@@ -167,7 +220,11 @@ export function createAuthApi(client: OpenSunsamaClient): AuthApi {
       input: UpdateUserInput,
       options?: RequestOptions
     ): Promise<User> {
-      const response = await client.patch<ApiResponseWrapper<User>>("auth/me", input, options);
+      const response = await client.patch<ApiResponseWrapper<User>>(
+        "auth/me",
+        input,
+        options
+      );
       return response.data;
     },
 
@@ -202,7 +259,11 @@ export function createAuthApi(client: OpenSunsamaClient): AuthApi {
     },
 
     async refreshToken(options?: RequestOptions): Promise<AuthResponse> {
-      const response = await client.post<ApiResponseWrapper<AuthResponse>>("auth/refresh", undefined, options);
+      const response = await client.post<ApiResponseWrapper<AuthResponse>>(
+        "auth/refresh",
+        undefined,
+        options
+      );
       return response.data;
     },
 
@@ -211,11 +272,7 @@ export function createAuthApi(client: OpenSunsamaClient): AuthApi {
     },
 
     async resendVerificationEmail(options?: RequestOptions): Promise<void> {
-      return client.post<void>(
-        "auth/resend-verification",
-        undefined,
-        options
-      );
+      return client.post<void>("auth/resend-verification", undefined, options);
     },
   };
 }

@@ -1,6 +1,6 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import * as schema from './schema';
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import * as schema from "./schema";
 
 /**
  * Get the database URL from environment variables
@@ -10,7 +10,7 @@ function getDatabaseUrl(): string {
 
   if (!url) {
     throw new Error(
-      'Database URL not found. Please set DATABASE_URL environment variable.'
+      "Database URL not found. Please set DATABASE_URL environment variable."
     );
   }
 
@@ -53,4 +53,22 @@ export function resetDbInstance(): void {
 }
 
 // Re-export drizzle-orm utilities
-export { sql, eq, and, or, desc, asc, isNull, isNotNull, inArray, notInArray, lt, gt, lte, gte, ne, like, ilike } from 'drizzle-orm';
+export {
+  sql,
+  eq,
+  and,
+  or,
+  desc,
+  asc,
+  isNull,
+  isNotNull,
+  inArray,
+  notInArray,
+  lt,
+  gt,
+  lte,
+  gte,
+  ne,
+  like,
+  ilike,
+} from "drizzle-orm";

@@ -9,15 +9,8 @@ import {
 import type { CalendarEvent } from "@open-sunsama/types";
 import { cn } from "@/lib/utils";
 import { CalendarDays } from "lucide-react";
-import {
-  calculateYFromTime,
-  HOUR_HEIGHT,
-} from "@/hooks/useCalendarDnd";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui";
+import { calculateYFromTime, HOUR_HEIGHT } from "@/hooks/useCalendarDnd";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui";
 import type { LayoutResult } from "./event-layout";
 
 const COLUMN_GAP_PCT = 1; // gap between side-by-side overlapping events
@@ -80,12 +73,12 @@ interface ExternalEventProps {
 function hexToRgba(hex: string, alpha: number): string {
   // Remove # if present
   const cleanHex = hex.replace("#", "");
-  
+
   // Parse hex values
   const r = parseInt(cleanHex.substring(0, 2), 16);
   const g = parseInt(cleanHex.substring(2, 4), 16);
   const b = parseInt(cleanHex.substring(4, 6), 16);
-  
+
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
@@ -181,150 +174,151 @@ export function ExternalEvent({
   return (
     <Tooltip delayDuration={300}>
       <TooltipTrigger asChild>
-          <div
-            data-external-event
-            className={cn(
-              "absolute z-5 my-0.5 rounded-md border-l-[3px] transition-all select-none",
-              "hover:brightness-90 hover:z-15",
-              isDragging
-                ? "opacity-50 cursor-grabbing"
-                : onDragStart
-                  ? "cursor-grab"
-                  : "cursor-pointer",
-              // Touch-drag visual feedback: lift + shadow on mobile.
-              isTouchDragging &&
-                "opacity-60 scale-[1.02] shadow-lg z-15",
-              className
-            )}
-            style={{
-              top: `${top}px`,
-              height: `${Math.max(height - 4, 20)}px`, // Account for margin
-              // Side-by-side overlap layout: split column into
-              // layout.columnCount lanes; this event lives in lane N.
-              // 4px gutter on the leftmost lane (matches the prior
-              // `left-1 right-1` look when no overlap), tighter gaps
-              // between sub-columns to keep them visually distinct.
-              left: `calc(${(100 / layout.columnCount) * layout.lane}% + ${layout.lane === 0 ? "4px" : "1px"})`,
-              width: `calc(${100 / layout.columnCount - COLUMN_GAP_PCT}% - ${layout.lane === 0 ? "4px" : "1px"})`,
-              backgroundColor: hexToRgba(color, 0.2),
-              borderColor: color,
-              // Suppress iOS Safari's text-selection callout on
-              // long-press — it would otherwise race with our 400ms
-              // long-press-to-drag timer and sometimes win, blocking
-              // the drag from starting. Belt + suspenders with
-              // `select-none` (which only suppresses selection, not
-              // the callout). Inline because there's no Tailwind
-              // shorthand for `-webkit-touch-callout`.
-              WebkitTouchCallout: "none",
-              WebkitUserSelect: "none",
-            }}
-            onClick={handleClick}
-            onMouseDown={handleMouseDown}
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
-            role="button"
-            tabIndex={0}
-            aria-label={`Calendar event: ${event.title} from ${format(startTime, "h:mm a")} to ${format(endTime, "h:mm a")}`}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.stopPropagation();
-                onClick?.();
-              }
-            }}
-          >
-            {/* Top resize handle — only when editable. Tagged with
+        <div
+          data-external-event
+          className={cn(
+            "absolute z-5 my-0.5 rounded-md border-l-[3px] transition-all select-none",
+            "hover:brightness-90 hover:z-15",
+            isDragging
+              ? "opacity-50 cursor-grabbing"
+              : onDragStart
+                ? "cursor-grab"
+                : "cursor-pointer",
+            // Touch-drag visual feedback: lift + shadow on mobile.
+            isTouchDragging && "opacity-60 scale-[1.02] shadow-lg z-15",
+            className
+          )}
+          style={{
+            top: `${top}px`,
+            height: `${Math.max(height - 4, 20)}px`, // Account for margin
+            // Side-by-side overlap layout: split column into
+            // layout.columnCount lanes; this event lives in lane N.
+            // 4px gutter on the leftmost lane (matches the prior
+            // `left-1 right-1` look when no overlap), tighter gaps
+            // between sub-columns to keep them visually distinct.
+            left: `calc(${(100 / layout.columnCount) * layout.lane}% + ${layout.lane === 0 ? "4px" : "1px"})`,
+            width: `calc(${100 / layout.columnCount - COLUMN_GAP_PCT}% - ${layout.lane === 0 ? "4px" : "1px"})`,
+            backgroundColor: hexToRgba(color, 0.2),
+            borderColor: color,
+            // Suppress iOS Safari's text-selection callout on
+            // long-press — it would otherwise race with our 400ms
+            // long-press-to-drag timer and sometimes win, blocking
+            // the drag from starting. Belt + suspenders with
+            // `select-none` (which only suppresses selection, not
+            // the callout). Inline because there's no Tailwind
+            // shorthand for `-webkit-touch-callout`.
+            WebkitTouchCallout: "none",
+            WebkitUserSelect: "none",
+          }}
+          onClick={handleClick}
+          onMouseDown={handleMouseDown}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          role="button"
+          tabIndex={0}
+          aria-label={`Calendar event: ${event.title} from ${format(startTime, "h:mm a")} to ${format(endTime, "h:mm a")}`}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.stopPropagation();
+              onClick?.();
+            }
+          }}
+        >
+          {/* Top resize handle — only when editable. Tagged with
                 `data-resize` so the body's mousedown bails out. */}
-            {onResizeStart && !continuesFromPriorDay && (
-              <div
-                data-resize="top"
-                title="Drag to change start time"
-                onMouseDown={handleTopResize}
-                className="absolute top-0 left-0 right-0 z-20 h-2 cursor-ns-resize hover:bg-foreground/10 rounded-t-md"
-              />
-            )}
-            {/* Bottom resize handle */}
-            {onResizeStart && !continuesToNextDay && (
-              <div
-                data-resize="bottom"
-                title="Drag to change end time"
-                onMouseDown={handleBottomResize}
-                className="absolute bottom-0 left-0 right-0 z-20 h-2 cursor-ns-resize hover:bg-foreground/10 rounded-b-md"
-              />
-            )}
-            {/* Content */}
+          {onResizeStart && !continuesFromPriorDay && (
             <div
-              className={cn(
-                "flex h-full flex-col overflow-hidden px-2",
-                isCompact ? "py-0.5" : "py-1"
+              data-resize="top"
+              title="Drag to change start time"
+              onMouseDown={handleTopResize}
+              className="absolute top-0 left-0 right-0 z-20 h-2 cursor-ns-resize hover:bg-foreground/10 rounded-t-md"
+            />
+          )}
+          {/* Bottom resize handle */}
+          {onResizeStart && !continuesToNextDay && (
+            <div
+              data-resize="bottom"
+              title="Drag to change end time"
+              onMouseDown={handleBottomResize}
+              className="absolute bottom-0 left-0 right-0 z-20 h-2 cursor-ns-resize hover:bg-foreground/10 rounded-b-md"
+            />
+          )}
+          {/* Content */}
+          <div
+            className={cn(
+              "flex h-full flex-col overflow-hidden px-2",
+              isCompact ? "py-0.5" : "py-1"
+            )}
+          >
+            {/* Title row with external indicator */}
+            <div className="flex items-center gap-1 min-w-0">
+              {!isVeryCompact && (
+                <CalendarDays className="h-3 w-3 shrink-0 text-muted-foreground" />
               )}
-            >
-              {/* Title row with external indicator */}
-              <div className="flex items-center gap-1 min-w-0">
-                {!isVeryCompact && (
-                  <CalendarDays className="h-3 w-3 shrink-0 text-muted-foreground" />
-                )}
-                <p className={cn(
+              <p
+                className={cn(
                   "truncate font-medium text-foreground",
                   isCompact ? "text-xs" : "text-sm"
-                )}>
-                  {event.title}
-                </p>
-                {/* `htmlLink` is intentionally not surfaced here as a
+                )}
+              >
+                {event.title}
+              </p>
+              {/* `htmlLink` is intentionally not surfaced here as a
                     "click to open" affordance — clicking the event opens
                     the in-app detail sheet. The detail sheet has an
                     explicit "Open in Google Calendar" action. */}
-              </div>
-
-              {/* Time range - muted text, hide if too compact */}
-              {!isCompact && (
-                <p className="truncate text-xs text-foreground/70">
-                  {format(startTime, "h:mm")} - {format(endTime, "h:mm a")}
-                </p>
-              )}
-
-              {/* Location - only show if space available */}
-              {!isCompact && event.location && (
-                <p className="truncate text-xs text-muted-foreground/60">
-                  {event.location}
-                </p>
-              )}
             </div>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="right" className="max-w-xs">
-          <div className="space-y-1">
-            <p className="font-medium">{event.title}</p>
-            <p className="text-xs text-muted-foreground">
-              {format(startTime, "MMM d, h:mm a")} -{" "}
-              {isSameDay(startTime, endTime)
-                ? format(endTime, "h:mm a")
-                : format(endTime, "MMM d, h:mm a")}
-            </p>
-            {(continuesFromPriorDay || continuesToNextDay) && (
-              <p className="text-xs text-muted-foreground/80 italic">
-                {continuesFromPriorDay && continuesToNextDay
-                  ? "Continues across days"
-                  : continuesFromPriorDay
-                    ? "Continues from earlier"
-                    : "Continues tomorrow"}
+
+            {/* Time range - muted text, hide if too compact */}
+            {!isCompact && (
+              <p className="truncate text-xs text-foreground/70">
+                {format(startTime, "h:mm")} - {format(endTime, "h:mm a")}
               </p>
             )}
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <div
-                className="h-2 w-2 rounded-full"
-                style={{ backgroundColor: color }}
-              />
-              <span>{calendarName}</span>
-            </div>
-            {event.location && (
-              <p className="text-xs text-muted-foreground">📍 {event.location}</p>
-            )}
-            {event.htmlLink && (
-              <p className="text-xs text-primary">Click to open in calendar</p>
+
+            {/* Location - only show if space available */}
+            {!isCompact && event.location && (
+              <p className="truncate text-xs text-muted-foreground/60">
+                {event.location}
+              </p>
             )}
           </div>
-        </TooltipContent>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="right" className="max-w-xs">
+        <div className="space-y-1">
+          <p className="font-medium">{event.title}</p>
+          <p className="text-xs text-muted-foreground">
+            {format(startTime, "MMM d, h:mm a")} -{" "}
+            {isSameDay(startTime, endTime)
+              ? format(endTime, "h:mm a")
+              : format(endTime, "MMM d, h:mm a")}
+          </p>
+          {(continuesFromPriorDay || continuesToNextDay) && (
+            <p className="text-xs text-muted-foreground/80 italic">
+              {continuesFromPriorDay && continuesToNextDay
+                ? "Continues across days"
+                : continuesFromPriorDay
+                  ? "Continues from earlier"
+                  : "Continues tomorrow"}
+            </p>
+          )}
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: color }}
+            />
+            <span>{calendarName}</span>
+          </div>
+          {event.location && (
+            <p className="text-xs text-muted-foreground">📍 {event.location}</p>
+          )}
+          {event.htmlLink && (
+            <p className="text-xs text-primary">Click to open in calendar</p>
+          )}
+        </div>
+      </TooltipContent>
     </Tooltip>
   );
 }
@@ -338,11 +332,7 @@ interface AllDayEventProps {
   className?: string;
 }
 
-export function AllDayEvent({
-  event,
-  onClick,
-  className,
-}: AllDayEventProps) {
+export function AllDayEvent({ event, onClick, className }: AllDayEventProps) {
   const color = getEventColor(event);
   const calendarName = event.calendar?.name || "External Calendar";
 
@@ -354,47 +344,47 @@ export function AllDayEvent({
   return (
     <Tooltip delayDuration={300}>
       <TooltipTrigger asChild>
-          <div
-            data-all-day-event
-            className={cn(
-              "flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium cursor-pointer transition-all",
-              "hover:brightness-90",
-              className
-            )}
-            style={{
-              backgroundColor: hexToRgba(color, 0.15),
-              borderLeft: `3px solid ${hexToRgba(color, 0.6)}`,
-            }}
-            onClick={handleClick}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.stopPropagation();
-                onClick?.();
-              }
-            }}
-          >
-            <CalendarDays className="h-3 w-3 shrink-0 text-muted-foreground" />
-            <span className="truncate text-foreground/80">{event.title}</span>
+        <div
+          data-all-day-event
+          className={cn(
+            "flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium cursor-pointer transition-all",
+            "hover:brightness-90",
+            className
+          )}
+          style={{
+            backgroundColor: hexToRgba(color, 0.15),
+            borderLeft: `3px solid ${hexToRgba(color, 0.6)}`,
+          }}
+          onClick={handleClick}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.stopPropagation();
+              onClick?.();
+            }
+          }}
+        >
+          <CalendarDays className="h-3 w-3 shrink-0 text-muted-foreground" />
+          <span className="truncate text-foreground/80">{event.title}</span>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">
+        <div className="space-y-1">
+          <p className="font-medium">{event.title}</p>
+          <p className="text-xs text-muted-foreground">All day event</p>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: color }}
+            />
+            <span>{calendarName}</span>
           </div>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <div className="space-y-1">
-            <p className="font-medium">{event.title}</p>
-            <p className="text-xs text-muted-foreground">All day event</p>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <div 
-                className="h-2 w-2 rounded-full" 
-                style={{ backgroundColor: color }}
-              />
-              <span>{calendarName}</span>
-            </div>
-            {event.location && (
-              <p className="text-xs text-muted-foreground">📍 {event.location}</p>
-            )}
-          </div>
-        </TooltipContent>
+          {event.location && (
+            <p className="text-xs text-muted-foreground">📍 {event.location}</p>
+          )}
+        </div>
+      </TooltipContent>
     </Tooltip>
   );
 }

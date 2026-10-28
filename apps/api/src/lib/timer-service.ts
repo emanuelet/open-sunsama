@@ -25,7 +25,10 @@ import { publishEvent } from "./websocket/index.js";
 import { stopTimerFields, timerSeconds } from "./timer.js";
 
 type Database = ReturnType<typeof getDb>;
-export type TimerDb = Pick<Database, "select" | "update" | "execute" | "delete">;
+export type TimerDb = Pick<
+  Database,
+  "select" | "update" | "execute" | "delete"
+>;
 type Db = TimerDb;
 type Task = typeof tasks.$inferSelect;
 type Subtask = typeof subtasks.$inferSelect;
@@ -37,12 +40,21 @@ type Subtask = typeof subtasks.$inferSelect;
 export async function stopSubtaskTimers(
   db: Db,
   userId: string,
-  scope: { taskId?: string; exceptTaskId?: string; exceptSubtaskId?: string } = {}
+  scope: {
+    taskId?: string;
+    exceptTaskId?: string;
+    exceptSubtaskId?: string;
+  } = {}
 ): Promise<void> {
-  const conditions = [eq(tasks.userId, userId), isNotNull(subtasks.timerStartedAt)];
+  const conditions = [
+    eq(tasks.userId, userId),
+    isNotNull(subtasks.timerStartedAt),
+  ];
   if (scope.taskId) conditions.push(eq(subtasks.taskId, scope.taskId));
-  if (scope.exceptTaskId) conditions.push(ne(subtasks.taskId, scope.exceptTaskId));
-  if (scope.exceptSubtaskId) conditions.push(ne(subtasks.id, scope.exceptSubtaskId));
+  if (scope.exceptTaskId)
+    conditions.push(ne(subtasks.taskId, scope.exceptTaskId));
+  if (scope.exceptSubtaskId)
+    conditions.push(ne(subtasks.id, scope.exceptSubtaskId));
 
   const running = await db
     .select({ subtask: subtasks })
@@ -54,7 +66,9 @@ export async function stopSubtaskTimers(
     await db
       .update(subtasks)
       .set({ ...stopTimerFields(subtask), updatedAt: new Date() })
-      .where(and(eq(subtasks.id, subtask.id), isNotNull(subtasks.timerStartedAt)));
+      .where(
+        and(eq(subtasks.id, subtask.id), isNotNull(subtasks.timerStartedAt))
+      );
   }
 }
 
@@ -73,7 +87,11 @@ async function stopTaskTimerUnlocked(
     .update(tasks)
     .set({ ...fields, updatedAt: new Date() })
     .where(
-      and(eq(tasks.id, task.id), eq(tasks.userId, userId), isNotNull(tasks.timerStartedAt))
+      and(
+        eq(tasks.id, task.id),
+        eq(tasks.userId, userId),
+        isNotNull(tasks.timerStartedAt)
+      )
     )
     .returning();
   if (!updated) return (await reloadTask(db, userId, task.id)) ?? task;
@@ -95,7 +113,8 @@ async function startTaskTimerUnlocked(
   task: Task,
   emit: typeof publishEvent
 ): Promise<{ task: Task; stoppedTask: Task | null }> {
-  if (task.completedAt) throw new ValidationError("Reopen the task before starting its timer.");
+  if (task.completedAt)
+    throw new ValidationError("Reopen the task before starting its timer.");
   if (task.timerStartedAt) return { task, stoppedTask: null };
 
   await stopSubtaskTimers(db, userId, { exceptTaskId: task.id });
@@ -119,10 +138,19 @@ async function startTaskTimerUnlocked(
       timerAccumulatedSeconds: timerSeconds(task),
       updatedAt: new Date(),
     })
-    .where(and(eq(tasks.id, task.id), eq(tasks.userId, userId), isNull(tasks.timerStartedAt)))
+    .where(
+      and(
+        eq(tasks.id, task.id),
+        eq(tasks.userId, userId),
+        isNull(tasks.timerStartedAt)
+      )
+    )
     .returning();
   if (!updated) {
-    return { task: (await reloadTask(db, userId, task.id)) ?? task, stoppedTask };
+    return {
+      task: (await reloadTask(db, userId, task.id)) ?? task,
+      stoppedTask,
+    };
   }
 
   emit(userId, "timer:started", {
@@ -141,7 +169,8 @@ async function startSubtaskTimerUnlocked(
   subtask: Subtask,
   emit: typeof publishEvent
 ): Promise<{ subtask: Subtask; task: Task; stoppedTask: Task | null }> {
-  if (subtask.completed) throw new ValidationError("Reopen the subtask before starting its timer.");
+  if (subtask.completed)
+    throw new ValidationError("Reopen the subtask before starting its timer.");
   const started = await startTaskTimerUnlocked(db, userId, task, emit);
   await stopSubtaskTimers(db, userId, { exceptSubtaskId: subtask.id });
   if (subtask.timerStartedAt) {
@@ -201,31 +230,85 @@ async function reloadTask(db: Db, userId: string, id: string) {
 
 // Serialize timer transitions across tabs/devices, then reload after acquiring
 // the lock. A stale request must not start two timers or overwrite logged time.
-export async function withTimerTransition<T>(db: Database, userId: string, run: (tx: Db, emit: typeof publishEvent) => Promise<T>) {
+export async function withTimerTransition<T>(
+  db: Database,
+  userId: string,
+  run: (tx: Db, emit: typeof publishEvent) => Promise<T>
+) {
   const events: Parameters<typeof publishEvent>[] = [];
   const result = await db.transaction(async (tx) => {
-    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${userId}), 917)`);
-    return run(tx, async (...args) => { events.push(args); });
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtext(${userId}), 917)`
+    );
+    return run(tx, async (...args) => {
+      events.push(args);
+    });
   });
   for (const args of events) void publishEvent(...args);
   return result;
 }
 export async function startTaskTimer(db: Database, userId: string, task: Task) {
-  return withTimerTransition(db, userId, async (tx, emit) => startTaskTimerUnlocked(tx, userId, (await reloadTask(tx, userId, task.id)) ?? task, emit));
+  return withTimerTransition(db, userId, async (tx, emit) =>
+    startTaskTimerUnlocked(
+      tx,
+      userId,
+      (await reloadTask(tx, userId, task.id)) ?? task,
+      emit
+    )
+  );
 }
 export async function stopTaskTimer(db: Database, userId: string, task: Task) {
-  return withTimerTransition(db, userId, async (tx, emit) => stopTaskTimerUnlocked(tx, userId, (await reloadTask(tx, userId, task.id)) ?? task, emit));
+  return withTimerTransition(db, userId, async (tx, emit) =>
+    stopTaskTimerUnlocked(
+      tx,
+      userId,
+      (await reloadTask(tx, userId, task.id)) ?? task,
+      emit
+    )
+  );
 }
-export async function startSubtaskTimer(db: Database, userId: string, task: Task, subtask: Subtask) {
+export async function startSubtaskTimer(
+  db: Database,
+  userId: string,
+  task: Task,
+  subtask: Subtask
+) {
   return withTimerTransition(db, userId, async (tx, emit) => {
-    const [current] = await tx.select().from(subtasks).where(eq(subtasks.id, subtask.id));
-    return startSubtaskTimerUnlocked(tx, userId, (await reloadTask(tx, userId, task.id)) ?? task, current ?? subtask, emit);
+    const [current] = await tx
+      .select()
+      .from(subtasks)
+      .where(eq(subtasks.id, subtask.id));
+    return startSubtaskTimerUnlocked(
+      tx,
+      userId,
+      (await reloadTask(tx, userId, task.id)) ?? task,
+      current ?? subtask,
+      emit
+    );
   });
 }
-export async function stopSubtaskTimer(db: Database, userId: string, task: Task, subtask: Subtask) {
+export async function stopSubtaskTimer(
+  db: Database,
+  userId: string,
+  task: Task,
+  subtask: Subtask
+) {
   return withTimerTransition(db, userId, async (tx, emit) => {
-    const [current] = await tx.select().from(subtasks).where(eq(subtasks.id, subtask.id));
-    if (!current?.timerStartedAt) return { subtask: current ?? subtask, task: (await reloadTask(tx, userId, task.id)) ?? task };
-    return stopSubtaskTimerUnlocked(tx, userId, (await reloadTask(tx, userId, task.id)) ?? task, current, emit);
+    const [current] = await tx
+      .select()
+      .from(subtasks)
+      .where(eq(subtasks.id, subtask.id));
+    if (!current?.timerStartedAt)
+      return {
+        subtask: current ?? subtask,
+        task: (await reloadTask(tx, userId, task.id)) ?? task,
+      };
+    return stopSubtaskTimerUnlocked(
+      tx,
+      userId,
+      (await reloadTask(tx, userId, task.id)) ?? task,
+      current,
+      emit
+    );
   });
 }

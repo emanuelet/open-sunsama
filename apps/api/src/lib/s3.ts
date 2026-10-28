@@ -9,7 +9,7 @@ import {
   GetObjectCommand,
   DeleteObjectCommand,
   NoSuchKey,
-} from '@aws-sdk/client-s3';
+} from "@aws-sdk/client-s3";
 
 // Lazy-initialized S3 client singleton
 let s3Client: S3Client | null = null;
@@ -22,7 +22,7 @@ function getS3Client(): S3Client {
   if (!s3Client) {
     s3Client = new S3Client({
       endpoint: process.env.AWS_ENDPOINT_URL,
-      region: process.env.AWS_DEFAULT_REGION ?? 'auto',
+      region: process.env.AWS_DEFAULT_REGION ?? "auto",
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
@@ -39,7 +39,7 @@ function getS3Client(): S3Client {
 function getBucketName(): string {
   const bucket = process.env.AWS_S3_BUCKET_NAME;
   if (!bucket) {
-    throw new Error('AWS_S3_BUCKET_NAME environment variable is not set');
+    throw new Error("AWS_S3_BUCKET_NAME environment variable is not set");
   }
   return bucket;
 }
@@ -78,9 +78,7 @@ export async function uploadToS3(
  * @param key - The S3 object key (path)
  * @returns The object body, content type, and content length, or null if not found
  */
-export async function getS3Object(
-  key: string
-): Promise<{
+export async function getS3Object(key: string): Promise<{
   body: ReadableStream;
   contentType: string;
   contentLength: number;
@@ -102,7 +100,7 @@ export async function getS3Object(
 
     return {
       body: response.Body.transformToWebStream(),
-      contentType: response.ContentType || 'application/octet-stream',
+      contentType: response.ContentType || "application/octet-stream",
       contentLength: response.ContentLength || 0,
     };
   } catch (error: unknown) {
@@ -111,7 +109,10 @@ export async function getS3Object(
       return null;
     }
     // Also check by name for compatibility
-    if (error instanceof Error && (error.name === 'NoSuchKey' || error.name === 'NotFound')) {
+    if (
+      error instanceof Error &&
+      (error.name === "NoSuchKey" || error.name === "NotFound")
+    ) {
       return null;
     }
     throw error;
@@ -141,9 +142,9 @@ export async function deleteFromS3(key: string): Promise<void> {
 function sanitizeFilename(filename: string): string {
   return filename
     .toLowerCase()
-    .replace(/[^a-z0-9.-]/g, '-') // Replace non-alphanumeric chars with hyphens
-    .replace(/-+/g, '-') // Collapse multiple hyphens
-    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+    .replace(/[^a-z0-9.-]/g, "-") // Replace non-alphanumeric chars with hyphens
+    .replace(/-+/g, "-") // Collapse multiple hyphens
+    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
 }
 
 /**
@@ -170,14 +171,16 @@ export function generateUniqueKey(
  * @param url - The proxy URL (e.g., /uploads/avatars/user-id/timestamp-filename.jpg)
  * @returns The S3 key or null if not a valid proxy URL
  */
-export function extractS3KeyFromUrl(url: string | null | undefined): string | null {
+export function extractS3KeyFromUrl(
+  url: string | null | undefined
+): string | null {
   if (!url) return null;
-  
+
   // Handle proxy URLs: /uploads/{key}
-  if (url.startsWith('/uploads/')) {
-    return url.replace(/^\/uploads\//, '');
+  if (url.startsWith("/uploads/")) {
+    return url.replace(/^\/uploads\//, "");
   }
-  
+
   return null;
 }
 
@@ -186,7 +189,9 @@ export function extractS3KeyFromUrl(url: string | null | undefined): string | nu
  * Safely handles null/undefined URLs and non-S3 URLs
  * @param url - The proxy URL to delete
  */
-export async function deleteFromS3ByUrl(url: string | null | undefined): Promise<void> {
+export async function deleteFromS3ByUrl(
+  url: string | null | undefined
+): Promise<void> {
   const key = extractS3KeyFromUrl(url);
   if (key) {
     await deleteFromS3(key);

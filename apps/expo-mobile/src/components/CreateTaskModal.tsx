@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   View,
   Text,
@@ -10,12 +10,12 @@ import {
   ActivityIndicator,
   Alert,
   ScrollView,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import type { TaskPriority } from '@open-sunsama/types';
-import { useCreateTask } from '@/hooks/useTasks';
-import { PrioritySelector } from './PrioritySelector';
-import { useThemeColors, type ThemeColors } from '@/lib/theme';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import type { TaskPriority } from "@open-sunsama/types";
+import { useCreateTask } from "@/hooks/useTasks";
+import { PrioritySelector } from "./PrioritySelector";
+import { useThemeColors, type ThemeColors } from "@/lib/theme";
 
 interface CreateTaskModalProps {
   onClose: () => void;
@@ -25,19 +25,22 @@ interface CreateTaskModalProps {
 /**
  * Create task modal component
  */
-export function CreateTaskModal({ onClose, defaultDate }: CreateTaskModalProps) {
+export function CreateTaskModal({
+  onClose,
+  defaultDate,
+}: CreateTaskModalProps) {
   const colors = useThemeColors();
   const styles = createStyles(colors);
-  const [title, setTitle] = useState('');
-  const [notes, setNotes] = useState('');
-  const [priority, setPriority] = useState<TaskPriority>('P2');
-  const [estimatedMins, setEstimatedMins] = useState('');
-  
+  const [title, setTitle] = useState("");
+  const [notes, setNotes] = useState("");
+  const [priority, setPriority] = useState<TaskPriority>("P2");
+  const [estimatedMins, setEstimatedMins] = useState("");
+
   const createTask = useCreateTask();
 
   const handleCreate = async () => {
     if (!title.trim()) {
-      Alert.alert('Error', 'Please enter a task title');
+      Alert.alert("Error", "Please enter a task title");
       return;
     }
 
@@ -51,15 +54,16 @@ export function CreateTaskModal({ onClose, defaultDate }: CreateTaskModalProps) 
       });
       onClose();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to create task';
-      Alert.alert('Error', message);
+      const message =
+        error instanceof Error ? error.message : "Failed to create task";
+      Alert.alert("Error", message);
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
       >
         {/* Header */}
@@ -70,13 +74,21 @@ export function CreateTaskModal({ onClose, defaultDate }: CreateTaskModalProps) 
           <Text style={styles.headerTitle}>New Task</Text>
           <TouchableOpacity
             onPress={handleCreate}
-            style={[styles.saveButton, !title.trim() && styles.saveButtonDisabled]}
+            style={[
+              styles.saveButton,
+              !title.trim() && styles.saveButtonDisabled,
+            ]}
             disabled={createTask.isPending || !title.trim()}
           >
             {createTask.isPending ? (
               <ActivityIndicator size="small" color={colors.accent} />
             ) : (
-              <Text style={[styles.saveText, !title.trim() && styles.saveTextDisabled]}>
+              <Text
+                style={[
+                  styles.saveText,
+                  !title.trim() && styles.saveTextDisabled,
+                ]}
+              >
                 Create
               </Text>
             )}
@@ -138,53 +150,59 @@ export function CreateTaskModal({ onClose, defaultDate }: CreateTaskModalProps) 
   );
 }
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.surface },
-  keyboardView: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  cancelButton: { padding: 8 },
-  cancelText: { fontSize: 16, color: colors.secondary },
-  headerTitle: { fontSize: 17, fontWeight: '600', color: colors.text },
-  saveButton: { padding: 8, minWidth: 60, alignItems: 'center' },
-  saveButtonDisabled: { opacity: 0.5 },
-  saveText: { fontSize: 16, fontWeight: '600', color: colors.accent },
-  saveTextDisabled: { color: colors.muted },
-  form: { flex: 1, padding: 16 },
-  inputGroup: { marginBottom: 24 },
-  label: { fontSize: 14, fontWeight: '500', color: colors.text, marginBottom: 8 },
-  titleInput: {
-    fontSize: 18,
-    color: colors.text,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    minHeight: 48,
-  },
-  notesInput: {
-    fontSize: 16,
-    color: colors.text,
-    backgroundColor: colors.background,
-    borderRadius: 8,
-    padding: 12,
-    minHeight: 100,
-    textAlignVertical: 'top',
-  },
-  input: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    color: colors.text,
-    backgroundColor: colors.surface,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.surface },
+    keyboardView: { flex: 1 },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    cancelButton: { padding: 8 },
+    cancelText: { fontSize: 16, color: colors.secondary },
+    headerTitle: { fontSize: 17, fontWeight: "600", color: colors.text },
+    saveButton: { padding: 8, minWidth: 60, alignItems: "center" },
+    saveButtonDisabled: { opacity: 0.5 },
+    saveText: { fontSize: 16, fontWeight: "600", color: colors.accent },
+    saveTextDisabled: { color: colors.muted },
+    form: { flex: 1, padding: 16 },
+    inputGroup: { marginBottom: 24 },
+    label: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: colors.text,
+      marginBottom: 8,
+    },
+    titleInput: {
+      fontSize: 18,
+      color: colors.text,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      minHeight: 48,
+    },
+    notesInput: {
+      fontSize: 16,
+      color: colors.text,
+      backgroundColor: colors.background,
+      borderRadius: 8,
+      padding: 12,
+      minHeight: 100,
+      textAlignVertical: "top",
+    },
+    input: {
+      height: 48,
+      borderWidth: 1,
+      borderColor: colors.inputBorder,
+      borderRadius: 8,
+      paddingHorizontal: 16,
+      fontSize: 16,
+      color: colors.text,
+      backgroundColor: colors.surface,
+    },
+  });

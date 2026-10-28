@@ -1,14 +1,14 @@
 /**
  * Task reminder email functionality
  */
-import { escapeHtml, generateEmailHTML } from './template';
-import { getResend, getFromEmail, getFrontendUrl } from './client';
+import { escapeHtml, generateEmailHTML } from "./template";
+import { getResend, getFromEmail, getFrontendUrl } from "./client";
 import {
   createHeading,
   createParagraph,
   createButton,
   createMutedText,
-} from './builders';
+} from "./builders";
 
 // =============================================================================
 // TYPES
@@ -39,25 +39,31 @@ export function generateTaskReminderContent(
   themeColor: string,
   taskId?: string
 ): string {
-  const greeting = userName ? `Hey ${userName},` : 'Hey there,';
+  const greeting = userName ? `Hey ${userName},` : "Hey there,";
   const frontendUrl = getFrontendUrl();
-  const viewUrl = taskId ? `${frontendUrl}/app?task=${taskId}` : `${frontendUrl}/app`;
+  const viewUrl = taskId
+    ? `${frontendUrl}/app?task=${taskId}`
+    : `${frontendUrl}/app`;
 
   const notesSection = taskNotes
     ? `
 <div style="margin: 16px 0; padding: 12px 16px; background-color: #f9fafb; border-radius: 8px; border-left: 3px solid ${themeColor};">
   <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #374151;">${escapeHtml(taskNotes)}</p>
 </div>`
-    : '';
+    : "";
 
   return [
-    createHeading('Task starting soon'),
+    createHeading("Task starting soon"),
     createParagraph(greeting),
-    createParagraph(`Your task "${taskTitle}" is scheduled to start at ${startTime}.`),
+    createParagraph(
+      `Your task "${taskTitle}" is scheduled to start at ${startTime}.`
+    ),
     notesSection,
-    createButton('View Task', viewUrl, themeColor),
-    createMutedText("You're receiving this because you have task reminders enabled."),
-  ].join('\n');
+    createButton("View Task", viewUrl, themeColor),
+    createMutedText(
+      "You're receiving this because you have task reminders enabled."
+    ),
+  ].join("\n");
 }
 
 // =============================================================================
@@ -76,7 +82,7 @@ export async function sendTaskReminderEmail(
     taskTitle,
     taskNotes,
     startTime,
-    themeColor = '#3b82f6',
+    themeColor = "#3b82f6",
     taskId,
   } = options;
 

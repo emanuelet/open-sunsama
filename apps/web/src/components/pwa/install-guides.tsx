@@ -15,7 +15,12 @@ export interface InstallGuide {
   menuName: string;
 }
 
-const iosShareItems = ["Copy", "Add to Favorites", "Add to Home Screen", "Find on Page"];
+const iosShareItems = [
+  "Copy",
+  "Add to Favorites",
+  "Add to Home Screen",
+  "Find on Page",
+];
 
 const guides: Record<Exclude<InstallPlatform, "desktop">, InstallGuide> = {
   "ios-safari": {
@@ -29,9 +34,13 @@ const guides: Record<Exclude<InstallPlatform, "desktop">, InstallGuide> = {
     steps: [
       {
         text: "Tap ··· in Safari's toolbar",
-        detail: "Then tap Share. On older iPhones, tap the Share button directly.",
+        detail:
+          "Then tap Share. On older iPhones, tap the Share button directly.",
       },
-      { text: "Tap “Add to Home Screen”", detail: "Scroll the list down if you don't see it." },
+      {
+        text: "Tap “Add to Home Screen”",
+        detail: "Scroll the list down if you don't see it.",
+      },
       { text: "Tap “Add”", detail: "Open Sunsama lands on your Home Screen." },
     ],
   },
@@ -44,8 +53,14 @@ const guides: Record<Exclude<InstallPlatform, "desktop">, InstallGuide> = {
     target: "Add to Home Screen",
     confirm: { title: "Add to Home Screen", action: "Add", style: "ios" },
     steps: [
-      { text: "Tap Share in the address bar", detail: "The square with an arrow, top right." },
-      { text: "Tap “Add to Home Screen”", detail: "Scroll the list down if you don't see it." },
+      {
+        text: "Tap Share in the address bar",
+        detail: "The square with an arrow, top right.",
+      },
+      {
+        text: "Tap “Add to Home Screen”",
+        detail: "Scroll the list down if you don't see it.",
+      },
       { text: "Tap “Add”", detail: "Open Sunsama lands on your Home Screen." },
     ],
   },
@@ -58,7 +73,10 @@ const guides: Record<Exclude<InstallPlatform, "desktop">, InstallGuide> = {
     target: "Add to Home Screen",
     confirm: { title: "Add to Home Screen", action: "Add", style: "ios" },
     steps: [
-      { text: "Tap Share in your browser", detail: "Or open this page in Safari." },
+      {
+        text: "Tap Share in your browser",
+        detail: "Or open this page in Safari.",
+      },
       { text: "Tap “Add to Home Screen”" },
       { text: "Tap “Add”", detail: "Open Sunsama lands on your Home Screen." },
     ],
@@ -68,13 +86,28 @@ const guides: Record<Exclude<InstallPlatform, "desktop">, InstallGuide> = {
     menuIcon: "kebab",
     menuName: "⋮",
     menuStyle: "dropdown",
-    menuItems: ["New tab", "History", "Bookmarks", "Add to Home screen", "Settings"],
+    menuItems: [
+      "New tab",
+      "History",
+      "Bookmarks",
+      "Add to Home screen",
+      "Settings",
+    ],
     target: "Add to Home screen",
     confirm: { title: "Install app", action: "Install", style: "android" },
     steps: [
-      { text: "Tap ⋮ at the top right", detail: "The three-dot menu next to the address bar." },
-      { text: "Tap “Add to Home screen”", detail: "Some phones call it “Install app”." },
-      { text: "Tap “Install”", detail: "Open Sunsama lands on your Home screen." },
+      {
+        text: "Tap ⋮ at the top right",
+        detail: "The three-dot menu next to the address bar.",
+      },
+      {
+        text: "Tap “Add to Home screen”",
+        detail: "Some phones call it “Install app”.",
+      },
+      {
+        text: "Tap “Install”",
+        detail: "Open Sunsama lands on your Home screen.",
+      },
     ],
   },
   "android-samsung": {
@@ -96,7 +129,13 @@ const guides: Record<Exclude<InstallPlatform, "desktop">, InstallGuide> = {
     menuIcon: "kebab",
     menuName: "⋮",
     menuStyle: "dropdown",
-    menuItems: ["New tab", "History", "Bookmarks", "Add app to Home screen", "Settings"],
+    menuItems: [
+      "New tab",
+      "History",
+      "Bookmarks",
+      "Add app to Home screen",
+      "Settings",
+    ],
     target: "Add app to Home screen",
     confirm: { title: "Add to Home screen", action: "Add", style: "android" },
     steps: [
@@ -110,11 +149,20 @@ const guides: Record<Exclude<InstallPlatform, "desktop">, InstallGuide> = {
     menuIcon: "kebab",
     menuName: "⋮",
     menuStyle: "dropdown",
-    menuItems: ["New tab", "History", "Bookmarks", "Add to Home screen", "Settings"],
+    menuItems: [
+      "New tab",
+      "History",
+      "Bookmarks",
+      "Add to Home screen",
+      "Settings",
+    ],
     target: "Add to Home screen",
     confirm: { title: "Add to Home screen", action: "Add", style: "android" },
     steps: [
-      { text: "Open your browser's menu", detail: "Usually ⋮ or ≡ next to the address bar." },
+      {
+        text: "Open your browser's menu",
+        detail: "Usually ⋮ or ≡ next to the address bar.",
+      },
       { text: "Tap “Add to Home screen”", detail: "Or “Install app”." },
       { text: "Confirm", detail: "Open Sunsama lands on your Home screen." },
     ],

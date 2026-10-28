@@ -7,7 +7,13 @@
  */
 
 import { defineMarketingPage } from "../types";
-import { giveUpSection, LICENSE_FAQ, LICENSE_GIVE_UP, verdictSection, type AlternativeExtras } from "./shared";
+import {
+  giveUpSection,
+  LICENSE_FAQ,
+  LICENSE_GIVE_UP,
+  verdictSection,
+  type AlternativeExtras,
+} from "./shared";
 
 const verdict: AlternativeExtras["verdict"] = {
   rival: "Reclaim",
@@ -24,7 +30,10 @@ const verdict: AlternativeExtras["verdict"] = {
     "You want tasks synced in from Asana, Jira, Linear or Todoist.",
   ],
   switchLink: { label: "See the daily loop", href: "#how-it-works" },
-  stayLink: { label: "Compare 7 Reclaim alternatives", href: "/blog/reclaim-ai-alternatives" },
+  stayLink: {
+    label: "Compare 7 Reclaim alternatives",
+    href: "/blog/reclaim-ai-alternatives",
+  },
 };
 
 const giveUps: AlternativeExtras["giveUps"] = [
@@ -71,8 +80,16 @@ export default defineMarketingPage({
       alt: "A task dragged onto Open Sunsama's day calendar next to meetings, then resized to fit",
     },
     chips: [
-      { tone: "agent", title: "ChatGPT connected", detail: "Found 2 hours for deep work" },
-      { tone: "block", title: "Deep work: pricing model", detail: "9:00 - 11:00 AM" },
+      {
+        tone: "agent",
+        title: "ChatGPT connected",
+        detail: "Found 2 hours for deep work",
+      },
+      {
+        tone: "block",
+        title: "Deep work: pricing model",
+        detail: "9:00 - 11:00 AM",
+      },
       { tone: "timer", title: "52:30 / 2:00", detail: "Focus" },
     ],
   },
@@ -82,7 +99,8 @@ export default defineMarketingPage({
       kind: "answer",
       id: "answer",
       eyebrow: "The short answer",
-      heading: "Open Sunsama is the Reclaim alternative that plans your day instead of guarding your calendar",
+      heading:
+        "Open Sunsama is the Reclaim alternative that plans your day instead of guarding your calendar",
       body: [
         "Open Sunsama is an open-source Reclaim.ai alternative for people who want to see and choose their day. Tasks live on a board of days. You drag them onto the calendar, next to your Google, Outlook and iCloud events.",
         "We build Open Sunsama, so we put it first — here is why, and where Reclaim fits better.",
@@ -98,14 +116,16 @@ export default defineMarketingPage({
       ],
     },
     verdictSection(verdict, {
-      heading: "Open Sunsama fits people who plan their own day; Reclaim fits teams that want time guarded for them",
+      heading:
+        "Open Sunsama fits people who plan their own day; Reclaim fits teams that want time guarded for them",
       lead: "Both apps put your work on your calendar. The real choice is a smart layer that moves blocks for you, or a planner you run yourself.",
     }),
     {
       kind: "story",
       id: "how-it-works",
       eyebrow: "The daily loop",
-      heading: "You choose each block, and the day stays the way you planned it",
+      heading:
+        "You choose each block, and the day stays the way you planned it",
       lead: "Plan, block, focus, and move fast from the keyboard. Every clip below is a real recording of the app.",
       steps: [
         {
@@ -122,7 +142,10 @@ export default defineMarketingPage({
           title: "Guard your own focus time",
           body: "Drag a task into a free slot next to your meetings, then drag its edge to set the length. That block is your focus time, and it stays put.",
           clip: "time-block",
-          link: { label: "How calendar sync works", href: "/features/calendar-sync" },
+          link: {
+            label: "How calendar sync works",
+            href: "/features/calendar-sync",
+          },
         },
         {
           icon: "timer",
@@ -138,7 +161,10 @@ export default defineMarketingPage({
           title: "Replan from the keyboard",
           body: "A meeting landed on your focus time? Press Cmd+K to find the task or jump to a day, and move it in seconds.",
           clip: "command-palette",
-          link: { label: "See the command palette", href: "/features/command-palette" },
+          link: {
+            label: "See the command palette",
+            href: "/features/command-palette",
+          },
         },
       ],
     },
@@ -146,7 +172,8 @@ export default defineMarketingPage({
       kind: "agent",
       id: "ai",
       eyebrow: "AI native",
-      heading: "Any AI agent can plan your tasks and time blocks in Open Sunsama",
+      heading:
+        "Any AI agent can plan your tasks and time blocks in Open Sunsama",
       lead: "Paste one URL into Claude, ChatGPT, Cursor or any MCP client, then sign in. Your agent sees your meetings and tasks together and plans around them.",
       body: [
         "Reclaim has an official MCP server too. It works on your calendar events, and changes wait in a preview for you to approve.",
@@ -157,27 +184,41 @@ export default defineMarketingPage({
         "Plan my day around my meetings. Put my top three tasks first.",
         "How did my planned time compare with my actual time yesterday?",
       ],
-      tools: ["get_schedule_for_day", "list_time_blocks", "create_time_block", "update_time_block", "list_tasks"],
+      tools: [
+        "get_schedule_for_day",
+        "list_time_blocks",
+        "create_time_block",
+        "update_time_block",
+        "list_tasks",
+      ],
       clip: "ai-plan",
-      clipCaption: "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
+      clipCaption:
+        "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
       links: [
         { label: "Claude setup", href: "/docs/mcp/claude" },
         { label: "ChatGPT setup", href: "/docs/mcp/chatgpt" },
         { label: "Cursor setup", href: "/docs/mcp/cursor" },
-        { label: "Task managers with MCP", href: "/blog/best-task-managers-with-mcp" },
+        {
+          label: "Task managers with MCP",
+          href: "/blog/best-task-managers-with-mcp",
+        },
       ],
     },
     {
       kind: "comparison",
       id: "compare",
       eyebrow: "Feature by feature",
-      heading: "Open Sunsama gives you a full planner, iCloud and the code; Reclaim gives you autopilot",
+      heading:
+        "Open Sunsama gives you a full planner, iCloud and the code; Reclaim gives you autopilot",
       lead: "Reclaim leads on automation and team scheduling. Open Sunsama leads on control and ownership. Here is each feature side by side.",
       columns: ["Open Sunsama", "Reclaim"],
       rows: [
         {
           feature: "What it is",
-          cells: [{ text: "A daily planner with a calendar" }, { text: "A smart layer on your calendar" }],
+          cells: [
+            { text: "A daily planner with a calendar" },
+            { text: "A smart layer on your calendar" },
+          ],
         },
         {
           feature: "Places tasks on its own",
@@ -187,7 +228,10 @@ export default defineMarketingPage({
           ],
         },
         { feature: "Habits and focus time defense", cells: ["no", "yes"] },
-        { feature: "Board of days and a backlog", cells: ["yes", { text: "Task list" }] },
+        {
+          feature: "Board of days and a backlog",
+          cells: ["yes", { text: "Task list" }],
+        },
         {
           feature: "Calendars",
           cells: [
@@ -195,7 +239,10 @@ export default defineMarketingPage({
             { mark: "partial", text: "Google, Outlook" },
           ],
         },
-        { feature: "Focus mode with planned vs actual", cells: ["yes", { text: "Focus time on the calendar" }] },
+        {
+          feature: "Focus mode with planned vs actual",
+          cells: ["yes", { text: "Focus time on the calendar" }],
+        },
         {
           feature: "Built-in task integrations",
           cells: [
@@ -203,7 +250,10 @@ export default defineMarketingPage({
             { mark: "yes", text: "Asana, Jira, Linear, Todoist and more" },
           ],
         },
-        { feature: "Smart meetings and scheduling links", cells: ["no", "yes"] },
+        {
+          feature: "Smart meetings and scheduling links",
+          cells: ["no", "yes"],
+        },
         {
           feature: "MCP server for AI agents",
           cells: [
@@ -231,7 +281,8 @@ export default defineMarketingPage({
         "Reclaim facts come from its [pricing page](https://reclaim.ai/pricing), [help center](https://help.reclaim.ai/) and [Claude integration page](https://reclaim.ai/integrations/claude). Reclaim has been part of Dropbox since August 2024. Checked September 2026.",
     },
     giveUpSection(giveUps, {
-      heading: "Leaving Reclaim costs you auto-scheduling, habits and task sync",
+      heading:
+        "Leaving Reclaim costs you auto-scheduling, habits and task sync",
       lead: "Reclaim is a good app. Here is what it does that Open Sunsama doesn't, so you can choose with clear eyes.",
     }),
     {
@@ -265,18 +316,28 @@ export default defineMarketingPage({
         question: "What is the best Reclaim.ai alternative?",
         answer:
           "We build Open Sunsama, and we think it is the best pick for most people. It is an open-source daily planner with time blocking that any AI agent can run. FlowSavvy is the closest auto-scheduler for one person, and Motion does more for you.",
-        link: { label: "Compare 7 Reclaim alternatives", href: "/blog/reclaim-ai-alternatives" },
+        link: {
+          label: "Compare 7 Reclaim alternatives",
+          href: "/blog/reclaim-ai-alternatives",
+        },
       },
       {
         question: "Is there an open-source Reclaim alternative?",
         answer:
           "Yes. Open Sunsama's code is public on GitHub, and you can self-host it with Docker for personal use. It has time blocking, focus mode, calendar sync and a hosted MCP server.",
-        link: { label: "Self-hosting guide", href: "/docs/self-hosting/docker" },
+        link: {
+          label: "Self-hosting guide",
+          href: "/docs/self-hosting/docker",
+        },
       },
       {
         question: "Does Open Sunsama work with iCloud Calendar?",
-        answer: "Yes. Connect Google Calendar, Outlook or iCloud in Settings. Reclaim works with Google and Outlook only.",
-        link: { label: "How calendar sync works", href: "/features/calendar-sync" },
+        answer:
+          "Yes. Connect Google Calendar, Outlook or iCloud in Settings. Reclaim works with Google and Outlook only.",
+        link: {
+          label: "How calendar sync works",
+          href: "/features/calendar-sync",
+        },
       },
       {
         question: "Does Open Sunsama auto-schedule like Reclaim?",
@@ -290,7 +351,8 @@ export default defineMarketingPage({
       },
       {
         question: "Did Dropbox buy Reclaim.ai?",
-        answer: "Yes. Dropbox announced it bought Reclaim in August 2024. Reclaim still runs as its own app.",
+        answer:
+          "Yes. Dropbox announced it bought Reclaim in August 2024. Reclaim still runs as its own app.",
       },
       {
         question: "Is there a Reclaim alternative with a phone app?",
@@ -308,7 +370,8 @@ export default defineMarketingPage({
       {
         kind: "guide",
         title: "7 best Reclaim.ai alternatives in 2026",
-        description: "Auto or manual planning, plus what happened to Clockwise.",
+        description:
+          "Auto or manual planning, plus what happened to Clockwise.",
         href: "/blog/reclaim-ai-alternatives",
       },
       {
@@ -326,7 +389,8 @@ export default defineMarketingPage({
       {
         kind: "compare",
         title: "Open Sunsama vs Motion",
-        description: "Plan by hand, or with your agent, instead of an auto-scheduler.",
+        description:
+          "Plan by hand, or with your agent, instead of an auto-scheduler.",
         href: "/alternative/motion",
       },
       {

@@ -8,10 +8,10 @@ Follow [DESIGN.md](DESIGN.md) for the compact workspace design tokens, component
 
 **Use Cursor browser tool for UI testing.**
 
-| Environment | Web                     | API                         | Prerequisites                          |
-| ----------- | ----------------------- | --------------------------- | -------------------------------------- |
-| Local       | http://localhost:3000   | http://localhost:3001       | `bun run dev:local` (see below)        |
-| Production  | https://opensunsama.com | https://api.opensunsama.com | None                                   |
+| Environment | Web                     | API                         | Prerequisites                   |
+| ----------- | ----------------------- | --------------------------- | ------------------------------- |
+| Local       | http://localhost:3000   | http://localhost:3001       | `bun run dev:local` (see below) |
+| Production  | https://opensunsama.com | https://api.opensunsama.com | None                            |
 
 **Login credentials:** `.env.local` in project root (gitignored, real user account - NEVER commit).
 
@@ -65,17 +65,17 @@ opensunsama/
 
 **Hono v4** | Port 3001 | tsup build
 
-| Route                   | Auth  | Description                      |
-| ----------------------- | ----- | -------------------------------- |
-| `/auth/*`               | Mixed | Login, register, profile         |
-| `/tasks/*`              | Yes   | Task CRUD + reorder              |
-| `/tasks/:id/subtasks/*` | Yes   | Subtask CRUD                     |
-| `/time-blocks/*`        | Yes   | Time block CRUD + cascade resize |
-| `/calendar-events`      | Yes   | Synced events (`date` or `from`/`to`; `calendar:read`) |
-| `/api-keys/*`           | JWT   | API key management               |
-| `/mcp`                  | OAuth/API key | Remote MCP server (Streamable HTTP) |
-| `/oauth/*`, `/.well-known/*` | Mixed | OAuth 2.1 for MCP clients     |
-| `/uploads/*`            | Yes   | S3 file uploads                  |
+| Route                        | Auth          | Description                                            |
+| ---------------------------- | ------------- | ------------------------------------------------------ |
+| `/auth/*`                    | Mixed         | Login, register, profile                               |
+| `/tasks/*`                   | Yes           | Task CRUD + reorder                                    |
+| `/tasks/:id/subtasks/*`      | Yes           | Subtask CRUD                                           |
+| `/time-blocks/*`             | Yes           | Time block CRUD + cascade resize                       |
+| `/calendar-events`           | Yes           | Synced events (`date` or `from`/`to`; `calendar:read`) |
+| `/api-keys/*`                | JWT           | API key management                                     |
+| `/mcp`                       | OAuth/API key | Remote MCP server (Streamable HTTP)                    |
+| `/oauth/*`, `/.well-known/*` | Mixed         | OAuth 2.1 for MCP clients                              |
+| `/uploads/*`                 | Yes           | S3 file uploads                                        |
 
 **Auth:** JWT (`Bearer <token>`), API Key (`X-API-Key: os_<key>`), or MCP OAuth token (`Bearer osat_<token>`)  
 **Scopes:** `tasks:read`, `tasks:write`, `time-blocks:read`, `time-blocks:write`, `calendar:read`, `user:read`, `user:write`
@@ -140,7 +140,7 @@ E2E test of the OAuth flow against a local API: `MCP_E2E_API_URL=http://localhos
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Tasks       | `list_tasks`, `get_task`, `create_task`, `update_task`, `complete_task`, `uncomplete_task`, `delete_task`, `schedule_task`, `reorder_tasks`            |
 | Time Blocks | `list_time_blocks`, `get_time_block`, `create_time_block`, `update_time_block`, `delete_time_block`, `link_task_to_time_block`, `get_schedule_for_day` |
-| Calendar    | `list_calendar_events` (read-only events synced from Google/Outlook/iCloud; also shown in `get_schedule_for_day`)                                   |
+| Calendar    | `list_calendar_events` (read-only events synced from Google/Outlook/iCloud; also shown in `get_schedule_for_day`)                                      |
 | Subtasks    | `list_subtasks`, `create_subtask`, `toggle_subtask`, `update_subtask`, `delete_subtask`                                                                |
 | User        | `get_user_profile`, `update_user_profile`                                                                                                              |
 

@@ -176,7 +176,9 @@ const baseInsertSchema = createInsertSchema(taskSeries, {
     .regex(/^\d{2}:\d{2}$/, { error: "Invalid time format (HH:MM)" })
     .optional(),
   timezone: z.string().min(1),
-  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { error: "Invalid date format" }),
+  startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { error: "Invalid date format" }),
   endDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, { error: "Invalid date format" })

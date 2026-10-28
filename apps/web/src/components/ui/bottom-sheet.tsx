@@ -3,8 +3,9 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
 import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 
-interface BottomSheetContentProps
-  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+interface BottomSheetContentProps extends React.ComponentPropsWithoutRef<
+  typeof DialogPrimitive.Content
+> {
   /** Called when the user drags the sheet down past the dismiss threshold. */
   onDismiss: () => void;
 }
@@ -27,12 +28,20 @@ export const BottomSheetContent = React.forwardRef<
 >(({ className, children, onDismiss, style, ...props }, ref) => {
   const { keyboard, visibleHeight } = useKeyboardInset();
   const [dragY, setDragY] = React.useState(0);
-  const drag = React.useRef<{ startY: number; lastY: number; lastT: number; v: number } | null>(
-    null
-  );
+  const drag = React.useRef<{
+    startY: number;
+    lastY: number;
+    lastT: number;
+    v: number;
+  } | null>(null);
 
   const onPointerDown = (e: React.PointerEvent) => {
-    drag.current = { startY: e.clientY, lastY: e.clientY, lastT: e.timeStamp, v: 0 };
+    drag.current = {
+      startY: e.clientY,
+      lastY: e.clientY,
+      lastT: e.timeStamp,
+      v: 0,
+    };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
   const onPointerMove = (e: React.PointerEvent) => {
@@ -78,7 +87,9 @@ export const BottomSheetContent = React.forwardRef<
           maxHeight: keyboard
             ? `${keyboard + visibleHeight - 12}px`
             : "calc(100dvh - env(safe-area-inset-top, 0px) - 16px)",
-          paddingBottom: keyboard ? `${keyboard}px` : "env(safe-area-inset-bottom, 0px)",
+          paddingBottom: keyboard
+            ? `${keyboard}px`
+            : "env(safe-area-inset-bottom, 0px)",
           transform: dragY ? `translateY(${dragY}px)` : undefined,
           transition: dragging
             ? "none"

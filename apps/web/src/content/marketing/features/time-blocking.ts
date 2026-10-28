@@ -14,7 +14,10 @@ export default defineMarketingPage({
     description:
       "Open Sunsama is an open-source time blocking app. Drag tasks onto your calendar next to Google, Outlook and iCloud events, or let any AI agent plan your day.",
   },
-  breadcrumbs: [{ label: "Features", href: "/#features" }, { label: "Time blocking" }],
+  breadcrumbs: [
+    { label: "Features", href: "/#features" },
+    { label: "Time blocking" },
+  ],
 
   hero: {
     badge: "Feature",
@@ -28,8 +31,16 @@ export default defineMarketingPage({
       alt: "A task dragged from the list onto the day calendar in Open Sunsama, then resized to fit",
     },
     chips: [
-      { tone: "agent", title: "Claude connected", detail: "Blocked 3 tasks around your meetings" },
-      { tone: "block", title: "Deep work: Q4 roadmap", detail: "9:30 - 11:00 AM" },
+      {
+        tone: "agent",
+        title: "Claude connected",
+        detail: "Blocked 3 tasks around your meetings",
+      },
+      {
+        tone: "block",
+        title: "Deep work: Q4 roadmap",
+        detail: "9:30 - 11:00 AM",
+      },
       { tone: "timer", title: "23:02 / 1:30", detail: "Focus" },
     ],
   },
@@ -39,7 +50,8 @@ export default defineMarketingPage({
       kind: "answer",
       id: "answer",
       eyebrow: "The short answer",
-      heading: "Time blocking in Open Sunsama means every task gets a slot on your calendar",
+      heading:
+        "Time blocking in Open Sunsama means every task gets a slot on your calendar",
       body: [
         "Time blocking in Open Sunsama means you drag a task from your list onto the calendar. It becomes a block with a start and an end. Drag its bottom edge to set how long it takes.",
         "Your meetings from Google Calendar, Outlook and iCloud sit in the same view. So you see what really fits before the day starts, not at 4 pm.",
@@ -115,7 +127,10 @@ export default defineMarketingPage({
             alt: "Open Sunsama week view with meetings and color-coded time blocks",
             caption: "The week view: meetings and time blocks side by side.",
           },
-          link: { label: "How calendar sync works", href: "/features/calendar-sync" },
+          link: {
+            label: "How calendar sync works",
+            href: "/features/calendar-sync",
+          },
         },
         {
           title: "Tasks on the left, time on the right",
@@ -158,9 +173,16 @@ export default defineMarketingPage({
         "I lost the morning. Move what's left into free slots today and tomorrow.",
         "Block two hours of deep work every morning this week.",
       ],
-      tools: ["get_schedule_for_day", "list_tasks", "create_time_block", "update_time_block", "link_task_to_time_block"],
+      tools: [
+        "get_schedule_for_day",
+        "list_tasks",
+        "create_time_block",
+        "update_time_block",
+        "link_task_to_time_block",
+      ],
       clip: "ai-plan",
-      clipCaption: "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
+      clipCaption:
+        "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
       links: [
         { label: "Claude setup", href: "/docs/mcp/claude" },
         { label: "ChatGPT setup", href: "/docs/mcp/chatgpt" },
@@ -215,7 +237,8 @@ export default defineMarketingPage({
       kind: "comparison",
       id: "compare",
       eyebrow: "Compare",
-      heading: "Open Sunsama gives you time blocking plus the code, the API and any agent",
+      heading:
+        "Open Sunsama gives you time blocking plus the code, the API and any agent",
       lead: "Sunsama, Motion and Akiflow are good apps. Here is how each one handles time blocking, so you can choose with clear eyes.",
       columns: ["Open Sunsama", "Sunsama", "Motion", "Akiflow"],
       rows: [
@@ -256,7 +279,10 @@ export default defineMarketingPage({
           ],
         },
         { feature: "Public REST API", cells: ["yes", "no", "yes", "no"] },
-        { feature: "Code you can read and self-host", cells: ["yes", "no", "no", "no"] },
+        {
+          feature: "Code you can read and self-host",
+          cells: ["yes", "no", "no", "no"],
+        },
         {
           feature: "Desktop apps",
           cells: [
@@ -320,19 +346,28 @@ export default defineMarketingPage({
         question: "What is the best time blocking app?",
         answer:
           "We build Open Sunsama, and we think it is the best pick for most people. You drag tasks onto your calendar next to your meetings, and any AI agent can plan with you. Pick Motion if you want AI to schedule every task for you.",
-        link: { label: "Compare 9 time blocking apps", href: "/blog/best-calendar-apps-time-blocking" },
+        link: {
+          label: "Compare 9 time blocking apps",
+          href: "/blog/best-calendar-apps-time-blocking",
+        },
       },
       {
         question: "How do I time block in Open Sunsama?",
         answer:
           "Open the day view and drag a task from your list onto the calendar. Drag the bottom edge of the block to set how long it takes. The block stays linked to its task.",
-        link: { label: "Time blocking guide", href: "/blog/complete-guide-time-blocking" },
+        link: {
+          label: "Time blocking guide",
+          href: "/blog/complete-guide-time-blocking",
+        },
       },
       {
         question: "Does Open Sunsama sync with Google Calendar and Outlook?",
         answer:
           "Yes. Connect Google Calendar, Outlook or iCloud in Settings. Your events show up next to your time blocks in the day and week views.",
-        link: { label: "How calendar sync works", href: "/features/calendar-sync" },
+        link: {
+          label: "How calendar sync works",
+          href: "/features/calendar-sync",
+        },
       },
       {
         question: "Can AI time-block my day for me?",
@@ -355,7 +390,10 @@ export default defineMarketingPage({
         question: "Is Open Sunsama open source?",
         answer:
           "The code is public on GitHub. It uses a non-commercial license: you can read it, run it and self-host it for personal use. Companies need a commercial license.",
-        link: { label: "See the code", href: "https://github.com/ShadowWalker2014/open-sunsama" },
+        link: {
+          label: "See the code",
+          href: "https://github.com/ShadowWalker2014/open-sunsama",
+        },
       },
     ],
   },
@@ -373,7 +411,8 @@ export default defineMarketingPage({
       {
         kind: "feature",
         title: "Focus mode",
-        description: "Work one block at a time with a timer that tracks real time.",
+        description:
+          "Work one block at a time with a timer that tracks real time.",
         href: "/features/focus-mode",
       },
       {
@@ -391,7 +430,8 @@ export default defineMarketingPage({
       {
         kind: "compare",
         title: "Open Sunsama vs Motion",
-        description: "Plan by hand, or with your agent, instead of an auto-scheduler.",
+        description:
+          "Plan by hand, or with your agent, instead of an auto-scheduler.",
         href: "/alternative/motion",
       },
       {

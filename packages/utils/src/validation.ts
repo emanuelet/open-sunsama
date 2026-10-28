@@ -2,7 +2,7 @@
  * Zod schemas for validation
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 import {
   MIN_PASSWORD_LENGTH,
   MAX_PASSWORD_LENGTH,
@@ -11,17 +11,17 @@ import {
   TASK_PRIORITIES,
   TASK_STATUSES,
   TIME_BLOCK_STATUSES,
-} from './constants.js';
+} from "./constants.js";
 
 /**
  * Email validation schema
  */
 export const emailSchema = z.preprocess(
-  (value) => typeof value === 'string' ? value.trim().toLowerCase() : value,
+  (value) => (typeof value === "string" ? value.trim().toLowerCase() : value),
   z
-    .email({ error: 'Invalid email address' })
-    .min(1, { error: 'Email is required' })
-    .max(255, { error: 'Email must be less than 255 characters' })
+    .email({ error: "Invalid email address" })
+    .min(1, { error: "Email is required" })
+    .max(255, { error: "Email must be less than 255 characters" })
 );
 
 /**
@@ -34,29 +34,39 @@ export const emailSchema = z.preprocess(
  */
 export const passwordSchema = z
   .string()
-  .min(MIN_PASSWORD_LENGTH, { error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` })
-  .max(MAX_PASSWORD_LENGTH, { error: `Password must be less than ${MAX_PASSWORD_LENGTH} characters` })
-  .regex(/[A-Z]/, { error: 'Password must contain at least one uppercase letter' })
-  .regex(/[a-z]/, { error: 'Password must contain at least one lowercase letter' })
-  .regex(/[0-9]/, { error: 'Password must contain at least one number' });
+  .min(MIN_PASSWORD_LENGTH, {
+    error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
+  })
+  .max(MAX_PASSWORD_LENGTH, {
+    error: `Password must be less than ${MAX_PASSWORD_LENGTH} characters`,
+  })
+  .regex(/[A-Z]/, {
+    error: "Password must contain at least one uppercase letter",
+  })
+  .regex(/[a-z]/, {
+    error: "Password must contain at least one lowercase letter",
+  })
+  .regex(/[0-9]/, { error: "Password must contain at least one number" });
 
 /**
  * UUID validation schema
  */
-export const uuidSchema = z.uuid({ error: 'Invalid UUID format' });
+export const uuidSchema = z.uuid({ error: "Invalid UUID format" });
 
 /**
  * Date validation schema (YYYY-MM-DD format)
  */
 export const dateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, { error: `Date must be in ${DATE_FORMAT} format` })
+  .regex(/^\d{4}-\d{2}-\d{2}$/, {
+    error: `Date must be in ${DATE_FORMAT} format`,
+  })
   .refine(
     (val) => {
       const date = new Date(val);
       return !isNaN(date.getTime());
     },
-    { error: 'Invalid date' }
+    { error: "Invalid date" }
   );
 
 /**
@@ -64,7 +74,9 @@ export const dateSchema = z
  */
 export const timeSchema = z
   .string()
-  .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, { error: `Time must be in ${TIME_FORMAT} format` });
+  .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, {
+    error: `Time must be in ${TIME_FORMAT} format`,
+  });
 
 /**
  * Task priority schema
@@ -86,9 +98,9 @@ export const timeBlockStatusSchema = z.enum(TIME_BLOCK_STATUSES);
  */
 export const estimatedMinsSchema = z
   .number()
-  .int({ error: 'Estimated minutes must be a whole number' })
-  .min(1, { error: 'Estimated minutes must be at least 1' })
-  .max(480, { error: 'Estimated minutes cannot exceed 8 hours' });
+  .int({ error: "Estimated minutes must be a whole number" })
+  .min(1, { error: "Estimated minutes must be at least 1" })
+  .max(480, { error: "Estimated minutes cannot exceed 8 hours" });
 
 /**
  * Task schema for creating/updating tasks
@@ -96,21 +108,25 @@ export const estimatedMinsSchema = z
 export const taskSchema = z.object({
   title: z
     .string()
-    .min(1, { error: 'Title is required' })
-    .max(255, { error: 'Title must be less than 255 characters' })
+    .min(1, { error: "Title is required" })
+    .max(255, { error: "Title must be less than 255 characters" })
     .trim(),
   description: z
     .string()
-    .max(5000, { error: 'Description must be less than 5000 characters' })
+    .max(5000, { error: "Description must be less than 5000 characters" })
     .optional()
     .nullable(),
-  priority: taskPrioritySchema.default('medium'),
-  status: taskStatusSchema.default('pending'),
+  priority: taskPrioritySchema.default("medium"),
+  status: taskStatusSchema.default("pending"),
   dueDate: dateSchema.optional().nullable(),
   estimatedMins: estimatedMinsSchema.optional().nullable(),
   projectId: uuidSchema.optional().nullable(),
   parentTaskId: uuidSchema.optional().nullable(),
-  tags: z.array(z.string().max(50)).max(10, { error: 'Maximum 10 tags allowed' }).optional().default([]),
+  tags: z
+    .array(z.string().max(50))
+    .max(10, { error: "Maximum 10 tags allowed" })
+    .optional()
+    .default([]),
 });
 
 /**
@@ -141,23 +157,23 @@ export const timeBlockSchema = z
     date: dateSchema,
     startTime: timeSchema,
     endTime: timeSchema,
-    status: timeBlockStatusSchema.default('scheduled'),
+    status: timeBlockStatusSchema.default("scheduled"),
     notes: z
       .string()
-      .max(1000, { error: 'Notes must be less than 1000 characters' })
+      .max(1000, { error: "Notes must be less than 1000 characters" })
       .optional()
       .nullable(),
   })
   .refine(
     (data) => {
       // Validate that end time is after start time
-      const [startHour, startMin] = data.startTime.split(':').map(Number);
-      const [endHour, endMin] = data.endTime.split(':').map(Number);
+      const [startHour, startMin] = data.startTime.split(":").map(Number);
+      const [endHour, endMin] = data.endTime.split(":").map(Number);
       const startMinutes = (startHour ?? 0) * 60 + (startMin ?? 0);
       const endMinutes = (endHour ?? 0) * 60 + (endMin ?? 0);
       return endMinutes > startMinutes;
     },
-    { error: 'End time must be after start time', path: ['endTime'] }
+    { error: "End time must be after start time", path: ["endTime"] }
   );
 
 /**
@@ -177,7 +193,7 @@ export const updateTimeBlockSchema = z
     status: timeBlockStatusSchema.optional(),
     notes: z
       .string()
-      .max(1000, { error: 'Notes must be less than 1000 characters' })
+      .max(1000, { error: "Notes must be less than 1000 characters" })
       .optional()
       .nullable(),
   })
@@ -185,15 +201,15 @@ export const updateTimeBlockSchema = z
     (data) => {
       // Only validate if both times are provided
       if (data.startTime && data.endTime) {
-        const [startHour, startMin] = data.startTime.split(':').map(Number);
-        const [endHour, endMin] = data.endTime.split(':').map(Number);
+        const [startHour, startMin] = data.startTime.split(":").map(Number);
+        const [endHour, endMin] = data.endTime.split(":").map(Number);
         const startMinutes = (startHour ?? 0) * 60 + (startMin ?? 0);
         const endMinutes = (endHour ?? 0) * 60 + (endMin ?? 0);
         return endMinutes > startMinutes;
       }
       return true;
     },
-    { error: 'End time must be after start time', path: ['endTime'] }
+    { error: "End time must be after start time", path: ["endTime"] }
   );
 
 /**

@@ -215,14 +215,15 @@ export function TaskShortcutsHandler({
       }
 
       // Edit estimate (E)
-      if (
-        matchesTimeEditShortcut(event, "planned")
-      ) {
+      if (matchesTimeEditShortcut(event, "planned")) {
         if (hoveredTask) {
           event.preventDefault();
           if (onEditEstimate) onEditEstimate(hoveredTask.id);
           // Cards open their own planned-time picker.
-          else window.dispatchEvent(new CustomEvent(EDIT_ESTIMATE_EVENT, { detail: hoveredTask.id }));
+          else
+            window.dispatchEvent(
+              new CustomEvent(EDIT_ESTIMATE_EVENT, { detail: hoveredTask.id })
+            );
         }
         return;
       }
@@ -329,11 +330,12 @@ export function TaskShortcutsHandler({
         if (hoveredTask) {
           event.preventDefault();
           const today = format(new Date(), "yyyy-MM-dd");
-          const isToday = hoveredTask.scheduledDate === today || !hoveredTask.scheduledDate;
+          const isToday =
+            hoveredTask.scheduledDate === today || !hoveredTask.scheduledDate;
           let currentTime: string | undefined;
           if (isToday) {
             const now = new Date();
-            currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            currentTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
           }
           autoSchedule.mutate({ taskId: hoveredTask.id, currentTime });
           toast({

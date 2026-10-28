@@ -70,7 +70,12 @@ interface MultiDayViewProps {
   /** Whether time blocks can be moved and resized on the grid. */
   blocksEditable?: boolean;
   /** Clicking an empty slot starts a one-hour block there. */
-  onTimeSlotClick?: (day: Date, startTime: Date, endTime: Date, anchor?: CalendarCreateAnchor) => void;
+  onTimeSlotClick?: (
+    day: Date,
+    startTime: Date,
+    endTime: Date,
+    anchor?: CalendarCreateAnchor
+  ) => void;
   className?: string;
 }
 
@@ -409,7 +414,8 @@ export function MultiDayView({
   // Press and drag on empty space to sweep out a new block.
   const createDrag = useDragToCreate(
     onTimeSlotClick
-      ? ({ day, start, end, anchor }) => onTimeSlotClick(day, start, end, anchor)
+      ? ({ day, start, end, anchor }) =>
+          onTimeSlotClick(day, start, end, anchor)
       : undefined
   );
   const scrollAreaRef = React.useRef<HTMLDivElement>(null);
@@ -541,7 +547,9 @@ export function MultiDayView({
   const isWeek = days.length >= 7;
 
   return (
-    <div className={cn("flex h-full w-full min-w-0 flex-1 flex-col", className)}>
+    <div
+      className={cn("flex h-full w-full min-w-0 flex-1 flex-col", className)}
+    >
       {/* Day-of-week headers */}
       <div className="flex shrink-0 border-b bg-background">
         {/* Empty gutter to align with hour axis */}
@@ -562,9 +570,7 @@ export function MultiDayView({
                 className={cn(
                   "uppercase tracking-wide",
                   isWeek ? "text-[10px] sm:text-[11px]" : "text-[11px]",
-                  today
-                    ? "text-primary font-semibold"
-                    : "text-muted-foreground"
+                  today ? "text-primary font-semibold" : "text-muted-foreground"
                 )}
               >
                 {/* Week view at narrow widths shows single-letter
@@ -573,7 +579,9 @@ export function MultiDayView({
                 {isWeek ? (
                   <>
                     <span className="sm:hidden">{format(day, "EEEEE")}</span>
-                    <span className="hidden sm:inline">{format(day, "EEE")}</span>
+                    <span className="hidden sm:inline">
+                      {format(day, "EEE")}
+                    </span>
                   </>
                 ) : (
                   format(day, "EEE")
@@ -732,7 +740,10 @@ export function MultiDayView({
                     const start = snapToInterval(
                       calculateTimeFromY(Math.max(0, y), day)
                     );
-                    onTimeSlotClick(day, start, addMinutes(start, 60), { x: e.clientX, y: e.clientY });
+                    onTimeSlotClick(day, start, addMinutes(start, 60), {
+                      x: e.clientX,
+                      y: e.clientY,
+                    });
                   }}
                   onMouseDown={(e) => createDrag.startCreate(e, day)}
                   className={cn(
@@ -781,8 +792,7 @@ export function MultiDayView({
                   {/* Time blocks (above events) */}
                   {bucket.blocks.map((block) => {
                     const layout =
-                      dayLayouts[i]?.get(`block:${block.id}`) ??
-                      DEFAULT_LAYOUT;
+                      dayLayouts[i]?.get(`block:${block.id}`) ?? DEFAULT_LAYOUT;
                     const dragId = `${BLOCK_DRAG_PREFIX}${block.id}`;
                     const startBlockDrag = (
                       mode: EventDragMode,
@@ -830,12 +840,9 @@ export function MultiDayView({
                   {/* External calendar events */}
                   {bucket.timed.map((event) => {
                     const layout =
-                      dayLayouts[i]?.get(`event:${event.id}`) ??
-                      DEFAULT_LAYOUT;
-                    const canEdit =
-                      externalEventCanEdit?.(event) ?? false;
-                    const isThisDragging =
-                      drag.dragState?.eventId === event.id;
+                      dayLayouts[i]?.get(`event:${event.id}`) ?? DEFAULT_LAYOUT;
+                    const canEdit = externalEventCanEdit?.(event) ?? false;
+                    const isThisDragging = drag.dragState?.eventId === event.id;
                     return (
                       <MultiDayEvent
                         key={event.id}
@@ -882,27 +889,26 @@ export function MultiDayView({
                   })}
 
                   {/* Block being swept out by a drag on empty space */}
-                  {createDrag.range &&
-                    isSameDay(createDrag.range.day, day) && (
-                      <div
-                        className="absolute inset-x-1 z-30 rounded border-2 border-dashed border-primary bg-primary/10 pointer-events-none px-1.5 py-0.5"
-                        style={{
-                          top: `${calculateYFromTime(createDrag.range.start)}px`,
-                          height: `${Math.max(
-                            ((createDrag.range.end.getTime() -
-                              createDrag.range.start.getTime()) /
-                              3_600_000) *
-                              HOUR_HEIGHT,
-                            16
-                          )}px`,
-                        }}
-                      >
-                        <span className="text-[10px] font-semibold text-primary">
-                          {format(createDrag.range.start, "h:mm")} –{" "}
-                          {format(createDrag.range.end, "h:mm a")}
-                        </span>
-                      </div>
-                    )}
+                  {createDrag.range && isSameDay(createDrag.range.day, day) && (
+                    <div
+                      className="absolute inset-x-1 z-30 rounded border-2 border-dashed border-primary bg-primary/10 pointer-events-none px-1.5 py-0.5"
+                      style={{
+                        top: `${calculateYFromTime(createDrag.range.start)}px`,
+                        height: `${Math.max(
+                          ((createDrag.range.end.getTime() -
+                            createDrag.range.start.getTime()) /
+                            3_600_000) *
+                            HOUR_HEIGHT,
+                          16
+                        )}px`,
+                      }}
+                    >
+                      <span className="text-[10px] font-semibold text-primary">
+                        {format(createDrag.range.start, "h:mm")} –{" "}
+                        {format(createDrag.range.end, "h:mm a")}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Live drop preview while this column owns the
                       active drag — a dashed outline at the new
@@ -916,7 +922,8 @@ export function MultiDayView({
                   {drag.dragState &&
                     drag.dragState.currentDayDate.toDateString() ===
                       day.toDateString() &&
-                    drag.dragState.moved && (() => {
+                    drag.dragState.moved &&
+                    (() => {
                       const previewTop = calculateYFromTime(
                         drag.dragState.previewStart
                       );

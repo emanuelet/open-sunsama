@@ -110,7 +110,10 @@ export function Reveal({
   y?: number;
   as?: keyof React.JSX.IntrinsicElements;
 }) {
-  const { ref, inView } = useInView({ triggerOnce: true, rootMargin: "0px 0px -8% 0px" });
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    rootMargin: "0px 0px -8% 0px",
+  });
   const Component = Tag as React.ElementType;
   return (
     <Component
@@ -131,7 +134,13 @@ export function Reveal({
 }
 
 /** Counts up to `value` once visible. Non-numeric values render as-is. */
-export function CountUp({ value, duration = 1200 }: { value: string; duration?: number }) {
+export function CountUp({
+  value,
+  duration = 1200,
+}: {
+  value: string;
+  duration?: number;
+}) {
   const { ref, inView } = useInView({ triggerOnce: true });
   const match = value.match(/^(\D*)(\d+)(.*)$/);
   const target = match ? Number(match[2]) : 0;
@@ -148,11 +157,17 @@ export function CountUp({ value, duration = 1200 }: { value: string; duration?: 
     return () => cancelAnimationFrame(frame);
   }, [inView, target, duration]);
 
-  return <span ref={ref}>{match ? `${match[1]}${current}${match[3]}` : value}</span>;
+  return (
+    <span ref={ref}>{match ? `${match[1]}${current}${match[3]}` : value}</span>
+  );
 }
 
 /** Staggered intro: an item transitions from its "before" state once `ready`. */
-export function introStyle(ready: boolean, delay: number, reduced: boolean): React.CSSProperties {
+export function introStyle(
+  ready: boolean,
+  delay: number,
+  reduced: boolean
+): React.CSSProperties {
   if (reduced) return {};
   return {
     transition:
@@ -193,24 +208,25 @@ export function HeadlineReveal({
             // The space sits between the masks: trailing spaces inside an inline-block collapse
             return (
               <React.Fragment key={`${word}-${i}`}>
-              {i > 0 && " "}
-              <span className="inline-block overflow-hidden pb-[0.08em] align-bottom">
-                <span
-                  className={cn("inline-block", line.accent && ACCENT_TEXT)}
-                  style={
-                    reduced
-                      ? undefined
-                      : {
-                          transition: "transform 900ms cubic-bezier(0.2,0.8,0.2,1), opacity 700ms ease",
-                          transitionDelay: `${delay}ms`,
-                          transform: ready ? "none" : "translateY(105%)",
-                          opacity: ready ? 1 : 0,
-                        }
-                  }
-                >
-                  {word}
+                {i > 0 && " "}
+                <span className="inline-block overflow-hidden pb-[0.08em] align-bottom">
+                  <span
+                    className={cn("inline-block", line.accent && ACCENT_TEXT)}
+                    style={
+                      reduced
+                        ? undefined
+                        : {
+                            transition:
+                              "transform 900ms cubic-bezier(0.2,0.8,0.2,1), opacity 700ms ease",
+                            transitionDelay: `${delay}ms`,
+                            transform: ready ? "none" : "translateY(105%)",
+                            opacity: ready ? 1 : 0,
+                          }
+                    }
+                  >
+                    {word}
+                  </span>
                 </span>
-              </span>
               </React.Fragment>
             );
           })}

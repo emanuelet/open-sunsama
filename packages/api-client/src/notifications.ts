@@ -43,13 +43,16 @@ export interface NotificationsApi {
  * @param client The Open Sunsama client instance
  * @returns Notifications API methods
  */
-export function createNotificationsApi(client: OpenSunsamaClient): NotificationsApi {
+export function createNotificationsApi(
+  client: OpenSunsamaClient
+): NotificationsApi {
   return {
-    async getPreferences(options?: RequestOptions): Promise<NotificationPreferences> {
-      const response = await client.get<ApiResponseWrapper<NotificationPreferences>>(
-        "notifications/preferences",
-        options
-      );
+    async getPreferences(
+      options?: RequestOptions
+    ): Promise<NotificationPreferences> {
+      const response = await client.get<
+        ApiResponseWrapper<NotificationPreferences>
+      >("notifications/preferences", options);
       return response.data;
     },
 
@@ -57,11 +60,9 @@ export function createNotificationsApi(client: OpenSunsamaClient): Notifications
       input: UpdateNotificationPreferencesInput,
       options?: RequestOptions
     ): Promise<NotificationPreferences> {
-      const response = await client.put<ApiResponseWrapper<NotificationPreferences>>(
-        "notifications/preferences",
-        input,
-        options
-      );
+      const response = await client.put<
+        ApiResponseWrapper<NotificationPreferences>
+      >("notifications/preferences", input, options);
       return response.data;
     },
   };

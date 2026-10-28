@@ -46,7 +46,8 @@ export function FileIcon({ contentType, className }: FileIconProps) {
   // Word documents
   if (
     contentType === "application/msword" ||
-    contentType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    contentType ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   ) {
     return <FileText className={cn(iconClass, "text-blue-600")} />;
   }
@@ -54,7 +55,8 @@ export function FileIcon({ contentType, className }: FileIconProps) {
   // Excel/Spreadsheets
   if (
     contentType === "application/vnd.ms-excel" ||
-    contentType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    contentType ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
     contentType === "text/csv"
   ) {
     return <Table2 className={cn(iconClass, "text-green-600")} />;
@@ -63,7 +65,8 @@ export function FileIcon({ contentType, className }: FileIconProps) {
   // PowerPoint/Presentations
   if (
     contentType === "application/vnd.ms-powerpoint" ||
-    contentType === "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    contentType ===
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation"
   ) {
     return <Presentation className={cn(iconClass, "text-orange-500")} />;
   }
@@ -103,13 +106,24 @@ export function getFileTypeColor(contentType: string): string {
   if (contentType.startsWith("audio/")) return "bg-pink-500/10";
   if (contentType === "application/pdf") return "bg-red-500/10";
   if (contentType.includes("word")) return "bg-blue-600/10";
-  if (contentType.includes("excel") || contentType.includes("spreadsheet") || contentType === "text/csv") {
+  if (
+    contentType.includes("excel") ||
+    contentType.includes("spreadsheet") ||
+    contentType === "text/csv"
+  ) {
     return "bg-green-600/10";
   }
-  if (contentType.includes("powerpoint") || contentType.includes("presentation")) {
+  if (
+    contentType.includes("powerpoint") ||
+    contentType.includes("presentation")
+  ) {
     return "bg-orange-500/10";
   }
-  if (contentType.includes("zip") || contentType.includes("rar") || contentType.includes("7z")) {
+  if (
+    contentType.includes("zip") ||
+    contentType.includes("rar") ||
+    contentType.includes("7z")
+  ) {
     return "bg-amber-600/10";
   }
   return "bg-muted";

@@ -135,7 +135,9 @@ export function TimeBlockNotesSection({
       <Textarea
         id="block-notes"
         value={notes}
-        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onChange(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+          onChange(e.target.value)
+        }
         onBlur={onBlur}
         placeholder="Add notes..."
         rows={4}

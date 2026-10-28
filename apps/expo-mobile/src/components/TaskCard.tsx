@@ -1,8 +1,14 @@
-import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
-import type { Task } from '@open-sunsama/types';
-import { useCompleteTask } from '@/hooks/useTasks';
-import { PRIORITY_LABELS, getPriorityColor } from './PrioritySelector';
-import { useThemeColors, type ThemeColors } from '@/lib/theme';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
+import type { Task } from "@open-sunsama/types";
+import { useCompleteTask } from "@/hooks/useTasks";
+import { PRIORITY_LABELS, getPriorityColor } from "./PrioritySelector";
+import { useThemeColors, type ThemeColors } from "@/lib/theme";
 
 interface TaskCardProps {
   task: Task;
@@ -33,10 +39,7 @@ export function TaskCard({ task, onPress }: TaskCardProps) {
     >
       {/* Checkbox */}
       <TouchableOpacity
-        style={[
-          styles.checkbox,
-          isCompleted && styles.checkboxCompleted,
-        ]}
+        style={[styles.checkbox, isCompleted && styles.checkboxCompleted]}
         onPress={handleToggleComplete}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
@@ -57,11 +60,16 @@ export function TaskCard({ task, onPress }: TaskCardProps) {
           <View
             style={[
               styles.priority,
-              { backgroundColor: `${getPriorityColor(task.priority, colors)}${colors.priorityAlpha}` },
+              {
+                backgroundColor: `${getPriorityColor(task.priority, colors)}${colors.priorityAlpha}`,
+              },
             ]}
           >
             <Text
-              style={[styles.priorityText, { color: getPriorityColor(task.priority, colors) }]}
+              style={[
+                styles.priorityText,
+                { color: getPriorityColor(task.priority, colors) },
+              ]}
             >
               {PRIORITY_LABELS[task.priority]}
             </Text>
@@ -79,84 +87,85 @@ export function TaskCard({ task, onPress }: TaskCardProps) {
   );
 }
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  containerCompleted: {
-    opacity: 0.7,
-  },
-  containerPressed: {
-    backgroundColor: colors.raised,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.inputBorder,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-    marginTop: 2,
-  },
-  checkboxCompleted: {
-    backgroundColor: colors.accentFill,
-    borderColor: colors.accentFill,
-  },
-  checkmark: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  content: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.text,
-    lineHeight: 22,
-    marginBottom: 8,
-  },
-  titleCompleted: {
-    textDecorationLine: 'line-through',
-    color: colors.muted,
-  },
-  meta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  priority: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  priorityText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  estimate: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    backgroundColor: colors.raised,
-    borderRadius: 4,
-  },
-  estimateText: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: colors.secondary,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 12,
+      padding: 16,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 3,
+      elevation: 2,
+    },
+    containerCompleted: {
+      opacity: 0.7,
+    },
+    containerPressed: {
+      backgroundColor: colors.raised,
+    },
+    checkbox: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      borderWidth: 2,
+      borderColor: colors.inputBorder,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 12,
+      marginTop: 2,
+    },
+    checkboxCompleted: {
+      backgroundColor: colors.accentFill,
+      borderColor: colors.accentFill,
+    },
+    checkmark: {
+      color: "#fff",
+      fontSize: 14,
+      fontWeight: "700",
+    },
+    content: {
+      flex: 1,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: "500",
+      color: colors.text,
+      lineHeight: 22,
+      marginBottom: 8,
+    },
+    titleCompleted: {
+      textDecorationLine: "line-through",
+      color: colors.muted,
+    },
+    meta: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    priority: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 4,
+    },
+    priorityText: {
+      fontSize: 11,
+      fontWeight: "600",
+    },
+    estimate: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      backgroundColor: colors.raised,
+      borderRadius: 4,
+    },
+    estimateText: {
+      fontSize: 11,
+      fontWeight: "500",
+      color: colors.secondary,
+    },
+  });

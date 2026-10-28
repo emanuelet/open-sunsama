@@ -31,7 +31,9 @@ function importCommandPalette(): Promise<CommandPaletteModule> {
   return preload;
 }
 
-const preloadableCommandPalette = preloadable(() => importCommandPalette().then((mod) => mod.CommandPalette));
+const preloadableCommandPalette = preloadable(() =>
+  importCommandPalette().then((mod) => mod.CommandPalette)
+);
 const LazyCommandPalette = preloadableCommandPalette.Component;
 
 export function prefetchCommandPalette(): Promise<unknown> {

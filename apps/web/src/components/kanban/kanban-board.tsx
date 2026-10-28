@@ -1,6 +1,10 @@
 import * as React from "react";
 import type { Task } from "@open-sunsama/types";
-import { SHORTCUTS, matchesShortcut, shouldIgnoreShortcut } from "@/hooks/useKeyboardShortcuts";
+import {
+  SHORTCUTS,
+  matchesShortcut,
+  shouldIgnoreShortcut,
+} from "@/hooks/useKeyboardShortcuts";
 import { useKanbanDates } from "@/hooks/useKanbanDates";
 import { useKanbanRangePrefetch } from "@/hooks/useKanbanRangePrefetch";
 import { useTasksDnd } from "@/lib/dnd/tasks-dnd-context";
@@ -98,8 +102,6 @@ export function KanbanBoard({
     centerDate: firstVisibleDate ?? new Date(),
   });
 
-
-
   // Today view: one day at a time. Navigation steps that day instead of
   // scrolling the board.
   const [ownMode, setOwnMode] = useBoardMode();
@@ -131,8 +133,15 @@ export function KanbanBoard({
   };
   React.useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.defaultPrevented || event.repeat || shouldIgnoreShortcut(event) ||
-        document.querySelector('[role="dialog"], [role="menu"], [role="listbox"]')) return;
+      if (
+        event.defaultPrevented ||
+        event.repeat ||
+        shouldIgnoreShortcut(event) ||
+        document.querySelector(
+          '[role="dialog"], [role="menu"], [role="listbox"]'
+        )
+      )
+        return;
       if (matchesShortcut(event, SHORTCUTS.todayView!)) {
         event.preventDefault();
         switchMode("day");
@@ -193,61 +202,63 @@ export function KanbanBoard({
 
         <div className="flex min-h-0 flex-1">
           {isDay ? (
-          // The day and its calendar sit together in the middle of the page,
-          // as in Sunsama's Today.
-          <div className="flex min-h-0 flex-1 justify-center gap-5 overflow-hidden px-4">
-            <DayColumn
-              key={format(day, "yyyy-MM-dd")}
-              date={day}
-              dateString={format(day, "yyyy-MM-dd")}
-              onSelectTask={setSelectedTask}
-              sortBy={sortBy}
-              searchQuery={searchQuery}
-              wide
-            />
-            {dayAside && (
-              <div className="hidden h-full shrink-0 lg:block">{dayAside}</div>
-            )}
-          </div>
-          ) : (
-        /* Kanban Board - DndContext is provided by TasksDndProvider */
-        <div
-          ref={containerRef}
-          className="scrollbar-thin flex-1 overflow-x-auto overflow-y-hidden snap-x snap-mandatory sm:snap-none"
-          onScroll={handleScroll}
-        >
-          <div
-            className="relative h-full"
-            style={{
-              width: `${virtualizer.getTotalSize()}px`,
-            }}
-          >
-            {virtualizer.getVirtualItems().map((virtualItem) => {
-              const dateInfo = dates[virtualItem.index];
-              if (!dateInfo) return null;
-
-              return (
-                <div
-                  key={dateInfo.dateString}
-                  className="absolute left-0 top-0 h-full snap-start snap-always"
-                  style={{
-                    width: `${virtualItem.size}px`,
-                    transform: `translateX(${virtualItem.start}px)`,
-                  }}
-                >
-                  <DayColumn
-                    date={dateInfo.date}
-                    dateString={dateInfo.dateString}
-                    onSelectTask={setSelectedTask}
-                    onDateClick={navigateToDate}
-                    sortBy={sortBy}
-                    searchQuery={searchQuery}
-                  />
+            // The day and its calendar sit together in the middle of the page,
+            // as in Sunsama's Today.
+            <div className="flex min-h-0 flex-1 justify-center gap-5 overflow-hidden px-4">
+              <DayColumn
+                key={format(day, "yyyy-MM-dd")}
+                date={day}
+                dateString={format(day, "yyyy-MM-dd")}
+                onSelectTask={setSelectedTask}
+                sortBy={sortBy}
+                searchQuery={searchQuery}
+                wide
+              />
+              {dayAside && (
+                <div className="hidden h-full shrink-0 lg:block">
+                  {dayAside}
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              )}
+            </div>
+          ) : (
+            /* Kanban Board - DndContext is provided by TasksDndProvider */
+            <div
+              ref={containerRef}
+              className="scrollbar-thin flex-1 overflow-x-auto overflow-y-hidden snap-x snap-mandatory sm:snap-none"
+              onScroll={handleScroll}
+            >
+              <div
+                className="relative h-full"
+                style={{
+                  width: `${virtualizer.getTotalSize()}px`,
+                }}
+              >
+                {virtualizer.getVirtualItems().map((virtualItem) => {
+                  const dateInfo = dates[virtualItem.index];
+                  if (!dateInfo) return null;
+
+                  return (
+                    <div
+                      key={dateInfo.dateString}
+                      className="absolute left-0 top-0 h-full snap-start snap-always"
+                      style={{
+                        width: `${virtualItem.size}px`,
+                        transform: `translateX(${virtualItem.start}px)`,
+                      }}
+                    >
+                      <DayColumn
+                        date={dateInfo.date}
+                        dateString={dateInfo.dateString}
+                        onSelectTask={setSelectedTask}
+                        onDateClick={navigateToDate}
+                        sortBy={sortBy}
+                        searchQuery={searchQuery}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
 
@@ -264,7 +275,6 @@ export function KanbanBoard({
           open={isImportTaskOpen}
           onOpenChange={setIsImportTaskOpen}
         />
-
       </div>
 
       {/* Render children inside the navigation provider scope */}

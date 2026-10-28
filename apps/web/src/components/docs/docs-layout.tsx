@@ -77,7 +77,11 @@ export function DocsLayout({ children, doc, sections }: DocsLayoutProps) {
           </aside>
 
           {/* Main content */}
-          <main id="main" tabIndex={-1} className="flex-1 min-w-0 py-8 focus:outline-hidden">
+          <main
+            id="main"
+            tabIndex={-1}
+            className="flex-1 min-w-0 py-8 focus:outline-hidden"
+          >
             <article className="max-w-3xl">
               {/* Breadcrumbs */}
               <Breadcrumbs items={breadcrumbItems} />

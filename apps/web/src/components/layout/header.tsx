@@ -89,7 +89,10 @@ export function Header({ className }: HeaderProps) {
 
         {/* Navigation - Hidden on mobile (using bottom nav instead) */}
         <nav className="hidden lg:flex items-center gap-0.5">
-          <NavLink href="/app/board" icon={<LayoutGrid className="h-3.5 w-3.5" />}>
+          <NavLink
+            href="/app/board"
+            icon={<LayoutGrid className="h-3.5 w-3.5" />}
+          >
             Board
           </NavLink>
           <NavLink href="/app/tasks" icon={<List className="h-3.5 w-3.5" />}>
@@ -101,7 +104,10 @@ export function Header({ className }: HeaderProps) {
           >
             Calendar
           </NavLink>
-          <NavLink href="/app/ideas" icon={<Lightbulb className="h-3.5 w-3.5" />}>
+          <NavLink
+            href="/app/ideas"
+            icon={<Lightbulb className="h-3.5 w-3.5" />}
+          >
             Ideas
           </NavLink>
         </nav>
@@ -188,7 +194,9 @@ export function Header({ className }: HeaderProps) {
               >
                 <Keyboard className="mr-2 h-3.5 w-3.5" />
                 Keyboard shortcuts
-                <span className="ml-auto text-[11px] text-muted-foreground">?</span>
+                <span className="ml-auto text-[11px] text-muted-foreground">
+                  ?
+                </span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuLabel className="py-1 text-[11px] font-normal text-muted-foreground">
@@ -211,7 +219,9 @@ export function Header({ className }: HeaderProps) {
                 >
                   <Icon className="mr-2 h-3.5 w-3.5" />
                   {label}
-                  {themeMode === mode && <Check className="ml-auto h-3.5 w-3.5" />}
+                  {themeMode === mode && (
+                    <Check className="ml-auto h-3.5 w-3.5" />
+                  )}
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />

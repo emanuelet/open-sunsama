@@ -2,7 +2,7 @@
  * Keeps a task's time blocks on the task's day.
  */
 import type { TimerDb } from "../lib/timer-service.js";
-import { getDb, and, eq, timeBlocks } from '@open-sunsama/database';
+import { getDb, and, eq, timeBlocks } from "@open-sunsama/database";
 
 export interface TaskDayChange {
   taskId: string;
@@ -36,7 +36,10 @@ export async function moveBlocksWithTasks(
           .set({ date: to, updatedAt: new Date() })
           .where(onOldDay)
           .returning({ id: timeBlocks.id })
-      : await db.delete(timeBlocks).where(onOldDay).returning({ id: timeBlocks.id });
+      : await db
+          .delete(timeBlocks)
+          .where(onOldDay)
+          .returning({ id: timeBlocks.id });
     changed += rows.length;
   }
   return changed;

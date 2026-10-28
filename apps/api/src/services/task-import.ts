@@ -27,7 +27,11 @@ import {
   type TaskExternalLink,
 } from "@open-sunsama/database/schema";
 import { decrypt } from "./encryption.js";
-import { ConflictError, NotFoundError, ValidationError } from "@open-sunsama/utils";
+import {
+  ConflictError,
+  NotFoundError,
+  ValidationError,
+} from "@open-sunsama/utils";
 import {
   getTaskProvider,
   hasTaskProvider,
@@ -75,13 +79,19 @@ export interface ImportedTaskPatch {
  */
 export function buildImportedTaskPatch(
   external: ExternalTask,
-  current: { priority: string; completedAt: Date | null; notes?: string | null },
+  current: {
+    priority: string;
+    completedAt: Date | null;
+    notes?: string | null;
+  },
   now: Date = new Date()
 ): ImportedTaskPatch {
   return {
     title: external.title.slice(0, 500),
     // Empty upstream descriptions do not erase notes written locally.
-    notes: external.description?.trim() ? external.description : (current.notes ?? null),
+    notes: external.description?.trim()
+      ? external.description
+      : (current.notes ?? null),
     estimatedMins: external.estimatedMins,
     // No remote priority means "not set upstream", which must not stomp
     // a priority the user chose locally.
@@ -246,14 +256,29 @@ export async function importExternalTask(
     // Another import may have inserted this link while we fetched upstream.
     // The transaction rolls back our task/subtasks before we return its winner.
     const pgError = error as { code?: string; constraint_name?: string };
-    if (pgError.code !== "23505" || pgError.constraint_name !== "task_external_links_account_external_idx") {
+    if (
+      pgError.code !== "23505" ||
+      pgError.constraint_name !== "task_external_links_account_external_idx"
+    ) {
       throw error;
     }
-    const [winner] = await db.select().from(taskExternalLinks).where(
-      and(eq(taskExternalLinks.userId, userId), eq(taskExternalLinks.accountId, account.id), eq(taskExternalLinks.externalId, external.externalId))
-    ).limit(1);
+    const [winner] = await db
+      .select()
+      .from(taskExternalLinks)
+      .where(
+        and(
+          eq(taskExternalLinks.userId, userId),
+          eq(taskExternalLinks.accountId, account.id),
+          eq(taskExternalLinks.externalId, external.externalId)
+        )
+      )
+      .limit(1);
     if (!winner) throw error;
-    const [task] = await db.select().from(tasks).where(eq(tasks.id, winner.taskId)).limit(1);
+    const [task] = await db
+      .select()
+      .from(tasks)
+      .where(eq(tasks.id, winner.taskId))
+      .limit(1);
     if (!task) throw error;
     return { task, link: winner, alreadyExisted: true };
   }
@@ -297,13 +322,21 @@ export async function refreshLinkedTask(
   const [account] = await db
     .select()
     .from(integrationAccounts)
-    .where(and(eq(integrationAccounts.id, link.accountId), eq(integrationAccounts.userId, userId)))
+    .where(
+      and(
+        eq(integrationAccounts.id, link.accountId),
+        eq(integrationAccounts.userId, userId)
+      )
+    )
     .limit(1);
 
   if (!account) {
     throw new NotFoundError("Integration account");
   }
-  if (!account.isActive) throw new ConflictError("Integration account is inactive — reactivate it to refresh");
+  if (!account.isActive)
+    throw new ConflictError(
+      "Integration account is inactive — reactivate it to refresh"
+    );
 
   const [current] = await db
     .select()

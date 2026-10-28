@@ -63,7 +63,9 @@ export function FocusHeader({
       {/* Top bar with close button */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground/70">Focus</span>
+          <span className="text-xs font-medium text-muted-foreground/70">
+            Focus
+          </span>
           <PriorityBadge priority={priority} />
         </div>
         <Button

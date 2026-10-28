@@ -5,6 +5,7 @@
 The current command palette shows ALL commands regardless of context, creating cognitive overload. Users must scan through navigation, theme, and action commands even when they have a task hovered and just want to complete it. Additionally, MCP setup (copying configs for Cursor/Claude) requires navigating to Settings > MCP tab—too many clicks for power users who want AI integration.
 
 **Current issues:**
+
 1. **No context awareness** - Commands don't adapt to hoveredTask, currentView, or selectedDate
 2. **Command overload** - All 9 commands shown always, no prioritization
 3. **MCP setup friction** - Copying config requires 3+ clicks to settings page
@@ -13,6 +14,7 @@ The current command palette shows ALL commands regardless of context, creating c
 ## Solution
 
 Transform the command palette into a context-aware interface that:
+
 1. Shows **max 6 commands by default** based on current context
 2. Surfaces **task actions** when a task is hovered
 3. Adds **MCP quick actions** for AI setup (searchable via "mcp", "ai", "cursor")
@@ -56,21 +58,21 @@ export interface CommandContext {
   openAddTask: () => void;
   openShortcuts: () => void;
   closeSearch: () => void;
-  
+
   // NEW: Context awareness
   hoveredTask: Task | null;
-  currentView: 'tasks' | 'calendar' | 'settings';
+  currentView: "tasks" | "calendar" | "settings";
   selectedDate: string | null;
-  
+
   // NEW: Task actions
   completeTask: (id: string) => void;
   deleteTask: (id: string) => void;
   duplicateTask: (task: Task) => void;
   deferTask: (id: string, date: string | null) => void;
   scheduleTask: (id: string) => void;
-  
+
   // NEW: MCP actions
-  copyMcpConfig: (client: 'cursor' | 'claude' | 'vscode' | 'windsurf') => void;
+  copyMcpConfig: (client: "cursor" | "claude" | "vscode" | "windsurf") => void;
   copyApiKey: () => void;
 }
 ```
@@ -82,15 +84,15 @@ export interface Command {
   id: string;
   title: string;
   shortcut?: string;
-  category: 'task' | 'mcp' | 'navigation' | 'actions' | 'settings';
+  category: "task" | "mcp" | "navigation" | "actions" | "settings";
   keywords: string[];
   icon: string;
   action: (ctx: CommandContext) => void;
-  
+
   // NEW: Context requirements
-  requiresHoveredTask?: boolean;      // Only show when task is hovered
-  showInViews?: ('tasks' | 'calendar' | 'settings')[];  // View-specific
-  priority?: number;                   // Lower = more prominent (0-100)
+  requiresHoveredTask?: boolean; // Only show when task is hovered
+  showInViews?: ("tasks" | "calendar" | "settings")[]; // View-specific
+  priority?: number; // Lower = more prominent (0-100)
 }
 ```
 
@@ -295,49 +297,51 @@ export function getContextualCommands(
   query: string
 ): Command[] {
   const lowerQuery = query.toLowerCase().trim();
-  
+
   // Step 1: Filter by query (if present)
   let filtered = lowerQuery
-    ? allCommands.filter(cmd => 
-        cmd.title.toLowerCase().includes(lowerQuery) ||
-        cmd.keywords.some(k => k.includes(lowerQuery))
+    ? allCommands.filter(
+        (cmd) =>
+          cmd.title.toLowerCase().includes(lowerQuery) ||
+          cmd.keywords.some((k) => k.includes(lowerQuery))
       )
     : allCommands;
-  
+
   // Step 2: Filter by context requirements
-  filtered = filtered.filter(cmd => {
+  filtered = filtered.filter((cmd) => {
     // Check hoveredTask requirement
     if (cmd.requiresHoveredTask && !context.hoveredTask) return false;
-    
+
     // Check view requirement
-    if (cmd.showInViews && !cmd.showInViews.includes(context.currentView)) return false;
-    
+    if (cmd.showInViews && !cmd.showInViews.includes(context.currentView))
+      return false;
+
     return true;
   });
-  
+
   // Step 3: Sort by priority and context relevance
   filtered.sort((a, b) => {
     // Task commands first when hovering
     if (context.hoveredTask) {
-      if (a.category === 'task' && b.category !== 'task') return -1;
-      if (b.category === 'task' && a.category !== 'task') return 1;
+      if (a.category === "task" && b.category !== "task") return -1;
+      if (b.category === "task" && a.category !== "task") return 1;
     }
-    
+
     // MCP commands first when searching for MCP
-    if (MCP_KEYWORDS.some(kw => lowerQuery.includes(kw))) {
-      if (a.category === 'mcp' && b.category !== 'mcp') return -1;
-      if (b.category === 'mcp' && a.category !== 'mcp') return 1;
+    if (MCP_KEYWORDS.some((kw) => lowerQuery.includes(kw))) {
+      if (a.category === "mcp" && b.category !== "mcp") return -1;
+      if (b.category === "mcp" && a.category !== "mcp") return 1;
     }
-    
+
     // Then by priority
     return (a.priority ?? 50) - (b.priority ?? 50);
   });
-  
+
   // Step 4: Limit default commands (unless searching)
   if (!lowerQuery) {
     return filtered.slice(0, MAX_DEFAULT_COMMANDS);
   }
-  
+
   return filtered;
 }
 ```
@@ -348,28 +352,38 @@ export function getContextualCommands(
 // apps/web/src/lib/mcp-config.ts
 
 export function generateMcpConfig(
-  client: 'cursor' | 'claude' | 'vscode' | 'windsurf',
+  client: "cursor" | "claude" | "vscode" | "windsurf",
   apiKey: string,
-  apiUrl: string = 'https://api.opensunsama.com'
+  apiUrl: string = "https://api.opensunsama.com"
 ): string {
   const baseConfig = {
     command: "npx",
     args: ["-y", "@open-sunsama/mcp"],
     env: {
       OPENSUNSAMA_API_KEY: apiKey,
-      ...(apiUrl !== "https://api.opensunsama.com" && { OPENSUNSAMA_API_URL: apiUrl }),
+      ...(apiUrl !== "https://api.opensunsama.com" && {
+        OPENSUNSAMA_API_URL: apiUrl,
+      }),
     },
   };
 
   if (client === "vscode") {
-    return JSON.stringify({
-      mcpServers: [{ name: "open-sunsama", ...baseConfig }],
-    }, null, 2);
+    return JSON.stringify(
+      {
+        mcpServers: [{ name: "open-sunsama", ...baseConfig }],
+      },
+      null,
+      2
+    );
   }
 
-  return JSON.stringify({
-    mcpServers: { "open-sunsama": baseConfig },
-  }, null, 2);
+  return JSON.stringify(
+    {
+      mcpServers: { "open-sunsama": baseConfig },
+    },
+    null,
+    2
+  );
 }
 
 export function getMcpApiKey(): string | null {
@@ -384,32 +398,32 @@ export function getMcpApiKey(): string | null {
 
 export function CommandPalette({ ... }: CommandPaletteProps) {
   // ... existing state ...
-  
+
   // NEW: Get context
   const { hoveredTask } = useHoveredTask();
   const location = useLocation();
   const currentView = getCurrentView(location.pathname);
-  
+
   // NEW: Task mutations
   const completeTask = useCompleteTask();
   const deleteTask = useDeleteTask();
   const createTask = useCreateTask();
   const moveTask = useMoveTask();
   const quickSchedule = useQuickSchedule();
-  
+
   // NEW: MCP config helpers
   const { toast } = useToast();
   const apiUrl = import.meta.env.VITE_API_URL || "https://api.opensunsama.com";
-  
+
   // Extended command context
   const commandContext: CommandContext = React.useMemo(() => ({
     // ... existing context ...
-    
+
     // NEW: Context awareness
     hoveredTask,
     currentView,
     selectedDate: null, // TODO: get from route params
-    
+
     // NEW: Task actions
     completeTask: (id) => {
       completeTask.mutate({ id, completed: true });
@@ -436,7 +450,7 @@ export function CommandPalette({ ... }: CommandPaletteProps) {
       quickSchedule.mutate({ taskId: id, startTime: `${format(new Date(), 'yyyy-MM-dd')}T09:00:00` });
       toast({ title: "Added to calendar" });
     },
-    
+
     // NEW: MCP actions
     copyMcpConfig: async (client) => {
       const apiKey = getMcpApiKey();
@@ -458,20 +472,20 @@ export function CommandPalette({ ... }: CommandPaletteProps) {
       toast({ title: "API key copied" });
     },
   }), [/* deps */]);
-  
+
   // Combine all commands
   const allCommands = React.useMemo(() => [
     ...TASK_COMMANDS,
     ...MCP_COMMANDS,
     ...COMMANDS, // existing navigation/settings commands
   ], []);
-  
+
   // Get contextual commands
   const filteredCommands = React.useMemo(
     () => getContextualCommands(allCommands, commandContext, query),
     [allCommands, commandContext, query]
   );
-  
+
   // ... rest of component ...
 }
 ```
@@ -483,12 +497,14 @@ export function CommandPalette({ ... }: CommandPaletteProps) {
 When showing default commands (no query), display a "Suggested" header:
 
 ```tsx
-{!query.trim() && commandItems.length > 0 && (
-  <div className="px-3 py-1.5 text-[11px] font-medium text-muted-foreground/70 uppercase tracking-wider flex items-center gap-1.5">
-    <Sparkles className="h-3 w-3" />
-    Suggested
-  </div>
-)}
+{
+  !query.trim() && commandItems.length > 0 && (
+    <div className="px-3 py-1.5 text-[11px] font-medium text-muted-foreground/70 uppercase tracking-wider flex items-center gap-1.5">
+      <Sparkles className="h-3 w-3" />
+      Suggested
+    </div>
+  );
+}
 ```
 
 #### Task Context Indicator
@@ -496,13 +512,15 @@ When showing default commands (no query), display a "Suggested" header:
 When hovering a task, show which task commands will affect:
 
 ```tsx
-{context.hoveredTask && (
-  <div className="px-3 py-1.5 text-[11px] text-muted-foreground border-b bg-muted/30 flex items-center gap-1.5">
-    <span className="text-foreground/80 truncate max-w-[200px]">
-      "{context.hoveredTask.title}"
-    </span>
-  </div>
-)}
+{
+  context.hoveredTask && (
+    <div className="px-3 py-1.5 text-[11px] text-muted-foreground border-b bg-muted/30 flex items-center gap-1.5">
+      <span className="text-foreground/80 truncate max-w-[200px]">
+        "{context.hoveredTask.title}"
+      </span>
+    </div>
+  );
+}
 ```
 
 #### MCP Section with Icon
@@ -510,32 +528,34 @@ When hovering a task, show which task commands will affect:
 When MCP commands are shown (via search), group them visually:
 
 ```tsx
-{mcpCommandsVisible && (
-  <div className="px-3 py-1.5 text-[11px] font-medium text-muted-foreground/70 uppercase tracking-wider flex items-center gap-1.5">
-    <Bot className="h-3 w-3" />
-    AI Setup
-  </div>
-)}
+{
+  mcpCommandsVisible && (
+    <div className="px-3 py-1.5 text-[11px] font-medium text-muted-foreground/70 uppercase tracking-wider flex items-center gap-1.5">
+      <Bot className="h-3 w-3" />
+      AI Setup
+    </div>
+  );
+}
 ```
 
 ### File Changes
 
 #### New Files
 
-| File | Purpose |
-|------|---------|
-| `apps/web/src/components/command-palette/task-commands.ts` | Task-specific commands (complete, defer, etc.) |
-| `apps/web/src/components/command-palette/mcp-commands.ts` | MCP setup commands |
-| `apps/web/src/components/command-palette/get-contextual-commands.ts` | Context-aware filtering logic |
-| `apps/web/src/lib/mcp-config.ts` | MCP config generation utilities |
+| File                                                                 | Purpose                                        |
+| -------------------------------------------------------------------- | ---------------------------------------------- |
+| `apps/web/src/components/command-palette/task-commands.ts`           | Task-specific commands (complete, defer, etc.) |
+| `apps/web/src/components/command-palette/mcp-commands.ts`            | MCP setup commands                             |
+| `apps/web/src/components/command-palette/get-contextual-commands.ts` | Context-aware filtering logic                  |
+| `apps/web/src/lib/mcp-config.ts`                                     | MCP config generation utilities                |
 
 #### Modified Files
 
-| File | Changes |
-|------|---------|
-| `apps/web/src/components/command-palette/commands.ts` | Extend `Command` interface with `requiresHoveredTask`, `showInViews`, `priority` |
-| `apps/web/src/components/command-palette/command-palette.tsx` | Add context awareness, task mutations, MCP actions |
-| `apps/web/src/components/settings/mcp-settings.tsx` | Extract config generation to shared utility |
+| File                                                          | Changes                                                                          |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `apps/web/src/components/command-palette/commands.ts`         | Extend `Command` interface with `requiresHoveredTask`, `showInViews`, `priority` |
+| `apps/web/src/components/command-palette/command-palette.tsx` | Add context awareness, task mutations, MCP actions                               |
+| `apps/web/src/components/settings/mcp-settings.tsx`           | Extract config generation to shared utility                                      |
 
 ### Flow
 
@@ -615,21 +635,23 @@ When MCP commands are shown (via search), group them visually:
 
 ### View-Specific Defaults
 
-| View | Default Commands (when no query, no hovered task) |
-|------|--------------------------------------------------|
-| Tasks (`/app`) | Add Task, Go to Calendar, Toggle Theme, Show Shortcuts |
-| Calendar (`/app/calendar`) | Add Task, Go to Tasks, Today, Toggle Theme |
-| Settings (`/app/settings`) | Go to Tasks, Go to Calendar, Toggle Theme |
+| View                       | Default Commands (when no query, no hovered task)      |
+| -------------------------- | ------------------------------------------------------ |
+| Tasks (`/app`)             | Add Task, Go to Calendar, Toggle Theme, Show Shortcuts |
+| Calendar (`/app/calendar`) | Add Task, Go to Tasks, Today, Toggle Theme             |
+| Settings (`/app/settings`) | Go to Tasks, Go to Calendar, Toggle Theme              |
 
 ### Utility Functions
 
 ```typescript
 // apps/web/src/lib/route-utils.ts
 
-export function getCurrentView(pathname: string): 'tasks' | 'calendar' | 'settings' {
-  if (pathname.includes('/calendar')) return 'calendar';
-  if (pathname.includes('/settings')) return 'settings';
-  return 'tasks';
+export function getCurrentView(
+  pathname: string
+): "tasks" | "calendar" | "settings" {
+  if (pathname.includes("/calendar")) return "calendar";
+  if (pathname.includes("/settings")) return "settings";
+  return "tasks";
 }
 ```
 

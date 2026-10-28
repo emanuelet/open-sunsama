@@ -24,7 +24,9 @@ function importShortcutsModal(): Promise<ShortcutsModalModule> {
   return preload;
 }
 
-const preloadableShortcutsModal = preloadable(() => importShortcutsModal().then((mod) => mod.ShortcutsModal));
+const preloadableShortcutsModal = preloadable(() =>
+  importShortcutsModal().then((mod) => mod.ShortcutsModal)
+);
 const LazyShortcutsModal = preloadableShortcutsModal.Component;
 
 export function prefetchShortcutsModal(): Promise<unknown> {

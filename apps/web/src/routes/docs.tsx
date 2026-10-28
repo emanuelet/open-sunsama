@@ -40,7 +40,11 @@ export default function DocsPage() {
 
       <DocsLayoutHeader sections={sections} />
 
-      <main id="main" tabIndex={-1} className="flex-1 relative focus:outline-hidden">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="flex-1 relative focus:outline-hidden"
+      >
         {/* Hero section */}
         <section className="py-16 md:py-24">
           <div className="container px-4 mx-auto max-w-4xl text-center">

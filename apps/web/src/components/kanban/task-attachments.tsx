@@ -42,11 +42,16 @@ export function TaskAttachments({ taskId }: TaskAttachmentsProps) {
 
   const [isDragOver, setIsDragOver] = React.useState(false);
   const [uploadProgress, setUploadProgress] = React.useState<
-    Map<string, { progress: number; status: "uploading" | "error"; error?: string }>
+    Map<
+      string,
+      { progress: number; status: "uploading" | "error"; error?: string }
+    >
   >(new Map());
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
   const [lightboxIndex, setLightboxIndex] = React.useState(0);
-  const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(
+    null
+  );
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -70,7 +75,11 @@ export function TaskAttachments({ taskId }: TaskAttachmentsProps) {
       if (!validation.valid) {
         setUploadProgress((prev) => {
           const next = new Map(prev);
-          next.set(file.name, { progress: 0, status: "error", error: validation.error });
+          next.set(file.name, {
+            progress: 0,
+            status: "error",
+            error: validation.error,
+          });
           return next;
         });
         continue;
@@ -173,13 +182,13 @@ export function TaskAttachments({ taskId }: TaskAttachmentsProps) {
   if (isError && error) {
     // Check if this is a real error we should display (not just empty results)
     const errorMessage = error instanceof Error ? error.message : String(error);
-    const isNetworkOrServerError = 
+    const isNetworkOrServerError =
       errorMessage.includes("Failed to fetch") ||
       errorMessage.includes("Network") ||
       errorMessage.includes("500") ||
       errorMessage.includes("503") ||
       errorMessage.includes("Not authenticated");
-    
+
     if (isNetworkOrServerError) {
       return (
         <div className="flex items-center gap-2 text-destructive py-4">
@@ -316,7 +325,8 @@ export function TaskAttachments({ taskId }: TaskAttachmentsProps) {
             <div className="space-y-1">
               {attachments
                 .filter(
-                  (a) => !isImageFile(a.contentType) && !isVideoFile(a.contentType)
+                  (a) =>
+                    !isImageFile(a.contentType) && !isVideoFile(a.contentType)
                 )
                 .map((attachment) => (
                   <AttachmentFileCard
@@ -334,7 +344,6 @@ export function TaskAttachments({ taskId }: TaskAttachmentsProps) {
           )}
         </div>
       )}
-
 
       {/* Lightbox */}
       <Lightbox

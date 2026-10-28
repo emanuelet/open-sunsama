@@ -31,12 +31,36 @@ interface FormData {
 
 const AVAILABLE_SCOPES = [
   { id: "tasks:read", label: "Tasks Read", description: "View tasks" },
-  { id: "tasks:write", label: "Tasks Write", description: "Create, update, delete tasks" },
-  { id: "time-blocks:read", label: "Time Blocks Read", description: "View time blocks" },
-  { id: "time-blocks:write", label: "Time Blocks Write", description: "Create, update, delete time blocks" },
-  { id: "calendar:read", label: "Calendar Read", description: "View events from connected calendars" },
-  { id: "ideas:read", label: "Ideas Read", description: "View idea boards, columns, cards and checklists" },
-  { id: "ideas:write", label: "Ideas Write", description: "Create, update and delete ideas" },
+  {
+    id: "tasks:write",
+    label: "Tasks Write",
+    description: "Create, update, delete tasks",
+  },
+  {
+    id: "time-blocks:read",
+    label: "Time Blocks Read",
+    description: "View time blocks",
+  },
+  {
+    id: "time-blocks:write",
+    label: "Time Blocks Write",
+    description: "Create, update, delete time blocks",
+  },
+  {
+    id: "calendar:read",
+    label: "Calendar Read",
+    description: "View events from connected calendars",
+  },
+  {
+    id: "ideas:read",
+    label: "Ideas Read",
+    description: "View idea boards, columns, cards and checklists",
+  },
+  {
+    id: "ideas:write",
+    label: "Ideas Write",
+    description: "Create, update and delete ideas",
+  },
 ] as const;
 
 interface ApiKeyFormProps {
@@ -106,7 +130,8 @@ export function ApiKeyForm({
         <DialogHeader>
           <DialogTitle>Create API Key</DialogTitle>
           <DialogDescription>
-            Create a new API key to access Open Sunsama from external applications
+            Create a new API key to access Open Sunsama from external
+            applications
           </DialogDescription>
         </DialogHeader>
 
@@ -122,7 +147,9 @@ export function ApiKeyForm({
                 disabled={isLoading}
               />
               {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.name.message}
+                </p>
               )}
               <p className="text-xs text-muted-foreground">
                 A descriptive name to help you identify this key
@@ -161,8 +188,12 @@ export function ApiKeyForm({
                     <input
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300"
-                      checked={watchedScopes[scope.id as keyof FormData["scopes"]]}
-                      onChange={() => toggleScope(scope.id as keyof FormData["scopes"])}
+                      checked={
+                        watchedScopes[scope.id as keyof FormData["scopes"]]
+                      }
+                      onChange={() =>
+                        toggleScope(scope.id as keyof FormData["scopes"])
+                      }
                       disabled={isLoading}
                     />
                     <div className="flex-1">

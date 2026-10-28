@@ -66,7 +66,9 @@ export function DesktopUpdateMenuItem() {
         variant: "destructive",
         title: "Couldn't check for updates",
         description:
-          err instanceof Error ? err.message : String(err || "Please try again later."),
+          err instanceof Error
+            ? err.message
+            : String(err || "Please try again later."),
       });
     } finally {
       setChecking(false);
@@ -90,7 +92,9 @@ export function DesktopUpdateMenuItem() {
         variant: "destructive",
         title: "Update failed",
         description:
-          err instanceof Error ? err.message : String(err || "Please try again later."),
+          err instanceof Error
+            ? err.message
+            : String(err || "Please try again later."),
       });
     }
   };

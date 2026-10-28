@@ -21,7 +21,10 @@ export default defineMarketingPage({
     description:
       "Open Sunsama is a Google Calendar task planner that also syncs Outlook and iCloud. See meetings beside tasks, time block around them and edit events in place.",
   },
-  breadcrumbs: [{ label: "Features", href: "/#features" }, { label: "Calendar sync" }],
+  breadcrumbs: [
+    { label: "Features", href: "/#features" },
+    { label: "Calendar sync" },
+  ],
 
   hero: {
     badge: "Feature",
@@ -35,8 +38,16 @@ export default defineMarketingPage({
       alt: "A task dragged onto the Open Sunsama day calendar between synced meetings, then resized to fit",
     },
     chips: [
-      { tone: "block", title: "Google · Outlook · iCloud", detail: "3 accounts connected" },
-      { tone: "agent", title: "Claude connected", detail: "Read 4 meetings, planned around them" },
+      {
+        tone: "block",
+        title: "Google · Outlook · iCloud",
+        detail: "3 accounts connected",
+      },
+      {
+        tone: "agent",
+        title: "Claude connected",
+        detail: "Read 4 meetings, planned around them",
+      },
       { tone: "timer", title: "1:1 with Priya", detail: "11:15 - 11:45 AM" },
     ],
   },
@@ -46,7 +57,8 @@ export default defineMarketingPage({
       kind: "answer",
       id: "answer",
       eyebrow: "The short answer",
-      heading: "Your meetings and your tasks share one calendar in Open Sunsama",
+      heading:
+        "Your meetings and your tasks share one calendar in Open Sunsama",
       body: [
         "Open Sunsama is a Google Calendar task planner that also works with Outlook and iCloud. Connect your accounts in Settings and your events appear next to your tasks and time blocks.",
         "You plan in the gaps. Drag a task into a free slot and it becomes a time block beside your meetings.",
@@ -82,7 +94,8 @@ export default defineMarketingPage({
           media: {
             shot: "calendar-week",
             alt: "Open Sunsama week view with synced meetings and color-coded time blocks",
-            caption: "The week view: synced meetings and time blocks side by side.",
+            caption:
+              "The week view: synced meetings and time blocks side by side.",
           },
         },
         {
@@ -94,9 +107,13 @@ export default defineMarketingPage({
           media: {
             clip: "time-block",
             alt: "A task dragged from the list onto the Open Sunsama day calendar, then resized to fit",
-            caption: "Drop a task between meetings, then drag its edge to set the length.",
+            caption:
+              "Drop a task between meetings, then drag its edge to set the length.",
           },
-          link: { label: "How time blocking works", href: "/features/time-blocking" },
+          link: {
+            label: "How time blocking works",
+            href: "/features/time-blocking",
+          },
         },
         {
           title: "Edit a meeting without opening Google Calendar",
@@ -107,7 +124,8 @@ export default defineMarketingPage({
           media: {
             shot: "calendar-day",
             alt: "Open Sunsama day view with the task list beside a calendar of meetings and time blocks",
-            caption: "Day view: your task list beside meetings and time blocks.",
+            caption:
+              "Day view: your task list beside meetings and time blocks.",
           },
         },
       ],
@@ -168,9 +186,16 @@ export default defineMarketingPage({
         "Find two open hours this week and block them for the launch plan.",
         "What meetings do I have tomorrow, and what should I prep?",
       ],
-      tools: ["get_schedule_for_day", "list_calendar_events", "list_tasks", "create_time_block", "link_task_to_time_block"],
+      tools: [
+        "get_schedule_for_day",
+        "list_calendar_events",
+        "list_tasks",
+        "create_time_block",
+        "link_task_to_time_block",
+      ],
       clip: "ai-plan",
-      clipCaption: "Claude reads the day and plans the afternoon around meetings. Blocks appear live.",
+      clipCaption:
+        "Claude reads the day and plans the afternoon around meetings. Blocks appear live.",
       links: [
         { label: "Claude setup", href: "/docs/mcp/claude" },
         { label: "ChatGPT setup", href: "/docs/mcp/chatgpt" },
@@ -181,7 +206,8 @@ export default defineMarketingPage({
       kind: "comparison",
       id: "compare",
       eyebrow: "Compare",
-      heading: "Open Sunsama syncs all three calendars and keeps your plan private",
+      heading:
+        "Open Sunsama syncs all three calendars and keeps your plan private",
       lead: "Sunsama, Motion and Akiflow all sync calendars well. The biggest difference is where your time blocks end up.",
       columns: ["Open Sunsama", "Sunsama", "Motion", "Akiflow"],
       rows: [
@@ -221,8 +247,14 @@ export default defineMarketingPage({
             { mark: "yes", text: "Calendar tools" },
           ],
         },
-        { feature: "Public REST API", cells: ["yes", "no", "yes", { mark: "no", text: "None listed" }] },
-        { feature: "Code you can read and self-host", cells: ["yes", "no", "no", "no"] },
+        {
+          feature: "Public REST API",
+          cells: ["yes", "no", "yes", { mark: "no", text: "None listed" }],
+        },
+        {
+          feature: "Code you can read and self-host",
+          cells: ["yes", "no", "no", "no"],
+        },
       ],
       sources:
         "Competitor facts come from each app's help docs: [Sunsama calendars](https://help.sunsama.com/docs/calendar-integration), [Sunsama timeboxing](https://help.sunsama.com/docs/timeboxing-choosing-your-calendar), [Motion calendars](https://www.usemotion.com/help/time-management/all-things-calendars/reference-all-things-calendars/supported-providers), [Motion and iCloud](https://www.usemotion.com/help/time-management/all-things-calendars/reference-all-things-calendars/all-things-icloud), [Akiflow Google Calendar](https://akiflow.com/integrations/google-calendar), [Akiflow MCP](https://akiflow.com/mcp) and our [MCP comparison](/blog/best-task-managers-with-mcp). Checked September 2026.",
@@ -258,7 +290,10 @@ export default defineMarketingPage({
         question: "What is the best Google Calendar task planner?",
         answer:
           "We build Open Sunsama, and we think it is the best pick for most people. Your Google, Outlook and iCloud meetings sit next to your tasks, and any AI agent can plan around them. Pick Sunsama if you want your time blocks to show on your Google Calendar.",
-        link: { label: "Best time blocking apps", href: "/blog/best-calendar-apps-time-blocking" },
+        link: {
+          label: "Best time blocking apps",
+          href: "/blog/best-calendar-apps-time-blocking",
+        },
       },
       {
         question: "Is Open Sunsama's calendar sync two-way?",
@@ -354,7 +389,8 @@ export default defineMarketingPage({
     heading: "Connect your calendar and plan around it",
     body: "Bring in Google, Outlook and iCloud, drag tasks into the gaps, and let the AI agent you already use plan around your meetings.",
     shot: "calendar-week",
-    shotAlt: "Open Sunsama week calendar with synced meetings next to time blocks",
+    shotAlt:
+      "Open Sunsama week calendar with synced meetings next to time blocks",
   },
 
   software: {

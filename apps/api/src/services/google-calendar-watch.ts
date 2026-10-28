@@ -23,9 +23,9 @@
  * Reference: https://developers.google.com/calendar/api/guides/push
  */
 
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from "node:crypto";
 
-const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3';
+const GOOGLE_CALENDAR_API = "https://www.googleapis.com/calendar/v3";
 
 /**
  * Channel TTL on Google's side. They cap at 7 days; we ask for the
@@ -51,16 +51,16 @@ export function getWebhookUrl(): string | null {
   } catch {
     return null;
   }
-  if (url.protocol !== 'https:' || isPrivateHost(url.hostname)) return null;
-  return `${base.replace(/\/$/, '')}/webhooks/google/calendar`;
+  if (url.protocol !== "https:" || isPrivateHost(url.hostname)) return null;
+  return `${base.replace(/\/$/, "")}/webhooks/google/calendar`;
 }
 
 function isPrivateHost(hostname: string): boolean {
-  const host = hostname.replace(/^\[|\]$/g, '').toLowerCase();
-  if (host === 'localhost' || host.endsWith('.localhost')) return true;
-  if (host.endsWith('.local') || host.endsWith('.internal')) return true;
-  if (host.includes(':')) {
-    return host === '::1' || /^(f[cd]|fe80)/.test(host);
+  const host = hostname.replace(/^\[|\]$/g, "").toLowerCase();
+  if (host === "localhost" || host.endsWith(".localhost")) return true;
+  if (host.endsWith(".local") || host.endsWith(".internal")) return true;
+  if (host.includes(":")) {
+    return host === "::1" || /^(f[cd]|fe80)/.test(host);
   }
   const ipv4 = host.match(/^(\d+)\.(\d+)\.\d+\.\d+$/);
   if (!ipv4) return false;
@@ -104,7 +104,7 @@ export async function registerWatch(params: {
     if (!warnedNoWebhookUrl) {
       warnedNoWebhookUrl = true;
       console.warn(
-        '[Google Watch] WEBHOOK_BASE_URL / API_URL is not a public https URL; skipping push channels and polling instead'
+        "[Google Watch] WEBHOOK_BASE_URL / API_URL is not a public https URL; skipping push channels and polling instead"
       );
     }
     return null;
@@ -120,14 +120,14 @@ export async function registerWatch(params: {
       params.externalCalendarId
     )}/events/watch`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${params.accessToken}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         id: channelId,
-        type: 'web_hook',
+        type: "web_hook",
         address,
         params: {
           ttl: String(WATCH_TTL_SECONDS),
@@ -178,10 +178,10 @@ export async function stopWatch(params: {
   resourceId: string;
 }): Promise<void> {
   const response = await fetch(`${GOOGLE_CALENDAR_API}/channels/stop`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${params.accessToken}`,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       id: params.channelId,

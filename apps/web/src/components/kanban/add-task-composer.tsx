@@ -6,15 +6,27 @@ import type { TaskPriority } from "@open-sunsama/types";
 import { cn, formatDuration } from "@/lib/utils";
 import { useCreateTask } from "@/hooks/useTasks";
 import { useCreateSubtask } from "@/hooks/useSubtaskMutations";
-import { useAddTaskPosition, usePlaceNewTask } from "@/hooks/useAddTaskPosition";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  useAddTaskPosition,
+  usePlaceNewTask,
+} from "@/hooks/useAddTaskPosition";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { DurationPicker } from "@/components/ui/duration-picker";
 import { WithShortcut } from "@/components/ui/with-shortcut";
 import { PriorityIcon, PRIORITY_META } from "@/components/ui/priority-badge";
 import { PriorityMenu } from "./priority-menu";
 import { DatePickerPopover } from "./task-date-picker";
 import { parseSubtaskTitles } from "./subtask-add-row";
-import { addMinutes, parseDate, parseTaskSchedule, parseTime } from "@open-sunsama/utils/date";
+import {
+  addMinutes,
+  parseDate,
+  parseTaskSchedule,
+  parseTime,
+} from "@open-sunsama/utils/date";
 import { useCreateTimeBlock } from "@/hooks/useTimeBlockMutations";
 
 interface DraftLine {
@@ -112,57 +124,62 @@ export function AddTaskComposer({
   });
 
   const { addPosition, setAddPosition } = useAddTaskPosition();
-    const createTask = useCreateTask();
-    const createSubtask = useCreateSubtask();
-    const createTimeBlock = useCreateTimeBlock();
+  const createTask = useCreateTask();
+  const createSubtask = useCreateSubtask();
+  const createTimeBlock = useCreateTimeBlock();
   const placeNewTask = usePlaceNewTask(date);
 
   const refocus = () => requestAnimationFrame(() => inputRef.current?.focus());
 
   const submit = () => {
-      const trimmed = title.trim();
-      if (!trimmed) return;
-      onDone();
-      const subtaskTitles = lines.map((l) => l.title.trim()).filter(Boolean);
+    const trimmed = title.trim();
+    if (!trimmed) return;
+    onDone();
+    const subtaskTitles = lines.map((l) => l.title.trim()).filter(Boolean);
     if (onSubmit) {
-      onSubmit({ title: trimmed, subtasks: subtaskTitles, estimatedMins: planned, priority });
+      onSubmit({
+        title: trimmed,
+        subtasks: subtaskTitles,
+        estimatedMins: planned,
+        priority,
+      });
       return;
-      }
-      const parsedSchedule = parseTaskSchedule(trimmed);
-      const taskTitle = parsedSchedule.title;
-      const taskDate = parsedSchedule.scheduledDate ?? date ?? undefined;
-      // The create is optimistic: the card shows at once, so nothing waits here.
-      void createTask
-        .mutateAsync({
-          title: taskTitle,
-          scheduledDate: taskDate,
+    }
+    const parsedSchedule = parseTaskSchedule(trimmed);
+    const taskTitle = parsedSchedule.title;
+    const taskDate = parsedSchedule.scheduledDate ?? date ?? undefined;
+    // The create is optimistic: the card shows at once, so nothing waits here.
+    void createTask
+      .mutateAsync({
+        title: taskTitle,
+        scheduledDate: taskDate,
         estimatedMins: planned ?? undefined,
         priority,
       })
       .then(async (task) => {
         // Explicit positions keep the typed order; the requests run in parallel.
-          await Promise.all(
+        await Promise.all(
           subtaskTitles.map((title, position) =>
             createSubtask.mutateAsync({
               taskId: task.id,
               data: { title: title.slice(0, 500), position },
             })
           )
-          );
-          if (parsedSchedule.time && taskDate) {
-            const startTime = parseTime(parsedSchedule.time, parseDate(taskDate));
-            await createTimeBlock.mutateAsync({
-              taskId: task.id,
-              title: taskTitle,
-              startTime,
-              endTime: addMinutes(startTime, planned ?? DEFAULT_TIME_BLOCK_MINS),
-            });
-          }
-          // The inferred date can differ from the column that opened the composer.
-          // Reordering that original column would otherwise move the task back.
-          if (taskDate === (date ?? undefined)) {
-            await placeNewTask(task.id, addPosition);
-          }
+        );
+        if (parsedSchedule.time && taskDate) {
+          const startTime = parseTime(parsedSchedule.time, parseDate(taskDate));
+          await createTimeBlock.mutateAsync({
+            taskId: task.id,
+            title: taskTitle,
+            startTime,
+            endTime: addMinutes(startTime, planned ?? DEFAULT_TIME_BLOCK_MINS),
+          });
+        }
+        // The inferred date can differ from the column that opened the composer.
+        // Reordering that original column would otherwise move the task back.
+        if (taskDate === (date ?? undefined)) {
+          await placeNewTask(task.id, addPosition);
+        }
       })
       .catch(() => {
         // useCreateTask already shows the error and rolls back.
@@ -175,7 +192,8 @@ export function AddTaskComposer({
   const insertLines = (afterId: number | null, titles: string[]) => {
     const fresh = titles.map((title) => ({ id: nextLineId++, title }));
     setLines((prev) => {
-      const at = afterId === null ? 0 : prev.findIndex((l) => l.id === afterId) + 1;
+      const at =
+        afterId === null ? 0 : prev.findIndex((l) => l.id === afterId) + 1;
       return [...prev.slice(0, at), ...fresh, ...prev.slice(at)];
     });
     focusLine(fresh[fresh.length - 1]!.id);
@@ -293,7 +311,9 @@ export function AddTaskComposer({
                 onPaste={(e) =>
                   pasteLines(e, line.id, (value) =>
                     setLines((prev) =>
-                      prev.map((l) => (l.id === line.id ? { ...l, title: value } : l))
+                      prev.map((l) =>
+                        l.id === line.id ? { ...l, title: value } : l
+                      )
                     )
                   )
                 }
@@ -332,32 +352,37 @@ export function AddTaskComposer({
             >
               <ListPlus className="h-3.5 w-3.5" />
               {lines.length > 0 && (
-                <span className="tabular-nums text-foreground">{lines.length}</span>
+                <span className="tabular-nums text-foreground">
+                  {lines.length}
+                </span>
               )}
             </button>
           </WithShortcut>
           {showDate && (
-          <WithShortcut label="Start date" side="bottom">
-            <span>
-              <DatePickerPopover
-                value={date}
-                onChange={(d) => {
-                  setDate(d);
-                  refocus();
-                }}
-                className={cn(chip, "font-normal")}
-              >
-                <Calendar className="h-3.5 w-3.5" />
-                {dateLabel(date)}
-              </DatePickerPopover>
-            </span>
-          </WithShortcut>
+            <WithShortcut label="Start date" side="bottom">
+              <span>
+                <DatePickerPopover
+                  value={date}
+                  onChange={(d) => {
+                    setDate(d);
+                    refocus();
+                  }}
+                  className={cn(chip, "font-normal")}
+                >
+                  <Calendar className="h-3.5 w-3.5" />
+                  {dateLabel(date)}
+                </DatePickerPopover>
+              </span>
+            </WithShortcut>
           )}
 
           <Popover open={plannedOpen} onOpenChange={setPlannedOpen}>
             <PopoverTrigger asChild>
               <WithShortcut label="Planned time" side="bottom">
-                <button type="button" className={cn(chip, planned && "text-foreground")}>
+                <button
+                  type="button"
+                  className={cn(chip, planned && "text-foreground")}
+                >
                   <Clock className="h-3.5 w-3.5" />
                   <span className="tabular-nums">
                     {planned ? formatDuration(planned) : "--:--"}
@@ -422,27 +447,27 @@ export function AddTaskComposer({
           </Popover>
 
           {showPosition && (
-          <WithShortcut
-            label={isTop ? "Adds to the top" : "Adds to the bottom"}
-            keys={[ALT_KEY, isTop ? "↓" : "↑"]}
-            side="bottom"
-          >
-            <button
-              type="button"
-              aria-label={isTop ? "Adding to top" : "Adding to bottom"}
-              onClick={() => {
-                setAddPosition(isTop ? "bottom" : "top");
-                refocus();
-              }}
-              className={chip}
+            <WithShortcut
+              label={isTop ? "Adds to the top" : "Adds to the bottom"}
+              keys={[ALT_KEY, isTop ? "↓" : "↑"]}
+              side="bottom"
             >
-              {isTop ? (
-                <ArrowUp className="h-3.5 w-3.5" />
-              ) : (
-                <ArrowDown className="h-3.5 w-3.5" />
-              )}
-            </button>
-          </WithShortcut>
+              <button
+                type="button"
+                aria-label={isTop ? "Adding to top" : "Adding to bottom"}
+                onClick={() => {
+                  setAddPosition(isTop ? "bottom" : "top");
+                  refocus();
+                }}
+                className={chip}
+              >
+                {isTop ? (
+                  <ArrowUp className="h-3.5 w-3.5" />
+                ) : (
+                  <ArrowDown className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </WithShortcut>
           )}
         </div>
       </div>

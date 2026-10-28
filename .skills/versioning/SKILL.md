@@ -15,11 +15,11 @@ All apps share ONE version. Semantic Versioning: `MAJOR.MINOR.PATCH`
 
 ## When to Increment
 
-| Type | When | Example |
-|------|------|---------|
+| Type  | When                                         | Example       |
+| ----- | -------------------------------------------- | ------------- |
 | MAJOR | Breaking changes, DB migrations, API changes | 1.0.0 → 2.0.0 |
-| MINOR | New features (backwards compatible) | 1.0.0 → 1.1.0 |
-| PATCH | Bug fixes, small improvements | 1.0.0 → 1.0.1 |
+| MINOR | New features (backwards compatible)          | 1.0.0 → 1.1.0 |
+| PATCH | Bug fixes, small improvements                | 1.0.0 → 1.0.1 |
 
 ## Files (Auto-Synced by `version:sync`)
 
@@ -51,10 +51,10 @@ grep -r '"version":' package.json apps/*/package.json apps/*/src-tauri/tauri.con
 
 ## Version History
 
-| Version | Date | Notes |
-|---------|------|-------|
-| v1.0.0 | 2026-01-30 | Initial release |
-| v1.0.7 | 2026-02-11 | Desktop release build |
+| Version | Date       | Notes                 |
+| ------- | ---------- | --------------------- |
+| v1.0.0  | 2026-01-30 | Initial release       |
+| v1.0.7  | 2026-02-11 | Desktop release build |
 | v1.0.10 | 2026-03-21 | Desktop release build |
 | v1.0.11 | 2026-07-13 | Desktop release build |
 | v1.0.12 | 2026-09-23 | Desktop release build |

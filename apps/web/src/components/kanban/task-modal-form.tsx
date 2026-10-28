@@ -10,7 +10,10 @@ export { NotesField } from "@/components/ui/notes-field";
 export { PrioritySelector, InlinePrioritySelector } from "./priority-selector";
 
 // Estimated time fields
-export { EstimatedTimeField, CompactEstimatedTimeField } from "./estimated-time-field";
+export {
+  EstimatedTimeField,
+  CompactEstimatedTimeField,
+} from "./estimated-time-field";
 
 // Legacy DescriptionField - keeping for backwards compatibility
 export { DescriptionField } from "./description-field";

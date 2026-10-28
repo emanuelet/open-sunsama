@@ -17,13 +17,25 @@
     {
       "name": "api-demo",
       "runtimeExecutable": "env",
-      "runtimeArgs": ["API_PORT=3101", "WEB_PORT=3107", "node", "scripts/dev-local.mjs", "api"],
+      "runtimeArgs": [
+        "API_PORT=3101",
+        "WEB_PORT=3107",
+        "node",
+        "scripts/dev-local.mjs",
+        "api"
+      ],
       "port": 3101
     },
     {
       "name": "web-demo",
       "runtimeExecutable": "env",
-      "runtimeArgs": ["API_PORT=3101", "WEB_PORT=3107", "node", "scripts/dev-local.mjs", "web"],
+      "runtimeArgs": [
+        "API_PORT=3101",
+        "WEB_PORT=3107",
+        "node",
+        "scripts/dev-local.mjs",
+        "web"
+      ],
       "port": 3107
     }
   ]

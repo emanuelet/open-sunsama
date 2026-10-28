@@ -5,7 +5,13 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Plus, MoreHorizontal, Pencil, Trash2, GripVertical } from "lucide-react";
+import {
+  Plus,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  GripVertical,
+} from "lucide-react";
 import type { Idea, IdeaColumn as IdeaColumnType } from "@open-sunsama/types";
 import { cn } from "@/lib/utils";
 import {
@@ -170,7 +176,10 @@ export function IdeaColumnView({
           while the header above and the "Add idea" button below stay pinned. */}
       <ScrollArea className="min-h-0 flex-1">
         <div className="flex flex-col gap-2 p-1 pb-2">
-          <SortableContext items={ideaIds} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={ideaIds}
+            strategy={verticalListSortingStrategy}
+          >
             {ideas.map((idea) => (
               <IdeaCard
                 key={idea.id}

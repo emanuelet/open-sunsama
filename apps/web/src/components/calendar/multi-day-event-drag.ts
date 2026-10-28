@@ -219,8 +219,7 @@ export function useMultiDayEventDrag(options: EventDragOptions) {
         // elementFromPoint is cheap (browser hit-test); walk up to the
         // marked column root and read its `data-day` ISO date.
         const hit = document.elementFromPoint(e.clientX, e.clientY);
-        const column =
-          hit?.closest<HTMLElement>("[data-day-column]") ?? null;
+        const column = hit?.closest<HTMLElement>("[data-day-column]") ?? null;
         if (column?.dataset.day) {
           const parsed = new Date(column.dataset.day);
           if (!Number.isNaN(parsed.getTime())) {
@@ -237,8 +236,7 @@ export function useMultiDayEventDrag(options: EventDragOptions) {
       // for move this is whichever column the cursor is over.
       const activeColumnRect =
         ds.mode === "move" ? nextColumnRect : ds.originColumnRect;
-      const activeDayDate =
-        ds.mode === "move" ? nextDayDate : ds.originDayDate;
+      const activeDayDate = ds.mode === "move" ? nextDayDate : ds.originDayDate;
       const relativeY = e.clientY - activeColumnRect.top + scrollDelta;
 
       let previewStart: Date;

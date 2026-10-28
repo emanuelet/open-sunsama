@@ -13,5 +13,7 @@ export function passkeyError(error: unknown) {
   if (error instanceof Error && error.name === "InvalidStateError") {
     return "This passkey is already registered. Try another authenticator.";
   }
-  return error instanceof Error ? error.message : "Could not use passkey. Please try again.";
+  return error instanceof Error
+    ? error.message
+    : "Could not use passkey. Please try again.";
 }

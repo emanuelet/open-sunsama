@@ -10,7 +10,12 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Github, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 export const GITHUB_URL = "https://github.com/ShadowWalker2014/open-sunsama";
@@ -18,7 +23,9 @@ export const GITHUB_URL = "https://github.com/ShadowWalker2014/open-sunsama";
 // One request per page load, shared by every component that shows the count
 let starsRequest: Promise<number | null> | null = null;
 function fetchStars(): Promise<number | null> {
-  starsRequest ??= fetch("https://api.github.com/repos/ShadowWalker2014/open-sunsama")
+  starsRequest ??= fetch(
+    "https://api.github.com/repos/ShadowWalker2014/open-sunsama"
+  )
     .then((res) => (res.ok ? res.json() : null))
     .then((repo: { stargazers_count?: number } | null) =>
       typeof repo?.stargazers_count === "number" ? repo.stargazers_count : null
@@ -107,23 +114,38 @@ function NavLink({
 function MobileMenu() {
   const [open, setOpen] = React.useState(false);
   const close = () => setOpen(false);
-  const item = "block rounded-lg px-3 py-2 text-[15px] text-foreground/85 transition-colors hover:bg-muted/70 hover:text-foreground";
+  const item =
+    "block rounded-lg px-3 py-2 text-[15px] text-foreground/85 transition-colors hover:bg-muted/70 hover:text-foreground";
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 lg:hidden" aria-label="Open menu">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 lg:hidden"
+          aria-label="Open menu"
+        >
           <Menu className="h-4 w-4" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="flex w-[300px] flex-col gap-0 overflow-y-auto p-0">
+      <SheetContent
+        side="right"
+        className="flex w-[300px] flex-col gap-0 overflow-y-auto p-0"
+      >
         <SheetTitle className="sr-only">Menu</SheetTitle>
         <div className="flex h-14 items-center gap-2 border-b border-border/60 px-5">
-          <img src="/open-sunsama-logo.png" alt="" className="h-6 w-6 rounded-md object-cover" />
+          <img
+            src="/open-sunsama-logo.png"
+            alt=""
+            className="h-6 w-6 rounded-md object-cover"
+          />
           <span className="text-[14px] font-semibold">Open Sunsama</span>
         </div>
         <nav className="flex-1 px-2 py-4" aria-label="Mobile">
-          <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Features</p>
+          <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            Features
+          </p>
           {MENU_FEATURES.map(([label, href]) => (
             <Link key={href} to={href} onClick={close} className={item}>
               {label}
@@ -131,11 +153,21 @@ function MobileMenu() {
           ))}
           <div className="my-3 border-t border-border/60" />
           {NAV.filter((n) => !n.href.includes("#")).map((n) => (
-            <NavLink key={n.href} href={n.href} className={item} onClick={close}>
+            <NavLink
+              key={n.href}
+              href={n.href}
+              className={item}
+              onClick={close}
+            >
               {n.label}
             </NavLink>
           ))}
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className={cn(item, "flex items-center gap-2")}>
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(item, "flex items-center gap-2")}
+          >
             <Github className="h-4 w-4" />
             GitHub
           </a>
@@ -192,8 +224,17 @@ export function SiteHeader({
             to="/"
             className="flex items-center gap-2 rounded-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <img src="/open-sunsama-logo.png" alt="Open Sunsama" className="h-7 w-7 rounded-lg object-cover" />
-            <span className={cn("whitespace-nowrap text-[14px] font-semibold tracking-tight", section && "hidden sm:inline")}>
+            <img
+              src="/open-sunsama-logo.png"
+              alt="Open Sunsama"
+              className="h-7 w-7 rounded-lg object-cover"
+            />
+            <span
+              className={cn(
+                "whitespace-nowrap text-[14px] font-semibold tracking-tight",
+                section && "hidden sm:inline"
+              )}
+            >
               Open Sunsama
             </span>
           </Link>
@@ -230,10 +271,17 @@ export function SiteHeader({
             <Github className="h-3.5 w-3.5" />
             Star
             {stars !== null && (
-              <span className="rounded bg-muted px-1.5 py-px text-[11px] tabular-nums text-foreground">{stars}</span>
+              <span className="rounded bg-muted px-1.5 py-px text-[11px] tabular-nums text-foreground">
+                {stars}
+              </span>
             )}
           </a>
-          <Button variant="ghost" size="sm" className="hidden h-8 px-3 text-[13px] sm:inline-flex" asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="hidden h-8 px-3 text-[13px] sm:inline-flex"
+            asChild
+          >
             <Link to="/login">Sign in</Link>
           </Button>
           <Button size="sm" className="h-8 px-3 text-[13px]" asChild>

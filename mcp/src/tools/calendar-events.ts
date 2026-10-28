@@ -8,7 +8,12 @@
 
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
-import type { ApiClient, ApiResponse, CalendarEvent, CalendarEventsMeta } from "../lib/api-client.js";
+import type {
+  ApiClient,
+  ApiResponse,
+  CalendarEvent,
+  CalendarEventsMeta,
+} from "../lib/api-client.js";
 import { defineTool } from "../lib/define-tool.js";
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
@@ -60,12 +65,18 @@ function eventDays(event: CalendarEvent, timeZone: string): [string, string] {
 function eventFlags(event: CalendarEvent): string {
   const flags: string[] = [];
   if (event.responseStatus === "declined") flags.push("declined");
-  else if (event.status === "tentative" || event.responseStatus === "tentative") flags.push("tentative");
-  else if (event.responseStatus === "needsAction") flags.push("not yet answered");
+  else if (event.status === "tentative" || event.responseStatus === "tentative")
+    flags.push("tentative");
+  else if (event.responseStatus === "needsAction")
+    flags.push("not yet answered");
   return flags.length ? ` (${flags.join(", ")})` : "";
 }
 
-function formatEventLine(event: CalendarEvent, day: string, timeZone: string): string {
+function formatEventLine(
+  event: CalendarEvent,
+  day: string,
+  timeZone: string
+): string {
   let when: string;
   if (event.isAllDay) {
     when = "All day";
@@ -74,19 +85,31 @@ function formatEventLine(event: CalendarEvent, day: string, timeZone: string): s
     const end = new Date(event.endTime);
     const startDay = localDate(start, timeZone);
     const endDay = localDate(end, timeZone);
-    const startLabel = startDay === day ? localTime(start, timeZone) : `${startDay} ${localTime(start, timeZone)}`;
-    const endLabel = endDay === day ? localTime(end, timeZone) : `${endDay} ${localTime(end, timeZone)}`;
+    const startLabel =
+      startDay === day
+        ? localTime(start, timeZone)
+        : `${startDay} ${localTime(start, timeZone)}`;
+    const endLabel =
+      endDay === day
+        ? localTime(end, timeZone)
+        : `${endDay} ${localTime(end, timeZone)}`;
     when = `${startLabel} - ${endLabel}`;
   }
   const calendar = event.calendar?.name ? ` [${event.calendar.name}]` : "";
   const location = event.location ? ` @ ${event.location}` : "";
-  const guests = event.attendees?.length ? ` · ${event.attendees.length} guests` : "";
+  const guests = event.attendees?.length
+    ? ` · ${event.attendees.length} guests`
+    : "";
   const join = event.conferenceUrl ? ` · join: ${event.conferenceUrl}` : "";
   return `${when}: ${event.title}${calendar}${location}${eventFlags(event)}${guests}${join}`;
 }
 
 /** Events for one local day, all-day first, then by start time. */
-export function eventsOnDay(events: CalendarEvent[], day: string, timeZone: string): CalendarEvent[] {
+export function eventsOnDay(
+  events: CalendarEvent[],
+  day: string,
+  timeZone: string
+): CalendarEvent[] {
   return events
     .filter((e) => e.status !== "cancelled")
     .filter((e) => {
@@ -99,14 +122,24 @@ export function eventsOnDay(events: CalendarEvent[], day: string, timeZone: stri
     });
 }
 
-export function formatEventsForDay(events: CalendarEvent[], day: string, timeZone: string): string[] {
-  return eventsOnDay(events, day, timeZone).map((e) => formatEventLine(e, day, timeZone));
+export function formatEventsForDay(
+  events: CalendarEvent[],
+  day: string,
+  timeZone: string
+): string[] {
+  return eventsOnDay(events, day, timeZone).map((e) =>
+    formatEventLine(e, day, timeZone)
+  );
 }
 
-export function isCalendarScopeError(response: ApiResponse<unknown, unknown>): boolean {
+export function isCalendarScopeError(
+  response: ApiResponse<unknown, unknown>
+): boolean {
   const status = response.error?.statusCode;
   const message = response.error?.message ?? "";
-  return (status === 401 || status === 403) && message.includes("calendar:read");
+  return (
+    (status === 401 || status === 403) && message.includes("calendar:read")
+  );
 }
 
 export async function fetchCalendarEvents(
@@ -118,13 +151,20 @@ export async function fetchCalendarEvents(
 > {
   const response = await apiClient.listCalendarEvents(params);
   if (!response.success) {
-    if (isCalendarScopeError(response)) return { ok: false, message: CALENDAR_SCOPE_MISSING };
-    return { ok: false, message: response.error?.message || "Failed to list calendar events" };
+    if (isCalendarScopeError(response))
+      return { ok: false, message: CALENDAR_SCOPE_MISSING };
+    return {
+      ok: false,
+      message: response.error?.message || "Failed to list calendar events",
+    };
   }
   return {
     ok: true,
     events: response.data ?? [],
-    meta: response.meta ?? { total: response.data?.length ?? 0, timezone: "UTC" },
+    meta: response.meta ?? {
+      total: response.data?.length ?? 0,
+      timezone: "UTC",
+    },
   };
 }
 
@@ -133,10 +173,16 @@ function successResponse(text: string) {
 }
 
 function errorResponse(message: string) {
-  return { content: [{ type: "text" as const, text: `Error: ${message}` }], isError: true };
+  return {
+    content: [{ type: "text" as const, text: `Error: ${message}` }],
+    isError: true,
+  };
 }
 
-export function registerCalendarEventTools(server: McpServer, apiClient: ApiClient): void {
+export function registerCalendarEventTools(
+  server: McpServer,
+  apiClient: ApiClient
+): void {
   defineTool(
     server,
     "list_calendar_events",
@@ -158,42 +204,63 @@ Declined and tentative events are marked. Cancelled events are left out.`,
       date: z
         .string()
         .optional()
-        .describe("A single day in YYYY-MM-DD format (e.g., '2024-01-15'). Cannot be used with from/to."),
+        .describe(
+          "A single day in YYYY-MM-DD format (e.g., '2024-01-15'). Cannot be used with from/to."
+        ),
       from: z
         .string()
         .optional()
-        .describe(`First day of a range in YYYY-MM-DD format. Use with 'to'. Ranges are at most ${MAX_RANGE_DAYS} days.`),
+        .describe(
+          `First day of a range in YYYY-MM-DD format. Use with 'to'. Ranges are at most ${MAX_RANGE_DAYS} days.`
+        ),
       to: z
         .string()
         .optional()
-        .describe("Last day of the range (inclusive) in YYYY-MM-DD format. Use with 'from'."),
+        .describe(
+          "Last day of the range (inclusive) in YYYY-MM-DD format. Use with 'from'."
+        ),
       calendars: z
         .array(z.string())
         .optional()
-        .describe("Only include events from these calendars, by calendar name (case-insensitive) or ID. Omit for all calendars."),
+        .describe(
+          "Only include events from these calendars, by calendar name (case-insensitive) or ID. Omit for all calendars."
+        ),
     },
     async (input) => {
       try {
         let fromDate: string;
         let toDate: string;
         if (input.date) {
-          if (input.from || input.to) return errorResponse("Pass either 'date', or 'from' and 'to', not both.");
+          if (input.from || input.to)
+            return errorResponse(
+              "Pass either 'date', or 'from' and 'to', not both."
+            );
           fromDate = toDate = input.date;
         } else if (input.from && input.to) {
           fromDate = input.from;
           toDate = input.to;
         } else {
-          return errorResponse("Pass 'date', or both 'from' and 'to' (YYYY-MM-DD).");
+          return errorResponse(
+            "Pass 'date', or both 'from' and 'to' (YYYY-MM-DD)."
+          );
         }
         for (const d of [fromDate, toDate]) {
           if (!DATE_REGEX.test(d) || Number.isNaN(Date.parse(d))) {
-            return errorResponse(`Invalid date '${d}'. Use YYYY-MM-DD format (e.g., '2024-01-15')`);
+            return errorResponse(
+              `Invalid date '${d}'. Use YYYY-MM-DD format (e.g., '2024-01-15')`
+            );
           }
         }
-        if (toDate < fromDate) return errorResponse(`'to' (${toDate}) must not be before 'from' (${fromDate}).`);
-        const spanDays = (Date.parse(toDate) - Date.parse(fromDate)) / 86_400_000 + 1;
+        if (toDate < fromDate)
+          return errorResponse(
+            `'to' (${toDate}) must not be before 'from' (${fromDate}).`
+          );
+        const spanDays =
+          (Date.parse(toDate) - Date.parse(fromDate)) / 86_400_000 + 1;
         if (spanDays > MAX_RANGE_DAYS) {
-          return errorResponse(`Range is ${spanDays} days; ask for at most ${MAX_RANGE_DAYS} days at a time.`);
+          return errorResponse(
+            `Range is ${spanDays} days; ask for at most ${MAX_RANGE_DAYS} days at a time.`
+          );
         }
 
         const result = await fetchCalendarEvents(
@@ -209,12 +276,16 @@ Declined and tentative events are marked. Cancelled events are left out.`,
           events = events.filter(
             (e) =>
               !!e.calendar &&
-              (wanted.includes(e.calendar.id.toLowerCase()) || wanted.includes(e.calendar.name.toLowerCase()))
+              (wanted.includes(e.calendar.id.toLowerCase()) ||
+                wanted.includes(e.calendar.name.toLowerCase()))
           );
         }
 
-        const rangeLabel = fromDate === toDate ? fromDate : `${fromDate} to ${toDate}`;
-        const lines = [`Calendar events for ${rangeLabel} (times in ${timeZone}):`];
+        const rangeLabel =
+          fromDate === toDate ? fromDate : `${fromDate} to ${toDate}`;
+        const lines = [
+          `Calendar events for ${rangeLabel} (times in ${timeZone}):`,
+        ];
         let count = 0;
         for (let day = fromDate; day <= toDate; day = addDays(day, 1)) {
           const dayLines = formatEventsForDay(events, day, timeZone);
@@ -227,14 +298,18 @@ Declined and tentative events are marked. Cancelled events are left out.`,
         }
 
         if (count === 0) {
-          const scope = input.calendars?.length ? " in the selected calendars" : "";
+          const scope = input.calendars?.length
+            ? " in the selected calendars"
+            : "";
           return successResponse(
             `No calendar events for ${rangeLabel}${scope}. (Only calendars connected and turned on in Open Sunsama are included.)`
           );
         }
         return successResponse(lines.join("\n"));
       } catch (error) {
-        return errorResponse(error instanceof Error ? error.message : "Unknown error");
+        return errorResponse(
+          error instanceof Error ? error.message : "Unknown error"
+        );
       }
     }
   );

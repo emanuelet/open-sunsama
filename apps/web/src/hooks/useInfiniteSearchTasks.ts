@@ -17,7 +17,12 @@ export function useInfiniteSearchTasks(params: InfiniteSearchTasksParams) {
   const { query = "", status = "all", priority, limit = 50 } = params;
 
   return useInfiniteQuery({
-    queryKey: ["tasks", "search", "infinite", { query, status, priority, limit }],
+    queryKey: [
+      "tasks",
+      "search",
+      "infinite",
+      { query, status, priority, limit },
+    ],
     queryFn: async ({ pageParam = 1 }) => {
       const api = getApi();
 

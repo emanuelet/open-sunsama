@@ -36,9 +36,15 @@ export const snippets: CodeSnippet[] = [
     id: "cursor",
     label: "Cursor",
     file: "~/.cursor/mcp.json",
-    code: ['{', '  "mcpServers": {', '    "open-sunsama": {', '      "url": "https://api.opensunsama.com/mcp"', "    }", "  }", "}"].join(
-      "\n"
-    ),
+    code: [
+      "{",
+      '  "mcpServers": {',
+      '    "open-sunsama": {',
+      '      "url": "https://api.opensunsama.com/mcp"',
+      "    }",
+      "  }",
+      "}",
+    ].join("\n"),
     note: "Then click **Connect** in Cursor Settings → MCP and allow access. [Cursor setup](/docs/mcp/cursor)",
   },
   {
@@ -92,7 +98,7 @@ export const day: DayEntry[] = [
     tone: "agent",
     tag: "Claude Code",
     title: "Ask for the plan in the terminal",
-    body: "\"What's on my schedule today, and what did I leave open yesterday?\" Claude reads your tasks and meetings over MCP.",
+    body: '"What\'s on my schedule today, and what did I leave open yesterday?" Claude reads your tasks and meetings over MCP.',
   },
   {
     time: "9:00 AM",
@@ -160,8 +166,16 @@ export default defineMarketingPage({
       alt: "Pressing Cmd+K in Open Sunsama to search tasks and jump to a day",
     },
     chips: [
-      { tone: "agent", title: "Claude Code connected", detail: "Created 3 tasks from your TODOs" },
-      { tone: "block", title: "Deep work: auth refactor", detail: "9:30 - 11:30 AM" },
+      {
+        tone: "agent",
+        title: "Claude Code connected",
+        detail: "Created 3 tasks from your TODOs",
+      },
+      {
+        tone: "block",
+        title: "Deep work: auth refactor",
+        detail: "9:30 - 11:30 AM",
+      },
       { tone: "timer", title: "1:12:40 / 2:00", detail: "Focus" },
     ],
     secondary: { label: "Read the MCP docs", href: "/docs/mcp/overview" },
@@ -172,7 +186,8 @@ export default defineMarketingPage({
       kind: "answer",
       id: "answer",
       eyebrow: "The short answer",
-      heading: "Open Sunsama is a task manager for developers that you can script, extend and run yourself",
+      heading:
+        "Open Sunsama is a task manager for developers that you can script, extend and run yourself",
       body: [
         "Open Sunsama is a task manager for developers who want speed and control. Your days are columns on a board, and your tasks go onto a calendar next to your meetings.",
         "You can drive it three ways: the keyboard, the REST API, or any AI agent over MCP. All three change the same tasks and time blocks.",
@@ -205,7 +220,10 @@ export default defineMarketingPage({
             alt: "The Cmd+K command palette open over the Open Sunsama board, with task results and commands",
             caption: "Cmd+K: search tasks, jump to a day, run a command.",
           },
-          link: { label: "How the command palette works", href: "/features/command-palette" },
+          link: {
+            label: "How the command palette works",
+            href: "/features/command-palette",
+          },
         },
         {
           title: "Your agent reads and writes your plan, and stays signed in",
@@ -236,7 +254,10 @@ export default defineMarketingPage({
             alt: "A task dragged from the list onto the day calendar in Open Sunsama and resized",
             caption: "Drag a task onto the calendar, then resize the block.",
           },
-          link: { label: "Time blocking in Open Sunsama", href: "/features/time-blocking" },
+          link: {
+            label: "Time blocking in Open Sunsama",
+            href: "/features/time-blocking",
+          },
         },
       ],
     },
@@ -244,7 +265,8 @@ export default defineMarketingPage({
       kind: "custom",
       id: "build",
       eyebrow: "Connect it",
-      heading: "You can connect an agent, a script or your own server in one step",
+      heading:
+        "You can connect an agent, a script or your own server in one step",
       lead: "Pick your way in. Each tab has the exact lines from the docs.",
       body: [
         `The REST API covers tasks, subtasks and time blocks: ${endpoints.join(", ")}.`,
@@ -339,8 +361,14 @@ export default defineMarketingPage({
             { mark: "no", text: "None we could find" },
           ],
         },
-        { feature: "Code you can read and change", cells: ["yes", "no", "no", "no"] },
-        { feature: "Self-host", cells: [{ mark: "yes", text: "Docker Compose" }, "no", "no", "no"] },
+        {
+          feature: "Code you can read and change",
+          cells: ["yes", "no", "no", "no"],
+        },
+        {
+          feature: "Self-host",
+          cells: [{ mark: "yes", text: "Docker Compose" }, "no", "no", "no"],
+        },
         {
           feature: "Linux desktop app",
           cells: ["yes", "yes", "yes", { mark: "no", text: "Mac and Windows" }],
@@ -378,7 +406,10 @@ export default defineMarketingPage({
         question: "What is the best task manager for developers?",
         answer:
           "We build Open Sunsama, and we think it is the best pick for developers who want control. It is keyboard-first, has a REST API and a hosted MCP server, and you can self-host the code. Pick Todoist if you mostly need a fast list on every device.",
-        link: { label: "Time blocking apps for developers", href: "/blog/best-time-blocking-apps-developers" },
+        link: {
+          label: "Time blocking apps for developers",
+          href: "/blog/best-time-blocking-apps-developers",
+        },
       },
       {
         question: "Does Open Sunsama have an API?",
@@ -396,7 +427,10 @@ export default defineMarketingPage({
         question: "Is there an MCP task manager that also does time blocking?",
         answer:
           "Yes. Open Sunsama's MCP server has 24 tools for tasks, subtasks, time blocks and your synced meetings. Your agent can see the whole day and block time around your meetings.",
-        link: { label: "Task managers with MCP", href: "/blog/best-task-managers-with-mcp" },
+        link: {
+          label: "Task managers with MCP",
+          href: "/blog/best-task-managers-with-mcp",
+        },
       },
       {
         question: "Can I self-host Open Sunsama?",
@@ -408,7 +442,10 @@ export default defineMarketingPage({
         question: "Is Open Sunsama open source?",
         answer:
           "The code is public on GitHub. It uses a non-commercial license: you can read it, run it and self-host it for personal use. Companies need a commercial license.",
-        link: { label: "See the code", href: "https://github.com/ShadowWalker2014/open-sunsama" },
+        link: {
+          label: "See the code",
+          href: "https://github.com/ShadowWalker2014/open-sunsama",
+        },
       },
       {
         question: "Does Open Sunsama integrate with GitHub, Linear or Jira?",
@@ -425,7 +462,8 @@ export default defineMarketingPage({
       {
         kind: "docs",
         title: "MCP overview",
-        description: "One URL for Claude Code, Cursor, ChatGPT and any MCP client.",
+        description:
+          "One URL for Claude Code, Cursor, ChatGPT and any MCP client.",
         href: "/docs/mcp/overview",
       },
       {
@@ -461,7 +499,8 @@ export default defineMarketingPage({
       {
         kind: "guide",
         title: "Task managers with MCP in 2026",
-        description: "Which to-do apps have a real MCP server, and what it can do.",
+        description:
+          "Which to-do apps have a real MCP server, and what it can do.",
         href: "/blog/best-task-managers-with-mcp",
       },
       {
@@ -473,7 +512,8 @@ export default defineMarketingPage({
       {
         kind: "persona",
         title: "For remote workers",
-        description: "Plan around meetings in any time zone and log off on time.",
+        description:
+          "Plan around meetings in any time zone and log off on time.",
         href: "/for/remote-workers",
       },
     ],
@@ -483,7 +523,8 @@ export default defineMarketingPage({
     heading: "Plan tomorrow from your terminal",
     body: "Connect Claude Code or Cursor in one line, script the rest with the API, or run the whole thing on your own server.",
     shot: "mcp-settings",
-    shotAlt: "Open Sunsama's MCP settings with the connector URL and setup steps for each AI app",
+    shotAlt:
+      "Open Sunsama's MCP settings with the connector URL and setup steps for each AI app",
   },
 
   software: {

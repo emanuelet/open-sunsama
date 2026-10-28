@@ -9,7 +9,10 @@ import type { ReactNode } from "react";
 import { JsonLd } from "@/components/seo";
 import { useSEO } from "@/hooks/useSEO";
 import { JSON_LD_IDS, softwareJsonLd } from "@/content/marketing/json-ld";
-import type { MarketingPageContent, MarketingSection } from "@/content/marketing/types";
+import type {
+  MarketingPageContent,
+  MarketingSection,
+} from "@/content/marketing/types";
 import { AgentPanel } from "./agent-panel";
 import { AnswerBlock } from "./answer-block";
 import { BenefitsSection } from "./benefit-grid";
@@ -36,13 +39,21 @@ export function MarketingSeo({ page }: { page: MarketingPageContent }) {
     canonical: page.path,
     ...(page.seo.ogImage ? { ogImage: page.seo.ogImage } : {}),
   });
-  return page.software ? <JsonLd id={JSON_LD_IDS.software} data={softwareJsonLd(page)} /> : null;
+  return page.software ? (
+    <JsonLd id={JSON_LD_IDS.software} data={softwareJsonLd(page)} />
+  ) : null;
 }
 
 /** Custom sections are rendered by the page: pass them by section id. */
 export type SectionSlots = Record<string, ReactNode>;
 
-export function SectionRenderer({ section, slots }: { section: MarketingSection; slots?: SectionSlots }) {
+export function SectionRenderer({
+  section,
+  slots,
+}: {
+  section: MarketingSection;
+  slots?: SectionSlots;
+}) {
   switch (section.kind) {
     case "answer":
       return (
@@ -74,10 +85,24 @@ export function SectionRenderer({ section, slots }: { section: MarketingSection;
         />
       );
     case "media-rows":
-      return <MediaRows id={section.id} eyebrow={section.eyebrow} heading={section.heading} lead={section.lead} rows={section.rows} />;
+      return (
+        <MediaRows
+          id={section.id}
+          eyebrow={section.eyebrow}
+          heading={section.heading}
+          lead={section.lead}
+          rows={section.rows}
+        />
+      );
     case "benefits":
       return (
-        <BenefitsSection id={section.id} eyebrow={section.eyebrow} heading={section.heading} lead={section.lead} items={section.items} />
+        <BenefitsSection
+          id={section.id}
+          eyebrow={section.eyebrow}
+          heading={section.heading}
+          lead={section.lead}
+          items={section.items}
+        />
       );
     case "comparison":
       return (
@@ -92,7 +117,15 @@ export function SectionRenderer({ section, slots }: { section: MarketingSection;
         />
       );
     case "steps":
-      return <StepsSection id={section.id} eyebrow={section.eyebrow} heading={section.heading} lead={section.lead} steps={section.steps} />;
+      return (
+        <StepsSection
+          id={section.id}
+          eyebrow={section.eyebrow}
+          heading={section.heading}
+          lead={section.lead}
+          steps={section.steps}
+        />
+      );
     case "stats":
       return <StatsStrip items={section.items} />;
     case "agent":
@@ -115,7 +148,11 @@ export function SectionRenderer({ section, slots }: { section: MarketingSection;
         slots?.[section.id] ?? (
           <section id={section.id} className={SECTION}>
             <div className={CONTAINER}>
-              <SectionHeading eyebrow={section.eyebrow} heading={section.heading} lead={section.lead} />
+              <SectionHeading
+                eyebrow={section.eyebrow}
+                heading={section.heading}
+                lead={section.lead}
+              />
             </div>
           </section>
         )
@@ -127,17 +164,45 @@ export function SectionRenderer({ section, slots }: { section: MarketingSection;
  * A complete marketing page: layout, breadcrumbs, hero, every section in
  * order, FAQ, related links and the closing CTA band.
  */
-export function MarketingPageView({ page, slots }: { page: MarketingPageContent; slots?: SectionSlots }) {
+export function MarketingPageView({
+  page,
+  slots,
+}: {
+  page: MarketingPageContent;
+  slots?: SectionSlots;
+}) {
   return (
     <MarketingLayout>
       <MarketingSeo page={page} />
-      <PageHero hero={page.hero} before={<Breadcrumbs items={page.breadcrumbs} path={page.path} className="mb-8 md:mb-10" />} />
+      <PageHero
+        hero={page.hero}
+        before={
+          <Breadcrumbs
+            items={page.breadcrumbs}
+            path={page.path}
+            className="mb-8 md:mb-10"
+          />
+        }
+      />
       {page.sections.map((section) => (
         <SectionRenderer key={section.id} section={section} slots={slots} />
       ))}
-      <FaqSection heading={page.faqs.heading} lead={page.faqs.lead} items={page.faqs.items} />
-      <RelatedLinks heading={page.related.heading} lead={page.related.lead} links={page.related.links} />
-      <CtaBand heading={page.cta.heading} body={page.cta.body} shot={page.cta.shot} shotAlt={page.cta.shotAlt} />
+      <FaqSection
+        heading={page.faqs.heading}
+        lead={page.faqs.lead}
+        items={page.faqs.items}
+      />
+      <RelatedLinks
+        heading={page.related.heading}
+        lead={page.related.lead}
+        links={page.related.links}
+      />
+      <CtaBand
+        heading={page.cta.heading}
+        body={page.cta.body}
+        shot={page.cta.shot}
+        shotAlt={page.cta.shotAlt}
+      />
     </MarketingLayout>
   );
 }

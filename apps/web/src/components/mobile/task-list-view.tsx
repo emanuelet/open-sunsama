@@ -76,14 +76,18 @@ export function MobileTaskListView({
   // Which way the day list slides in: forward days enter from the right.
   const previousDate = React.useRef(currentDate);
   const slideFrom =
-    currentDate > previousDate.current ? "right" : currentDate < previousDate.current ? "left" : null;
+    currentDate > previousDate.current
+      ? "right"
+      : currentDate < previousDate.current
+        ? "left"
+        : null;
   React.useEffect(() => {
     previousDate.current = currentDate;
   }, [currentDate]);
 
   const goToNextDay = () => onSelectDate(addDays(currentDate, 1));
   const goToPreviousDay = () => onSelectDate(subDays(currentDate, 1));
-  
+
   // Swipe gesture handling
   const touchStartX = React.useRef<number | null>(null);
   const touchStartY = React.useRef<number | null>(null);
@@ -115,14 +119,17 @@ export function MobileTaskListView({
     touchStartX.current = null;
     touchStartY.current = null;
   };
-  
+
   // Fetch tasks for the current date
   // Same cache key as the board's DayColumn and the week strip's dots.
-  const { data: tasks, isLoading } = useTasks({ scheduledDate: dateString, limit: 200 });
+  const { data: tasks, isLoading } = useTasks({
+    scheduledDate: dateString,
+    limit: 200,
+  });
 
   // Same in-view card search as the desktop board toolbar.
   const [searchQuery, setSearchQuery] = React.useState("");
-  
+
   // DnD setup for reordering
   const sensors = useSensors(
     useSensor(TouchSensor, {
@@ -132,9 +139,9 @@ export function MobileTaskListView({
       },
     })
   );
-  
+
   const reorderTasks = useReorderTasks();
-  
+
   // Separate pending and completed tasks
   const { pendingTasks, completedTasks } = React.useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -168,27 +175,28 @@ export function MobileTaskListView({
     const completed = all.filter((task) => task.completedAt);
     return { pendingTasks: pending, completedTasks: completed };
   }, [tasks, searchQuery, sortBy]);
-  
+
   // Calculate progress statistics
   const stats = React.useMemo(() => {
     const allTasks = tasks ?? [];
-    
+
     // Total estimated time
     const totalEstimatedMins = allTasks.reduce(
       (sum, task) => sum + (task.estimatedMins ?? 0),
       0
     );
-    
+
     // Completed estimated time
     const completedEstimatedMins = allTasks
       .filter((task) => task.completedAt)
       .reduce((sum, task) => sum + (task.estimatedMins ?? 0), 0);
-    
+
     // Calculate progress percentage
-    const progressPercent = totalEstimatedMins > 0
-      ? Math.min((completedEstimatedMins / totalEstimatedMins) * 100, 100)
-      : 0;
-    
+    const progressPercent =
+      totalEstimatedMins > 0
+        ? Math.min((completedEstimatedMins / totalEstimatedMins) * 100, 100)
+        : 0;
+
     return {
       totalEstimatedMins,
       completedEstimatedMins,
@@ -197,15 +205,15 @@ export function MobileTaskListView({
       completedCount: completedTasks.length,
     };
   }, [tasks, completedTasks]);
-  
+
   const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
   };
-  
+
   const handleAddTask = () => {
     setIsAddModalOpen(true);
   };
-  
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -213,18 +221,17 @@ export function MobileTaskListView({
     if (sortBy !== "position") return; // reordering only means something in manual order
     const oldIndex = pendingTasks.findIndex((t) => t.id === active.id);
     const newIndex = pendingTasks.findIndex((t) => t.id === over.id);
-    
+
     if (oldIndex !== -1 && newIndex !== -1) {
       const newOrder = arrayMove(pendingTasks, oldIndex, newIndex);
-      
+
       reorderTasks.mutate({
         date: dateString,
         taskIds: newOrder.map((t) => t.id),
       });
     }
   };
-  
-  
+
   return (
     <div className={cn("flex flex-col h-full bg-canvas", className)}>
       <MobileDateHeader
@@ -278,8 +285,10 @@ export function MobileTaskListView({
         key={dateString}
         className={cn(
           "pb-under-fab flex-1 overflow-y-auto transition-opacity duration-200",
-          slideFrom === "right" && "animate-[day-in-right_240ms_cubic-bezier(0.32,0.72,0,1)]",
-          slideFrom === "left" && "animate-[day-in-left_240ms_cubic-bezier(0.32,0.72,0,1)]"
+          slideFrom === "right" &&
+            "animate-[day-in-right_240ms_cubic-bezier(0.32,0.72,0,1)]",
+          slideFrom === "left" &&
+            "animate-[day-in-left_240ms_cubic-bezier(0.32,0.72,0,1)]"
         )}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
@@ -333,7 +342,7 @@ export function MobileTaskListView({
                 ))}
               </SortableContext>
             </DndContext>
-            
+
             {/* Completed tasks section */}
             {completedTasks.length > 0 && (
               <div className="pt-2">
@@ -355,7 +364,7 @@ export function MobileTaskListView({
           </>
         )}
       </main>
-      
+
       {/* Floating add button */}
       <button
         onClick={handleAddTask}
@@ -370,7 +379,7 @@ export function MobileTaskListView({
       >
         <Plus className="h-6 w-6" />
       </button>
-      
+
       {/* Task detail modal */}
       <TaskModal
         task={selectedTask}
@@ -379,7 +388,7 @@ export function MobileTaskListView({
           if (!open) setSelectedTask(null);
         }}
       />
-      
+
       {/* New task: the same sheet used to edit tasks */}
       <TaskModal
         task={null}
@@ -430,9 +439,12 @@ function MobileBacklogSidebar() {
                 <Skeleton key={i} className="h-10 w-full rounded" />
               ))}
             </div>
-          ) : pendingBacklogTasks.length === 0 && completedBacklogTasks.length === 0 ? (
+          ) : pendingBacklogTasks.length === 0 &&
+            completedBacklogTasks.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-sm text-muted-foreground">No unscheduled tasks</p>
+              <p className="text-sm text-muted-foreground">
+                No unscheduled tasks
+              </p>
               <p className="text-xs text-muted-foreground/70 mt-1">
                 Tasks without a date appear here
               </p>
@@ -469,7 +481,9 @@ function MobileBacklogSidebar() {
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-muted/50 active:bg-muted transition-colors opacity-60"
                     >
-                      <p className="text-sm truncate line-through">{task.title}</p>
+                      <p className="text-sm truncate line-through">
+                        {task.title}
+                      </p>
                     </button>
                   ))}
                 </div>

@@ -2,7 +2,12 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /** An OAuth client's logo, falling back to its initial when missing or broken. */
-export function AppLogo({ name, logoUri, className, imageClassName }: {
+export function AppLogo({
+  name,
+  logoUri,
+  className,
+  imageClassName,
+}: {
   name: string;
   logoUri: string | null;
   className?: string;
@@ -17,9 +22,16 @@ export function AppLogo({ name, logoUri, className, imageClassName }: {
       )}
     >
       {logoUri && !failed ? (
-        <img src={logoUri} alt="" className={cn("object-contain", imageClassName)} onError={() => setFailed(true)} />
+        <img
+          src={logoUri}
+          alt=""
+          className={cn("object-contain", imageClassName)}
+          onError={() => setFailed(true)}
+        />
       ) : (
-        <span className="text-sm font-semibold">{name.charAt(0).toUpperCase()}</span>
+        <span className="text-sm font-semibold">
+          {name.charAt(0).toUpperCase()}
+        </span>
       )}
     </div>
   );

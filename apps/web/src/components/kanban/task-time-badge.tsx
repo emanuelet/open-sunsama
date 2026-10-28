@@ -21,10 +21,9 @@ function useLiveTimer(task: Task): {
   isTimerRunning: boolean;
   liveSeconds: number;
 } {
-  const isTimerRunning = task.timerStartedAt !== null && task.timerStartedAt !== undefined;
-  const startedAtMs = isTimerRunning
-    ? parseTimestamp(task.timerStartedAt)
-    : 0;
+  const isTimerRunning =
+    task.timerStartedAt !== null && task.timerStartedAt !== undefined;
+  const startedAtMs = isTimerRunning ? parseTimestamp(task.timerStartedAt) : 0;
 
   const [elapsed, setElapsed] = React.useState(() =>
     isTimerRunning ? Math.floor((Date.now() - startedAtMs) / 1000) : 0

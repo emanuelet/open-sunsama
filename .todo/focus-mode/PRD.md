@@ -7,6 +7,7 @@ Users need a distraction-free environment to concentrate on a single task. The c
 ## Solution
 
 Create a full-screen Focus mode view that displays a single task with:
+
 - Large, prominent task title (editable)
 - Timer with START/STOP controls
 - ACTUAL vs PLANNED time comparison
@@ -20,6 +21,7 @@ Create a full-screen Focus mode view that displays a single task with:
 ### 1. Database Changes
 
 #### Add `actualMins` to Tasks Table
+
 **File:** `packages/database/src/schema/tasks.ts`
 
 ```typescript
@@ -30,6 +32,7 @@ actualMins: integer('actual_mins').default(0),
 **Migration:** Add column `actual_mins INTEGER DEFAULT 0` to tasks table.
 
 **Update Types:** `packages/types/src/task.ts`
+
 ```typescript
 // Add to Task interface
 actualMins: number | null;
@@ -43,6 +46,7 @@ actualMins?: number | null;
 ### 2. New Route
 
 #### Focus Route Configuration
+
 **File:** `apps/web/src/routeTree.gen.tsx`
 
 ```typescript
@@ -73,6 +77,7 @@ appRoute.addChildren([
 **File:** `apps/web/src/routes/app/focus.tsx`
 
 #### Component Structure
+
 ```
 FocusPage
 ├── FocusHeader (task title, priority, close button)
@@ -84,12 +89,14 @@ FocusPage
 ```
 
 #### Key Features
+
 - **Full-screen layout:** `fixed inset-0 z-50 bg-background`
 - **Centered content:** Max-width container with generous padding
 - **Large title:** Editable h1-style input, auto-save on blur
 - **Esc key handler:** Global keyboard listener to navigate back
 
 #### Data Flow
+
 1. Extract `taskId` from route params using `useParams()`
 2. Fetch task data using `useTask(taskId)` hook
 3. Fetch subtasks using `useSubtasks(taskId)` hook
@@ -102,6 +109,7 @@ FocusPage
 **File:** `apps/web/src/components/focus/focus-timer.tsx`
 
 #### Timer State Management
+
 ```typescript
 interface FocusTimerState {
   isRunning: boolean;
@@ -112,23 +120,27 @@ interface FocusTimerState {
 ```
 
 #### Key Functions
+
 - `useTimer(taskId)` - Custom hook for timer logic
 - Persist timer state to localStorage keyed by taskId
 - Update `actualMins` on task when timer stops
 - Use `setInterval` for live countdown (1-second tick)
 
 #### Display Format
+
 ```
 ACTUAL: 0:05:23    PLANNED: 0:30
    [START]  /  [STOP]
 ```
 
 #### Timer Controls
+
 - **START:** Begin timing, set `isRunning: true`, record `startedAt`
 - **STOP:** Pause timing, accumulate elapsed, update task `actualMins`
 - **Visual indicator:** Pulsing dot when running
 
 #### Pomodoro Option (Future Enhancement)
+
 - Toggle in header for Pomodoro mode
 - 25-minute intervals with break reminders
 - Configurable intervals in settings
@@ -140,18 +152,21 @@ ACTUAL: 0:05:23    PLANNED: 0:30
 **File:** `apps/web/src/components/focus/calendar-sidebar.tsx`
 
 #### Hover Trigger Zone
+
 - Invisible trigger area on right edge: `fixed right-0 top-0 bottom-0 w-8`
 - On hover, slide in sidebar from right
 - Sidebar width: `w-80` (320px)
 - Semi-transparent backdrop on rest of screen
 
 #### Sidebar Content
+
 - Today's date header
 - Mini timeline view (reuse existing `Timeline` component simplified)
 - List of time blocks for today
 - Current time indicator
 
 #### Animation
+
 - Use CSS transitions or Framer Motion
 - Slide in from right: `transform: translateX(100%) → translateX(0)`
 - Duration: 200ms ease-out
@@ -163,6 +178,7 @@ ACTUAL: 0:05:23    PLANNED: 0:30
 **File:** `apps/web/src/components/focus/focus-subtasks.tsx`
 
 #### Features
+
 - Reuse existing `SortableSubtaskItem` component
 - Drag-and-drop reordering (existing DnD-kit setup)
 - Inline add subtask with Enter key
@@ -176,6 +192,7 @@ ACTUAL: 0:05:23    PLANNED: 0:30
 **File:** `apps/web/src/components/focus/focus-notes.tsx`
 
 #### Features
+
 - Reuse existing `RichTextEditor` component
 - Larger editing area for focus mode
 - Auto-save on blur with debounce
@@ -188,6 +205,7 @@ ACTUAL: 0:05:23    PLANNED: 0:30
 **File:** `apps/web/src/components/kanban/task-context-menu.tsx`
 
 #### Change Focus Action
+
 ```typescript
 // Replace handleFocus with navigation
 import { useNavigate } from "@tanstack/react-router";
@@ -206,6 +224,7 @@ const handleFocus = () => {
 **File:** `apps/web/src/hooks/useKeyboardShortcuts.tsx`
 
 #### Add Focus Mode Shortcut
+
 ```typescript
 // Add to SHORTCUTS
 enterFocus: {
@@ -218,6 +237,7 @@ enterFocus: {
 **File:** `apps/web/src/routes/app/focus.tsx`
 
 #### Esc Key Handler
+
 ```typescript
 useEffect(() => {
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -237,7 +257,9 @@ useEffect(() => {
 **File:** `apps/web/src/hooks/useWebSocket.ts`
 
 #### Existing Functionality
+
 The current WebSocket setup already handles:
+
 - `task:updated` → invalidates task queries
 - `timeblock:updated` → invalidates time block queries
 
@@ -250,9 +272,11 @@ No additional WebSocket events needed. Timer state is local; `actualMins` update
 **File:** `apps/api/src/routes/tasks.ts`
 
 #### Ensure actualMins in Updates
+
 The existing `PATCH /tasks/:id` endpoint should already support updating `actualMins` once the database column and types are added.
 
 **Validation:** `apps/api/src/validation/tasks.ts`
+
 ```typescript
 // Add to updateTaskSchema
 actualMins: z.number().int().nonnegative().optional(),
@@ -263,6 +287,7 @@ actualMins: z.number().int().nonnegative().optional(),
 ## File Structure Summary
 
 ### New Files
+
 ```
 apps/web/src/
 ├── routes/app/focus.tsx                    # Focus mode page
@@ -278,6 +303,7 @@ apps/web/src/
 ```
 
 ### Modified Files
+
 ```
 packages/database/src/schema/tasks.ts       # Add actualMins column
 packages/types/src/task.ts                  # Add actualMins to types
@@ -293,12 +319,14 @@ apps/web/src/hooks/useKeyboardShortcuts.tsx # Add enterFocus shortcut
 ## Component Props & Interfaces
 
 ### FocusPage Props
+
 ```typescript
 // No props - uses route params
 // Extracted from: useParams({ from: "/app/focus/$taskId" })
 ```
 
 ### FocusTimer Props
+
 ```typescript
 interface FocusTimerProps {
   taskId: string;
@@ -309,6 +337,7 @@ interface FocusTimerProps {
 ```
 
 ### CalendarSidebar Props
+
 ```typescript
 interface CalendarSidebarProps {
   isOpen: boolean;
@@ -317,6 +346,7 @@ interface CalendarSidebarProps {
 ```
 
 ### useTimer Hook
+
 ```typescript
 interface UseTimerOptions {
   taskId: string;
@@ -339,6 +369,7 @@ interface UseTimerReturn {
 ## UI/UX Details
 
 ### Focus View Layout
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  [←]  Focus Mode                                    [×]     │
@@ -371,6 +402,7 @@ interface UseTimerReturn {
 ```
 
 ### Calendar Sidebar (on hover)
+
 ```
                                             ┌───────────────┐
                                             │ Today, Jan 30 │
@@ -384,11 +416,13 @@ interface UseTimerReturn {
 ```
 
 ### Timer States
+
 - **Idle:** Gray text, "START" button primary
 - **Running:** Green pulsing indicator, "STOP" button destructive
 - **Paused:** Yellow indicator, shows accumulated time, "START" resumes
 
 ### Color Theme
+
 - Background: `bg-background` (respects light/dark mode)
 - Timer running: `text-green-500` with pulse animation
 - Over planned time: `text-amber-500` warning

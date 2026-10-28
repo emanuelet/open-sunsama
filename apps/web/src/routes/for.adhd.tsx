@@ -9,7 +9,9 @@ import type { CustomSection } from "@/content/marketing/types";
  * crawlers (scripts/prerender-marketing.ts).
  */
 
-const typical = page.sections.find((s): s is CustomSection => s.kind === "custom" && s.id === "typical-day")!;
+const typical = page.sections.find(
+  (s): s is CustomSection => s.kind === "custom" && s.id === "typical-day"
+)!;
 
 export default function AdhdPage() {
   return (
@@ -26,7 +28,10 @@ export default function AdhdPage() {
             entries={day}
             links={[
               { label: "Focus mode", href: "/features/focus-mode" },
-              { label: "Plan your day with Claude", href: "/blog/plan-your-day-with-claude" },
+              {
+                label: "Plan your day with Claude",
+                href: "/blog/plan-your-day-with-claude",
+              },
             ]}
           />
         ),

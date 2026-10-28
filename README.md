@@ -57,7 +57,7 @@ https://api.opensunsama.com/mcp
 **Claude** (web, Desktop, and mobile)
 
 1. **Settings → Customize → Connectors → Add**
-2. Name it *Open Sunsama* and paste the URL
+2. Name it _Open Sunsama_ and paste the URL
 3. **Continue → Add → Connect**, then **Allow access**
 
 [Claude setup guide →](https://opensunsama.com/docs/mcp/claude)
@@ -83,18 +83,18 @@ https://api.opensunsama.com/mcp
 
 **Coding assistants** connect the same way:
 
-| Client | Install |
-| --- | --- |
-| **Claude Code** | `claude mcp add --transport http open-sunsama https://api.opensunsama.com/mcp`, then run `/mcp` → Authenticate |
-| **Cursor** | [![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=open-sunsama&config=eyJ1cmwiOiJodHRwczovL2FwaS5vcGVuc3Vuc2FtYS5jb20vbWNwIn0=) |
-| **VS Code** | [![Add to VS Code](https://img.shields.io/badge/VS_Code-Add_MCP_server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=open-sunsama&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A//api.opensunsama.com/mcp%22%7D) |
-| **Any MCP client** | Add the URL as a Streamable HTTP server with OAuth |
+| Client             | Install                                                                                                                                                                                                                                                                                       |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Claude Code**    | `claude mcp add --transport http open-sunsama https://api.opensunsama.com/mcp`, then run `/mcp` → Authenticate                                                                                                                                                                                |
+| **Cursor**         | [![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=open-sunsama&config=eyJ1cmwiOiJodHRwczovL2FwaS5vcGVuc3Vuc2FtYS5jb20vbWNwIn0=)                                                                                                     |
+| **VS Code**        | [![Add to VS Code](https://img.shields.io/badge/VS_Code-Add_MCP_server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=open-sunsama&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A//api.opensunsama.com/mcp%22%7D) |
+| **Any MCP client** | Add the URL as a Streamable HTTP server with OAuth                                                                                                                                                                                                                                            |
 
 Then just ask:
 
-> *"What's on my plate today? Move anything that isn't a P0 or P1 to tomorrow."*<br />
-> *"Block 9–11am tomorrow for deep work on the launch plan and link it to that task."*<br />
-> *"Add subtasks to 'Board deck': metrics slide, roadmap slide, asks."*
+> _"What's on my plate today? Move anything that isn't a P0 or P1 to tomorrow."_<br />
+> _"Block 9–11am tomorrow for deep work on the launch plan and link it to that task."_<br />
+> _"Add subtasks to 'Board deck': metrics slide, roadmap slide, asks."_
 
 <details>
 <summary><b>How the connection stays secure</b></summary>
@@ -234,15 +234,15 @@ Trello-style boards for bets and side projects. Promote an idea to a real task w
 
 ## 🆚 How it compares
 
-| | **Open Sunsama** | Typical closed planners |
-| --- | :---: | :---: |
-| Open source & self-hostable | ✅ | ❌ |
-| AI native: control it from any agent over MCP | ✅ | ❌ |
-| One-click Claude & ChatGPT connector (OAuth) | ✅ | Rare |
-| Full REST API with scoped keys | ✅ | Limited |
-| Daily planning board + time blocking | ✅ | ✅ |
-| Focus timer, routines, rollover | ✅ | Varies |
-| Web, desktop, and mobile apps | ✅ | ✅ |
+|                                               | **Open Sunsama** | Typical closed planners |
+| --------------------------------------------- | :--------------: | :---------------------: |
+| Open source & self-hostable                   |        ✅        |           ❌            |
+| AI native: control it from any agent over MCP |        ✅        |           ❌            |
+| One-click Claude & ChatGPT connector (OAuth)  |        ✅        |          Rare           |
+| Full REST API with scoped keys                |        ✅        |         Limited         |
+| Daily planning board + time blocking          |        ✅        |           ✅            |
+| Focus timer, routines, rollover               |        ✅        |         Varies          |
+| Web, desktop, and mobile apps                 |        ✅        |           ✅            |
 
 Switching from another tool? Read the comparisons: [Sunsama](https://opensunsama.com/alternative/sunsama) · [Motion](https://opensunsama.com/alternative/motion) · [Akiflow](https://opensunsama.com/alternative/akiflow) · [Reclaim](https://opensunsama.com/alternative/reclaim) · [Todoist](https://opensunsama.com/alternative/todoist)
 
@@ -262,13 +262,13 @@ Switching from another tool? Read the comparisons: [Sunsama](https://opensunsama
 
 24 tools, available through the hosted connector and the local server:
 
-| Category | Tools |
-| --- | --- |
-| **Tasks** | `list_tasks` `get_task` `create_task` `update_task` `complete_task` `uncomplete_task` `delete_task` `schedule_task` `reorder_tasks` |
-| **Time blocks** | `list_time_blocks` `get_time_block` `create_time_block` `update_time_block` `delete_time_block` `link_task_to_time_block` `get_schedule_for_day` |
-| **Calendar events** (read-only) | `list_calendar_events` |
-| **Subtasks** | `list_subtasks` `create_subtask` `toggle_subtask` `update_subtask` `delete_subtask` |
-| **Profile** | `get_user_profile` `update_user_profile` |
+| Category                        | Tools                                                                                                                                            |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Tasks**                       | `list_tasks` `get_task` `create_task` `update_task` `complete_task` `uncomplete_task` `delete_task` `schedule_task` `reorder_tasks`              |
+| **Time blocks**                 | `list_time_blocks` `get_time_block` `create_time_block` `update_time_block` `delete_time_block` `link_task_to_time_block` `get_schedule_for_day` |
+| **Calendar events** (read-only) | `list_calendar_events`                                                                                                                           |
+| **Subtasks**                    | `list_subtasks` `create_subtask` `toggle_subtask` `update_subtask` `delete_subtask`                                                              |
+| **Profile**                     | `get_user_profile` `update_user_profile`                                                                                                         |
 
 ## 🧩 REST API
 
@@ -318,12 +318,12 @@ DEV_DATABASE_URL=postgresql://localhost:5432/opensunsama bun run dev:local
 
 To run with integrations turned on, copy `apps/api/.env.example` to `apps/api/.env`, fill it in, and use `bun run dev`.
 
-| Service | URL |
-| --- | --- |
-| Web app | http://localhost:3000 |
-| API | http://localhost:3001 |
-| MCP connector | http://localhost:3001/mcp |
-| Drizzle Studio | http://localhost:4983 |
+| Service        | URL                       |
+| -------------- | ------------------------- |
+| Web app        | http://localhost:3000     |
+| API            | http://localhost:3001     |
+| MCP connector  | http://localhost:3001/mcp |
+| Drizzle Studio | http://localhost:4983     |
 
 For calendar sync, follow the [Google Calendar setup guide](docs/calendar/google-calendar-setup.md).
 
@@ -346,13 +346,13 @@ DEMO_API_URL=http://localhost:3001 DEMO_PASSWORD='Choose-a-strong-1' bun run scr
 
 ## 🏗️ Tech stack
 
-| Layer | Technologies |
-| --- | --- |
-| **Frontend** | React 19, Vite, TanStack Router + Query, Tailwind CSS, Radix UI, Tiptap |
-| **Backend** | Hono 4, Drizzle ORM, PostgreSQL, PG Boss jobs, Zod, OAuth 2.1 authorization server |
-| **AI** | Model Context Protocol (Streamable HTTP + stdio), 24 annotated tools |
-| **Desktop / mobile** | Tauri 2, Expo |
-| **Infra** | Bun workspaces, Turborepo, Docker, Railway |
+| Layer                | Technologies                                                                       |
+| -------------------- | ---------------------------------------------------------------------------------- |
+| **Frontend**         | React 19, Vite, TanStack Router + Query, Tailwind CSS, Radix UI, Tiptap            |
+| **Backend**          | Hono 4, Drizzle ORM, PostgreSQL, PG Boss jobs, Zod, OAuth 2.1 authorization server |
+| **AI**               | Model Context Protocol (Streamable HTTP + stdio), 24 annotated tools               |
+| **Desktop / mobile** | Tauri 2, Expo                                                                      |
+| **Infra**            | Bun workspaces, Turborepo, Docker, Railway                                         |
 
 ```
 open-sunsama/

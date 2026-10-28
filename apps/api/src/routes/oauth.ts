@@ -28,7 +28,10 @@ import {
   resolveClient,
   type RegistrationRequest,
 } from "../lib/oauth/clients.js";
-import { signConsentRequest, verifyConsentRequest } from "../lib/oauth/consent.js";
+import {
+  signConsentRequest,
+  verifyConsentRequest,
+} from "../lib/oauth/consent.js";
 import { OAuthError } from "../lib/oauth/errors.js";
 import {
   createAuthorizationCode,
@@ -63,9 +66,14 @@ function oauthErrorResponse(c: Context, error: unknown): Response {
 async function readForm(c: Context): Promise<Record<string, string>> {
   const contentType = c.req.header("content-type") ?? "";
   if (contentType.includes("application/json")) {
-    const body = (await c.req.json().catch(() => ({}))) as Record<string, unknown>;
+    const body = (await c.req.json().catch(() => ({}))) as Record<
+      string,
+      unknown
+    >;
     return Object.fromEntries(
-      Object.entries(body).filter((entry): entry is [string, string] => typeof entry[1] === "string")
+      Object.entries(body).filter(
+        (entry): entry is [string, string] => typeof entry[1] === "string"
+      )
     );
   }
   const text = await c.req.text();
@@ -86,7 +94,11 @@ function buildClientRedirect(
 }
 
 /** Errors we must not redirect (unknown client / bad redirect_uri) render on the consent page. */
-function consentErrorRedirect(c: Context, error: string, description: string): Response {
+function consentErrorRedirect(
+  c: Context,
+  error: string,
+  description: string
+): Response {
   const url = new URL(`${getWebAppUrl()}/oauth/consent`);
   url.searchParams.set("error", error);
   url.searchParams.set("error_description", description);
@@ -101,14 +113,21 @@ oauthRouter.get("/authorize", async (c) => {
   const q = c.req.query();
   const clientId = q.client_id;
   if (!clientId) {
-    return consentErrorRedirect(c, "invalid_request", "The app did not identify itself (missing client_id).");
+    return consentErrorRedirect(
+      c,
+      "invalid_request",
+      "The app did not identify itself (missing client_id)."
+    );
   }
 
   let client;
   try {
     client = await resolveClient(clientId);
   } catch (error) {
-    const description = error instanceof OAuthError ? error.message : "Could not load the app's details.";
+    const description =
+      error instanceof OAuthError
+        ? error.message
+        : "Could not load the app's details.";
     return consentErrorRedirect(c, "invalid_client", description);
   }
   if (!client) {
@@ -120,7 +139,8 @@ oauthRouter.get("/authorize", async (c) => {
   }
 
   const redirectUri =
-    q.redirect_uri ?? (client.redirectUris.length === 1 ? client.redirectUris[0] : undefined);
+    q.redirect_uri ??
+    (client.redirectUris.length === 1 ? client.redirectUris[0] : undefined);
   if (!redirectUri || !redirectUriMatches(client.redirectUris, redirectUri)) {
     return consentErrorRedirect(
       c,
@@ -132,13 +152,26 @@ oauthRouter.get("/authorize", async (c) => {
   // From here on, errors go back to the client (RFC 6749 §4.1.2.1).
   const state = q.state ?? null;
   const fail = (error: string, description: string) =>
-    c.redirect(buildClientRedirect(redirectUri, { error, error_description: description, state }), 302);
+    c.redirect(
+      buildClientRedirect(redirectUri, {
+        error,
+        error_description: description,
+        state,
+      }),
+      302
+    );
 
   if (q.response_type !== "code") {
-    return fail("unsupported_response_type", "Only response_type=code is supported");
+    return fail(
+      "unsupported_response_type",
+      "Only response_type=code is supported"
+    );
   }
   if (!q.code_challenge || q.code_challenge_method !== "S256") {
-    return fail("invalid_request", "PKCE with code_challenge_method=S256 is required");
+    return fail(
+      "invalid_request",
+      "PKCE with code_challenge_method=S256 is required"
+    );
   }
   if (!/^[A-Za-z0-9\-._~]{43,128}$/.test(q.code_challenge)) {
     return fail("invalid_request", "Malformed code_challenge");
@@ -156,7 +189,10 @@ oauthRouter.get("/authorize", async (c) => {
     resource,
     state,
   });
-  return c.redirect(`${getWebAppUrl()}/oauth/consent?request=${encodeURIComponent(request)}`, 302);
+  return c.redirect(
+    `${getWebAppUrl()}/oauth/consent?request=${encodeURIComponent(request)}`,
+    302
+  );
 });
 
 // ---------------------------------------------------------------------------
@@ -167,36 +203,58 @@ oauthRouter.get("/consent", async (c) => {
   const request = verifyConsentRequest(c.req.query("request") ?? "");
   if (!request) {
     return c.json(
-      { error: "invalid_request", error_description: "This authorization link has expired. Start connecting again from the app." },
+      {
+        error: "invalid_request",
+        error_description:
+          "This authorization link has expired. Start connecting again from the app.",
+      },
       400
     );
   }
   const client = await resolveClient(request.clientId).catch(() => null);
   if (!client) {
-    return c.json({ error: "invalid_client", error_description: "Unknown app" }, 400);
+    return c.json(
+      { error: "invalid_client", error_description: "Unknown app" },
+      400
+    );
   }
   return c.json({
     client: describeClient(client),
-    redirectHost: new URL(request.redirectUri).host || new URL(request.redirectUri).protocol,
+    redirectHost:
+      new URL(request.redirectUri).host ||
+      new URL(request.redirectUri).protocol,
     scopes: request.scopes.filter((s) => RESOURCE_SCOPES.includes(s)),
     offlineAccess: true,
   });
 });
 
 oauthRouter.post("/consent", jwtAuth, async (c) => {
-  const body = (await c.req.json().catch(() => ({}))) as { request?: string; decision?: string };
+  const body = (await c.req.json().catch(() => ({}))) as {
+    request?: string;
+    decision?: string;
+  };
   const request = verifyConsentRequest(body.request ?? "");
   if (!request) {
     return c.json(
-      { error: "invalid_request", error_description: "This authorization link has expired. Start connecting again from the app." },
+      {
+        error: "invalid_request",
+        error_description:
+          "This authorization link has expired. Start connecting again from the app.",
+      },
       400
     );
   }
 
   // Re-check: the client could have changed since the request was signed.
   const client = await resolveClient(request.clientId).catch(() => null);
-  if (!client || !redirectUriMatches(client.redirectUris, request.redirectUri)) {
-    return c.json({ error: "invalid_client", error_description: "Unknown app" }, 400);
+  if (
+    !client ||
+    !redirectUriMatches(client.redirectUris, request.redirectUri)
+  ) {
+    return c.json(
+      { error: "invalid_client", error_description: "Unknown app" },
+      400
+    );
   }
 
   if (body.decision !== "allow") {
@@ -218,7 +276,10 @@ oauthRouter.post("/consent", jwtAuth, async (c) => {
     resource: request.resource,
   });
   return c.json({
-    redirectTo: buildClientRedirect(request.redirectUri, { code, state: request.state }),
+    redirectTo: buildClientRedirect(request.redirectUri, {
+      code,
+      state: request.state,
+    }),
   });
 });
 
@@ -250,7 +311,10 @@ oauthRouter.post("/token", async (c) => {
         resource: form.resource,
       });
     } else {
-      throw new OAuthError("unsupported_grant_type", "Supported grants: authorization_code, refresh_token");
+      throw new OAuthError(
+        "unsupported_grant_type",
+        "Supported grants: authorization_code, refresh_token"
+      );
     }
     return c.json(tokens, 200, NO_STORE);
   } catch (error) {
@@ -285,18 +349,29 @@ function allowRegistration(ip: string): boolean {
 }
 
 oauthRouter.post("/register", async (c) => {
-  const ip = c.req.header("x-forwarded-for")?.split(",")[0]?.trim() || c.req.header("x-real-ip") || "unknown";
+  const ip =
+    c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
+    c.req.header("x-real-ip") ||
+    "unknown";
   if (!allowRegistration(ip)) {
     return c.json(
-      { error: "slow_down", error_description: "Too many client registrations. Try again later." },
+      {
+        error: "slow_down",
+        error_description: "Too many client registrations. Try again later.",
+      },
       429,
       NO_STORE
     );
   }
   try {
-    const body = (await c.req.json().catch(() => null)) as RegistrationRequest | null;
+    const body = (await c.req
+      .json()
+      .catch(() => null)) as RegistrationRequest | null;
     if (!body || typeof body !== "object") {
-      throw new OAuthError("invalid_client_metadata", "Request body must be a JSON object");
+      throw new OAuthError(
+        "invalid_client_metadata",
+        "Request body must be a JSON object"
+      );
     }
     return c.json(await registerClient(body), 201, NO_STORE);
   } catch (error) {
@@ -327,10 +402,16 @@ oauthRouter.post("/revoke", async (c) => {
 // ---------------------------------------------------------------------------
 
 oauthRouter.get("/connections", jwtAuth, async (c) => {
-  return c.json({ success: true, data: await listConnections(c.get("userId")) });
+  return c.json({
+    success: true,
+    data: await listConnections(c.get("userId")),
+  });
 });
 
 oauthRouter.delete("/connections/:clientId", jwtAuth, async (c) => {
-  const revoked = await revokeConnection(c.get("userId"), c.req.param("clientId"));
+  const revoked = await revokeConnection(
+    c.get("userId"),
+    c.req.param("clientId")
+  );
   return c.json({ success: true, data: { revoked } });
 });

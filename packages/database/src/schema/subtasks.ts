@@ -1,27 +1,37 @@
-import { pgTable, uuid, varchar, boolean, integer, timestamp, index } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
-import { tasks } from './tasks';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  boolean,
+  integer,
+  timestamp,
+  index,
+} from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
+import { tasks } from "./tasks";
 
 export const subtasks = pgTable(
-  'subtasks',
+  "subtasks",
   {
-    id: uuid('id').primaryKey().defaultRandom(),
-    taskId: uuid('task_id')
+    id: uuid("id").primaryKey().defaultRandom(),
+    taskId: uuid("task_id")
       .notNull()
-      .references(() => tasks.id, { onDelete: 'cascade' }),
-    title: varchar('title', { length: 500 }).notNull(),
-    completed: boolean('completed').notNull().default(false),
-    position: integer('position').notNull().default(0),
+      .references(() => tasks.id, { onDelete: "cascade" }),
+    title: varchar("title", { length: 500 }).notNull(),
+    completed: boolean("completed").notNull().default(false),
+    position: integer("position").notNull().default(0),
     // Planned and logged minutes, and a focus timer, like the parent task's.
     // A running subtask timer also runs its task's timer.
-    estimatedMins: integer('estimated_mins'),
-    actualMins: integer('actual_mins'),
-    timerStartedAt: timestamp('timer_started_at'),
-    timerAccumulatedSeconds: integer('timer_accumulated_seconds').notNull().default(0),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+    estimatedMins: integer("estimated_mins"),
+    actualMins: integer("actual_mins"),
+    timerStartedAt: timestamp("timer_started_at"),
+    timerAccumulatedSeconds: integer("timer_accumulated_seconds")
+      .notNull()
+      .default(0),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (table) => ({
     // PostgreSQL doesn't auto-create indices for foreign keys. Without
@@ -29,7 +39,7 @@ export const subtasks = pgTable(
     // every `WHERE task_id IN (...)` (subtasks-batch + the new
     // `?includeSubtasks=true` join in /tasks) does a sequential scan over
     // the entire subtasks table.
-    taskIdIdx: index('subtasks_task_id_idx').on(table.taskId),
+    taskIdIdx: index("subtasks_task_id_idx").on(table.taskId),
   })
 );
 
@@ -42,7 +52,7 @@ export const subtasksRelations = relations(subtasks, ({ one }) => ({
 
 // Zod schemas for validation
 export const insertSubtaskSchema = createInsertSchema(subtasks, {
-  title: z.string().min(1, { error: 'Title is required' }).max(500),
+  title: z.string().min(1, { error: "Title is required" }).max(500),
   completed: z.boolean().optional(),
   position: z.number().int().nonnegative().optional(),
 });
@@ -50,7 +60,9 @@ export const insertSubtaskSchema = createInsertSchema(subtasks, {
 export const selectSubtaskSchema = createSelectSchema(subtasks);
 
 // Partial update schema (all fields optional)
-export const updateSubtaskSchema = insertSubtaskSchema.partial().omit({ taskId: true });
+export const updateSubtaskSchema = insertSubtaskSchema
+  .partial()
+  .omit({ taskId: true });
 
 // Type exports
 export type Subtask = typeof subtasks.$inferSelect;

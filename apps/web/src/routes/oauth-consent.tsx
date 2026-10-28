@@ -8,7 +8,17 @@
 
 import * as React from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowLeftRight, BadgeCheck, CalendarClock, CalendarDays, CheckSquare, Lightbulb, Loader2, ShieldAlert, UserRound } from "lucide-react";
+import {
+  ArrowLeftRight,
+  BadgeCheck,
+  CalendarClock,
+  CalendarDays,
+  CheckSquare,
+  Lightbulb,
+  Loader2,
+  ShieldAlert,
+  UserRound,
+} from "lucide-react";
 import { AuthLayout } from "@/components/layout/auth-layout";
 import { AppLogo } from "@/components/settings/app-logo";
 import { Button } from "@/components/ui";
@@ -63,7 +73,11 @@ const PERMISSION_GROUPS = [
   },
 ] as const;
 
-function describeAccess(scopes: string[], read: string, write: string | null): string | null {
+function describeAccess(
+  scopes: string[],
+  read: string,
+  write: string | null
+): string | null {
   const canRead = scopes.includes(read);
   const canWrite = write !== null && scopes.includes(write);
   if (canRead && canWrite) return "View and edit";
@@ -93,31 +107,50 @@ function ConsentError({ title, message }: { title: string; message: string }) {
 export default function OAuthConsentPage() {
   useSEO({
     title: "Authorize access",
-    description: "Allow an AI assistant to connect to your Open Sunsama account.",
+    description:
+      "Allow an AI assistant to connect to your Open Sunsama account.",
     noindex: true,
   });
   const navigate = useNavigate();
-  const { user, token, isAuthenticated, isLoading: isAuthLoading, logout } = useAuth();
+  const {
+    user,
+    token,
+    isAuthenticated,
+    isLoading: isAuthLoading,
+    logout,
+  } = useAuth();
 
-  const params = React.useMemo(() => new URLSearchParams(window.location.search), []);
+  const params = React.useMemo(
+    () => new URLSearchParams(window.location.search),
+    []
+  );
   const request = params.get("request");
   const upstreamError = params.get("error_description") ?? params.get("error");
   const currentPath = `${window.location.pathname}${window.location.search}`;
 
   const [details, setDetails] = React.useState<ConsentDetails | null>(null);
   const [loadError, setLoadError] = React.useState<string | null>(null);
-  const [submitting, setSubmitting] = React.useState<"allow" | "deny" | null>(null);
+  const [submitting, setSubmitting] = React.useState<"allow" | "deny" | null>(
+    null
+  );
 
   React.useEffect(() => {
     if (!request) return;
     fetch(`${API_URL}/oauth/consent?request=${encodeURIComponent(request)}`)
       .then(async (res) => {
         const body = await res.json();
-        if (!res.ok) throw new Error(body.error_description ?? "This authorization link is invalid.");
+        if (!res.ok)
+          throw new Error(
+            body.error_description ?? "This authorization link is invalid."
+          );
         setDetails(body as ConsentDetails);
       })
       .catch((error: unknown) => {
-        setLoadError(error instanceof Error ? error.message : "This authorization link is invalid.");
+        setLoadError(
+          error instanceof Error
+            ? error.message
+            : "This authorization link is invalid."
+        );
       });
   }, [request]);
 
@@ -127,17 +160,26 @@ export default function OAuthConsentPage() {
     try {
       const res = await fetch(`${API_URL}/oauth/consent`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ request, decision }),
       });
       if (res.status === 401) {
         logout();
-        void navigate({ href: withRedirect("/login", currentPath), replace: true });
+        void navigate({
+          href: withRedirect("/login", currentPath),
+          replace: true,
+        });
         return;
       }
       const body = await res.json();
       if (!res.ok || !body.redirectTo) {
-        throw new Error(body.error_description ?? "Something went wrong. Please try connecting again.");
+        throw new Error(
+          body.error_description ??
+            "Something went wrong. Please try connecting again."
+        );
       }
       if (decision === "allow") {
         trackGoal("connect_ai", { client: details?.client.name ?? "unknown" });
@@ -147,12 +189,16 @@ export default function OAuthConsentPage() {
       window.location.assign(body.redirectTo as string);
     } catch (error) {
       setSubmitting(null);
-      setLoadError(error instanceof Error ? error.message : "Something went wrong.");
+      setLoadError(
+        error instanceof Error ? error.message : "Something went wrong."
+      );
     }
   };
 
   if (upstreamError) {
-    return <ConsentError title="Can't connect this app" message={upstreamError} />;
+    return (
+      <ConsentError title="Can't connect this app" message={upstreamError} />
+    );
   }
   if (!request) {
     return (
@@ -230,7 +276,10 @@ export default function OAuthConsentPage() {
           <>
             <div className="mb-4 flex items-center justify-between gap-2 text-xs text-muted-foreground">
               <span className="truncate">
-                Signed in as <span className="font-medium text-foreground">{user?.email}</span>
+                Signed in as{" "}
+                <span className="font-medium text-foreground">
+                  {user?.email}
+                </span>
               </span>
               <button
                 type="button"
@@ -250,7 +299,9 @@ export default function OAuthConsentPage() {
                 disabled={submitting !== null}
                 onClick={() => decide("deny")}
               >
-                {submitting === "deny" && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                {submitting === "deny" && (
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                )}
                 Cancel
               </Button>
               <Button
@@ -258,7 +309,9 @@ export default function OAuthConsentPage() {
                 disabled={submitting !== null}
                 onClick={() => decide("allow")}
               >
-                {submitting === "allow" && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                {submitting === "allow" && (
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                )}
                 Allow access
               </Button>
             </div>
@@ -267,21 +320,26 @@ export default function OAuthConsentPage() {
           <div className="grid gap-2">
             <Button
               className="h-9 text-[13px]"
-              onClick={() => void navigate({ href: withRedirect("/login", currentPath) })}
+              onClick={() =>
+                void navigate({ href: withRedirect("/login", currentPath) })
+              }
             >
               Sign in to continue
             </Button>
             <Button
               variant="outline"
               className="h-9 text-[13px]"
-              onClick={() => void navigate({ href: withRedirect("/register", currentPath) })}
+              onClick={() =>
+                void navigate({ href: withRedirect("/register", currentPath) })
+              }
             >
               Create an account
             </Button>
           </div>
         )}
         <p className="mt-4 text-center text-[11px] leading-relaxed text-muted-foreground">
-          You'll be sent back to <span className="font-medium">{details.redirectHost}</span>. You can
+          You'll be sent back to{" "}
+          <span className="font-medium">{details.redirectHost}</span>. You can
           disconnect it anytime in Settings → MCP.
         </p>
       </div>

@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from "react";
 
 const MOBILE_BREAKPOINT = 1023;
 
@@ -9,8 +9,8 @@ const MOBILE_BREAKPOINT = 1023;
 export function useIsMobile(): boolean {
   const subscribe = (callback: () => void) => {
     const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
-    mq.addEventListener('change', callback);
-    return () => mq.removeEventListener('change', callback);
+    mq.addEventListener("change", callback);
+    return () => mq.removeEventListener("change", callback);
   };
 
   const getSnapshot = () => {

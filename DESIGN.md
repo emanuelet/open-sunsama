@@ -27,23 +27,23 @@ This is the reusable specification distilled from Open Sunsama's September 2026 
 
 Use semantic variables everywhere, including menus, dialogs, drag previews, loading states, charts, and third-party widgets. The following values are complete CSS colors; an implementation may store just their HSL channels if its utilities require that format.
 
-| Token | Light | Dark | Role |
-| --- | --- | --- | --- |
-| `background` | `hsl(0 0% 100%)` | `hsl(240 5% 5%)` | Base page; the white Ideas-board canvas in light mode. |
-| `foreground` | `hsl(220 13% 18%)` | `hsl(0 0% 95%)` | Main content and selected labels. |
-| `chrome` | `hsl(220 13% 94%)` | `hsl(240 6% 2.5%)` | Global navigation and surrounding app frame. |
-| `canvas` | `hsl(220 14% 97.5%)` | `hsl(240 5% 5%)` | Open planner workspace behind cards. |
-| `surface` / `card` | `hsl(0 0% 100%)` | `hsl(240 4% 8%)` | Cards and raised content surfaces. |
-| `surface-hover` | `hsl(220 14% 99%)` | `hsl(240 4% 9.5%)` | Quiet card hover. |
-| `muted` / `secondary` | `hsl(220 14% 96%)` | `hsl(240 4% 12%)` | Subordinate surfaces and controls. |
-| `tray` | Alias of `muted` | Alias of `muted` | Borderless board-column containers. |
-| `muted-foreground` | `hsl(220 9% 46%)` | `hsl(240 5% 62%)` | Supporting text and inactive icons. |
-| `accent` | `hsl(220 14% 96%)` | `hsl(240 4% 14.5%)` | **Neutral** hover/selected-control surface. |
-| `popover` | `hsl(0 0% 100%)` | `hsl(240 4% 10%)` | Menus and floating editors. |
-| `border` | `hsl(220 13% 91%)` | `hsl(240 4% 15%)` | Hairlines and dividers. |
-| `input` | `hsl(220 13% 91%)` | `hsl(240 4% 14%)` | Input edge. |
-| `destructive` | `hsl(0 72% 51%)` | `hsl(0 62% 50%)` | Destructive action and error. |
-| `destructive-foreground` | `hsl(0 0% 100%)` | `hsl(0 0% 100%)` | Text on destructive fill. |
+| Token                    | Light                | Dark                | Role                                                   |
+| ------------------------ | -------------------- | ------------------- | ------------------------------------------------------ |
+| `background`             | `hsl(0 0% 100%)`     | `hsl(240 5% 5%)`    | Base page; the white Ideas-board canvas in light mode. |
+| `foreground`             | `hsl(220 13% 18%)`   | `hsl(0 0% 95%)`     | Main content and selected labels.                      |
+| `chrome`                 | `hsl(220 13% 94%)`   | `hsl(240 6% 2.5%)`  | Global navigation and surrounding app frame.           |
+| `canvas`                 | `hsl(220 14% 97.5%)` | `hsl(240 5% 5%)`    | Open planner workspace behind cards.                   |
+| `surface` / `card`       | `hsl(0 0% 100%)`     | `hsl(240 4% 8%)`    | Cards and raised content surfaces.                     |
+| `surface-hover`          | `hsl(220 14% 99%)`   | `hsl(240 4% 9.5%)`  | Quiet card hover.                                      |
+| `muted` / `secondary`    | `hsl(220 14% 96%)`   | `hsl(240 4% 12%)`   | Subordinate surfaces and controls.                     |
+| `tray`                   | Alias of `muted`     | Alias of `muted`    | Borderless board-column containers.                    |
+| `muted-foreground`       | `hsl(220 9% 46%)`    | `hsl(240 5% 62%)`   | Supporting text and inactive icons.                    |
+| `accent`                 | `hsl(220 14% 96%)`   | `hsl(240 4% 14.5%)` | **Neutral** hover/selected-control surface.            |
+| `popover`                | `hsl(0 0% 100%)`     | `hsl(240 4% 10%)`   | Menus and floating editors.                            |
+| `border`                 | `hsl(220 13% 91%)`   | `hsl(240 4% 15%)`   | Hairlines and dividers.                                |
+| `input`                  | `hsl(220 13% 91%)`   | `hsl(240 4% 14%)`   | Input edge.                                            |
+| `destructive`            | `hsl(0 72% 51%)`     | `hsl(0 62% 50%)`    | Destructive action and error.                          |
+| `destructive-foreground` | `hsl(0 0% 100%)`     | `hsl(0 0% 100%)`    | Text on destructive fill.                              |
 
 `card-foreground`, `popover-foreground`, `secondary-foreground`, and `accent-foreground` inherit `foreground` for their mode.
 
@@ -60,12 +60,12 @@ Use semantic variables everywhere, including menus, dialogs, drag previews, load
 
 ### Surface recipes are intentional
 
-| Workspace | Layering |
-| --- | --- |
-| Open day planner | `chrome` frame → `canvas` workspace → unboxed day columns → `surface` cards. |
-| Contained Ideas/Kanban board | `background` workspace → `tray` column → `surface` card. Light mode is **white → light gray → white**. |
-| Dark contained board | Near-black `background` → neutral `tray` → slightly darker `surface` cards, separated by a faint card edge. |
-| Floating editor | Existing workspace → restrained scrim when modal → `popover` or `surface` editor. |
+| Workspace                    | Layering                                                                                                    |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Open day planner             | `chrome` frame → `canvas` workspace → unboxed day columns → `surface` cards.                                |
+| Contained Ideas/Kanban board | `background` workspace → `tray` column → `surface` card. Light mode is **white → light gray → white**.      |
+| Dark contained board         | Near-black `background` → neutral `tray` → slightly darker `surface` cards, separated by a faint card edge. |
+| Floating editor              | Existing workspace → restrained scrim when modal → `popover` or `surface` editor.                           |
 
 Do not add trays to every layout. Day columns are open groupings; Ideas columns are contained trays. This distinction preserves the reference's visual lightness.
 
@@ -77,18 +77,18 @@ Use one UI font family throughout navigation, forms, content, menus, and dialogs
 
 Expose it through a shared `font-family` token. User font preferences replace that token globally. Do not mix a display font into workspace headings.
 
-| Role | Size / line height | Weight | Treatment |
-| --- | --- | --- | --- |
-| Card title / primary row content | 14 / 20px | 400 | Sentence case; wrap naturally. |
-| Navigation, controls, tray headings | 13 / 20px | 500; headings 600 | Compact, clear labels. |
-| Card subtask preview | 13 / 16px | 400 | Muted; align with the parent title. |
-| Small toolbar labels | 12 / 16px | 400–500 | Use for secondary controls, not main content. |
-| Metadata / duration / counts | 11 / 16px | 400–600 | Tabular numerals for time and counts. |
-| Tiny status badge | 10 / 16px | 500 | Short code only; never paragraphs. |
-| Day/section heading | 18 / 28px | 600 | Tracking `-0.025em`. |
-| Date below heading | 14 / 20px | 400 | `muted-foreground`. |
-| Desktop detail-editor title | 24 / 32px | 500 | Tracking `-0.025em`; editable content. |
-| Mobile detail-editor title | 20 / 27.5px | 500 | Full available width; natural wrapping. |
+| Role                                | Size / line height | Weight            | Treatment                                     |
+| ----------------------------------- | ------------------ | ----------------- | --------------------------------------------- |
+| Card title / primary row content    | 14 / 20px          | 400               | Sentence case; wrap naturally.                |
+| Navigation, controls, tray headings | 13 / 20px          | 500; headings 600 | Compact, clear labels.                        |
+| Card subtask preview                | 13 / 16px          | 400               | Muted; align with the parent title.           |
+| Small toolbar labels                | 12 / 16px          | 400–500           | Use for secondary controls, not main content. |
+| Metadata / duration / counts        | 11 / 16px          | 400–600           | Tabular numerals for time and counts.         |
+| Tiny status badge                   | 10 / 16px          | 500               | Short code only; never paragraphs.            |
+| Day/section heading                 | 18 / 28px          | 600               | Tracking `-0.025em`.                          |
+| Date below heading                  | 14 / 20px          | 400               | `muted-foreground`.                           |
+| Desktop detail-editor title         | 24 / 32px          | 500               | Tracking `-0.025em`; editable content.        |
+| Mobile detail-editor title          | 20 / 27.5px        | 500               | Full available width; natural wrapping.       |
 
 Use weights 400, 500, and 600 for normal workspace hierarchy. Reserve uppercase for very short metadata labels, with modest tracking. Avoid uppercase navigation, heavy bold body text, and oversized dashboard headings.
 
@@ -108,14 +108,14 @@ Use `2, 4, 6, 8, 10, 12, 16, 20, 24, 32px` for normal component spacing. A measu
 
 ### Corner radii
 
-| Radius | Usage |
-| --- | --- |
-| 4px | Tiny badges and compact highlight regions. |
-| 6px | Inputs, toolbar controls, segmented controls, rail buttons. |
-| 8px | Cards and standard buttons. |
-| 12px | Board trays and desktop dialogs. |
-| 16px | Larger surface exceptions; use sparingly. |
-| Full circle | Completion controls and avatars; not ordinary buttons. |
+| Radius      | Usage                                                       |
+| ----------- | ----------------------------------------------------------- |
+| 4px         | Tiny badges and compact highlight regions.                  |
+| 6px         | Inputs, toolbar controls, segmented controls, rail buttons. |
+| 8px         | Cards and standard buttons.                                 |
+| 12px        | Board trays and desktop dialogs.                            |
+| 16px        | Larger surface exceptions; use sparingly.                   |
+| Full circle | Completion controls and avatars; not ordinary buttons.      |
 
 Use 1px edges. Internal panel separators normally use `border` at 40–60% opacity; controls needing a clear edge may use the full token. Avoid dark outlines around every region.
 
@@ -123,16 +123,14 @@ Use 1px edges. Internal panel separators normally use `border` at 40–60% opaci
 
 ```css
 /* Light */
---shadow-card: 0 0 0 1px rgb(16 24 40 / 0.05),
-               0 1px 3px 0 rgb(16 24 40 / 0.10);
---shadow-card-hover: 0 2px 4px 0 rgb(16 24 40 / 0.08),
-                     0 4px 10px -2px rgb(16 24 40 / 0.10);
+--shadow-card: 0 0 0 1px rgb(16 24 40 / 0.05), 0 1px 3px 0 rgb(16 24 40 / 0.1);
+--shadow-card-hover:
+  0 2px 4px 0 rgb(16 24 40 / 0.08), 0 4px 10px -2px rgb(16 24 40 / 0.1);
 
 /* Dark */
---shadow-card: 0 0 0 1px rgb(255 255 255 / 0.06),
-               0 1px 2px 0 rgb(0 0 0 / 0.60);
---shadow-card-hover: 0 0 0 1px rgb(255 255 255 / 0.09),
-                     0 2px 6px 0 rgb(0 0 0 / 0.60);
+--shadow-card: 0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px 0 rgb(0 0 0 / 0.6);
+--shadow-card-hover:
+  0 0 0 1px rgb(255 255 255 / 0.09), 0 2px 6px 0 rgb(0 0 0 / 0.6);
 ```
 
 The first shadow supplies a faint edge. Do not automatically add another border. Ordinary task cards change surface color on hover; the stronger hover shadow is available for components that need it, not a requirement for every card.
@@ -194,13 +192,13 @@ Reserve stronger elevation for floating menus, dialogs, and a currently dragged 
 
 ### Controls, forms, and editors
 
-| Control | Reference dimensions |
-| --- | --- |
-| Standard button | 36px high; 16px horizontal padding; 13px medium label; 14px icon; 6px gap; 8px radius. |
-| Small button | 32px high; 12px horizontal padding; 12px label. |
-| Large button | 40px high; 20px horizontal padding; 14px label. Use selectively. |
-| Icon button | 36px square; compact 32px; dense secondary 24px. |
-| Text input | 32px high; 10px horizontal padding; 13px text; 6px radius; subtle 1px edge. |
+| Control                    | Reference dimensions                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------------------- |
+| Standard button            | 36px high; 16px horizontal padding; 13px medium label; 14px icon; 6px gap; 8px radius.      |
+| Small button               | 32px high; 12px horizontal padding; 12px label.                                             |
+| Large button               | 40px high; 20px horizontal padding; 14px label. Use selectively.                            |
+| Icon button                | 36px square; compact 32px; dense secondary 24px.                                            |
+| Text input                 | 32px high; 10px horizontal padding; 13px text; 6px radius; subtle 1px edge.                 |
 | Desktop task/detail dialog | Maximum width 768px; maximum height 84vh; top at 8vh; 12px radius; bounded inner scrolling. |
 
 Use a 2px theme-derived focus ring for buttons and a clearly visible theme-derived input focus edge. Disabled controls use 50% opacity and cannot activate. Validation errors remain readable and explain how to recover.
@@ -224,15 +222,15 @@ Use a shared action registry for handlers, menus, tooltips, and shortcut help. A
 
 Reference task-app mappings:
 
-| Action | Shortcut |
-| --- | --- |
-| Enter Today view | `Shift+T` |
-| Enter Board view | `Shift+B` |
-| Edit planned/estimated time | `E` |
-| Edit actual time | `W` |
+| Action                                                | Shortcut                                                 |
+| ----------------------------------------------------- | -------------------------------------------------------- |
+| Enter Today view                                      | `Shift+T`                                                |
+| Enter Board view                                      | `Shift+B`                                                |
+| Edit planned/estimated time                           | `E`                                                      |
+| Edit actual time                                      | `W`                                                      |
 | Assign P0–P3 while creating/editing, including typing | `Alt+Shift+0` through `Alt+Shift+3` (`Option` on macOS). |
-| Open **and close** shortcut help | `?` |
-| Toggle companion panel | `>` |
+| Open **and close** shortcut help                      | `?`                                                      |
+| Toggle companion panel                                | `>`                                                      |
 
 These mappings are examples for a task app; other domains should retain the consistency rule. Unmodified global shortcuts must not consume normal typing in inputs or rich-text editors. Modal shortcuts belong to the active modal. Escape closes the top dismissible layer, and closing returns focus to the initiating control. A control advertised as a toggle must work in both directions.
 

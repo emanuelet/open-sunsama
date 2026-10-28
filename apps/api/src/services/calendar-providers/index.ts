@@ -22,8 +22,8 @@ export interface ExternalEvent {
   timezone: string | null;
   recurrenceRule: string | null;
   recurringEventId: string | null;
-  status: 'confirmed' | 'tentative' | 'cancelled';
-  responseStatus: 'accepted' | 'declined' | 'tentative' | 'needsAction' | null;
+  status: "confirmed" | "tentative" | "cancelled";
+  responseStatus: "accepted" | "declined" | "tentative" | "needsAction" | null;
   htmlLink: string | null;
   etag: string | null;
   /** Guests, or null when the provider doesn't report them. */
@@ -32,12 +32,12 @@ export interface ExternalEvent {
   conferenceUrl: string | null;
 }
 
-export type RsvpResponse = 'accepted' | 'declined' | 'tentative';
+export type RsvpResponse = "accepted" | "declined" | "tentative";
 
 export interface ExternalAttendee {
   email: string;
   name: string | null;
-  responseStatus: 'accepted' | 'declined' | 'tentative' | 'needsAction' | null;
+  responseStatus: "accepted" | "declined" | "tentative" | "needsAction" | null;
   organizer: boolean;
   self: boolean;
 }
@@ -88,7 +88,11 @@ export interface CalendarProvider {
   exchangeCode(code: string, redirectUri: string): Promise<OAuthTokens>;
   refreshTokens(refreshToken: string): Promise<OAuthTokens>;
   listCalendars(accessToken: string): Promise<ExternalCalendar[]>;
-  listEvents(accessToken: string, calendarId: string, options: SyncOptions): Promise<SyncResult>;
+  listEvents(
+    accessToken: string,
+    calendarId: string,
+    options: SyncOptions
+  ): Promise<SyncResult>;
   /**
    * Create a new event upstream. Returns the canonical post-write
    * representation so the caller can write it through to local
@@ -149,10 +153,10 @@ export interface CalendarProvider {
  * surface a "read-only" message and disable the action.
  */
 export class ProviderReadOnlyError extends Error {
-  readonly code = 'PROVIDER_READ_ONLY' as const;
+  readonly code = "PROVIDER_READ_ONLY" as const;
   constructor(provider: string) {
     super(`${provider} provider does not support write-back yet`);
-    this.name = 'ProviderReadOnlyError';
+    this.name = "ProviderReadOnlyError";
   }
 }
 
@@ -168,10 +172,10 @@ export class ProviderReadOnlyError extends Error {
  * of the affected account so the next attempt has fresh data.
  */
 export class ProviderEventNotFoundError extends Error {
-  readonly code = 'EVENT_NOT_FOUND_UPSTREAM' as const;
+  readonly code = "EVENT_NOT_FOUND_UPSTREAM" as const;
   constructor(provider: string) {
     super(`${provider} no longer has this event`);
-    this.name = 'ProviderEventNotFoundError';
+    this.name = "ProviderEventNotFoundError";
   }
 }
 
@@ -180,13 +184,13 @@ export class ProviderEventNotFoundError extends Error {
  * refresh path can't recover. Client should prompt re-auth.
  */
 export class ProviderAuthError extends Error {
-  readonly code = 'PROVIDER_AUTH_FAILED' as const;
+  readonly code = "PROVIDER_AUTH_FAILED" as const;
   constructor(provider: string) {
     super(`${provider} authentication failed — please reconnect the account`);
-    this.name = 'ProviderAuthError';
+    this.name = "ProviderAuthError";
   }
 }
 
-export { GoogleCalendarProvider } from './google';
-export { OutlookCalendarProvider } from './outlook';
-export { ICloudCalendarProvider } from './icloud';
+export { GoogleCalendarProvider } from "./google";
+export { OutlookCalendarProvider } from "./outlook";
+export { ICloudCalendarProvider } from "./icloud";

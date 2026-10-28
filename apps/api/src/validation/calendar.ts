@@ -2,19 +2,19 @@
  * Validation schemas for calendar routes
  */
 
-import { z } from 'zod';
-import { uuidSchema, dateSchema } from '@open-sunsama/utils';
+import { z } from "zod";
+import { uuidSchema, dateSchema } from "@open-sunsama/utils";
 
 /**
  * Calendar provider enum
  */
-export const calendarProviderSchema = z.enum(['google', 'outlook', 'icloud']);
+export const calendarProviderSchema = z.enum(["google", "outlook", "icloud"]);
 
 /**
  * Schema for OAuth initiate route params
  */
 export const oauthInitiateParamsSchema = z.object({
-  provider: z.enum(['google', 'outlook']),
+  provider: z.enum(["google", "outlook"]),
 });
 
 export const oauthInitiateQuerySchema = z.object({
@@ -25,8 +25,8 @@ export const oauthInitiateQuerySchema = z.object({
  * Schema for OAuth callback query params
  */
 export const oauthCallbackQuerySchema = z.object({
-  code: z.string().min(1, { error: 'Authorization code is required' }),
-  state: z.string().min(1, { error: 'State parameter is required' }),
+  code: z.string().min(1, { error: "Authorization code is required" }),
+  state: z.string().min(1, { error: "State parameter is required" }),
   error: z.string().optional(),
   error_description: z.string().optional(),
 });
@@ -35,8 +35,11 @@ export const oauthCallbackQuerySchema = z.object({
  * Schema for CalDAV connect body
  */
 export const caldavConnectSchema = z.object({
-  email: z.email({ error: 'Invalid email address' }).max(255),
-  appPassword: z.string().min(1, { error: 'App password is required' }).max(255),
+  email: z.email({ error: "Invalid email address" }).max(255),
+  appPassword: z
+    .string()
+    .min(1, { error: "App password is required" })
+    .max(255),
   caldavUrl: z.url().max(500).optional(),
 });
 
@@ -67,7 +70,7 @@ export const updateCalendarSettingsSchema = z.object({
   isDefaultForTasks: z.boolean().optional(),
   color: z
     .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/, { error: 'color must be a #RRGGBB hex string' })
+    .regex(/^#[0-9A-Fa-f]{6}$/, { error: "color must be a #RRGGBB hex string" })
     .nullable()
     .optional(),
 });
@@ -85,13 +88,15 @@ export const calendarEventsQuerySchema = z
     calendarIds: z.string().optional(), // Comma-separated UUIDs
   })
   .refine((q) => (q.date ? !q.from && !q.to : !!q.from && !!q.to), {
-    error: 'Pass either date, or both from and to',
+    error: "Pass either date, or both from and to",
   });
 
 /**
  * Parse comma-separated calendar IDs
  */
-export function parseCalendarIds(calendarIdsParam?: string): string[] | undefined {
+export function parseCalendarIds(
+  calendarIdsParam?: string
+): string[] | undefined {
   if (!calendarIdsParam) return undefined;
-  return calendarIdsParam.split(',').filter(id => id.trim().length > 0);
+  return calendarIdsParam.split(",").filter((id) => id.trim().length > 0);
 }

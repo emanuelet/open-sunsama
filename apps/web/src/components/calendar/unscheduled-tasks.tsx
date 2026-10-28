@@ -51,7 +51,10 @@ export function UnscheduledTasksPanel({
             )}
           </div>
           {taskCount > 0 && (
-            <Badge variant="secondary" className="h-5 min-w-[20px] justify-center">
+            <Badge
+              variant="secondary"
+              className="h-5 min-w-[20px] justify-center"
+            >
               {taskCount}
             </Badge>
           )}
@@ -100,7 +103,10 @@ export function UnscheduledTasksPanel({
                     isHovered={false}
                     onToggleComplete={(e) => {
                       e.stopPropagation();
-                      completeTask.mutate({ id: task.id, completed: !task.completedAt });
+                      completeTask.mutate({
+                        id: task.id,
+                        completed: !task.completedAt,
+                      });
                     }}
                     onClick={() => onTaskClick?.(task)}
                     onHoverChange={() => {}}
@@ -111,7 +117,6 @@ export function UnscheduledTasksPanel({
           )}
         </div>
       </ScrollArea>
-
     </>
   );
 

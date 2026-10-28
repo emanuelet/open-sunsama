@@ -52,28 +52,68 @@ describe("isAllowedRedirectUri", () => {
 describe("redirectUriMatches", () => {
   it("requires an exact match for https", () => {
     const registered = ["https://claude.ai/api/mcp/auth_callback"];
-    expect(clients.redirectUriMatches(registered, "https://claude.ai/api/mcp/auth_callback")).toBe(true);
-    expect(clients.redirectUriMatches(registered, "https://claude.ai/api/mcp/auth_callback/")).toBe(false);
-    expect(clients.redirectUriMatches(registered, "https://claude.ai/api/mcp/auth_callback?x=1")).toBe(false);
+    expect(
+      clients.redirectUriMatches(
+        registered,
+        "https://claude.ai/api/mcp/auth_callback"
+      )
+    ).toBe(true);
+    expect(
+      clients.redirectUriMatches(
+        registered,
+        "https://claude.ai/api/mcp/auth_callback/"
+      )
+    ).toBe(false);
+    expect(
+      clients.redirectUriMatches(
+        registered,
+        "https://claude.ai/api/mcp/auth_callback?x=1"
+      )
+    ).toBe(false);
   });
 
   it("ignores the port for loopback redirects (RFC 8252)", () => {
-    const registered = ["http://localhost/callback", "http://127.0.0.1/callback"];
-    expect(clients.redirectUriMatches(registered, "http://localhost:53172/callback")).toBe(true);
-    expect(clients.redirectUriMatches(registered, "http://127.0.0.1:9000/callback")).toBe(true);
-    expect(clients.redirectUriMatches(registered, "http://localhost:53172/other")).toBe(false);
-    expect(clients.redirectUriMatches(["http://127.0.0.1/callback"], "http://localhost:1/callback")).toBe(false);
+    const registered = [
+      "http://localhost/callback",
+      "http://127.0.0.1/callback",
+    ];
+    expect(
+      clients.redirectUriMatches(registered, "http://localhost:53172/callback")
+    ).toBe(true);
+    expect(
+      clients.redirectUriMatches(registered, "http://127.0.0.1:9000/callback")
+    ).toBe(true);
+    expect(
+      clients.redirectUriMatches(registered, "http://localhost:53172/other")
+    ).toBe(false);
+    expect(
+      clients.redirectUriMatches(
+        ["http://127.0.0.1/callback"],
+        "http://localhost:1/callback"
+      )
+    ).toBe(false);
   });
 
   it("never port-matches non-loopback http", () => {
-    expect(clients.redirectUriMatches(["http://example.com/cb"], "http://example.com:8080/cb")).toBe(false);
+    expect(
+      clients.redirectUriMatches(
+        ["http://example.com/cb"],
+        "http://example.com:8080/cb"
+      )
+    ).toBe(false);
   });
 });
 
 describe("isCimdClientId", () => {
   it("accepts https URLs with a path", () => {
-    expect(clients.isCimdClientId("https://claude.ai/oauth/mcp-oauth-client-metadata")).toBe(true);
-    expect(clients.isCimdClientId("https://chatgpt.com/oauth/client.json")).toBe(true);
+    expect(
+      clients.isCimdClientId(
+        "https://claude.ai/oauth/mcp-oauth-client-metadata"
+      )
+    ).toBe(true);
+    expect(
+      clients.isCimdClientId("https://chatgpt.com/oauth/client.json")
+    ).toBe(true);
   });
 
   it("rejects DCR ids, bare origins, http, and fragments", () => {
@@ -95,17 +135,35 @@ describe("config", () => {
 
   it("normalizes the resource parameter", () => {
     expect(config.normalizeResource(undefined)).toBeNull();
-    expect(config.normalizeResource("https://api.example.com/mcp")).toBe("https://api.example.com/mcp");
-    expect(config.normalizeResource("https://api.example.com/mcp/")).toBe("https://api.example.com/mcp");
-    expect(config.normalizeResource("https://api.example.com")).toBe("https://api.example.com/mcp");
-    expect(config.normalizeResource("https://other.example.com/mcp")).toBeUndefined();
+    expect(config.normalizeResource("https://api.example.com/mcp")).toBe(
+      "https://api.example.com/mcp"
+    );
+    expect(config.normalizeResource("https://api.example.com/mcp/")).toBe(
+      "https://api.example.com/mcp"
+    );
+    expect(config.normalizeResource("https://api.example.com")).toBe(
+      "https://api.example.com/mcp"
+    );
+    expect(
+      config.normalizeResource("https://other.example.com/mcp")
+    ).toBeUndefined();
   });
 
   it("keeps known scopes and defaults to every resource scope", () => {
-    expect(config.resolveRequestedScopes("tasks:read offline_access")).toEqual(["tasks:read", "offline_access"]);
-    expect(config.resolveRequestedScopes("openid email")).toEqual([...config.RESOURCE_SCOPES]);
-    expect(config.resolveRequestedScopes(undefined)).toEqual([...config.RESOURCE_SCOPES]);
-    expect(config.resolveRequestedScopes("offline_access")).toEqual([...config.RESOURCE_SCOPES, "offline_access"]);
+    expect(config.resolveRequestedScopes("tasks:read offline_access")).toEqual([
+      "tasks:read",
+      "offline_access",
+    ]);
+    expect(config.resolveRequestedScopes("openid email")).toEqual([
+      ...config.RESOURCE_SCOPES,
+    ]);
+    expect(config.resolveRequestedScopes(undefined)).toEqual([
+      ...config.RESOURCE_SCOPES,
+    ]);
+    expect(config.resolveRequestedScopes("offline_access")).toEqual([
+      ...config.RESOURCE_SCOPES,
+      "offline_access",
+    ]);
   });
 });
 
@@ -118,7 +176,9 @@ describe("verifyPkceS256", () => {
   });
 
   it("rejects a different or malformed verifier", () => {
-    expect(crypto.verifyPkceS256(verifier.replace("d", "e"), challenge)).toBe(false);
+    expect(crypto.verifyPkceS256(verifier.replace("d", "e"), challenge)).toBe(
+      false
+    );
     expect(crypto.verifyPkceS256("too-short", challenge)).toBe(false);
   });
 });

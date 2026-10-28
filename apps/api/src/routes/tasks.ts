@@ -123,8 +123,9 @@ tasksRouter.get(
     // so the client can hydrate every visible day's task cards plus their
     // subtask previews in a single round-trip — no follow-up
     // `subtasks-batch` call needed.
-    let withSubtasks: Array<typeof results[number] & { subtasks?: unknown[] }> =
-      results;
+    let withSubtasks: Array<
+      (typeof results)[number] & { subtasks?: unknown[] }
+    > = results;
     if (filters.includeSubtasks === "true" && results.length > 0) {
       const ids = results.map((t) => t.id);
       const allSubtasks = await db
@@ -240,22 +241,18 @@ tasksRouter.post(
 );
 
 /** GET /tasks/timer/active - Get the currently active timer task */
-tasksRouter.get(
-  "/timer/active",
-  requireScopes("tasks:read"),
-  async (c) => {
-    const userId = c.get("userId");
-    const db = getDb();
+tasksRouter.get("/timer/active", requireScopes("tasks:read"), async (c) => {
+  const userId = c.get("userId");
+  const db = getDb();
 
-    const [activeTask] = await db
-      .select()
-      .from(tasks)
-      .where(and(eq(tasks.userId, userId), isNotNull(tasks.timerStartedAt)))
-      .limit(1);
+  const [activeTask] = await db
+    .select()
+    .from(tasks)
+    .where(and(eq(tasks.userId, userId), isNotNull(tasks.timerStartedAt)))
+    .limit(1);
 
-    return c.json({ success: true, data: activeTask ?? null });
-  }
-);
+  return c.json({ success: true, data: activeTask ?? null });
+});
 
 /** POST /tasks/:id/timer/start - Start the focus timer for a task */
 tasksRouter.post(
@@ -275,7 +272,11 @@ tasksRouter.post(
       .limit(1);
     if (!task) throw new NotFoundError("Task", id);
 
-    const { task: updatedTask, stoppedTask } = await startTaskTimer(db, userId, task);
+    const { task: updatedTask, stoppedTask } = await startTaskTimer(
+      db,
+      userId,
+      task
+    );
     return c.json({ success: true, data: updatedTask, stoppedTask });
   }
 );
@@ -345,7 +346,6 @@ tasksRouter.patch(
     const { id } = c.req.valid("param");
     const updates = c.req.valid("json");
     return withTimerTransition(getDb(), userId, async (db, publishEvent) => {
-
       const [existing] = await db
         .select()
         .from(tasks)
@@ -360,12 +360,14 @@ tasksRouter.patch(
         updateData.scheduledDate = updates.scheduledDate;
       if (updates.estimatedMins !== undefined)
         updateData.estimatedMins = updates.estimatedMins;
-      if (updates.priority !== undefined) updateData.priority = updates.priority;
+      if (updates.priority !== undefined)
+        updateData.priority = updates.priority;
       if (updates.completedAt !== undefined)
         updateData.completedAt = updates.completedAt
           ? new Date(updates.completedAt)
           : null;
-      if (updates.position !== undefined) updateData.position = updates.position;
+      if (updates.position !== undefined)
+        updateData.position = updates.position;
       if (updates.subtasksHidden !== undefined)
         updateData.subtasksHidden = updates.subtasksHidden;
       let timerStopped: number | null = null;
@@ -408,7 +410,8 @@ tasksRouter.patch(
           updatedTask.scheduledDate,
           db
         );
-        if (moved > 0) publishEvent(userId, "timeblock:updated", { taskId: id });
+        if (moved > 0)
+          publishEvent(userId, "timeblock:updated", { taskId: id });
       }
 
       // Publish realtime event (fire and forget)
@@ -420,7 +423,9 @@ tasksRouter.patch(
         });
       }
       if (updatedTask) {
-        const eventType = updates.completedAt ? "task:completed" : "task:updated";
+        const eventType = updates.completedAt
+          ? "task:completed"
+          : "task:updated";
         publishEvent(userId, eventType, {
           taskId: updatedTask.id,
           scheduledDate: updatedTask.scheduledDate,
@@ -523,7 +528,6 @@ tasksRouter.post(
     const userId = c.get("userId");
     const { id } = c.req.valid("param");
     return withTimerTransition(getDb(), userId, async (db, publishEvent) => {
-
       const [existing] = await db
         .select()
         .from(tasks)
@@ -637,7 +641,11 @@ tasksRouter.post(
       )
     );
 
-    const movedBlocks = await moveBlocksWithTasks(userId, previousDays, targetDate);
+    const movedBlocks = await moveBlocksWithTasks(
+      userId,
+      previousDays,
+      targetDate
+    );
     if (movedBlocks > 0) publishEvent(userId, "timeblock:updated", { date });
 
     // Fetch all tasks for the target date

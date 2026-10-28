@@ -53,9 +53,18 @@ describe("buildImportedTaskPatch", () => {
   });
 
   it("preserves local notes when the provider has no description", () => {
-    expect(buildImportedTaskPatch(external({ description: null }), current).notes).toBe("My own notes");
-    expect(buildImportedTaskPatch(external({ description: "  " }), current).notes).toBe("My own notes");
-    expect(buildImportedTaskPatch(external({ description: null }), { ...current, notes: null }).notes).toBeNull();
+    expect(
+      buildImportedTaskPatch(external({ description: null }), current).notes
+    ).toBe("My own notes");
+    expect(
+      buildImportedTaskPatch(external({ description: "  " }), current).notes
+    ).toBe("My own notes");
+    expect(
+      buildImportedTaskPatch(external({ description: null }), {
+        ...current,
+        notes: null,
+      }).notes
+    ).toBeNull();
   });
 
   it("keeps the local priority when the remote has none set", () => {

@@ -56,9 +56,7 @@ export function ApiKeyCreatedView({
             </div>
             <div>
               <DialogTitle>API Key Created</DialogTitle>
-              <DialogDescription>
-                {createdKey.apiKey.name}
-              </DialogDescription>
+              <DialogDescription>{createdKey.apiKey.name}</DialogDescription>
             </div>
           </div>
         </DialogHeader>
@@ -72,7 +70,7 @@ export function ApiKeyCreatedView({
                   Copy your API key now
                 </p>
                 <p className="text-xs text-yellow-500/80">
-                  This is the only time you'll see this key. Store it securely - 
+                  This is the only time you'll see this key. Store it securely -
                   you won't be able to retrieve it later.
                 </p>
               </div>

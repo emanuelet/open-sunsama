@@ -21,10 +21,10 @@ Add two columns to the `tasks` table (`timer_started_at`, `timer_accumulated_sec
 
 **Table:** `tasks` (in `packages/database/src/schema/tasks.ts`)
 
-| Column | Type | Default | Description |
-|---|---|---|---|
-| `timer_started_at` | `timestamp` (nullable) | `null` | Set to `now()` when timer starts; cleared on stop |
-| `timer_accumulated_seconds` | `integer` | `0` | Total seconds accumulated across all start/stop cycles for the current work session |
+| Column                      | Type                   | Default | Description                                                                         |
+| --------------------------- | ---------------------- | ------- | ----------------------------------------------------------------------------------- |
+| `timer_started_at`          | `timestamp` (nullable) | `null`  | Set to `now()` when timer starts; cleared on stop                                   |
+| `timer_accumulated_seconds` | `integer`              | `0`     | Total seconds accumulated across all start/stop cycles for the current work session |
 
 **Index:** Add a partial index for quickly finding the active timer per user:
 
@@ -34,6 +34,7 @@ CREATE INDEX tasks_active_timer_idx ON tasks (user_id)
 ```
 
 **Migration notes:**
+
 - Both columns are nullable/defaulted, so the migration is backward-compatible and requires no data backfill.
 - The `timer_accumulated_seconds` column resets to `0` each time `actualMins` is synced on stop (accumulated is a working buffer, `actualMins` is the permanent record).
 
@@ -58,6 +59,7 @@ All three endpoints go in `apps/api/src/routes/tasks.ts` and require `tasks:writ
 **Auth:** JWT or API Key with `tasks:write`
 
 **Behavior:**
+
 1. Verify the task belongs to the authenticated user.
 2. Check if any other task for this user has `timer_started_at IS NOT NULL`. If so, auto-stop it first (calculate elapsed, add to its `timer_accumulated_seconds`, compute `actualMins`, clear its timer fields, broadcast `timer:stopped` for that task).
 3. Set `timer_started_at = now()` on the target task. Leave `timer_accumulated_seconds` at its current value (may be >0 if resuming).
@@ -65,11 +67,12 @@ All three endpoints go in `apps/api/src/routes/tasks.ts` and require `tasks:writ
 5. Return the updated task.
 
 **Response:**
+
 ```json
 {
   "success": true,
-  "data": { /* full task object */ },
-  "stoppedTask": { /* task that was auto-stopped, or null */ }
+  "data": {/* full task object */},
+  "stoppedTask": {/* task that was auto-stopped, or null */}
 }
 ```
 
@@ -78,6 +81,7 @@ All three endpoints go in `apps/api/src/routes/tasks.ts` and require `tasks:writ
 **Auth:** JWT or API Key with `tasks:write`
 
 **Behavior:**
+
 1. Verify task belongs to user and has `timer_started_at IS NOT NULL`. If timer is not running, return 400.
 2. Compute `elapsed = now() - timer_started_at` (in seconds).
 3. `totalSeconds = timer_accumulated_seconds + elapsed`
@@ -87,10 +91,11 @@ All three endpoints go in `apps/api/src/routes/tasks.ts` and require `tasks:writ
 7. Return the updated task.
 
 **Response:**
+
 ```json
 {
   "success": true,
-  "data": { /* full task object with updated actualMins */ }
+  "data": {/* full task object with updated actualMins */}
 }
 ```
 
@@ -99,14 +104,16 @@ All three endpoints go in `apps/api/src/routes/tasks.ts` and require `tasks:writ
 **Auth:** JWT or API Key with `tasks:read`
 
 **Behavior:**
+
 1. Find the task for this user where `timer_started_at IS NOT NULL`.
 2. Return the task, or `null` if no active timer.
 
 **Response:**
+
 ```json
 {
   "success": true,
-  "data": { /* task with active timer, or null */ }
+  "data": {/* task with active timer, or null */}
 }
 ```
 
@@ -136,8 +143,7 @@ Add two new event types:
 ```typescript
 export type WebSocketEventType =
   // ... existing types ...
-  | "timer:started"
-  | "timer:stopped";
+  "timer:started" | "timer:stopped";
 ```
 
 Add event payload interfaces:
@@ -145,13 +151,13 @@ Add event payload interfaces:
 ```typescript
 export interface TimerStartedEvent {
   taskId: string;
-  startedAt: string;           // ISO 8601 timestamp
-  accumulatedSeconds: number;  // seconds already accumulated before this start
+  startedAt: string; // ISO 8601 timestamp
+  accumulatedSeconds: number; // seconds already accumulated before this start
 }
 
 export interface TimerStoppedEvent {
   taskId: string;
-  actualMins: number;          // final actualMins saved on the task
+  actualMins: number; // final actualMins saved on the task
 }
 ```
 
@@ -225,45 +231,52 @@ timerAccumulatedSeconds: number;
 ```typescript
 interface UseTimerOptions {
   taskId: string;
-  initialSeconds?: number;   // from task.actualMins * 60
+  initialSeconds?: number; // from task.actualMins * 60
   onStop?: (totalSeconds: number) => void;
 }
 ```
 
 **Initialization:**
+
 1. On mount, call `GET /tasks/timer/active`.
 2. If the active timer's `taskId` matches the hook's `taskId`, hydrate local state from the response (`startedAt`, `accumulatedSeconds`).
 3. If no active timer and `localStorage` has state for this task, use that as a fallback (offline scenario).
 
 **Start:**
+
 1. Optimistically set local `isRunning = true`, `startedAt = Date.now()`.
 2. Call `POST /tasks/:id/timer/start`.
 3. On success, update local `startedAt` from server response (authoritative timestamp).
 4. On failure, roll back local state.
 
 **Stop:**
+
 1. Optimistically set local `isRunning = false`, calculate `totalSeconds`.
 2. Call `POST /tasks/:id/timer/stop`.
 3. On success, call `onStop(totalSeconds)` and update `accumulatedSeconds = 0`.
 4. On failure, roll back local state.
 
 **Tick:**
+
 - Still uses `setInterval(1000)` client-side.
 - Elapsed = `Math.floor((Date.now() - startedAt) / 1000)`.
 - Display = `accumulatedSeconds + elapsed`.
 
 **WebSocket integration** (new):
+
 - Listen for `timer:started` and `timer:stopped` events.
 - On `timer:started` where `taskId` matches: update local state to running with the server's `startedAt` and `accumulatedSeconds`.
 - On `timer:stopped` where `taskId` matches: update local state to stopped.
 - On `timer:stopped` for a **different** task (auto-stop): if that task's timer hook is mounted, stop its local state.
 
 **localStorage:**
+
 - Continue writing state to `localStorage` on each state change (offline fallback).
 - On mount, prefer server state over `localStorage`.
 - On reconnect (WebSocket `connected` event), re-fetch active timer to reconcile.
 
 **Exported utilities:**
+
 - Keep `getRunningTimerSeconds()` and `stopAndClearTimer()` but mark them as **deprecated** — they read from `localStorage` and are only used as a fallback when the server is unreachable.
 
 ### 4. WebSocket Handler (`apps/web/src/hooks/useWebSocket.ts`)
@@ -359,15 +372,15 @@ export const timerKeys = {
 
 ## Files Changed
 
-| File | Change |
-|---|---|
-| `packages/database/src/schema/tasks.ts` | Add `timerStartedAt`, `timerAccumulatedSeconds` columns + index |
-| `packages/types/src/task.ts` | Add timer fields to `Task` interface |
-| `apps/api/src/routes/tasks.ts` | Add 3 timer endpoints, update complete endpoint |
-| `apps/api/src/lib/websocket/events.ts` | Add `timer:started`, `timer:stopped` types + payload interfaces |
-| `packages/api-client/src/tasks.ts` | Add `timerStart`, `timerStop`, `timerActive` methods |
-| `apps/web/src/lib/websocket/index.ts` | Add `timer:started`, `timer:stopped` event types |
-| `apps/web/src/hooks/useTimer.ts` | Refactor to server-authoritative with WS sync |
-| `apps/web/src/hooks/useWebSocket.ts` | Handle timer events for cache invalidation |
-| `apps/web/src/hooks/useTasks.ts` | Remove `stopAndClearTimer` from `useCompleteTask` |
-| `apps/web/src/components/focus/focus-timer.tsx` | No changes needed (hook interface unchanged) |
+| File                                            | Change                                                          |
+| ----------------------------------------------- | --------------------------------------------------------------- |
+| `packages/database/src/schema/tasks.ts`         | Add `timerStartedAt`, `timerAccumulatedSeconds` columns + index |
+| `packages/types/src/task.ts`                    | Add timer fields to `Task` interface                            |
+| `apps/api/src/routes/tasks.ts`                  | Add 3 timer endpoints, update complete endpoint                 |
+| `apps/api/src/lib/websocket/events.ts`          | Add `timer:started`, `timer:stopped` types + payload interfaces |
+| `packages/api-client/src/tasks.ts`              | Add `timerStart`, `timerStop`, `timerActive` methods            |
+| `apps/web/src/lib/websocket/index.ts`           | Add `timer:started`, `timer:stopped` event types                |
+| `apps/web/src/hooks/useTimer.ts`                | Refactor to server-authoritative with WS sync                   |
+| `apps/web/src/hooks/useWebSocket.ts`            | Handle timer events for cache invalidation                      |
+| `apps/web/src/hooks/useTasks.ts`                | Remove `stopAndClearTimer` from `useCompleteTask`               |
+| `apps/web/src/components/focus/focus-timer.tsx` | No changes needed (hook interface unchanged)                    |

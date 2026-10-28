@@ -1,8 +1,24 @@
 import * as React from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Loader2, Check, X, Calendar, MoreHorizontal, Trash2, Copy } from "lucide-react";
+import {
+  ArrowLeft,
+  Loader2,
+  Check,
+  X,
+  Calendar,
+  MoreHorizontal,
+  Trash2,
+  Copy,
+} from "lucide-react";
 import { format, parse, addDays, startOfWeek } from "date-fns";
-import { useTask, useUpdateTask, useTasks, useCreateTask, useDeleteTask, useCompleteTask } from "@/hooks/useTasks";
+import {
+  useTask,
+  useUpdateTask,
+  useTasks,
+  useCreateTask,
+  useDeleteTask,
+  useCompleteTask,
+} from "@/hooks/useTasks";
 import {
   Button,
   DropdownMenu,
@@ -10,19 +26,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui";
-import {
-  FocusTimer,
-  FocusSubtasks,
-  CalendarSidebar,
-} from "@/components/focus";
+import { FocusTimer, FocusSubtasks, CalendarSidebar } from "@/components/focus";
 import { NotesField } from "@/components/ui/notes-field";
 import { WithShortcut } from "@/components/ui/with-shortcut";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { PriorityIcon, PRIORITY_META } from "@/components/ui/priority-badge";
 import { PriorityMenu } from "@/components/kanban/priority-menu";
 import { SubtaskSizeContext } from "@/components/kanban/subtask-size";
 import type { FocusTimerRef } from "@/components/focus/focus-timer";
-import { shouldIgnoreShortcut, matchesTimeEditShortcut } from "@/hooks/useKeyboardShortcuts";
+import {
+  shouldIgnoreShortcut,
+  matchesTimeEditShortcut,
+} from "@/hooks/useKeyboardShortcuts";
 import { cn } from "@/lib/utils";
 import { TaskSeriesBanner } from "@/components/kanban/task-series-banner";
 import { toast } from "@/hooks/use-toast";
@@ -183,16 +202,25 @@ export default function FocusPage() {
         e.preventDefault();
         const tomorrow = addDays(new Date(), 1);
         handleScheduledDateChange(format(tomorrow, "yyyy-MM-dd"));
-        toast({ title: "Snoozed one day", description: `Scheduled for ${format(tomorrow, "EEEE, MMM d")}.` });
+        toast({
+          title: "Snoozed one day",
+          description: `Scheduled for ${format(tomorrow, "EEEE, MMM d")}.`,
+        });
         return;
       }
 
       // Shift+Z - Move to next week
       if ((e.key === "z" || e.key === "Z") && e.shiftKey) {
         e.preventDefault();
-        const nextMonday = addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 7);
+        const nextMonday = addDays(
+          startOfWeek(new Date(), { weekStartsOn: 1 }),
+          7
+        );
         handleScheduledDateChange(format(nextMonday, "yyyy-MM-dd"));
-        toast({ title: "Moved to next week", description: `Scheduled for ${format(nextMonday, "EEEE, MMM d")}.` });
+        toast({
+          title: "Moved to next week",
+          description: `Scheduled for ${format(nextMonday, "EEEE, MMM d")}.`,
+        });
         return;
       }
 

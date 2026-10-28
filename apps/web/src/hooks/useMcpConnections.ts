@@ -20,7 +20,9 @@ export function useMcpConnections() {
   return useQuery({
     queryKey: connectionsKey,
     queryFn: async () => {
-      const res = await getApiClient().get<{ data: McpConnection[] }>("oauth/connections");
+      const res = await getApiClient().get<{ data: McpConnection[] }>(
+        "oauth/connections"
+      );
       return res.data;
     },
   });
@@ -30,14 +32,23 @@ export function useDisconnectMcpConnection() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (clientId: string) => {
-      await getApiClient().delete(`oauth/connections/${encodeURIComponent(clientId)}`);
+      await getApiClient().delete(
+        `oauth/connections/${encodeURIComponent(clientId)}`
+      );
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: connectionsKey });
-      toast({ title: "Disconnected", description: "The app can no longer access your account." });
+      toast({
+        title: "Disconnected",
+        description: "The app can no longer access your account.",
+      });
     },
     onError: () => {
-      toast({ variant: "destructive", title: "Couldn't disconnect", description: "Please try again." });
+      toast({
+        variant: "destructive",
+        title: "Couldn't disconnect",
+        description: "Please try again.",
+      });
     },
   });
 }

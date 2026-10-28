@@ -12,7 +12,10 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Format a date to a readable string
  */
-export function formatDate(date: Date | string, options?: Intl.DateTimeFormatOptions): string {
+export function formatDate(
+  date: Date | string,
+  options?: Intl.DateTimeFormatOptions
+): string {
   const d = typeof date === "string" ? new Date(date) : date;
   return d.toLocaleDateString("en-US", {
     month: "short",
@@ -77,7 +80,9 @@ export function stripHtmlTags(html: string): string {
  * Get the full URL for an avatar image
  * Avatar URLs are stored as relative paths (/uploads/...) which need the API base URL prepended
  */
-export function getAvatarUrl(avatarUrl: string | null | undefined): string | undefined {
+export function getAvatarUrl(
+  avatarUrl: string | null | undefined
+): string | undefined {
   return resolveUploadUrl(avatarUrl) ?? undefined;
 }
 
@@ -137,7 +142,9 @@ export const TIME_PRESETS_NUMERIC = [
 /**
  * Format minutes to human-readable time display (e.g., "30 min", "1 hour", "2h 30m")
  */
-export function formatTimeDisplay(mins: string | number | null | undefined): string {
+export function formatTimeDisplay(
+  mins: string | number | null | undefined
+): string {
   if (mins === null || mins === undefined || mins === "") return "";
   const num = typeof mins === "string" ? parseInt(mins, 10) : mins;
   if (isNaN(num) || num <= 0) return "";
@@ -151,7 +158,9 @@ export function formatTimeDisplay(mins: string | number | null | undefined): str
 /**
  * Format minutes to compact time display (e.g., "30m", "1h", "2h 30m")
  */
-export function formatTimeDisplayCompact(mins: string | number | null | undefined): string {
+export function formatTimeDisplayCompact(
+  mins: string | number | null | undefined
+): string {
   if (mins === null || mins === undefined || mins === "") return "";
   const num = typeof mins === "string" ? parseInt(mins, 10) : mins;
   if (isNaN(num) || num <= 0) return "";

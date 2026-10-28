@@ -38,35 +38,44 @@ export function VideoLightbox({
           className="fixed left-1/2 top-1/2 z-61 w-[min(1120px,calc(100vw-24px),calc((100dvh-96px)*16/9))] -translate-x-1/2 -translate-y-1/2 focus:outline-hidden"
           aria-describedby={undefined}
         >
-          <DialogPrimitive.Title className="sr-only">{video.title}</DialogPrimitive.Title>
+          <DialogPrimitive.Title className="sr-only">
+            {video.title}
+          </DialogPrimitive.Title>
           <div className="motion-safe:animate-in">
-          <div
-            className="relative overflow-hidden rounded-xl bg-black shadow-[0_40px_120px_-20px_rgb(0_0_0/0.8)] ring-1 ring-white/10"
-            style={{ aspectRatio: `${video.width} / ${video.height}` }}
-          >
-            <video
-              src={video.mp4}
-              poster={video.poster}
-              width={video.width}
-              height={video.height}
-              controls
-              autoPlay
-              playsInline
-              preload="auto"
-              aria-label={video.title}
-              className="absolute inset-0 h-full w-full"
+            <div
+              className="relative overflow-hidden rounded-xl bg-black shadow-[0_40px_120px_-20px_rgb(0_0_0/0.8)] ring-1 ring-white/10"
+              style={{ aspectRatio: `${video.width} / ${video.height}` }}
             >
-              {/* Captions are burned into the video; the track stays off so they don't show twice. */}
-              {video.captions && <track kind="captions" src={video.captions} srcLang="en" label="English" />}
-            </video>
-          </div>
-          <div className="mt-3 flex items-center justify-between gap-4 px-1 text-[13px] text-white/75">
-            <span className="min-w-0 truncate">{video.title}</span>
-            <DialogPrimitive.Close className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white/60">
-              <X className="h-4 w-4" />
-              Close
-            </DialogPrimitive.Close>
-          </div>
+              <video
+                src={video.mp4}
+                poster={video.poster}
+                width={video.width}
+                height={video.height}
+                controls
+                autoPlay
+                playsInline
+                preload="auto"
+                aria-label={video.title}
+                className="absolute inset-0 h-full w-full"
+              >
+                {/* Captions are burned into the video; the track stays off so they don't show twice. */}
+                {video.captions && (
+                  <track
+                    kind="captions"
+                    src={video.captions}
+                    srcLang="en"
+                    label="English"
+                  />
+                )}
+              </video>
+            </div>
+            <div className="mt-3 flex items-center justify-between gap-4 px-1 text-[13px] text-white/75">
+              <span className="min-w-0 truncate">{video.title}</span>
+              <DialogPrimitive.Close className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white/60">
+                <X className="h-4 w-4" />
+                Close
+              </DialogPrimitive.Close>
+            </div>
           </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
@@ -115,7 +124,9 @@ export const VideoCard = React.forwardRef<
         </span>
       </span>
       <span className="min-w-0">
-        <span className="block text-[14px] font-semibold leading-snug text-foreground">{label}</span>
+        <span className="block text-[14px] font-semibold leading-snug text-foreground">
+          {label}
+        </span>
         <span className="mt-1 block text-[12.5px] text-muted-foreground">
           Narrated · {clockDuration(video.duration)}
         </span>

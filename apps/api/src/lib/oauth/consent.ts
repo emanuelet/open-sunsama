@@ -7,7 +7,8 @@
 import jwt from "jsonwebtoken";
 import { CONSENT_REQUEST_TTL_SECONDS } from "./config.js";
 
-const SECRET = process.env.JWT_SECRET || "open-sunsama-dev-secret-change-in-production";
+const SECRET =
+  process.env.JWT_SECRET || "open-sunsama-dev-secret-change-in-production";
 const AUDIENCE = "open-sunsama:oauth-consent";
 
 export interface ConsentRequest {
@@ -28,7 +29,9 @@ export function signConsentRequest(request: ConsentRequest): string {
 
 export function verifyConsentRequest(token: string): ConsentRequest | null {
   try {
-    const decoded = jwt.verify(token, SECRET, { audience: AUDIENCE }) as { req?: ConsentRequest };
+    const decoded = jwt.verify(token, SECRET, { audience: AUDIENCE }) as {
+      req?: ConsentRequest;
+    };
     return decoded.req ?? null;
   } catch {
     return null;

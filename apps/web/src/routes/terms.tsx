@@ -8,7 +8,7 @@ import { useSEO, SEO_CONFIGS } from "@/hooks/useSEO";
  */
 export default function TermsPage() {
   useSEO(SEO_CONFIGS.terms);
-  
+
   return (
     <LegalLayout>
       <TermsContent />

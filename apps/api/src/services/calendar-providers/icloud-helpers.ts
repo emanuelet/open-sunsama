@@ -1,8 +1,8 @@
 /**
  * iCloud Calendar (CalDAV) helper functions and types
  */
-import type { DAVObject } from 'tsdav';
-import type { ExternalEvent } from './index';
+import type { DAVObject } from "tsdav";
+import type { ExternalEvent } from "./index";
 
 export interface VCalendarComponent {
   uid?: string;
@@ -72,7 +72,7 @@ export function parseICalDateTime(
   const minute = parseInt(value.slice(11, 13), 10);
   const second = parseInt(value.slice(13, 15), 10);
 
-  if (value.endsWith('Z')) {
+  if (value.endsWith("Z")) {
     return new Date(Date.UTC(year, month, day, hour, minute, second));
   }
 
@@ -128,26 +128,26 @@ function wallTimeInZoneToUtc(
  */
 function getZoneOffsetMs(utcMs: number, tzid: string): number {
   try {
-    const dtf = new Intl.DateTimeFormat('en-US', {
+    const dtf = new Intl.DateTimeFormat("en-US", {
       timeZone: tzid,
-      hourCycle: 'h23',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
+      hourCycle: "h23",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     });
     const parts = dtf.formatToParts(new Date(utcMs));
     const get = (type: Intl.DateTimeFormatPartTypes) =>
-      parseInt(parts.find((p) => p.type === type)?.value ?? '0', 10);
+      parseInt(parts.find((p) => p.type === type)?.value ?? "0", 10);
     const asUtc = Date.UTC(
-      get('year'),
-      get('month') - 1,
-      get('day'),
-      get('hour'),
-      get('minute'),
-      get('second')
+      get("year"),
+      get("month") - 1,
+      get("day"),
+      get("hour"),
+      get("minute"),
+      get("second")
     );
     return asUtc - utcMs;
   } catch {
@@ -160,22 +160,22 @@ function getZoneOffsetMs(utcMs: number, tzid: string): number {
  * Note: This is a simplified parser. For production, consider a full iCal library.
  */
 export function parseVCalendar(icalData: string): VCalendarComponent | null {
-  const lines = icalData.replace(/\r\n /g, '').split(/\r?\n/);
+  const lines = icalData.replace(/\r\n /g, "").split(/\r?\n/);
 
   let inEvent = false;
   const event: VCalendarComponent = {};
 
   for (const line of lines) {
-    if (line === 'BEGIN:VEVENT') {
+    if (line === "BEGIN:VEVENT") {
       inEvent = true;
       continue;
     }
-    if (line === 'END:VEVENT') {
+    if (line === "END:VEVENT") {
       break;
     }
     if (!inEvent) continue;
 
-    const colonIndex = line.indexOf(':');
+    const colonIndex = line.indexOf(":");
     if (colonIndex === -1) continue;
 
     const rawKey = line.slice(0, colonIndex);
@@ -185,38 +185,40 @@ export function parseVCalendar(icalData: string): VCalendarComponent | null {
     // — split them off so the switch matches on the bare property name,
     // but keep the parameter string around so DTSTART/DTEND can pull
     // out TZID below.
-    const semicolonIndex = rawKey.indexOf(';');
-    const key = semicolonIndex === -1 ? rawKey : rawKey.slice(0, semicolonIndex);
-    const params = semicolonIndex === -1 ? '' : rawKey.slice(semicolonIndex + 1);
+    const semicolonIndex = rawKey.indexOf(";");
+    const key =
+      semicolonIndex === -1 ? rawKey : rawKey.slice(0, semicolonIndex);
+    const params =
+      semicolonIndex === -1 ? "" : rawKey.slice(semicolonIndex + 1);
 
     switch (key.toUpperCase()) {
-      case 'UID':
+      case "UID":
         event.uid = value;
         break;
-      case 'SUMMARY':
+      case "SUMMARY":
         event.summary = value;
         break;
-      case 'DESCRIPTION':
+      case "DESCRIPTION":
         event.description = value;
         break;
-      case 'LOCATION':
+      case "LOCATION":
         event.location = value;
         break;
-      case 'DTSTART':
+      case "DTSTART":
         event.dtstart = value;
-        event.dtstartTzid = extractParam(params, 'TZID') ?? undefined;
+        event.dtstartTzid = extractParam(params, "TZID") ?? undefined;
         break;
-      case 'DTEND':
+      case "DTEND":
         event.dtend = value;
-        event.dtendTzid = extractParam(params, 'TZID') ?? undefined;
+        event.dtendTzid = extractParam(params, "TZID") ?? undefined;
         break;
-      case 'RRULE':
+      case "RRULE":
         event.rrule = value;
         break;
-      case 'STATUS':
+      case "STATUS":
         event.status = value;
         break;
-      case 'SEQUENCE': {
+      case "SEQUENCE": {
         const n = parseInt(value, 10);
         if (Number.isFinite(n) && n >= 0) {
           event.sequence = n;
@@ -246,8 +248,8 @@ export function parseVCalendar(icalData: string): VCalendarComponent | null {
 function extractParam(params: string, name: string): string | null {
   if (!params) return null;
   const upper = name.toUpperCase();
-  for (const piece of params.split(';')) {
-    const eq = piece.indexOf('=');
+  for (const piece of params.split(";")) {
+    const eq = piece.indexOf("=");
     if (eq === -1) continue;
     const k = piece.slice(0, eq).trim().toUpperCase();
     if (k !== upper) continue;
@@ -263,14 +265,16 @@ function extractParam(params: string, name: string): string | null {
 /**
  * Map CalDAV status to our status type
  */
-export function mapCalDavStatus(status?: string): 'confirmed' | 'tentative' | 'cancelled' {
+export function mapCalDavStatus(
+  status?: string
+): "confirmed" | "tentative" | "cancelled" {
   switch (status?.toUpperCase()) {
-    case 'TENTATIVE':
-      return 'tentative';
-    case 'CANCELLED':
-      return 'cancelled';
+    case "TENTATIVE":
+      return "tentative";
+    case "CANCELLED":
+      return "cancelled";
     default:
-      return 'confirmed';
+      return "confirmed";
   }
 }
 
@@ -321,14 +325,16 @@ function buildExternalEventFromComponent(
       event.dtendTzid ?? event.dtstartTzid
     );
   } else {
-    endTime = new Date(startTime.getTime() + (isAllDay ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000));
+    endTime = new Date(
+      startTime.getTime() + (isAllDay ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000)
+    );
   }
 
   const etag = obj.etag ?? null;
 
   return {
     externalId: event.uid,
-    title: event.summary || '(No title)',
+    title: event.summary || "(No title)",
     description: event.description ?? null,
     location: event.location ?? null,
     startTime,
@@ -387,11 +393,11 @@ export function buildVCalendar(input: {
   sequence?: number | null;
 }): string {
   const lines: string[] = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Open Sunsama//EN',
-    'CALSCALE:GREGORIAN',
-    'BEGIN:VEVENT',
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Open Sunsama//EN",
+    "CALSCALE:GREGORIAN",
+    "BEGIN:VEVENT",
     `UID:${escapeICS(input.uid)}`,
     `DTSTAMP:${formatICalUtc(new Date())}`,
     `SUMMARY:${escapeICS(input.title)}`,
@@ -416,38 +422,38 @@ export function buildVCalendar(input: {
   if (input.rrule) {
     lines.push(`RRULE:${input.rrule}`);
   }
-  if (typeof input.sequence === 'number') {
+  if (typeof input.sequence === "number") {
     lines.push(`SEQUENCE:${input.sequence}`);
   }
-  lines.push('END:VEVENT', 'END:VCALENDAR');
+  lines.push("END:VEVENT", "END:VCALENDAR");
   // CRLF line endings per RFC 5545.
-  return lines.join('\r\n');
+  return lines.join("\r\n");
 }
 
 /** YYYYMMDD for VALUE=DATE all-day events. Reads UTC components per the iCal convention. */
 function formatICalDate(d: Date): string {
   const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const dd = String(d.getUTCDate()).padStart(2, '0');
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(d.getUTCDate()).padStart(2, "0");
   return `${y}${m}${dd}`;
 }
 
 /** YYYYMMDDTHHMMSSZ — iCal UTC dateTime. */
 function formatICalUtc(d: Date): string {
   const y = d.getUTCFullYear();
-  const M = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const D = String(d.getUTCDate()).padStart(2, '0');
-  const h = String(d.getUTCHours()).padStart(2, '0');
-  const m = String(d.getUTCMinutes()).padStart(2, '0');
-  const s = String(d.getUTCSeconds()).padStart(2, '0');
+  const M = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const D = String(d.getUTCDate()).padStart(2, "0");
+  const h = String(d.getUTCHours()).padStart(2, "0");
+  const m = String(d.getUTCMinutes()).padStart(2, "0");
+  const s = String(d.getUTCSeconds()).padStart(2, "0");
   return `${y}${M}${D}T${h}${m}${s}Z`;
 }
 
 /** Escape commas, semicolons, backslashes, newlines per RFC 5545. */
 function escapeICS(s: string): string {
   return s
-    .replace(/\\/g, '\\\\')
-    .replace(/;/g, '\\;')
-    .replace(/,/g, '\\,')
-    .replace(/\r?\n/g, '\\n');
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r?\n/g, "\\n");
 }

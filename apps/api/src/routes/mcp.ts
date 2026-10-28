@@ -11,7 +11,10 @@ import { Hono } from "hono";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/server";
 import { createOpenSunsamaMcpServer } from "@open-sunsama/mcp/server";
 import { authenticateRequest } from "../middleware/auth.js";
-import { RESOURCE_SCOPES, getProtectedResourceMetadataUrl } from "../lib/oauth/config.js";
+import {
+  RESOURCE_SCOPES,
+  getProtectedResourceMetadataUrl,
+} from "../lib/oauth/config.js";
 
 type InProcessFetch = (request: Request) => Response | Promise<Response>;
 
@@ -21,12 +24,18 @@ function unauthorized(error?: { code: string; description: string }): Response {
     `scope="${RESOURCE_SCOPES.join(" ")}"`,
   ];
   if (error) {
-    params.push(`error="${error.code}"`, `error_description="${error.description}"`);
+    params.push(
+      `error="${error.code}"`,
+      `error_description="${error.description}"`
+    );
   }
   return new Response(
     JSON.stringify({
       jsonrpc: "2.0",
-      error: { code: -32001, message: error?.description ?? "Authentication required" },
+      error: {
+        code: -32001,
+        message: error?.description ?? "Authentication required",
+      },
       id: null,
     }),
     {
@@ -47,9 +56,14 @@ export function createMcpRouter(appFetch: InProcessFetch): Hono {
     const apiKey = c.req.header("x-api-key");
     if (!authorization && !apiKey) return unauthorized();
 
-    const principal = await authenticateRequest(authorization, apiKey).catch(() => null);
+    const principal = await authenticateRequest(authorization, apiKey).catch(
+      () => null
+    );
     if (!principal) {
-      return unauthorized({ code: "invalid_token", description: "The access token is invalid or expired" });
+      return unauthorized({
+        code: "invalid_token",
+        description: "The access token is invalid or expired",
+      });
     }
 
     const server = createOpenSunsamaMcpServer({
@@ -80,10 +94,16 @@ export function createMcpRouter(appFetch: InProcessFetch): Hono {
     new Response(
       JSON.stringify({
         jsonrpc: "2.0",
-        error: { code: -32000, message: "Method not allowed. Send JSON-RPC requests with POST." },
+        error: {
+          code: -32000,
+          message: "Method not allowed. Send JSON-RPC requests with POST.",
+        },
         id: null,
       }),
-      { status: 405, headers: { "Content-Type": "application/json", Allow: "POST" } }
+      {
+        status: 405,
+        headers: { "Content-Type": "application/json", Allow: "POST" },
+      }
     );
   router.get("/", methodNotAllowed);
   router.delete("/", methodNotAllowed);

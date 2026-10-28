@@ -13,7 +13,9 @@ export function LegalLayout({ children }: LegalLayoutProps) {
   return (
     <MarketingLayout>
       <div className="container mx-auto max-w-[720px] px-4 pb-24 pt-10 md:pt-16">
-        <article className="blog-prose [&>h1:first-child]:mt-0 [&>h1]:text-[34px] md:[&>h1]:text-[44px]">{children}</article>
+        <article className="blog-prose [&>h1:first-child]:mt-0 [&>h1]:text-[34px] md:[&>h1]:text-[44px]">
+          {children}
+        </article>
       </div>
     </MarketingLayout>
   );

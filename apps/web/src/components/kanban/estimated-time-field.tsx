@@ -1,6 +1,11 @@
 import * as React from "react";
 import { Clock, ChevronDown } from "lucide-react";
-import { cn, TIME_PRESETS, formatTimeDisplay, parseTimeInput } from "@/lib/utils";
+import {
+  cn,
+  TIME_PRESETS,
+  formatTimeDisplay,
+  parseTimeInput,
+} from "@/lib/utils";
 import {
   Button,
   Input,
@@ -22,7 +27,9 @@ function useTimeField({ value, onChange, onComplete }: UseTimeFieldOptions) {
   const [isCustomMode, setIsCustomMode] = React.useState(false);
   const [customValue, setCustomValue] = React.useState(value);
 
-  React.useEffect(() => { setCustomValue(value); }, [value]);
+  React.useEffect(() => {
+    setCustomValue(value);
+  }, [value]);
 
   const handlePresetSelect = (preset: string) => {
     onChange(preset);
@@ -62,12 +69,12 @@ function useTimeField({ value, onChange, onComplete }: UseTimeFieldOptions) {
 }
 
 // Shared dropdown menu items
-function TimePresetItems({ 
-  value, 
-  onSelect, 
-  onCustom, 
-  onClear 
-}: { 
+function TimePresetItems({
+  value,
+  onSelect,
+  onCustom,
+  onClear,
+}: {
   value: string;
   onSelect: (v: string) => void;
   onCustom: () => void;
@@ -85,13 +92,19 @@ function TimePresetItems({
         </DropdownMenuItem>
       ))}
       <DropdownMenuSeparator />
-      <DropdownMenuItem onClick={onCustom} className="text-sm text-muted-foreground">
+      <DropdownMenuItem
+        onClick={onCustom}
+        className="text-sm text-muted-foreground"
+      >
         Custom...
       </DropdownMenuItem>
       {value && (
         <>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={onClear} className="text-sm text-muted-foreground">
+          <DropdownMenuItem
+            onClick={onClear}
+            className="text-sm text-muted-foreground"
+          >
             Clear
           </DropdownMenuItem>
         </>
@@ -122,7 +135,10 @@ function CustomTimeInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") { e.preventDefault(); onSubmit(); }
+            if (e.key === "Enter") {
+              e.preventDefault();
+              onSubmit();
+            }
             if (e.key === "Escape") onCancel();
           }}
           onBlur={onSubmit}
@@ -130,7 +146,13 @@ function CustomTimeInput({
           className="h-8 w-24 text-sm"
           autoFocus
         />
-        <Button type={buttonType} size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={onCancel}>
+        <Button
+          type={buttonType}
+          size="sm"
+          variant="ghost"
+          className="h-7 px-2 text-xs"
+          onClick={onCancel}
+        >
           Cancel
         </Button>
       </div>
@@ -150,13 +172,19 @@ interface EstimatedTimeFieldProps {
 /**
  * Estimated time field with label for task forms.
  */
-export function EstimatedTimeField({ value, onChange, onBlur }: EstimatedTimeFieldProps) {
+export function EstimatedTimeField({
+  value,
+  onChange,
+  onBlur,
+}: EstimatedTimeFieldProps) {
   const field = useTimeField({ value, onChange, onComplete: onBlur });
 
   if (field.isCustomMode) {
     return (
       <div className="space-y-1.5">
-        <Label className="text-xs font-medium text-muted-foreground">Estimated time</Label>
+        <Label className="text-xs font-medium text-muted-foreground">
+          Estimated time
+        </Label>
         <CustomTimeInput
           value={field.customValue}
           onChange={field.setCustomValue}
@@ -169,17 +197,31 @@ export function EstimatedTimeField({ value, onChange, onBlur }: EstimatedTimeFie
 
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs font-medium text-muted-foreground">Estimated time</Label>
+      <Label className="text-xs font-medium text-muted-foreground">
+        Estimated time
+      </Label>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className={cn("h-8 gap-1.5 text-sm font-normal", !value && "text-muted-foreground")}>
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn(
+              "h-8 gap-1.5 text-sm font-normal",
+              !value && "text-muted-foreground"
+            )}
+          >
             <Clock className="h-3.5 w-3.5" />
             {field.displayValue || "Add estimate"}
             <ChevronDown className="h-3 w-3 opacity-50" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-36">
-          <TimePresetItems value={value} onSelect={field.handlePresetSelect} onCustom={() => field.setIsCustomMode(true)} onClear={field.handleClear} />
+          <TimePresetItems
+            value={value}
+            onSelect={field.handlePresetSelect}
+            onCustom={() => field.setIsCustomMode(true)}
+            onClear={field.handleClear}
+          />
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -194,7 +236,10 @@ interface CompactEstimatedTimeFieldProps {
 /**
  * Compact estimated time field without label for add task modal.
  */
-export function CompactEstimatedTimeField({ value, onChange }: CompactEstimatedTimeFieldProps) {
+export function CompactEstimatedTimeField({
+  value,
+  onChange,
+}: CompactEstimatedTimeFieldProps) {
   const field = useTimeField({ value, onChange });
 
   if (field.isCustomMode) {
@@ -212,14 +257,27 @@ export function CompactEstimatedTimeField({ value, onChange }: CompactEstimatedT
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="button" variant="outline" size="sm" className={cn("h-8 gap-1.5 text-sm font-normal", !value && "text-muted-foreground")}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className={cn(
+            "h-8 gap-1.5 text-sm font-normal",
+            !value && "text-muted-foreground"
+          )}
+        >
           <Clock className="h-3.5 w-3.5" />
           {field.displayValue || "Add estimate"}
           <ChevronDown className="h-3 w-3 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-36">
-        <TimePresetItems value={value} onSelect={field.handlePresetSelect} onCustom={() => field.setIsCustomMode(true)} onClear={field.handleClear} />
+        <TimePresetItems
+          value={value}
+          onSelect={field.handlePresetSelect}
+          onCustom={() => field.setIsCustomMode(true)}
+          onClear={field.handleClear}
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );

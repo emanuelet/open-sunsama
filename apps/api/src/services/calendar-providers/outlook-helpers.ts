@@ -1,7 +1,7 @@
 /**
  * Outlook Calendar helper functions and types
  */
-import type { ExternalAttendee, ExternalEvent } from './index';
+import type { ExternalAttendee, ExternalEvent } from "./index";
 
 // Outlook API interfaces
 export interface OutlookCalendar {
@@ -61,13 +61,13 @@ export interface OutlookEvent {
   onlineMeetingUrl?: string | null;
   webLink?: string;
   changeKey?: string;
-  '@removed'?: { reason: string };
+  "@removed"?: { reason: string };
 }
 
 export interface OutlookEventsResponse {
   value?: OutlookEvent[];
-  '@odata.deltaLink'?: string;
-  '@odata.nextLink'?: string;
+  "@odata.deltaLink"?: string;
+  "@odata.nextLink"?: string;
 }
 
 export interface OutlookTokenResponse {
@@ -82,17 +82,17 @@ export interface OutlookCalendarListResponse {
 
 // Microsoft color codes mapped to hex
 export const OUTLOOK_COLORS: Record<string, string> = {
-  auto: '#0078D4',
-  lightBlue: '#8ED0FF',
-  lightGreen: '#7FD37F',
-  lightOrange: '#FFB878',
-  lightGray: '#D5D5D5',
-  lightYellow: '#FFF078',
-  lightTeal: '#7FD2D5',
-  lightPink: '#FFB3DE',
-  lightBrown: '#D5B59C',
-  lightRed: '#FF8080',
-  maxColor: '#0078D4',
+  auto: "#0078D4",
+  lightBlue: "#8ED0FF",
+  lightGreen: "#7FD37F",
+  lightOrange: "#FFB878",
+  lightGray: "#D5D5D5",
+  lightYellow: "#FFF078",
+  lightTeal: "#7FD2D5",
+  lightPink: "#FFB3DE",
+  lightBrown: "#D5B59C",
+  lightRed: "#FF8080",
+  maxColor: "#0078D4",
 };
 
 /**
@@ -101,7 +101,7 @@ export const OUTLOOK_COLORS: Record<string, string> = {
 export function getClientId(): string {
   const clientId = process.env.MICROSOFT_CLIENT_ID;
   if (!clientId) {
-    throw new Error('MICROSOFT_CLIENT_ID environment variable is required');
+    throw new Error("MICROSOFT_CLIENT_ID environment variable is required");
   }
   return clientId;
 }
@@ -112,7 +112,7 @@ export function getClientId(): string {
 export function getClientSecret(): string {
   const clientSecret = process.env.MICROSOFT_CLIENT_SECRET;
   if (!clientSecret) {
-    throw new Error('MICROSOFT_CLIENT_SECRET environment variable is required');
+    throw new Error("MICROSOFT_CLIENT_SECRET environment variable is required");
   }
   return clientSecret;
 }
@@ -120,14 +120,16 @@ export function getClientSecret(): string {
 /**
  * Map Outlook showAs status to our status type
  */
-export function mapShowAsToStatus(showAs?: string): 'confirmed' | 'tentative' | 'cancelled' {
+export function mapShowAsToStatus(
+  showAs?: string
+): "confirmed" | "tentative" | "cancelled" {
   switch (showAs) {
-    case 'tentative':
-      return 'tentative';
-    case 'free':
-      return 'tentative';
+    case "tentative":
+      return "tentative";
+    case "free":
+      return "tentative";
     default:
-      return 'confirmed';
+      return "confirmed";
   }
 }
 
@@ -136,17 +138,17 @@ export function mapShowAsToStatus(showAs?: string): 'confirmed' | 'tentative' | 
  */
 export function mapOutlookResponseStatus(
   response?: string
-): 'accepted' | 'declined' | 'tentative' | 'needsAction' | null {
+): "accepted" | "declined" | "tentative" | "needsAction" | null {
   switch (response) {
-    case 'accepted':
-      return 'accepted';
-    case 'declined':
-      return 'declined';
-    case 'tentativelyAccepted':
-      return 'tentative';
-    case 'notResponded':
-    case 'none':
-      return 'needsAction';
+    case "accepted":
+      return "accepted";
+    case "declined":
+      return "declined";
+    case "tentativelyAccepted":
+      return "tentative";
+    case "notResponded":
+    case "none":
+      return "needsAction";
     default:
       return null;
   }
@@ -155,7 +157,9 @@ export function mapOutlookResponseStatus(
 /**
  * Build RRULE string from Outlook recurrence pattern
  */
-export function buildRRuleFromOutlook(recurrence?: OutlookEvent['recurrence']): string | null {
+export function buildRRuleFromOutlook(
+  recurrence?: OutlookEvent["recurrence"]
+): string | null {
   if (!recurrence?.pattern) return null;
 
   const parts: string[] = [];
@@ -163,19 +167,19 @@ export function buildRRuleFromOutlook(recurrence?: OutlookEvent['recurrence']): 
   const range = recurrence.range;
 
   switch (pattern.type) {
-    case 'daily':
-      parts.push('FREQ=DAILY');
+    case "daily":
+      parts.push("FREQ=DAILY");
       break;
-    case 'weekly':
-      parts.push('FREQ=WEEKLY');
+    case "weekly":
+      parts.push("FREQ=WEEKLY");
       break;
-    case 'absoluteMonthly':
-    case 'relativeMonthly':
-      parts.push('FREQ=MONTHLY');
+    case "absoluteMonthly":
+    case "relativeMonthly":
+      parts.push("FREQ=MONTHLY");
       break;
-    case 'absoluteYearly':
-    case 'relativeYearly':
-      parts.push('FREQ=YEARLY');
+    case "absoluteYearly":
+    case "relativeYearly":
+      parts.push("FREQ=YEARLY");
       break;
     default:
       return null;
@@ -187,7 +191,7 @@ export function buildRRuleFromOutlook(recurrence?: OutlookEvent['recurrence']): 
 
   if (pattern.daysOfWeek?.length) {
     const days = pattern.daysOfWeek.map((d) => d.slice(0, 2).toUpperCase());
-    parts.push(`BYDAY=${days.join(',')}`);
+    parts.push(`BYDAY=${days.join(",")}`);
   }
 
   if (pattern.dayOfMonth) {
@@ -199,15 +203,15 @@ export function buildRRuleFromOutlook(recurrence?: OutlookEvent['recurrence']): 
   }
 
   if (range) {
-    if (range.type === 'endDate' && range.endDate) {
-      const until = range.endDate.replace(/-/g, '');
+    if (range.type === "endDate" && range.endDate) {
+      const until = range.endDate.replace(/-/g, "");
       parts.push(`UNTIL=${until}T235959Z`);
-    } else if (range.type === 'numbered' && range.numberOfOccurrences) {
+    } else if (range.type === "numbered" && range.numberOfOccurrences) {
       parts.push(`COUNT=${range.numberOfOccurrences}`);
     }
   }
 
-  return parts.join(';');
+  return parts.join(";");
 }
 
 /**
@@ -235,7 +239,7 @@ export function parseOutlookEvent(event: OutlookEvent): ExternalEvent | null {
   // whole day for all-day events east/west of UTC). Append Z to
   // force UTC interpretation in both branches.
   const toUtcDate = (s: string): Date =>
-    new Date(s.endsWith('Z') ? s : s + 'Z');
+    new Date(s.endsWith("Z") ? s : s + "Z");
 
   if (isAllDay) {
     startTime = toUtcDate(event.start.dateTime);
@@ -251,16 +255,16 @@ export function parseOutlookEvent(event: OutlookEvent): ExternalEvent | null {
 
   let description: string | null = null;
   if (event.body?.content) {
-    if (event.body.contentType === 'text') {
+    if (event.body.contentType === "text") {
       description = event.body.content;
     } else {
-      description = event.body.content.replace(/<[^>]*>/g, '').trim() || null;
+      description = event.body.content.replace(/<[^>]*>/g, "").trim() || null;
     }
   }
 
   return {
     externalId: event.id,
-    title: event.subject || '(No title)',
+    title: event.subject || "(No title)",
     description,
     location: event.location?.displayName ?? null,
     startTime,
@@ -286,7 +290,7 @@ export function parseOutlookEvent(event: OutlookEvent): ExternalEvent | null {
 function parseOutlookAttendees(event: OutlookEvent): ExternalAttendee[] | null {
   const organizerEmail = event.organizer?.emailAddress?.address?.toLowerCase();
   const people: ExternalAttendee[] = (event.attendees ?? [])
-    .filter((a) => a.emailAddress?.address && a.type !== 'resource')
+    .filter((a) => a.emailAddress?.address && a.type !== "resource")
     .map((a) => {
       const email = a.emailAddress!.address!;
       const isOrganizer = email.toLowerCase() === organizerEmail;
@@ -294,7 +298,7 @@ function parseOutlookAttendees(event: OutlookEvent): ExternalAttendee[] | null {
         email,
         name: a.emailAddress?.name ?? null,
         responseStatus: isOrganizer
-          ? 'accepted'
+          ? "accepted"
           : mapOutlookResponseStatus(a.status?.response),
         organizer: isOrganizer,
         self: isOrganizer && (event.isOrganizer ?? false),
@@ -307,7 +311,7 @@ function parseOutlookAttendees(event: OutlookEvent): ExternalAttendee[] | null {
     people.unshift({
       email: event.organizer!.emailAddress!.address!,
       name: event.organizer?.emailAddress?.name ?? null,
-      responseStatus: 'accepted',
+      responseStatus: "accepted",
       organizer: true,
       self: event.isOrganizer ?? false,
     });

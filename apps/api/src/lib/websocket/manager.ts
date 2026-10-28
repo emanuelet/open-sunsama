@@ -3,8 +3,8 @@
  * Tracks all active connections and handles broadcasting to users
  */
 
-import type { WebSocket } from 'ws';
-import type { WebSocketEvent } from './events.js';
+import type { WebSocket } from "ws";
+import type { WebSocketEvent } from "./events.js";
 
 interface Connection {
   ws: WebSocket;

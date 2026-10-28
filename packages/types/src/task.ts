@@ -97,7 +97,7 @@ export interface Task {
   timerAccumulatedSeconds: number;
 
   /**
-    * External objects this task is linked to — the external task it was
+   * External objects this task is linked to — the external task it was
    * imported from, a pull request attached by hand, and so on. Only
    * present on endpoints that ask for links.
    */

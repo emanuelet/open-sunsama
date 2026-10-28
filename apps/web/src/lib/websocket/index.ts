@@ -89,7 +89,10 @@ type EventHandler = (event: WebSocketEvent) => void;
 // Falls back to the API URL (http→ws, https→wss), so self-hosters only set VITE_API_URL
 const WS_URL =
   import.meta.env.VITE_WS_URL ||
-  (import.meta.env.VITE_API_URL || "http://localhost:3001").replace(/^http/, "ws");
+  (import.meta.env.VITE_API_URL || "http://localhost:3001").replace(
+    /^http/,
+    "ws"
+  );
 
 class WebSocketClient {
   private ws: WebSocket | null = null;
@@ -106,7 +109,11 @@ class WebSocketClient {
    */
   connect(token: string): void {
     // Don't reconnect if we're already connected with the same token
-    if (this.ws && this.token === token && this.ws.readyState === WebSocket.OPEN) {
+    if (
+      this.ws &&
+      this.token === token &&
+      this.ws.readyState === WebSocket.OPEN
+    ) {
       return;
     }
 
@@ -231,14 +238,20 @@ export const wsClient = new WebSocketClient();
  * Simple event emitter for preferences updates from WebSocket
  * This allows the ThemeProvider to sync preferences in realtime
  */
-type PreferencesHandler = (preferences: NonNullable<UserEvent['preferences']>) => void;
+type PreferencesHandler = (
+  preferences: NonNullable<UserEvent["preferences"]>
+) => void;
 const preferencesHandlers = new Set<PreferencesHandler>();
 
-export function subscribeToPreferencesUpdates(handler: PreferencesHandler): () => void {
+export function subscribeToPreferencesUpdates(
+  handler: PreferencesHandler
+): () => void {
   preferencesHandlers.add(handler);
   return () => preferencesHandlers.delete(handler);
 }
 
-export function emitPreferencesUpdate(preferences: NonNullable<UserEvent['preferences']>): void {
-  preferencesHandlers.forEach(handler => handler(preferences));
+export function emitPreferencesUpdate(
+  preferences: NonNullable<UserEvent["preferences"]>
+): void {
+  preferencesHandlers.forEach((handler) => handler(preferences));
 }

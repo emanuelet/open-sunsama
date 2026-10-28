@@ -33,12 +33,15 @@ let preloadPromise: Promise<RichTextEditorModule> | null = null;
 
 function importEditorModule(): Promise<RichTextEditorModule> {
   if (!preloadPromise) {
-    preloadPromise = import("./rich-text-editor") as Promise<RichTextEditorModule>;
+    preloadPromise =
+      import("./rich-text-editor") as Promise<RichTextEditorModule>;
   }
   return preloadPromise;
 }
 
-const preloadableEditor = preloadable(() => importEditorModule().then((mod) => mod.RichTextEditor));
+const preloadableEditor = preloadable(() =>
+  importEditorModule().then((mod) => mod.RichTextEditor)
+);
 const LazyEditor = preloadableEditor.Component;
 
 /**
@@ -73,7 +76,10 @@ function EditorFallback({
   // Strip basic HTML tags so the placeholder reads as plaintext while
   // Tiptap is still loading.
   const plain = value
-    ? value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()
+    ? value
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
     : "";
 
   return (

@@ -120,7 +120,9 @@ export default function IdeasPage() {
           <div className="grid h-12 w-12 place-items-center rounded-xl bg-muted text-muted-foreground">
             <LayoutGrid className="h-6 w-6" />
           </div>
-          <h2 className="text-base font-semibold">Your idea boards live here</h2>
+          <h2 className="text-base font-semibold">
+            Your idea boards live here
+          </h2>
           <p className="max-w-xs text-sm text-muted-foreground">
             Make a board per kind of thought — startup ideas, movies, someday
             projects.

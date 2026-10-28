@@ -7,7 +7,7 @@
  * Convert time string (HH:MM) to minutes since midnight
  */
 function timeToMinutes(time: string): number {
-  const [hour, min] = time.split(':').map(Number);
+  const [hour, min] = time.split(":").map(Number);
   return (hour ?? 0) * 60 + (min ?? 0);
 }
 
@@ -17,7 +17,7 @@ function timeToMinutes(time: string): number {
 function minutesToTime(minutes: number): string {
   const hours = Math.floor(minutes / 60) % 24;
   const mins = minutes % 60;
-  return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+  return `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`;
 }
 
 /**
@@ -46,31 +46,40 @@ export interface ResizedBlockInfo extends BlockInfo {
 
 /**
  * Calculate cascade shifts when a time block is resized.
- * 
+ *
  * Only shifts blocks when there's ACTUAL overlap (block starts before previous ends).
  * When shifting, maintains the ORIGINAL gap between blocks.
- * 
+ *
  * @param resizedBlock - The block being resized with its new and original times
  * @param allBlocks - All blocks for the same date (excluding the resized block)
  * @returns CascadeResult with list of blocks that need to be updated
  */
 export function calculateCascadeShifts(
   resizedBlock: ResizedBlockInfo,
-  allBlocks: BlockInfo[],
+  allBlocks: BlockInfo[]
 ): CascadeResult {
-  const { id, startTime: newStartTime, endTime: newEndTime, originalStartTime, originalEndTime } = resizedBlock;
-  
+  const {
+    id,
+    startTime: newStartTime,
+    endTime: newEndTime,
+    originalStartTime,
+    originalEndTime,
+  } = resizedBlock;
+
   // Use the minimum of original and new start time to handle cases where
   // the start time moves earlier (we might need to cascade blocks that were "before")
   const filterStartMinutes = Math.min(
     timeToMinutes(originalStartTime),
     timeToMinutes(newStartTime)
   );
-  
+
   // Filter to blocks that start AFTER the minimum start time (excluding the target)
   // Sort by start time to process in order
   const subsequentBlocks = allBlocks
-    .filter((block) => block.id !== id && timeToMinutes(block.startTime) > filterStartMinutes)
+    .filter(
+      (block) =>
+        block.id !== id && timeToMinutes(block.startTime) > filterStartMinutes
+    )
     .sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
 
   const updates: Array<{ id: string; startTime: string; endTime: string }> = [];

@@ -41,20 +41,32 @@ export function useLatestRelease(): LatestRelease | null {
     let cancelled = false;
     fetch(`${api}/releases/latest`)
       .then((res) => (res.ok ? res.json() : null))
-      .then((body: { success?: boolean; data?: Record<string, { version?: string; createdAt?: string } | null> } | null) => {
-        if (cancelled || !body?.success || !body.data) return;
-        const newest = Object.values(body.data)
-          .filter((r): r is { version: string; createdAt: string } => Boolean(r?.version && r.createdAt))
-          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
-        if (!newest) return;
-        const next = { version: newest.version, date: newest.createdAt };
-        setRelease(next);
-        try {
-          sessionStorage.setItem(RELEASE_CACHE, JSON.stringify(next));
-        } catch {
-          // Storage unavailable; it refetches next visit.
+      .then(
+        (
+          body: {
+            success?: boolean;
+            data?: Record<
+              string,
+              { version?: string; createdAt?: string } | null
+            >;
+          } | null
+        ) => {
+          if (cancelled || !body?.success || !body.data) return;
+          const newest = Object.values(body.data)
+            .filter((r): r is { version: string; createdAt: string } =>
+              Boolean(r?.version && r.createdAt)
+            )
+            .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+          if (!newest) return;
+          const next = { version: newest.version, date: newest.createdAt };
+          setRelease(next);
+          try {
+            sessionStorage.setItem(RELEASE_CACHE, JSON.stringify(next));
+          } catch {
+            // Storage unavailable; it refetches next visit.
+          }
         }
-      })
+      )
       .catch(() => {});
     return () => {
       cancelled = true;
@@ -71,14 +83,21 @@ export function releasedAgo(iso: string): string {
   if (days <= 0) return "today";
   if (days === 1) return "yesterday";
   if (days < 31) return `${days} days ago`;
-  return then.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return then.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 const CELL =
   "group flex min-w-0 flex-col justify-center px-3 py-2.5 transition-colors hover:bg-muted/50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-4";
-const LABEL = "flex items-center gap-1.5 truncate text-[10.5px] font-medium uppercase tracking-widest text-muted-foreground";
-const VALUE = "mt-1 truncate font-jetbrains text-[13px] font-semibold tabular-nums text-foreground";
-const META = "mt-0.5 truncate text-[11.5px] text-muted-foreground transition-colors group-hover:text-foreground/80";
+const LABEL =
+  "flex items-center gap-1.5 truncate text-[10.5px] font-medium uppercase tracking-widest text-muted-foreground";
+const VALUE =
+  "mt-1 truncate font-jetbrains text-[13px] font-semibold tabular-nums text-foreground";
+const META =
+  "mt-0.5 truncate text-[11.5px] text-muted-foreground transition-colors group-hover:text-foreground/80";
 
 export function RepoBar({ className }: { className?: string }) {
   const stars = useGitHubStars();
@@ -104,30 +123,51 @@ export function RepoBar({ className }: { className?: string }) {
         </span>
         <span className="min-w-0">
           <span className="block truncate font-jetbrains text-[13px] text-muted-foreground">
-            {owner}/<span className="font-semibold text-foreground">{name}</span>
+            {owner}/
+            <span className="font-semibold text-foreground">{name}</span>
           </span>
           <span className="mt-0.5 flex items-center gap-1.5 text-[11.5px] text-muted-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_0_3px_rgb(16_185_129/0.15)]" aria-hidden />
+            <span
+              className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_0_3px_rgb(16_185_129/0.15)]"
+              aria-hidden
+            />
             Public repo · {openSource.language}
           </span>
         </span>
       </a>
 
       <div className="grid flex-1 grid-cols-[1fr_1.3fr_1fr] divide-x sm:grid-cols-3 divide-border/60 dark:divide-white/[0.07]">
-        <a href={`${openSource.github}/stargazers`} target="_blank" rel="noopener noreferrer" className={CELL}>
+        <a
+          href={`${openSource.github}/stargazers`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={CELL}
+        >
           <span className={LABEL}>
-            <Star className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" aria-hidden />
+            <Star
+              className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400"
+              aria-hidden
+            />
             Stars
           </span>
-          <span className={VALUE}>{stars !== null ? stars.toLocaleString("en-US") : "Star it"}</span>
+          <span className={VALUE}>
+            {stars !== null ? stars.toLocaleString("en-US") : "Star it"}
+          </span>
           <span className={META}>on GitHub</span>
         </a>
-        <a href={openSource.licenseUrl} target="_blank" rel="noopener noreferrer" className={CELL}>
+        <a
+          href={openSource.licenseUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={CELL}
+        >
           <span className={LABEL}>
             <Scale className="h-3 w-3 shrink-0" aria-hidden />
             License
           </span>
-          <span className={cn(VALUE, "font-sans tracking-[-0.01em]")}>{openSource.licenseName}</span>
+          <span className={cn(VALUE, "font-sans tracking-[-0.01em]")}>
+            {openSource.licenseName}
+          </span>
           <span className={META}>Personal use OK</span>
         </a>
         <Link to="/download" className={CELL}>
@@ -135,8 +175,12 @@ export function RepoBar({ className }: { className?: string }) {
             <Tag className="h-3 w-3 shrink-0" aria-hidden />
             Release
           </span>
-          <span className={VALUE}>{release ? `v${release.version}` : "Download"}</span>
-          <span className={META}>{release ? releasedAgo(release.date) : "Desktop apps"}</span>
+          <span className={VALUE}>
+            {release ? `v${release.version}` : "Download"}
+          </span>
+          <span className={META}>
+            {release ? releasedAgo(release.date) : "Desktop apps"}
+          </span>
         </Link>
       </div>
     </div>

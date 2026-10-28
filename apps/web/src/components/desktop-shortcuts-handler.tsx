@@ -25,7 +25,9 @@ interface DesktopShortcutsHandlerProps {
  * the tray and app-menu actions. The Rust side brings the window forward
  * before emitting. Renders nothing, and does nothing outside Tauri.
  */
-export function DesktopShortcutsHandler({ onAddTask }: DesktopShortcutsHandlerProps) {
+export function DesktopShortcutsHandler({
+  onAddTask,
+}: DesktopShortcutsHandlerProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -45,7 +47,8 @@ export function DesktopShortcutsHandler({ onAddTask }: DesktopShortcutsHandlerPr
         queryClient.fetchQuery({
           queryKey: taskKeys.list({ scheduledDate: today }),
           queryFn: async () =>
-            (await api.tasks.list({ scheduledDate: today, limit: 200 })).data ?? [],
+            (await api.tasks.list({ scheduledDate: today, limit: 200 })).data ??
+            [],
           staleTime: 10_000,
         }),
         queryClient.fetchQuery({
@@ -63,7 +66,10 @@ export function DesktopShortcutsHandler({ onAddTask }: DesktopShortcutsHandlerPr
       });
 
       if (target.kind === "task") {
-        void navigate({ to: "/app/focus/$taskId", params: { taskId: target.taskId } });
+        void navigate({
+          to: "/app/focus/$taskId",
+          params: { taskId: target.taskId },
+        });
       } else if (target.kind === "all-done") {
         void navigate({ to: "/app/focus/complete" });
       } else {

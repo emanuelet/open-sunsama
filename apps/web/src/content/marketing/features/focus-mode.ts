@@ -15,7 +15,10 @@ export default defineMarketingPage({
     description:
       "Open Sunsama is a focus mode app for your daily plan. Open one task full screen, run a focus timer against your estimate and see planned vs actual at night.",
   },
-  breadcrumbs: [{ label: "Features", href: "/#features" }, { label: "Focus mode" }],
+  breadcrumbs: [
+    { label: "Features", href: "/#features" },
+    { label: "Focus mode" },
+  ],
 
   hero: {
     badge: "Feature",
@@ -30,8 +33,16 @@ export default defineMarketingPage({
     },
     chips: [
       { tone: "timer", title: "0:42 / 1:30", detail: "Finalize Q4 roadmap" },
-      { tone: "block", title: "Deep work: Q4 roadmap", detail: "9:30 - 11:00 AM" },
-      { tone: "agent", title: "Claude connected", detail: "Planned 4:45, spent 5:10 today" },
+      {
+        tone: "block",
+        title: "Deep work: Q4 roadmap",
+        detail: "9:30 - 11:00 AM",
+      },
+      {
+        tone: "agent",
+        title: "Claude connected",
+        detail: "Planned 4:45, spent 5:10 today",
+      },
     ],
   },
 
@@ -76,7 +87,10 @@ export default defineMarketingPage({
           title: "Give the hard task a slot on the calendar",
           body: "Drag your most important task into a free slot, away from your meetings. That block is your protected focus time.",
           clip: "time-block",
-          link: { label: "How time blocking works", href: "/features/time-blocking" },
+          link: {
+            label: "How time blocking works",
+            href: "/features/time-blocking",
+          },
         },
         {
           icon: "timer",
@@ -115,7 +129,8 @@ export default defineMarketingPage({
           media: {
             shot: "focus",
             alt: "Open Sunsama focus mode showing a task with 0:42 of 1:30 spent, its subtasks and notes",
-            caption: "0:42 spent of a 1:30 estimate, with subtasks and notes in view.",
+            caption:
+              "0:42 spent of a 1:30 estimate, with subtasks and notes in view.",
           },
         },
         {
@@ -127,9 +142,13 @@ export default defineMarketingPage({
           media: {
             clip: "shutdown",
             alt: "Tasks checked off at the end of the day in Open Sunsama, moving into the Completed list with planned and actual time",
-            caption: "Finished tasks move to Completed with planned and actual time.",
+            caption:
+              "Finished tasks move to Completed with planned and actual time.",
           },
-          link: { label: "How to track your time", href: "/blog/how-to-track-your-time" },
+          link: {
+            label: "How to track your time",
+            href: "/blog/how-to-track-your-time",
+          },
         },
       ],
     },
@@ -188,20 +207,31 @@ export default defineMarketingPage({
         "Plan tomorrow with bigger estimates for the tasks I ran over on.",
         "Block 90 minutes of focus time for my top task tomorrow morning.",
       ],
-      tools: ["get_schedule_for_day", "list_tasks", "update_task", "create_time_block", "link_task_to_time_block"],
+      tools: [
+        "get_schedule_for_day",
+        "list_tasks",
+        "update_task",
+        "create_time_block",
+        "link_task_to_time_block",
+      ],
       clip: "ai-plan",
-      clipCaption: "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
+      clipCaption:
+        "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
       links: [
         { label: "Claude setup", href: "/docs/mcp/claude" },
         { label: "ChatGPT setup", href: "/docs/mcp/chatgpt" },
-        { label: "Plan your day with Claude", href: "/blog/plan-your-day-with-claude" },
+        {
+          label: "Plan your day with Claude",
+          href: "/blog/plan-your-day-with-claude",
+        },
       ],
     },
     {
       kind: "comparison",
       id: "compare",
       eyebrow: "Compare",
-      heading: "Open Sunsama times your tasks inside your plan, with code you can run",
+      heading:
+        "Open Sunsama times your tasks inside your plan, with code you can run",
       lead: "Sunsama and TickTick have strong focus timers too. Todoist leaves it to add-on apps. Here is how they differ.",
       columns: ["Open Sunsama", "Sunsama", "TickTick", "Todoist"],
       rows: [
@@ -241,7 +271,10 @@ export default defineMarketingPage({
             { mark: "yes", text: "Hosted" },
           ],
         },
-        { feature: "Code you can read and self-host", cells: ["yes", "no", "no", "no"] },
+        {
+          feature: "Code you can read and self-host",
+          cells: ["yes", "no", "no", "no"],
+        },
         {
           feature: "Phone",
           cells: [
@@ -286,13 +319,19 @@ export default defineMarketingPage({
         question: "What is the best focus mode app?",
         answer:
           "We build Open Sunsama, and we think it is the best pick if you plan your day first. Focus mode opens right from your plan and tracks planned vs actual time. Pick TickTick if you want Pomodoro cycles and focus stats in a to-do list.",
-        link: { label: "Best focus apps for deep work", href: "/blog/best-focus-apps-deep-work" },
+        link: {
+          label: "Best focus apps for deep work",
+          href: "/blog/best-focus-apps-deep-work",
+        },
       },
       {
         question: "Does Open Sunsama have a Pomodoro timer?",
         answer:
           "No. The focus timer counts up against your estimate and has no set work and break cycles. If you like 25-minute sprints, split a task into 25-minute estimates and take a break between them.",
-        link: { label: "Pomodoro apps with tasks", href: "/blog/best-pomodoro-apps-task-management" },
+        link: {
+          label: "Pomodoro apps with tasks",
+          href: "/blog/best-pomodoro-apps-task-management",
+        },
       },
       {
         question: "How do I start focus mode?",
@@ -355,7 +394,8 @@ export default defineMarketingPage({
       {
         kind: "persona",
         title: "For developers",
-        description: "Deep work blocks, keyboard first, and an agent in your editor.",
+        description:
+          "Deep work blocks, keyboard first, and an agent in your editor.",
         href: "/for/developers",
       },
       {
@@ -377,7 +417,8 @@ export default defineMarketingPage({
     heading: "Pick one task and start the timer",
     body: "Open it full screen, work until it's done, and let the AI agent you already use learn from your planned vs actual time.",
     shot: "focus",
-    shotAlt: "Open Sunsama focus mode with a task, its timer, subtasks and notes",
+    shotAlt:
+      "Open Sunsama focus mode with a task, its timer, subtasks and notes",
   },
 
   software: {

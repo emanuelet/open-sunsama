@@ -57,7 +57,11 @@ interface CommandItemProps {
   onClick: () => void;
 }
 
-export function CommandItem({ command, isSelected, onClick }: CommandItemProps) {
+export function CommandItem({
+  command,
+  isSelected,
+  onClick,
+}: CommandItemProps) {
   const Icon = ICON_MAP[command.icon] || Settings;
 
   return (
@@ -71,7 +75,9 @@ export function CommandItem({ command, isSelected, onClick }: CommandItemProps) 
     >
       <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
       <span className="text-[13px] flex-1 truncate">{command.title}</span>
-      {command.shortcut && <Kbd className="text-[10px]">{command.shortcut}</Kbd>}
+      {command.shortcut && (
+        <Kbd className="text-[10px]">{command.shortcut}</Kbd>
+      )}
     </button>
   );
 }

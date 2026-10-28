@@ -2,8 +2,8 @@
  * Validation schemas for releases routes
  */
 
-import { z } from 'zod';
-import { RELEASE_PLATFORMS } from '@open-sunsama/database';
+import { z } from "zod";
+import { RELEASE_PLATFORMS } from "@open-sunsama/database";
 
 /**
  * Platform schema for releases
@@ -14,11 +14,14 @@ export const platformSchema = z.enum(RELEASE_PLATFORMS);
  * Tauri target to platform mapping
  * Maps Tauri's target triple format to our platform names
  */
-export const TAURI_TARGET_MAP: Record<string, (typeof RELEASE_PLATFORMS)[number]> = {
-  'darwin-aarch64': 'macos-arm64',
-  'darwin-x86_64': 'macos-x64',
-  'linux-x86_64': 'linux',
-  'windows-x86_64': 'windows',
+export const TAURI_TARGET_MAP: Record<
+  string,
+  (typeof RELEASE_PLATFORMS)[number]
+> = {
+  "darwin-aarch64": "macos-arm64",
+  "darwin-x86_64": "macos-x64",
+  "linux-x86_64": "linux",
+  "windows-x86_64": "windows",
 };
 
 /**
@@ -26,9 +29,9 @@ export const TAURI_TARGET_MAP: Record<string, (typeof RELEASE_PLATFORMS)[number]
  * its own `{os}-{arch}` entry from a static-format response. Map each OS to its targets.
  */
 export const TAURI_OS_TARGETS: Record<string, string[]> = {
-  darwin: ['darwin-aarch64', 'darwin-x86_64'],
-  linux: ['linux-x86_64'],
-  windows: ['windows-x86_64'],
+  darwin: ["darwin-aarch64", "darwin-x86_64"],
+  linux: ["linux-x86_64"],
+  windows: ["windows-x86_64"],
 };
 
 export const TAURI_TARGETS = [
@@ -42,15 +45,29 @@ export const TAURI_TARGETS = [
 export const createReleaseSchema = z.object({
   version: z
     .string()
-    .min(1, { error: 'Version is required' })
-    .regex(/^\d+\.\d+\.\d+/, { error: 'Version must be in semver format (e.g., 1.0.0)' }),
+    .min(1, { error: "Version is required" })
+    .regex(/^\d+\.\d+\.\d+/, {
+      error: "Version must be in semver format (e.g., 1.0.0)",
+    }),
   platform: platformSchema,
-  downloadUrl: z.url({ error: 'Download URL must be a valid URL' }),
-  fileSize: z.number().int().positive({ error: 'File size must be a positive integer' }),
-  fileName: z.string().min(1, { error: 'File name is required' }),
-  sha256: z.string().length(64, { error: 'SHA256 must be 64 characters' }).optional(),
-  signature: z.preprocess((v) => v === '' ? undefined : v, z.string().optional()),
-  updaterUrl: z.preprocess((v) => v === '' ? undefined : v, z.url({ error: 'Updater URL must be a valid URL' }).optional()),
+  downloadUrl: z.url({ error: "Download URL must be a valid URL" }),
+  fileSize: z
+    .number()
+    .int()
+    .positive({ error: "File size must be a positive integer" }),
+  fileName: z.string().min(1, { error: "File name is required" }),
+  sha256: z
+    .string()
+    .length(64, { error: "SHA256 must be 64 characters" })
+    .optional(),
+  signature: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.string().optional()
+  ),
+  updaterUrl: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.url({ error: "Updater URL must be a valid URL" }).optional()
+  ),
   releaseNotes: z.string().optional(),
 });
 
@@ -77,5 +94,5 @@ export const tauriUpdateParamSchema = z.object({
   target: z.enum(TAURI_TARGETS),
   current_version: z
     .string()
-    .regex(/^\d+\.\d+\.\d+/, { error: 'Version must be in semver format' }),
+    .regex(/^\d+\.\d+\.\d+/, { error: "Version must be in semver format" }),
 });

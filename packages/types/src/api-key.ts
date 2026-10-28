@@ -14,37 +14,37 @@ export interface ApiKey {
   /** ID of the user who owns this API key */
   userId: string;
 
-  /** 
+  /**
    * Human-readable name/label for the API key.
    * Helps users identify the purpose of each key.
    */
   name: string;
 
-  /** 
+  /**
    * The API key prefix (first 8 characters).
    * Used for identification without exposing the full key.
    */
   keyPrefix: string;
 
-  /** 
+  /**
    * Hash of the full API key.
    * The actual key is only shown once upon creation.
    */
   keyHash: string;
 
-  /** 
+  /**
    * Permissions/scopes granted to this API key.
    * Defines what actions the key can perform.
    */
   scopes: ApiKeyScope[];
 
-  /** 
+  /**
    * Optional expiration date for the API key.
    * null indicates the key never expires.
    */
   expiresAt: Date | null;
 
-  /** 
+  /**
    * Timestamp of the last time this key was used.
    * null if the key has never been used.
    */
@@ -63,25 +63,25 @@ export interface ApiKey {
  */
 export type ApiKeyScope =
   /** Read-only access to tasks */
-  | 'tasks:read'
+  | "tasks:read"
   /** Full access to tasks (create, update, delete) */
-  | 'tasks:write'
+  | "tasks:write"
   /** Read-only access to time blocks */
-  | 'time-blocks:read'
+  | "time-blocks:read"
   /** Full access to time blocks (create, update, delete) */
-  | 'time-blocks:write'
+  | "time-blocks:write"
   /** Read-only access to events synced from Google, Outlook and iCloud calendars */
-  | 'calendar:read'
+  | "calendar:read"
   /** Read access to idea boards, columns, cards and checklists */
-  | 'ideas:read'
+  | "ideas:read"
   /** Create, update and delete idea boards, columns, cards and checklists */
-  | 'ideas:write'
+  | "ideas:write"
   /** Read-only access to user profile */
-  | 'user:read'
+  | "user:read"
   /** Full access to user profile (update) */
-  | 'user:write'
+  | "user:write"
   /** Full access to all resources */
-  | 'all';
+  | "all";
 
 /**
  * Input data required to create a new API key.
@@ -90,13 +90,13 @@ export interface CreateApiKeyInput {
   /** Human-readable name/label for the API key */
   name: string;
 
-  /** 
+  /**
    * Permissions/scopes to grant to this key.
    * Defaults to read-only access if not specified.
    */
   scopes?: ApiKeyScope[];
 
-  /** 
+  /**
    * Optional expiration date.
    * Omit or set to null for a non-expiring key.
    */
@@ -111,7 +111,7 @@ export interface CreateApiKeyResponse {
   /** The created API key metadata */
   apiKey: ApiKey;
 
-  /** 
+  /**
    * The full API key value.
    * IMPORTANT: This is only shown once upon creation.
    * Store it securely as it cannot be retrieved later.
@@ -130,7 +130,7 @@ export interface UpdateApiKeyInput {
   /** Updated scopes/permissions */
   scopes?: ApiKeyScope[];
 
-  /** 
+  /**
    * Updated expiration date.
    * Use null to remove expiration (make non-expiring).
    */

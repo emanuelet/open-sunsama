@@ -46,7 +46,8 @@ export interface AccessTokenInfo {
   scopes: string[];
 }
 
-const secondsFromNow = (seconds: number) => new Date(Date.now() + seconds * 1000);
+const secondsFromNow = (seconds: number) =>
+  new Date(Date.now() + seconds * 1000);
 
 export async function createAuthorizationCode(input: {
   clientId: string;
@@ -107,14 +108,25 @@ async function revokeFamily(familyId: string): Promise<void> {
   await getDb()
     .update(oauthTokens)
     .set({ revokedAt: new Date() })
-    .where(and(eq(oauthTokens.familyId, familyId), isNull(oauthTokens.revokedAt)));
+    .where(
+      and(eq(oauthTokens.familyId, familyId), isNull(oauthTokens.revokedAt))
+    );
 }
 
-function checkResource(requested: string | undefined, granted: string | null): void {
+function checkResource(
+  requested: string | undefined,
+  granted: string | null
+): void {
   if (!requested) return;
   const normalized = normalizeResource(requested);
-  if (normalized === undefined || (granted !== null && normalized !== granted)) {
-    throw new OAuthError("invalid_target", "The requested resource does not match this grant");
+  if (
+    normalized === undefined ||
+    (granted !== null && normalized !== granted)
+  ) {
+    throw new OAuthError(
+      "invalid_target",
+      "The requested resource does not match this grant"
+    );
   }
 }
 
@@ -126,7 +138,10 @@ export async function exchangeAuthorizationCode(input: {
   resource: string | undefined;
 }): Promise<TokenResponse> {
   if (!input.code || !input.codeVerifier) {
-    throw new OAuthError("invalid_request", "code and code_verifier are required");
+    throw new OAuthError(
+      "invalid_request",
+      "code and code_verifier are required"
+    );
   }
 
   const db = getDb();
@@ -142,13 +157,22 @@ export async function exchangeAuthorizationCode(input: {
   if (row.consumedAt) {
     // A replayed code means it leaked: kill anything it produced.
     await revokeFamily(row.id);
-    throw new OAuthError("invalid_grant", "Authorization code has already been used");
+    throw new OAuthError(
+      "invalid_grant",
+      "Authorization code has already been used"
+    );
   }
   if (row.expiresAt.getTime() < Date.now()) {
     throw new OAuthError("invalid_grant", "Authorization code has expired");
   }
-  if (input.redirectUri !== undefined && input.redirectUri !== row.redirectUri) {
-    throw new OAuthError("invalid_grant", "redirect_uri does not match the authorization request");
+  if (
+    input.redirectUri !== undefined &&
+    input.redirectUri !== row.redirectUri
+  ) {
+    throw new OAuthError(
+      "invalid_grant",
+      "redirect_uri does not match the authorization request"
+    );
   }
   if (!verifyPkceS256(input.codeVerifier, row.codeChallenge)) {
     throw new OAuthError("invalid_grant", "PKCE verification failed");
@@ -158,10 +182,18 @@ export async function exchangeAuthorizationCode(input: {
   const claimed = await db
     .update(oauthAuthorizationCodes)
     .set({ consumedAt: new Date() })
-    .where(and(eq(oauthAuthorizationCodes.id, row.id), isNull(oauthAuthorizationCodes.consumedAt)))
+    .where(
+      and(
+        eq(oauthAuthorizationCodes.id, row.id),
+        isNull(oauthAuthorizationCodes.consumedAt)
+      )
+    )
     .returning({ id: oauthAuthorizationCodes.id });
   if (claimed.length === 0) {
-    throw new OAuthError("invalid_grant", "Authorization code has already been used");
+    throw new OAuthError(
+      "invalid_grant",
+      "Authorization code has already been used"
+    );
   }
 
   return issueTokenPair({
@@ -198,9 +230,15 @@ export async function refreshAccessToken(input: {
     if (sinceRotation > REFRESH_REUSE_GRACE_SECONDS * 1000) {
       await revokeFamily(row.familyId);
     }
-    throw new OAuthError("invalid_grant", "Refresh token has already been used");
+    throw new OAuthError(
+      "invalid_grant",
+      "Refresh token has already been used"
+    );
   }
-  if (!row.refreshTokenExpiresAt || row.refreshTokenExpiresAt.getTime() < Date.now()) {
+  if (
+    !row.refreshTokenExpiresAt ||
+    row.refreshTokenExpiresAt.getTime() < Date.now()
+  ) {
     throw new OAuthError("invalid_grant", "Refresh token has expired");
   }
   checkResource(input.resource, row.resource);
@@ -209,7 +247,10 @@ export async function refreshAccessToken(input: {
   if (input.scope) {
     const requested = input.scope.split(/\s+/).filter(Boolean);
     if (!requested.every((s) => row.scopes.includes(s))) {
-      throw new OAuthError("invalid_scope", "Requested scope exceeds the original grant");
+      throw new OAuthError(
+        "invalid_scope",
+        "Requested scope exceeds the original grant"
+      );
     }
     scopes = requested;
   }
@@ -220,7 +261,10 @@ export async function refreshAccessToken(input: {
     .where(and(eq(oauthTokens.id, row.id), isNull(oauthTokens.rotatedAt)))
     .returning({ id: oauthTokens.id });
   if (claimed.length === 0) {
-    throw new OAuthError("invalid_grant", "Refresh token has already been used");
+    throw new OAuthError(
+      "invalid_grant",
+      "Refresh token has already been used"
+    );
   }
 
   return issueTokenPair({
@@ -233,7 +277,9 @@ export async function refreshAccessToken(input: {
 }
 
 /** Validate a bearer access token. Returns null when missing, expired, or revoked. */
-export async function validateAccessToken(token: string): Promise<AccessTokenInfo | null> {
+export async function validateAccessToken(
+  token: string
+): Promise<AccessTokenInfo | null> {
   if (!token.startsWith(ACCESS_TOKEN_PREFIX)) return null;
 
   const db = getDb();
@@ -255,7 +301,10 @@ export async function validateAccessToken(token: string): Promise<AccessTokenInf
 
   // Throttle the bookkeeping write to once a minute per token.
   if (!row.lastUsedAt || Date.now() - row.lastUsedAt.getTime() > 60_000) {
-    await db.update(oauthTokens).set({ lastUsedAt: new Date() }).where(eq(oauthTokens.id, row.id));
+    await db
+      .update(oauthTokens)
+      .set({ lastUsedAt: new Date() })
+      .where(eq(oauthTokens.id, row.id));
   }
 
   return {
@@ -267,12 +316,19 @@ export async function validateAccessToken(token: string): Promise<AccessTokenInf
 }
 
 /** RFC 7009: revoking either token of a pair revokes the whole grant. */
-export async function revokeToken(token: string, clientId: string): Promise<void> {
+export async function revokeToken(
+  token: string,
+  clientId: string
+): Promise<void> {
   const hash = sha256Hex(token);
   const column = token.startsWith(REFRESH_TOKEN_PREFIX)
     ? oauthTokens.refreshTokenHash
     : oauthTokens.accessTokenHash;
-  const [row] = await getDb().select().from(oauthTokens).where(eq(column, hash)).limit(1);
+  const [row] = await getDb()
+    .select()
+    .from(oauthTokens)
+    .where(eq(column, hash))
+    .limit(1);
   if (row && row.clientId === clientId) {
     await revokeFamily(row.familyId);
   }
@@ -290,7 +346,9 @@ export interface OAuthConnection {
 }
 
 /** Apps the user has authorized that still hold a usable grant. */
-export async function listConnections(userId: string): Promise<OAuthConnection[]> {
+export async function listConnections(
+  userId: string
+): Promise<OAuthConnection[]> {
   const rows = await getDb()
     .select({ token: oauthTokens, client: oauthClients })
     .from(oauthTokens)
@@ -310,7 +368,10 @@ export async function listConnections(userId: string): Promise<OAuthConnection[]
     const existing = byClient.get(client.clientId);
     const lastUsed = token.lastUsedAt?.toISOString() ?? null;
     if (existing) {
-      if (lastUsed && (!existing.lastUsedAt || lastUsed > existing.lastUsedAt)) {
+      if (
+        lastUsed &&
+        (!existing.lastUsedAt || lastUsed > existing.lastUsedAt)
+      ) {
         existing.lastUsedAt = lastUsed;
       }
       if (token.createdAt.toISOString() < existing.connectedAt) {
@@ -319,7 +380,9 @@ export async function listConnections(userId: string): Promise<OAuthConnection[]
       continue;
     }
     const verifiedDomain =
-      client.registrationType === "cimd" ? new URL(client.clientId).hostname : null;
+      client.registrationType === "cimd"
+        ? new URL(client.clientId).hostname
+        : null;
     byClient.set(client.clientId, {
       clientId: client.clientId,
       clientName: client.clientName || verifiedDomain || "Unnamed app",
@@ -335,12 +398,17 @@ export async function listConnections(userId: string): Promise<OAuthConnection[]
 }
 
 /** Disconnect an app: revoke every token the user granted it. */
-export async function revokeConnection(userId: string, clientId: string): Promise<number> {
+export async function revokeConnection(
+  userId: string,
+  clientId: string
+): Promise<number> {
   const db = getDb();
   const families = await db
     .selectDistinct({ familyId: oauthTokens.familyId })
     .from(oauthTokens)
-    .where(and(eq(oauthTokens.userId, userId), eq(oauthTokens.clientId, clientId)));
+    .where(
+      and(eq(oauthTokens.userId, userId), eq(oauthTokens.clientId, clientId))
+    );
   if (families.length === 0) return 0;
   const revoked = await db
     .update(oauthTokens)

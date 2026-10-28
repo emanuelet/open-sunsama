@@ -2,50 +2,51 @@ import { Link } from "@tanstack/react-router";
 import { Command, Github } from "lucide-react";
 import { GITHUB_URL } from "./site-header";
 
-const FOOTER_COLUMNS: Array<{ title: string; links: Array<[string, string]> }> = [
-  {
-    title: "Product",
-    links: [
-      ["Time blocking", "/features/time-blocking"],
-      ["Kanban board", "/features/kanban"],
-      ["Focus mode", "/features/focus-mode"],
-      ["Calendar sync", "/features/calendar-sync"],
-      ["AI and MCP", "/features/ai-integration"],
-      ["Command palette", "/features/command-palette"],
-      ["Download", "/download"],
-    ],
-  },
-  {
-    title: "Compare",
-    links: [
-      ["Sunsama alternative", "/alternative/sunsama"],
-      ["Motion alternative", "/alternative/motion"],
-      ["Akiflow alternative", "/alternative/akiflow"],
-      ["Reclaim alternative", "/alternative/reclaim"],
-      ["Todoist alternative", "/alternative/todoist"],
-    ],
-  },
-  {
-    title: "For",
-    links: [
-      ["Developers", "/for/developers"],
-      ["Remote workers", "/for/remote-workers"],
-      ["ADHD", "/for/adhd"],
-      ["Open-source task manager", "/open-source-task-manager"],
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      ["Docs", "/docs"],
-      ["Connect your AI", "/docs/mcp/overview"],
-      ["Self-hosting", "/docs/self-hosting/docker"],
-      ["Blog", "/blog"],
-      ["Privacy", "/privacy"],
-      ["Terms", "/terms"],
-    ],
-  },
-];
+const FOOTER_COLUMNS: Array<{ title: string; links: Array<[string, string]> }> =
+  [
+    {
+      title: "Product",
+      links: [
+        ["Time blocking", "/features/time-blocking"],
+        ["Kanban board", "/features/kanban"],
+        ["Focus mode", "/features/focus-mode"],
+        ["Calendar sync", "/features/calendar-sync"],
+        ["AI and MCP", "/features/ai-integration"],
+        ["Command palette", "/features/command-palette"],
+        ["Download", "/download"],
+      ],
+    },
+    {
+      title: "Compare",
+      links: [
+        ["Sunsama alternative", "/alternative/sunsama"],
+        ["Motion alternative", "/alternative/motion"],
+        ["Akiflow alternative", "/alternative/akiflow"],
+        ["Reclaim alternative", "/alternative/reclaim"],
+        ["Todoist alternative", "/alternative/todoist"],
+      ],
+    },
+    {
+      title: "For",
+      links: [
+        ["Developers", "/for/developers"],
+        ["Remote workers", "/for/remote-workers"],
+        ["ADHD", "/for/adhd"],
+        ["Open-source task manager", "/open-source-task-manager"],
+      ],
+    },
+    {
+      title: "Resources",
+      links: [
+        ["Docs", "/docs"],
+        ["Connect your AI", "/docs/mcp/overview"],
+        ["Self-hosting", "/docs/self-hosting/docker"],
+        ["Blog", "/blog"],
+        ["Privacy", "/privacy"],
+        ["Terms", "/terms"],
+      ],
+    },
+  ];
 
 const LINK =
   "rounded-sm text-[13px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring";
@@ -57,7 +58,11 @@ export function SiteFooter() {
       <div className="container mx-auto grid max-w-6xl gap-10 px-4 sm:grid-cols-2 md:grid-cols-[1.3fr_repeat(4,1fr)]">
         <div className="sm:col-span-2 md:col-span-1">
           <Link to="/" className="flex items-center gap-2">
-            <img src="/open-sunsama-logo.png" alt="Open Sunsama" className="h-7 w-7 rounded-lg object-cover" />
+            <img
+              src="/open-sunsama-logo.png"
+              alt="Open Sunsama"
+              className="h-7 w-7 rounded-lg object-cover"
+            />
             <span className="text-[14px] font-semibold">Open Sunsama</span>
           </Link>
           <p className="mt-3 max-w-[240px] text-[13px] leading-relaxed text-muted-foreground">
@@ -75,11 +80,17 @@ export function SiteFooter() {
         </div>
         {FOOTER_COLUMNS.map((column) => (
           <nav key={column.title} aria-label={column.title}>
-            <p className="text-[12px] font-semibold uppercase tracking-wider text-foreground/70">{column.title}</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-foreground/70">
+              {column.title}
+            </p>
             <ul className="mt-3 space-y-2">
               {column.links.map(([label, href]) => (
                 <li key={href}>
-                  <Link to={href} search={href === "/blog" ? {} : undefined} className={LINK}>
+                  <Link
+                    to={href}
+                    search={href === "/blog" ? {} : undefined}
+                    className={LINK}
+                  >
                     {label}
                   </Link>
                 </li>

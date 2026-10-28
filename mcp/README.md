@@ -82,10 +82,10 @@ Or create one with custom scopes:
 
 ### Environment Variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `OPENSUNSAMA_API_KEY` | Yes | - | Your API key starting with `os_` |
-| `OPENSUNSAMA_API_URL` | No | `https://api.opensunsama.com` | API server URL |
+| Variable              | Required | Default                       | Description                      |
+| --------------------- | -------- | ----------------------------- | -------------------------------- |
+| `OPENSUNSAMA_API_KEY` | Yes      | -                             | Your API key starting with `os_` |
+| `OPENSUNSAMA_API_URL` | No       | `https://api.opensunsama.com` | API server URL                   |
 
 ### Self-Hosted / Local Development
 
@@ -206,51 +206,51 @@ If you prefer Bun over Node.js:
 
 ### Task Management
 
-| Tool | Description |
-|------|-------------|
-| `list_tasks` | List tasks with filters (date, range, completion status, backlog) |
-| `get_task` | Get detailed information about a specific task |
-| `create_task` | Create a new task with title, notes, priority, schedule |
-| `update_task` | Update task fields (title, notes, priority, schedule) |
-| `complete_task` | Mark a task as complete |
-| `uncomplete_task` | Reopen a completed task |
-| `delete_task` | Permanently delete a task |
-| `schedule_task` | Move a task to a specific date or backlog |
-| `reorder_tasks` | Reorder tasks within a date |
+| Tool              | Description                                                       |
+| ----------------- | ----------------------------------------------------------------- |
+| `list_tasks`      | List tasks with filters (date, range, completion status, backlog) |
+| `get_task`        | Get detailed information about a specific task                    |
+| `create_task`     | Create a new task with title, notes, priority, schedule           |
+| `update_task`     | Update task fields (title, notes, priority, schedule)             |
+| `complete_task`   | Mark a task as complete                                           |
+| `uncomplete_task` | Reopen a completed task                                           |
+| `delete_task`     | Permanently delete a task                                         |
+| `schedule_task`   | Move a task to a specific date or backlog                         |
+| `reorder_tasks`   | Reorder tasks within a date                                       |
 
 ### Subtask Management
 
-| Tool | Description |
-|------|-------------|
-| `list_subtasks` | List all subtasks for a task |
-| `create_subtask` | Add a subtask to a task |
-| `toggle_subtask` | Toggle subtask completion |
+| Tool             | Description                   |
+| ---------------- | ----------------------------- |
+| `list_subtasks`  | List all subtasks for a task  |
+| `create_subtask` | Add a subtask to a task       |
+| `toggle_subtask` | Toggle subtask completion     |
 | `update_subtask` | Update subtask title/position |
-| `delete_subtask` | Delete a subtask |
+| `delete_subtask` | Delete a subtask              |
 
 ### Time Block Management
 
-| Tool | Description |
-|------|-------------|
-| `list_time_blocks` | List time blocks with filters |
-| `get_time_block` | Get details of a time block |
-| `create_time_block` | Schedule a new time block |
-| `update_time_block` | Update time block details |
-| `delete_time_block` | Remove a time block |
-| `link_task_to_time_block` | Link/unlink a task to a time block |
-| `get_schedule_for_day` | Get a day's calendar events and time blocks in one view |
+| Tool                      | Description                                             |
+| ------------------------- | ------------------------------------------------------- |
+| `list_time_blocks`        | List time blocks with filters                           |
+| `get_time_block`          | Get details of a time block                             |
+| `create_time_block`       | Schedule a new time block                               |
+| `update_time_block`       | Update time block details                               |
+| `delete_time_block`       | Remove a time block                                     |
+| `link_task_to_time_block` | Link/unlink a task to a time block                      |
+| `get_schedule_for_day`    | Get a day's calendar events and time blocks in one view |
 
 ### Calendar Events (read-only)
 
-| Tool | Description |
-|------|-------------|
+| Tool                   | Description                                                                        |
+| ---------------------- | ---------------------------------------------------------------------------------- |
 | `list_calendar_events` | List events from connected Google, Outlook and iCloud calendars for a day or range |
 
 ### User Profile
 
-| Tool | Description |
-|------|-------------|
-| `get_user_profile` | Get current user's profile |
+| Tool                  | Description                        |
+| --------------------- | ---------------------------------- |
+| `get_user_profile`    | Get current user's profile         |
 | `update_user_profile` | Update name, timezone, preferences |
 
 ## Example Interactions
@@ -258,6 +258,7 @@ If you prefer Bun over Node.js:
 Once configured, you can ask your AI assistant things like:
 
 ### Task Management
+
 - "What tasks do I have scheduled for today?"
 - "Create a task to review the quarterly report with high priority"
 - "Mark my 'Send emails' task as complete"
@@ -265,17 +266,20 @@ Once configured, you can ask your AI assistant things like:
 - "Show me all my backlog tasks"
 
 ### Time Blocking
+
 - "Block 2 hours tomorrow morning for deep work starting at 9 AM"
 - "What does my schedule look like for Friday?"
 - "Link my 'Write documentation' task to my 2 PM time block"
 - "Delete the meeting block I created for today"
 
 ### Subtasks
+
 - "Add subtasks to my 'Prepare presentation' task: create slides, add charts, practice delivery"
 - "Check off the 'create slides' subtask"
 - "What subtasks are left on my project task?"
 
 ### Planning
+
 - "Help me plan my day around my meetings - I need to do code review and write docs"
 - "When am I free tomorrow afternoon?"
 - "Schedule my tasks for this week based on priority"
@@ -390,17 +394,17 @@ bun run dev      # Watch mode for development
 
 ## API Key Scopes
 
-| Scope | Permissions |
-|-------|-------------|
-| `tasks:read` | List and view tasks |
-| `tasks:write` | Create, update, delete tasks |
-| `time-blocks:read` | List and view time blocks |
-| `time-blocks:write` | Create, update, delete time blocks |
-| `calendar:read` | List events from connected calendars |
-| `ideas:read` | List idea boards, columns, cards, and checklists |
-| `ideas:write` | Create, update, delete, and reorder ideas |
-| `user:read` | View user profile |
-| `user:write` | Update user profile |
+| Scope               | Permissions                                      |
+| ------------------- | ------------------------------------------------ |
+| `tasks:read`        | List and view tasks                              |
+| `tasks:write`       | Create, update, delete tasks                     |
+| `time-blocks:read`  | List and view time blocks                        |
+| `time-blocks:write` | Create, update, delete time blocks               |
+| `calendar:read`     | List events from connected calendars             |
+| `ideas:read`        | List idea boards, columns, cards, and checklists |
+| `ideas:write`       | Create, update, delete, and reorder ideas        |
+| `user:read`         | View user profile                                |
+| `user:write`        | Update user profile                              |
 
 ## License
 

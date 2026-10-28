@@ -1,5 +1,10 @@
 /** Read-only Todoist task source using a personal token and API v1. */
-import type { CredentialField, ExternalTask, TaskProvider, VerifiedAccount } from "./index.js";
+import type {
+  CredentialField,
+  ExternalTask,
+  TaskProvider,
+  VerifiedAccount,
+} from "./index.js";
 import {
   ProviderCredentialError,
   ProviderRateLimitError,
@@ -27,14 +32,17 @@ export class TodoistProvider implements TaskProvider {
   readonly id = "todoist";
   readonly displayName = "Todoist";
   readonly docsUrl = "https://developer.todoist.com/api/v1/";
-  readonly referenceExample = "https://app.todoist.com/app/task/buy-milk-6cF5Q2gH9P3V8d7R";
-  readonly credentialFields: CredentialField[] = [{
-    key: "token",
-    label: "Personal API token",
-    type: "password",
-    placeholder: "API token",
-    help: "Todoist → Settings → Integrations → Developer → API token",
-  }];
+  readonly referenceExample =
+    "https://app.todoist.com/app/task/buy-milk-6cF5Q2gH9P3V8d7R";
+  readonly credentialFields: CredentialField[] = [
+    {
+      key: "token",
+      label: "Personal API token",
+      type: "password",
+      placeholder: "API token",
+      help: "Todoist → Settings → Integrations → Developer → API token",
+    },
+  ];
   readonly credentialSchema = todoistCredentialSchema;
 
   async verifyCredentials(credentials: unknown): Promise<VerifiedAccount> {
@@ -51,20 +59,32 @@ export class TodoistProvider implements TaskProvider {
     return parseTodoistReference(input);
   }
 
-  async fetchTask(credentials: unknown, externalId: string): Promise<ExternalTask> {
+  async fetchTask(
+    credentials: unknown,
+    externalId: string
+  ): Promise<ExternalTask> {
     const { token } = todoistCredentialSchema.parse(credentials);
-    const task = await this.request<TodoistTask>(token, `/tasks/${encodeURIComponent(externalId)}`);
+    const task = await this.request<TodoistTask>(
+      token,
+      `/tasks/${encodeURIComponent(externalId)}`
+    );
     let project: TodoistProject | null = null;
     let section: TodoistSection | null = null;
     try {
-      project = await this.request<TodoistProject>(token, `/projects/${encodeURIComponent(task.project_id)}`);
+      project = await this.request<TodoistProject>(
+        token,
+        `/projects/${encodeURIComponent(task.project_id)}`
+      );
     } catch (error) {
       // Missing project metadata should not prevent importing a valid task.
       if (!(error instanceof ProviderTaskNotFoundError)) throw error;
     }
     if (task.section_id) {
       try {
-        section = await this.request<TodoistSection>(token, `/sections/${encodeURIComponent(task.section_id)}`);
+        section = await this.request<TodoistSection>(
+          token,
+          `/sections/${encodeURIComponent(task.section_id)}`
+        );
       } catch (error) {
         // Sections can be removed while their task is still being read.
         if (!(error instanceof ProviderTaskNotFoundError)) throw error;
@@ -80,14 +100,18 @@ export class TodoistProvider implements TaskProvider {
       this.listAll<TodoistProject>(token, "/projects"),
       this.listAll<TodoistSection>(token, "/sections"),
     ]);
-    const projectsById = new Map(projects.map((project) => [project.id, project]));
-    const sectionsById = new Map(sections.map((section) => [section.id, section]));
+    const projectsById = new Map(
+      projects.map((project) => [project.id, project])
+    );
+    const sectionsById = new Map(
+      sections.map((section) => [section.id, section])
+    );
 
     return tasks.map((task) =>
       normalizeTask(
         task,
         projectsById.get(task.project_id) ?? null,
-        task.section_id ? sectionsById.get(task.section_id) ?? null : null
+        task.section_id ? (sectionsById.get(task.section_id) ?? null) : null
       )
     );
   }
@@ -99,9 +123,16 @@ export class TodoistProvider implements TaskProvider {
     do {
       const params = new URLSearchParams({ limit: "200" });
       if (cursor) params.set("cursor", cursor);
-      const page = await this.request<TodoistPage<T>>(token, `${path}?${params}`);
+      const page = await this.request<TodoistPage<T>>(
+        token,
+        `${path}?${params}`
+      );
       if (!Array.isArray(page.results)) {
-        throw new ProviderRequestError(this.displayName, 200, "Unexpected list response");
+        throw new ProviderRequestError(
+          this.displayName,
+          200,
+          "Unexpected list response"
+        );
       }
       results.push(...page.results);
       cursor = page.next_cursor;
@@ -115,7 +146,10 @@ export class TodoistProvider implements TaskProvider {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (response.status === 401 || response.status === 403) {
-      throw new ProviderCredentialError(this.displayName, await safeText(response));
+      throw new ProviderCredentialError(
+        this.displayName,
+        await safeText(response)
+      );
     }
     if (response.status === 404) {
       throw new ProviderTaskNotFoundError(this.displayName, path);
@@ -123,11 +157,17 @@ export class TodoistProvider implements TaskProvider {
     if (response.status === 429) {
       const header = response.headers.get("retry-after");
       const retryAfter = header === null ? null : Number(header);
-      throw new ProviderRateLimitError(this.displayName,
-        retryAfter !== null && Number.isFinite(retryAfter) ? retryAfter : null);
+      throw new ProviderRateLimitError(
+        this.displayName,
+        retryAfter !== null && Number.isFinite(retryAfter) ? retryAfter : null
+      );
     }
     if (!response.ok) {
-      throw new ProviderRequestError(this.displayName, response.status, await safeText(response));
+      throw new ProviderRequestError(
+        this.displayName,
+        response.status,
+        await safeText(response)
+      );
     }
     return (await response.json()) as T;
   }

@@ -16,7 +16,10 @@
  * compatibility so consumers like `useTasks.taskKeys` keep working.
  */
 
-import type { TaskFilterInput, TimeBlockFilterInput } from "@open-sunsama/types";
+import type {
+  TaskFilterInput,
+  TimeBlockFilterInput,
+} from "@open-sunsama/types";
 
 export const taskKeys = {
   all: ["tasks"] as const,
@@ -79,7 +82,8 @@ export const integrationKeys = {
   all: ["integrations"] as const,
   providers: () => [...integrationKeys.all, "providers"] as const,
   accounts: () => [...integrationKeys.all, "accounts"] as const,
-  tasks: (accountId: string) => [...integrationKeys.all, "tasks", accountId] as const,
+  tasks: (accountId: string) =>
+    [...integrationKeys.all, "tasks", accountId] as const,
 };
 
 export const ideaBoardKeys = {

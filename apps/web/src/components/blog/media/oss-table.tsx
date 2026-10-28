@@ -46,11 +46,19 @@ export function OssTable({ ids }: { ids: string[] }) {
               <tr key={app.id}>
                 <td>
                   <a {...outboundLink(app.repo, true)}>{app.name}</a>
-                  {app.status !== "active" && <span className="oss-table-status">{STATUS_LABELS[app.status]}</span>}
+                  {app.status !== "active" && (
+                    <span className="oss-table-status">
+                      {STATUS_LABELS[app.status]}
+                    </span>
+                  )}
                 </td>
                 <td>{licenseShort(app)}</td>
                 <td className="tabular-nums">{formatStars(app.stars)}</td>
-                <td>{app.latestRelease ? `${app.latestRelease.version} (${monthYear(app.latestRelease.date)})` : "None"}</td>
+                <td>
+                  {app.latestRelease
+                    ? `${app.latestRelease.version} (${monthYear(app.latestRelease.date)})`
+                    : "None"}
+                </td>
                 <td>{platformList(app)}</td>
                 <td>{app.selfHost ?? "No"}</td>
                 <td>{app.api.length ? app.api.join(", ") : "None"}</td>
@@ -61,7 +69,8 @@ export function OssTable({ ids }: { ids: string[] }) {
         </table>
       </div>
       <figcaption className={CAPTION_CLASS}>
-        Stars, licenses and releases from each project's repository, checked {checked}. App names link to the source code.
+        Stars, licenses and releases from each project's repository, checked{" "}
+        {checked}. App names link to the source code.
       </figcaption>
     </figure>
   );

@@ -31,7 +31,9 @@ function importAddTaskModal(): Promise<AddTaskModalModule> {
   return preload;
 }
 
-const preloadableAddTaskModal = preloadable(() => importAddTaskModal().then((mod) => mod.AddTaskModal));
+const preloadableAddTaskModal = preloadable(() =>
+  importAddTaskModal().then((mod) => mod.AddTaskModal)
+);
 const LazyAddTaskModal = preloadableAddTaskModal.Component;
 
 export function prefetchAddTaskModal(): Promise<unknown> {

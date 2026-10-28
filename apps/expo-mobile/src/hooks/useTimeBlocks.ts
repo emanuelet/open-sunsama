@@ -1,21 +1,22 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type {
   TimeBlock,
   CreateTimeBlockInput,
   UpdateTimeBlockInput,
   TimeBlockFilterInput,
-} from '@open-sunsama/types';
-import { getApi } from '@/lib/api';
-import * as Haptics from 'expo-haptics';
+} from "@open-sunsama/types";
+import { getApi } from "@/lib/api";
+import * as Haptics from "expo-haptics";
 
 /**
  * Query key factory for time blocks
  */
 export const timeBlockKeys = {
-  all: ['timeBlocks'] as const,
-  lists: () => [...timeBlockKeys.all, 'list'] as const,
-  list: (filters: TimeBlockFilterInput) => [...timeBlockKeys.lists(), filters] as const,
-  details: () => [...timeBlockKeys.all, 'detail'] as const,
+  all: ["timeBlocks"] as const,
+  lists: () => [...timeBlockKeys.all, "list"] as const,
+  list: (filters: TimeBlockFilterInput) =>
+    [...timeBlockKeys.lists(), filters] as const,
+  details: () => [...timeBlockKeys.all, "detail"] as const,
   detail: (id: string) => [...timeBlockKeys.details(), id] as const,
 };
 
@@ -67,10 +68,13 @@ export function useCreateTimeBlock() {
     onSuccess: (newTimeBlock) => {
       // Invalidate and refetch time block lists
       queryClient.invalidateQueries({ queryKey: timeBlockKeys.lists() });
-      
+
       // Add the new time block to the cache
-      queryClient.setQueryData(timeBlockKeys.detail(newTimeBlock.id), newTimeBlock);
-      
+      queryClient.setQueryData(
+        timeBlockKeys.detail(newTimeBlock.id),
+        newTimeBlock
+      );
+
       // Haptic feedback
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     },
@@ -87,14 +91,23 @@ export function useUpdateTimeBlock() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: UpdateTimeBlockInput }): Promise<TimeBlock> => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateTimeBlockInput;
+    }): Promise<TimeBlock> => {
       const api = getApi();
       return await api.timeBlocks.update(id, data);
     },
     onSuccess: (updatedTimeBlock) => {
       // Update the time block in cache
-      queryClient.setQueryData(timeBlockKeys.detail(updatedTimeBlock.id), updatedTimeBlock);
-      
+      queryClient.setQueryData(
+        timeBlockKeys.detail(updatedTimeBlock.id),
+        updatedTimeBlock
+      );
+
       // Invalidate lists to ensure consistency
       queryClient.invalidateQueries({ queryKey: timeBlockKeys.lists() });
     },
@@ -119,10 +132,10 @@ export function useDeleteTimeBlock() {
     onSuccess: (deletedId) => {
       // Remove from cache
       queryClient.removeQueries({ queryKey: timeBlockKeys.detail(deletedId) });
-      
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: timeBlockKeys.lists() });
-      
+
       // Haptic feedback
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     },

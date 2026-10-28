@@ -10,7 +10,12 @@ import { Node, Extension, type AnyExtension } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Image as ImageIcon, Paperclip, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useUploadAttachment, validateFile, getFileType, type UploadResult } from "@/hooks/useUploadAttachment";
+import {
+  useUploadAttachment,
+  validateFile,
+  getFileType,
+  type UploadResult,
+} from "@/hooks/useUploadAttachment";
 import { toast } from "@/hooks/use-toast";
 import {
   ImageNodeView,
@@ -56,7 +61,10 @@ const VideoNode = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ["video", { ...HTMLAttributes, controls: true, class: "tiptap-video" }];
+    return [
+      "video",
+      { ...HTMLAttributes, controls: true, class: "tiptap-video" },
+    ];
   },
 
   addNodeView() {
@@ -169,7 +177,9 @@ const UploadPlaceholderNode = Node.create({
  * File Upload Extension
  * Handles drag & drop and paste events for file uploads
  */
-function createFileUploadExtension(onUpload: (file: File) => Promise<UploadResult>) {
+function createFileUploadExtension(
+  onUpload: (file: File) => Promise<UploadResult>
+) {
   return Extension.create({
     name: "fileUpload",
 
@@ -217,7 +227,7 @@ function createFileUploadExtension(onUpload: (file: File) => Promise<UploadResul
 
                   let node;
                   const { schema } = view.state;
-                  
+
                   if (fileType === "image" && schema.nodes.image) {
                     node = schema.nodes.image.create({
                       src: result.url,
@@ -239,7 +249,10 @@ function createFileUploadExtension(onUpload: (file: File) => Promise<UploadResul
                   }
 
                   if (node) {
-                    const transaction = view.state.tr.insert(coordinates.pos, node);
+                    const transaction = view.state.tr.insert(
+                      coordinates.pos,
+                      node
+                    );
                     view.dispatch(transaction);
                   }
                 } catch (error) {
@@ -312,7 +325,8 @@ function createFileUploadExtension(onUpload: (file: File) => Promise<UploadResul
                   }
 
                   if (node) {
-                    const transaction = view.state.tr.replaceSelectionWith(node);
+                    const transaction =
+                      view.state.tr.replaceSelectionWith(node);
                     view.dispatch(transaction);
                   }
                 } catch (error) {
@@ -402,7 +416,9 @@ export function RichTextEditor({
         class: cn(
           // Compact text like Linear - smaller font, tighter spacing
           "prose dark:prose-invert max-w-none focus:outline-hidden px-2 py-1.5",
-          variant === "plain" ? "text-[15px] leading-relaxed" : "text-[13px] leading-relaxed",
+          variant === "plain"
+            ? "text-[15px] leading-relaxed"
+            : "text-[13px] leading-relaxed",
           "prose-p:my-0.5 prose-ul:my-0.5 prose-ol:my-0.5 prose-li:my-0",
           "[&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5",
           // Compact, distinct headings (the base font is 13px)
@@ -601,7 +617,9 @@ export function RichTextEditor({
             </button>
 
             {isUploading && (
-              <span className="text-xs text-muted-foreground ml-auto">Uploading...</span>
+              <span className="text-xs text-muted-foreground ml-auto">
+                Uploading...
+              </span>
             )}
           </div>
         )}

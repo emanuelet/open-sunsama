@@ -3,7 +3,12 @@
  */
 
 export { MarketingLayout } from "./marketing-layout";
-export { SiteHeader, SkipLink, useGitHubStars, GITHUB_URL } from "./site-header";
+export {
+  SiteHeader,
+  SkipLink,
+  useGitHubStars,
+  GITHUB_URL,
+} from "./site-header";
 export { SiteFooter } from "./site-footer";
 export { PageHero } from "./page-hero";
 export { Breadcrumbs } from "./breadcrumbs";
@@ -22,5 +27,10 @@ export { RelatedLinks } from "./related-links";
 export { ClipPlayer } from "./clip-player";
 export { MediaBlock } from "./media";
 export { RichText, SmartLink } from "./rich-text";
-export { MarketingPageView, MarketingSeo, SectionRenderer, type SectionSlots } from "./marketing-page";
+export {
+  MarketingPageView,
+  MarketingSeo,
+  SectionRenderer,
+  type SectionSlots,
+} from "./marketing-page";
 export * from "./tokens";

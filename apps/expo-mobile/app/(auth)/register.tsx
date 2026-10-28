@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   View,
   Text,
@@ -9,12 +9,12 @@ import {
   ActivityIndicator,
   Alert,
   ScrollView,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
-import { useAuth } from '@/lib/auth';
-import { FormInput } from '@/components/FormInput';
-import { useThemeColors, type ThemeColors } from '@/lib/theme';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Link } from "expo-router";
+import { useAuth } from "@/lib/auth";
+import { FormInput } from "@/components/FormInput";
+import { useThemeColors, type ThemeColors } from "@/lib/theme";
 
 /**
  * Register screen
@@ -23,25 +23,25 @@ export default function RegisterScreen() {
   const colors = useThemeColors();
   const styles = createStyles(colors);
   const { register } = useAuth();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async () => {
     if (!email.trim() || !password.trim()) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      Alert.alert("Error", "Please fill in all required fields");
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert("Error", "Passwords do not match");
       return;
     }
 
     if (password.length < 8) {
-      Alert.alert('Error', 'Password must be at least 8 characters');
+      Alert.alert("Error", "Password must be at least 8 characters");
       return;
     }
 
@@ -53,25 +53,31 @@ export default function RegisterScreen() {
         name: name.trim() || undefined,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Registration failed';
-      Alert.alert('Registration Failed', message);
+      const message =
+        error instanceof Error ? error.message : "Registration failed";
+      Alert.alert("Registration Failed", message);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.content}>
             {/* Header */}
             <View style={styles.header}>
               <Text style={styles.title}>Create Account</Text>
-              <Text style={styles.subtitle}>Start organizing your tasks today</Text>
+              <Text style={styles.subtitle}>
+                Start organizing your tasks today
+              </Text>
             </View>
 
             {/* Form */}
@@ -150,32 +156,43 @@ export default function RegisterScreen() {
   );
 }
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.surface },
-  keyboardView: { flex: 1 },
-  scrollContent: { flexGrow: 1 },
-  content: { flex: 1, paddingHorizontal: 24, paddingTop: 24, paddingBottom: 32 },
-  header: { alignItems: 'center', marginBottom: 32 },
-  title: { fontSize: 28, fontWeight: '700', color: colors.text, marginBottom: 8 },
-  subtitle: { fontSize: 16, color: colors.secondary },
-  form: { gap: 20 },
-  button: {
-    height: 48,
-    backgroundColor: colors.accentFill,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonDisabled: { backgroundColor: '#a5b4fc' },
-  buttonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 32,
-  },
-  footerText: { fontSize: 14, color: colors.secondary },
-  linkText: { fontSize: 14, fontWeight: '600', color: colors.accent },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.surface },
+    keyboardView: { flex: 1 },
+    scrollContent: { flexGrow: 1 },
+    content: {
+      flex: 1,
+      paddingHorizontal: 24,
+      paddingTop: 24,
+      paddingBottom: 32,
+    },
+    header: { alignItems: "center", marginBottom: 32 },
+    title: {
+      fontSize: 28,
+      fontWeight: "700",
+      color: colors.text,
+      marginBottom: 8,
+    },
+    subtitle: { fontSize: 16, color: colors.secondary },
+    form: { gap: 20 },
+    button: {
+      height: 48,
+      backgroundColor: colors.accentFill,
+      borderRadius: 8,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 8,
+    },
+    buttonDisabled: { backgroundColor: "#a5b4fc" },
+    buttonText: { fontSize: 16, fontWeight: "600", color: "#fff" },
+    footer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 8,
+      marginTop: 32,
+    },
+    footerText: { fontSize: 14, color: colors.secondary },
+    linkText: { fontSize: 14, fontWeight: "600", color: colors.accent },
+  });

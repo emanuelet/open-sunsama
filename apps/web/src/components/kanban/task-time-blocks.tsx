@@ -18,9 +18,7 @@ export function TimeBlockItem({ timeBlock }: TimeBlockItemProps) {
   return (
     <div className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2">
       <div>
-        <p className="text-sm font-medium">
-          {format(startTime, "EEE, MMM d")}
-        </p>
+        <p className="text-sm font-medium">{format(startTime, "EEE, MMM d")}</p>
         <p className="text-xs text-muted-foreground">
           {format(startTime, "h:mm a")} - {format(endTime, "h:mm a")}
         </p>

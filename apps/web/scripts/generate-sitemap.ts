@@ -225,7 +225,13 @@ async function main() {
   for (const { page } of marketingPages) {
     const existing = entries.find((entry) => entry.loc === page.path);
     if (existing) existing.lastmod = page.updated;
-    else entries.push({ loc: page.path, lastmod: page.updated, changefreq: "weekly", priority: 0.8 });
+    else
+      entries.push({
+        loc: page.path,
+        lastmod: page.updated,
+        changefreq: "weekly",
+        priority: 0.8,
+      });
   }
 
   // Add docs pages (priority 0.6)
@@ -246,7 +252,8 @@ async function main() {
 
   // Add blog posts (priority 0.7). lastmod is the frontmatter `updated ?? date`.
   const blogPosts = readBlogPosts();
-  const toDay = (iso: string) => new Date(iso).toISOString().split("T")[0] ?? "";
+  const toDay = (iso: string) =>
+    new Date(iso).toISOString().split("T")[0] ?? "";
 
   for (const { slug, frontmatter } of blogPosts) {
     entries.push({
@@ -260,10 +267,11 @@ async function main() {
   // The blog index changes whenever a post does
   const blogIndex = entries.find((entry) => entry.loc === "/blog");
   if (blogIndex && blogPosts.length) {
-    blogIndex.lastmod = blogPosts
-      .map((post) => toDay(lastUpdated(post.frontmatter)))
-      .sort()
-      .at(-1) ?? "";
+    blogIndex.lastmod =
+      blogPosts
+        .map((post) => toDay(lastUpdated(post.frontmatter)))
+        .sort()
+        .at(-1) ?? "";
   }
 
   // Sort entries by priority (descending) then by loc (alphabetically)
@@ -282,7 +290,9 @@ async function main() {
 
   console.log(`Generated sitemap.xml with ${entries.length} URLs`);
   console.log(`  - Static pages: ${STATIC_PAGES.length}`);
-  console.log(`  - Marketing pages with content modules: ${marketingPages.length}`);
+  console.log(
+    `  - Marketing pages with content modules: ${marketingPages.length}`
+  );
   console.log(`  - Docs: ${docFiles.length}`);
   console.log(`  - Blog posts: ${blogPosts.length}`);
   console.log(`\nSitemap written to: ${sitemapPath}`);

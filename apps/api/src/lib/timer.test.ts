@@ -24,22 +24,38 @@ describe("timerSeconds", () => {
 
   it("resumes from the exact seconds after a stop", () => {
     expect(
-      timerSeconds({ timerStartedAt: null, timerAccumulatedSeconds: 65, actualMins: 2 })
+      timerSeconds({
+        timerStartedAt: null,
+        timerAccumulatedSeconds: 65,
+        actualMins: 2,
+      })
     ).toBe(65);
   });
 
   it("uses a manual edit of actual time over stale seconds", () => {
     expect(
-      timerSeconds({ timerStartedAt: null, timerAccumulatedSeconds: 65, actualMins: 30 })
+      timerSeconds({
+        timerStartedAt: null,
+        timerAccumulatedSeconds: 65,
+        actualMins: 30,
+      })
     ).toBe(1800);
   });
 
   it("starts from actual minutes when there are no seconds", () => {
     expect(
-      timerSeconds({ timerStartedAt: null, timerAccumulatedSeconds: 0, actualMins: 5 })
+      timerSeconds({
+        timerStartedAt: null,
+        timerAccumulatedSeconds: 0,
+        actualMins: 5,
+      })
     ).toBe(300);
     expect(
-      timerSeconds({ timerStartedAt: null, timerAccumulatedSeconds: 0, actualMins: null })
+      timerSeconds({
+        timerStartedAt: null,
+        timerAccumulatedSeconds: 0,
+        actualMins: null,
+      })
     ).toBe(0);
   });
 });

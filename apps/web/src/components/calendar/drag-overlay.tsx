@@ -14,11 +14,11 @@ interface DragOverlayProps {
 /**
  * DragOverlay - Floating preview shown while dragging tasks or blocks
  */
-export function DragOverlay({
-  dragState,
-  dropPreview,
-}: DragOverlayProps) {
-  const [position, setPosition] = React.useState<{ x: number; y: number } | null>(null);
+export function DragOverlay({ dragState, dropPreview }: DragOverlayProps) {
+  const [position, setPosition] = React.useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   // Track mouse position for floating preview
   React.useEffect(() => {
@@ -103,9 +103,7 @@ function TaskDragPreview({ task, dropPreview }: TaskDragPreviewProps) {
     >
       <div className="p-3">
         {/* Task title */}
-        <p className="text-sm font-medium truncate">
-          {task.title}
-        </p>
+        <p className="text-sm font-medium truncate">{task.title}</p>
 
         {/* Duration info */}
         {task.estimatedMins && (
@@ -141,7 +139,11 @@ interface BlockDragPreviewProps {
   dragType: "move-block" | "resize-top" | "resize-bottom";
 }
 
-function BlockDragPreview({ block, dropPreview, dragType }: BlockDragPreviewProps) {
+function BlockDragPreview({
+  block,
+  dropPreview,
+  dragType,
+}: BlockDragPreviewProps) {
   const isResizing = dragType === "resize-top" || dragType === "resize-bottom";
 
   return (
@@ -176,10 +178,7 @@ function BlockDragPreview({ block, dropPreview, dragType }: BlockDragPreviewProp
       {/* New time preview */}
       {dropPreview && (
         <div
-          className={cn(
-            "border-t px-3 py-2",
-            !block.color && "bg-accent/50"
-          )}
+          className={cn("border-t px-3 py-2", !block.color && "bg-accent/50")}
           style={{
             borderColor: block.color ? "rgba(255,255,255,0.2)" : undefined,
             backgroundColor: block.color ? "rgba(0,0,0,0.2)" : undefined,
@@ -273,7 +272,11 @@ interface TimeSlotHighlightProps {
   color?: string;
 }
 
-export function TimeSlotHighlight({ top, height, color }: TimeSlotHighlightProps) {
+export function TimeSlotHighlight({
+  top,
+  height,
+  color,
+}: TimeSlotHighlightProps) {
   return (
     <div
       className="absolute left-0 right-0 border-2 border-dashed rounded-md pointer-events-none"
@@ -281,9 +284,7 @@ export function TimeSlotHighlight({ top, height, color }: TimeSlotHighlightProps
         top: `${top}px`,
         height: `${height}px`,
         borderColor: color ?? "hsl(var(--primary))",
-        backgroundColor: color
-          ? `${color}20`
-          : "hsl(var(--primary) / 0.1)",
+        backgroundColor: color ? `${color}20` : "hsl(var(--primary) / 0.1)",
       }}
     />
   );

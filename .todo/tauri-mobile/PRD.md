@@ -3,6 +3,7 @@
 ## Problem
 
 The current Expo mobile app at `apps/mobile` has limited features compared to the web app. Users expect feature parity across platforms, but maintaining two separate codebases (React web + React Native) creates:
+
 - **Feature lag**: Mobile lacks rich text editing, command palette, attachment uploads, and other web features
 - **Code duplication**: UI components must be rebuilt for React Native
 - **Inconsistent UX**: Different implementations lead to different behavior
@@ -12,12 +13,14 @@ The current Expo mobile app at `apps/mobile` has limited features compared to th
 Replace the Expo mobile app with a **Tauri v2 mobile app** that wraps the existing React web app. Tauri v2 supports iOS and Android mobile platforms using the same architecture as the desktop app.
 
 **Benefits:**
+
 - **100% feature parity**: Same web app, same features on mobile
 - **Zero UI code duplication**: Single React codebase for web, desktop, and mobile
 - **Shared Rust backend**: Reuse notification, storage, and native API code from desktop
 - **Faster iteration**: Web changes automatically appear on all platforms
 
 **Approach:**
+
 1. Rename `apps/mobile` → `apps/expo-mobile` (keep as backup/fallback)
 2. Create new `apps/mobile` with Tauri v2 mobile configuration
 3. Share Rust backend code with desktop where applicable
@@ -97,6 +100,7 @@ apps/mobile/
 ### Mobile-Specific Configuration
 
 **tauri.conf.json**:
+
 ```json
 {
   "$schema": "https://schema.tauri.app/config/2",
@@ -129,6 +133,7 @@ apps/mobile/
 ```
 
 **Cargo.toml**:
+
 ```toml
 [package]
 name = "open-sunsama-mobile"
@@ -161,6 +166,7 @@ tauri = { version = "2", features = ["mobile", "devtools"] }
 ```
 
 **package.json**:
+
 ```json
 {
   "name": "@open-sunsama/mobile",
@@ -195,11 +201,13 @@ tauri = { version = "2", features = ["mobile", "devtools"] }
 ### iOS Configuration
 
 **Required Capabilities** (configured in Xcode project at `src-tauri/gen/apple/`):
+
 - Push Notifications
 - Background Modes (remote notifications, background fetch)
 - Associated Domains (for universal links)
 
 **Info.plist additions**:
+
 ```xml
 <key>CFBundleURLTypes</key>
 <array>
@@ -217,12 +225,14 @@ tauri = { version = "2", features = ["mobile", "devtools"] }
 ```
 
 **App Icons** (`src-tauri/icons/ios/`):
+
 - AppIcon-20x20@1x.png through AppIcon-1024x1024@1x.png
 - All required sizes for iOS app store
 
 ### Android Configuration
 
 **AndroidManifest.xml additions**:
+
 ```xml
 <intent-filter android:autoVerify="true">
   <action android:name="android.intent.action.VIEW" />
@@ -233,6 +243,7 @@ tauri = { version = "2", features = ["mobile", "devtools"] }
 ```
 
 **App Icons** (`src-tauri/icons/android/`):
+
 - mipmap-mdpi through mipmap-xxxhdpi
 - Adaptive icon with foreground/background layers
 
@@ -272,6 +283,7 @@ Alternatively, keep platform-specific code separate for simplicity, extracting t
 ### Monorepo Configuration Updates
 
 **turbo.json** additions:
+
 ```json
 {
   "tasks": {
@@ -305,6 +317,7 @@ Alternatively, keep platform-specific code separate for simplicity, extracting t
 ```
 
 **Root package.json** script updates:
+
 ```json
 {
   "scripts": {
@@ -320,33 +333,36 @@ Alternatively, keep platform-specific code separate for simplicity, extracting t
 ### Web App Mobile Detection
 
 **`apps/web/src/lib/mobile.ts`**:
+
 ```typescript
-import { invoke } from '@tauri-apps/api/core';
+import { invoke } from "@tauri-apps/api/core";
 
 export async function isTauriMobile(): Promise<boolean> {
-  if (typeof window === 'undefined') return false;
-  if (!('__TAURI__' in window)) return false;
-  
+  if (typeof window === "undefined") return false;
+  if (!("__TAURI__" in window)) return false;
+
   try {
-    return await invoke<boolean>('is_mobile');
+    return await invoke<boolean>("is_mobile");
   } catch {
     return false;
   }
 }
 
 export async function triggerHaptic(
-  type: 'light' | 'medium' | 'heavy' | 'selection' | 'success' | 'warning' | 'error'
+  type:
+    "light" | "medium" | "heavy" | "selection" | "success" | "warning" | "error"
 ): Promise<void> {
   if (await isTauriMobile()) {
-    await invoke('trigger_haptic', { type });
+    await invoke("trigger_haptic", { type });
   }
 }
 ```
 
 **`apps/web/src/hooks/useMobile.ts`**:
+
 ```typescript
-import { useEffect, useState } from 'react';
-import { isTauriMobile, triggerHaptic } from '@/lib/mobile';
+import { useEffect, useState } from "react";
+import { isTauriMobile, triggerHaptic } from "@/lib/mobile";
 
 export function useMobile() {
   const [isMobile, setIsMobile] = useState(false);

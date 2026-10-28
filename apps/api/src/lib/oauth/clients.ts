@@ -6,7 +6,12 @@
 
 import { isIP } from "node:net";
 import { createRemoteJWKSet, jwtVerify } from "jose";
-import { getDb, eq, oauthClients, type OAuthClient } from "@open-sunsama/database";
+import {
+  getDb,
+  eq,
+  oauthClients,
+  type OAuthClient,
+} from "@open-sunsama/database";
 import {
   CIMD_CACHE_SECONDS,
   CLIENT_ID_PREFIX,
@@ -30,7 +35,8 @@ const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 const CIMD_MAX_BYTES = 64 * 1024;
 const CIMD_FETCH_TIMEOUT_MS = 5000;
 
-type TokenAuthMethod = "none" | "client_secret_basic" | "client_secret_post" | "private_key_jwt";
+type TokenAuthMethod =
+  "none" | "client_secret_basic" | "client_secret_post" | "private_key_jwt";
 
 /**
  * A redirect URI is acceptable when it is HTTPS, an http loopback address
@@ -55,7 +61,10 @@ export function isAllowedRedirectUri(value: string): boolean {
  * and VS Code bind an ephemeral port per session and register the portless
  * URI (RFC 8252 §7.3).
  */
-export function redirectUriMatches(registered: readonly string[], requested: string): boolean {
+export function redirectUriMatches(
+  registered: readonly string[],
+  requested: string
+): boolean {
   if (registered.includes(requested)) return true;
 
   let req: URL;
@@ -64,7 +73,8 @@ export function redirectUriMatches(registered: readonly string[], requested: str
   } catch {
     return false;
   }
-  if (req.protocol !== "http:" || !LOOPBACK_HOSTS.has(req.hostname)) return false;
+  if (req.protocol !== "http:" || !LOOPBACK_HOSTS.has(req.hostname))
+    return false;
 
   return registered.some((candidate) => {
     try {
@@ -97,9 +107,14 @@ function isPublicHostname(hostname: string): boolean {
   const host = hostname.toLowerCase().replace(/^\[|\]$/g, "");
   if (isIP(host)) return false;
   if (!host.includes(".")) return false;
-  return !["localhost", ".local", ".localhost", ".internal", ".lan", ".home.arpa"].some(
-    (suffix) => host === suffix || host.endsWith(suffix)
-  );
+  return ![
+    "localhost",
+    ".local",
+    ".localhost",
+    ".internal",
+    ".lan",
+    ".home.arpa",
+  ].some((suffix) => host === suffix || host.endsWith(suffix));
 }
 
 interface ClientMetadataDocument {
@@ -122,62 +137,100 @@ function optionalHttpsUrl(value: unknown): string | null {
 }
 
 function optionalName(value: unknown): string | null {
-  return typeof value === "string" && value.trim() ? value.trim().slice(0, 255) : null;
+  return typeof value === "string" && value.trim()
+    ? value.trim().slice(0, 255)
+    : null;
 }
 
-async function fetchClientMetadataDocument(clientId: string): Promise<ClientMetadataDocument> {
+async function fetchClientMetadataDocument(
+  clientId: string
+): Promise<ClientMetadataDocument> {
   const url = new URL(clientId);
   if (!isPublicHostname(url.hostname)) {
-    throw new OAuthError("invalid_client", "Client metadata host is not allowed");
+    throw new OAuthError(
+      "invalid_client",
+      "Client metadata host is not allowed"
+    );
   }
 
   let response: Response;
   try {
     response = await fetch(url, {
-      headers: { Accept: "application/json", "User-Agent": "OpenSunsama-OAuth/1.0" },
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "OpenSunsama-OAuth/1.0",
+      },
       redirect: "error",
       signal: AbortSignal.timeout(CIMD_FETCH_TIMEOUT_MS),
     });
   } catch {
-    throw new OAuthError("invalid_client", "Could not fetch the client metadata document");
+    throw new OAuthError(
+      "invalid_client",
+      "Could not fetch the client metadata document"
+    );
   }
   if (!response.ok) {
-    throw new OAuthError("invalid_client", `Client metadata document returned ${response.status}`);
+    throw new OAuthError(
+      "invalid_client",
+      `Client metadata document returned ${response.status}`
+    );
   }
 
   const declaredLength = Number(response.headers.get("content-length"));
   if (declaredLength > CIMD_MAX_BYTES) {
-    throw new OAuthError("invalid_client", "Client metadata document is too large");
+    throw new OAuthError(
+      "invalid_client",
+      "Client metadata document is too large"
+    );
   }
   const text = await response.text();
   if (text.length > CIMD_MAX_BYTES) {
-    throw new OAuthError("invalid_client", "Client metadata document is too large");
+    throw new OAuthError(
+      "invalid_client",
+      "Client metadata document is too large"
+    );
   }
 
   let doc: Partial<ClientMetadataDocument>;
   try {
     doc = JSON.parse(text) as Partial<ClientMetadataDocument>;
   } catch {
-    throw new OAuthError("invalid_client", "Client metadata document is not valid JSON");
+    throw new OAuthError(
+      "invalid_client",
+      "Client metadata document is not valid JSON"
+    );
   }
 
   if (doc.client_id !== clientId) {
-    throw new OAuthError("invalid_client", "client_id in the metadata document does not match");
+    throw new OAuthError(
+      "invalid_client",
+      "client_id in the metadata document does not match"
+    );
   }
   if (
     !Array.isArray(doc.redirect_uris) ||
     doc.redirect_uris.length === 0 ||
-    !doc.redirect_uris.every((u) => typeof u === "string" && isAllowedRedirectUri(u))
+    !doc.redirect_uris.every(
+      (u) => typeof u === "string" && isAllowedRedirectUri(u)
+    )
   ) {
-    throw new OAuthError("invalid_client", "Client metadata document has invalid redirect_uris");
+    throw new OAuthError(
+      "invalid_client",
+      "Client metadata document has invalid redirect_uris"
+    );
   }
   return doc as ClientMetadataDocument;
 }
 
-async function upsertCimdClient(clientId: string, doc: ClientMetadataDocument): Promise<OAuthClient> {
+async function upsertCimdClient(
+  clientId: string,
+  doc: ClientMetadataDocument
+): Promise<OAuthClient> {
   const db = getDb();
   const method: TokenAuthMethod =
-    doc.token_endpoint_auth_method === "private_key_jwt" ? "private_key_jwt" : "none";
+    doc.token_endpoint_auth_method === "private_key_jwt"
+      ? "private_key_jwt"
+      : "none";
   const values = {
     clientName: optionalName(doc.client_name) ?? new URL(clientId).hostname,
     clientUri: optionalHttpsUrl(doc.client_uri),
@@ -200,7 +253,9 @@ async function upsertCimdClient(clientId: string, doc: ClientMetadataDocument): 
  * Look up a client by ID. CIMD clients are fetched on first sight and
  * refreshed daily; a stale cached copy is used if the refresh fails.
  */
-export async function resolveClient(clientId: string): Promise<OAuthClient | null> {
+export async function resolveClient(
+  clientId: string
+): Promise<OAuthClient | null> {
   if (!clientId || clientId.length > 512) return null;
 
   const db = getDb();
@@ -214,11 +269,15 @@ export async function resolveClient(clientId: string): Promise<OAuthClient | nul
 
   const fresh =
     existing?.metadataFetchedAt &&
-    Date.now() - existing.metadataFetchedAt.getTime() < CIMD_CACHE_SECONDS * 1000;
+    Date.now() - existing.metadataFetchedAt.getTime() <
+      CIMD_CACHE_SECONDS * 1000;
   if (existing && fresh) return existing;
 
   try {
-    return await upsertCimdClient(clientId, await fetchClientMetadataDocument(clientId));
+    return await upsertCimdClient(
+      clientId,
+      await fetchClientMetadataDocument(clientId)
+    );
   } catch (error) {
     if (existing) return existing;
     throw error;
@@ -237,7 +296,9 @@ export interface RegistrationRequest {
 }
 
 /** RFC 7591 dynamic client registration. Returns the registration response body. */
-export async function registerClient(body: RegistrationRequest): Promise<Record<string, unknown>> {
+export async function registerClient(
+  body: RegistrationRequest
+): Promise<Record<string, unknown>> {
   const redirectUris = body.redirect_uris;
   if (
     !Array.isArray(redirectUris) ||
@@ -245,11 +306,19 @@ export async function registerClient(body: RegistrationRequest): Promise<Record<
     redirectUris.length > 10 ||
     !redirectUris.every((u) => typeof u === "string" && u.length <= 2048)
   ) {
-    throw new OAuthError("invalid_redirect_uri", "redirect_uris must be a non-empty array of URLs");
+    throw new OAuthError(
+      "invalid_redirect_uri",
+      "redirect_uris must be a non-empty array of URLs"
+    );
   }
-  const invalid = (redirectUris as string[]).find((u) => !isAllowedRedirectUri(u));
+  const invalid = (redirectUris as string[]).find(
+    (u) => !isAllowedRedirectUri(u)
+  );
   if (invalid) {
-    throw new OAuthError("invalid_redirect_uri", `Redirect URI not allowed: ${invalid}`);
+    throw new OAuthError(
+      "invalid_redirect_uri",
+      `Redirect URI not allowed: ${invalid}`
+    );
   }
 
   const requestedMethod = body.token_endpoint_auth_method ?? "none";
@@ -266,14 +335,20 @@ export async function registerClient(body: RegistrationRequest): Promise<Record<
   const method = requestedMethod as TokenAuthMethod;
 
   const grantTypes = Array.isArray(body.grant_types)
-    ? (body.grant_types as unknown[]).filter((g): g is string => typeof g === "string")
+    ? (body.grant_types as unknown[]).filter(
+        (g): g is string => typeof g === "string"
+      )
     : ["authorization_code", "refresh_token"];
   if (!grantTypes.includes("authorization_code")) {
-    throw new OAuthError("invalid_client_metadata", "grant_types must include authorization_code");
+    throw new OAuthError(
+      "invalid_client_metadata",
+      "grant_types must include authorization_code"
+    );
   }
 
   const clientId = randomToken(CLIENT_ID_PREFIX, 16);
-  const clientSecret = method === "none" ? null : randomToken(CLIENT_SECRET_PREFIX);
+  const clientSecret =
+    method === "none" ? null : randomToken(CLIENT_SECRET_PREFIX);
   const clientName = optionalName(body.client_name);
 
   const db = getDb();
@@ -293,7 +368,9 @@ export async function registerClient(body: RegistrationRequest): Promise<Record<
 
   return {
     client_id: row!.clientId,
-    ...(clientSecret ? { client_secret: clientSecret, client_secret_expires_at: 0 } : {}),
+    ...(clientSecret
+      ? { client_secret: clientSecret, client_secret_expires_at: 0 }
+      : {}),
     client_id_issued_at: Math.floor(row!.createdAt.getTime() / 1000),
     redirect_uris: row!.redirectUris,
     token_endpoint_auth_method: method,
@@ -324,7 +401,10 @@ export function extractClientCredentials(
 
   if (authorizationHeader?.toLowerCase().startsWith("basic ")) {
     try {
-      const decoded = Buffer.from(authorizationHeader.slice(6).trim(), "base64").toString("utf8");
+      const decoded = Buffer.from(
+        authorizationHeader.slice(6).trim(),
+        "base64"
+      ).toString("utf8");
       const separator = decoded.indexOf(":");
       if (separator > 0) {
         clientId = decodeURIComponent(decoded.slice(0, separator));
@@ -345,14 +425,20 @@ export function extractClientCredentials(
   };
 }
 
-const JWT_BEARER_ASSERTION = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+const JWT_BEARER_ASSERTION =
+  "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
 const remoteJwks = new Map<string, ReturnType<typeof createRemoteJWKSet>>();
 
-async function verifyClientAssertion(client: OAuthClient, assertion: string): Promise<boolean> {
+async function verifyClientAssertion(
+  client: OAuthClient,
+  assertion: string
+): Promise<boolean> {
   if (!client.jwksUri) return false;
   let jwks = remoteJwks.get(client.jwksUri);
   if (!jwks) {
-    jwks = createRemoteJWKSet(new URL(client.jwksUri), { timeoutDuration: 5000 });
+    jwks = createRemoteJWKSet(new URL(client.jwksUri), {
+      timeoutDuration: 5000,
+    });
     remoteJwks.set(client.jwksUri, jwks);
   }
   try {
@@ -373,28 +459,41 @@ async function verifyClientAssertion(client: OAuthClient, assertion: string): Pr
  * client_id — PKCE binds the code to them. A client_assertion, when sent,
  * must verify even though ChatGPT also accepts running as a public client.
  */
-export async function authenticateClient(creds: TokenRequestCredentials): Promise<OAuthClient> {
+export async function authenticateClient(
+  creds: TokenRequestCredentials
+): Promise<OAuthClient> {
   if (!creds.clientId) {
     throw new OAuthError("invalid_client", "client_id is required");
   }
 
   const client = await resolveClient(creds.clientId).catch(() => null);
   if (!client) {
-    throw new OAuthError("invalid_client", "Unknown client", { basicAuth: creds.usedBasicAuth });
+    throw new OAuthError("invalid_client", "Unknown client", {
+      basicAuth: creds.usedBasicAuth,
+    });
   }
 
   if (creds.clientAssertion) {
     if (creds.clientAssertionType !== JWT_BEARER_ASSERTION) {
-      throw new OAuthError("invalid_client", "Unsupported client_assertion_type");
+      throw new OAuthError(
+        "invalid_client",
+        "Unsupported client_assertion_type"
+      );
     }
     if (!(await verifyClientAssertion(client, creds.clientAssertion))) {
-      throw new OAuthError("invalid_client", "client_assertion could not be verified");
+      throw new OAuthError(
+        "invalid_client",
+        "client_assertion could not be verified"
+      );
     }
     return client;
   }
 
   if (client.clientSecretHash) {
-    if (!creds.clientSecret || !safeEqual(sha256Hex(creds.clientSecret), client.clientSecretHash)) {
+    if (
+      !creds.clientSecret ||
+      !safeEqual(sha256Hex(creds.clientSecret), client.clientSecretHash)
+    ) {
       throw new OAuthError("invalid_client", "Invalid client credentials", {
         basicAuth: creds.usedBasicAuth,
       });
@@ -413,7 +512,10 @@ export function describeClient(client: OAuthClient): {
 } {
   // A CIMD client proved control of its client_id's domain by hosting the
   // document there; a DCR client_name is self-asserted.
-  const verifiedDomain = client.registrationType === "cimd" ? new URL(client.clientId).hostname : null;
+  const verifiedDomain =
+    client.registrationType === "cimd"
+      ? new URL(client.clientId).hostname
+      : null;
   return {
     name: client.clientName || verifiedDomain || "An application",
     uri: client.clientUri,

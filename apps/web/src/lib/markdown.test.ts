@@ -20,8 +20,8 @@ describe("descriptionToHtml", () => {
     expect(descriptionToHtml("<p><strong>Existing</strong> note</p>")).toBe(
       "<p><strong>Existing</strong> note</p>"
     );
-    expect(descriptionToHtml("<blockquote><p>Existing quote</p></blockquote>")).toBe(
-      "<blockquote><p>Existing quote</p></blockquote>"
-    );
+    expect(
+      descriptionToHtml("<blockquote><p>Existing quote</p></blockquote>")
+    ).toBe("<blockquote><p>Existing quote</p></blockquote>");
   });
 });

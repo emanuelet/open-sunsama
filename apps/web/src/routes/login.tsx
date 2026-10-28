@@ -2,9 +2,17 @@ import * as React from "react";
 import { useNavigate, Link } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { Loader2, KeyRound } from "lucide-react";
-import { startAuthentication, browserSupportsWebAuthnAutofill, WebAuthnAbortService } from "@simplewebauthn/browser";
+import {
+  startAuthentication,
+  browserSupportsWebAuthnAutofill,
+  WebAuthnAbortService,
+} from "@simplewebauthn/browser";
 import { useAuth } from "@/hooks/useAuth";
-import { AuthLayout, AuthHeader, AuthFooter } from "@/components/layout/auth-layout";
+import {
+  AuthLayout,
+  AuthHeader,
+  AuthFooter,
+} from "@/components/layout/auth-layout";
 import { Button, Input, Label } from "@/components/ui";
 import { toast } from "@/hooks/use-toast";
 import { useSEO, SEO_CONFIGS } from "@/hooks/useSEO";
@@ -38,12 +46,19 @@ export default function LoginPage() {
     const isCurrent = () => active && version === ceremonyVersion.current;
     // Conditional mediation waits quietly for a passkey selected in autofill.
     void (async () => {
-      if (!await browserSupportsWebAuthnAutofill() || !isCurrent()) return;
-      const { options, challengeId } = await getApi().auth.passkeyLoginOptions();
+      if (!(await browserSupportsWebAuthnAutofill()) || !isCurrent()) return;
+      const { options, challengeId } =
+        await getApi().auth.passkeyLoginOptions();
       if (!isCurrent()) return;
-      const response = await startAuthentication({ optionsJSON: options, useBrowserAutofill: true });
+      const response = await startAuthentication({
+        optionsJSON: options,
+        useBrowserAutofill: true,
+      });
       if (!isCurrent()) return;
-      const data = await getApi().auth.verifyPasskeyLogin({ challengeId, response });
+      const data = await getApi().auth.verifyPasskeyLogin({
+        challengeId,
+        response,
+      });
       if (isCurrent()) completePasskeyLogin(data);
     })().catch(() => {
       // Autofill is optional; explicit passkey and password sign-in remain usable.
@@ -59,16 +74,23 @@ export default function LoginPage() {
     WebAuthnAbortService.cancelCeremony();
     setIsPasskeyLoading(true);
     try {
-      const { options, challengeId } = await getApi().auth.passkeyLoginOptions();
+      const { options, challengeId } =
+        await getApi().auth.passkeyLoginOptions();
       const response = await startAuthentication({ optionsJSON: options });
-      completePasskeyLogin(await getApi().auth.verifyPasskeyLogin({ challengeId, response }));
+      completePasskeyLogin(
+        await getApi().auth.verifyPasskeyLogin({ challengeId, response })
+      );
     } catch (error) {
-      toast({ variant: "destructive", title: "Passkey sign-in failed", description: passkeyError(error) });
+      toast({
+        variant: "destructive",
+        title: "Passkey sign-in failed",
+        description: passkeyError(error),
+      });
     } finally {
       setIsPasskeyLoading(false);
     }
   };
-  
+
   const {
     register,
     handleSubmit,
@@ -105,10 +127,19 @@ export default function LoginPage() {
     <AuthLayout>
       <AuthHeader
         title="Sign in"
-        description={passkeysSupported ? "Use your password or a passkey to continue" : "Enter your email and password"}
+        description={
+          passkeysSupported
+            ? "Use your password or a passkey to continue"
+            : "Enter your email and password"
+        }
       />
 
-      <form id="login-form" autoComplete="on" onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+      <form
+        id="login-form"
+        autoComplete="on"
+        onSubmit={handleSubmit(onSubmit)}
+        className="grid gap-4"
+      >
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -157,19 +188,35 @@ export default function LoginPage() {
             })}
           />
           {errors.password && (
-            <p className="text-sm text-destructive">{errors.password.message}</p>
+            <p className="text-sm text-destructive">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
-        <Button type="submit" disabled={isLoading || isPasskeyLoading} className="w-full mt-2 h-9 text-[13px]">
+        <Button
+          type="submit"
+          disabled={isLoading || isPasskeyLoading}
+          className="w-full mt-2 h-9 text-[13px]"
+        >
           {isLoading && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
           Sign in
         </Button>
       </form>
 
       {passkeysSupported && (
-        <Button type="button" variant="outline" disabled={isLoading || isPasskeyLoading} onClick={signInWithPasskey} className="mt-3 w-full">
-          {isPasskeyLoading ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <KeyRound className="mr-1.5 h-3.5 w-3.5" />}
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isLoading || isPasskeyLoading}
+          onClick={signInWithPasskey}
+          className="mt-3 w-full"
+        >
+          {isPasskeyLoading ? (
+            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <KeyRound className="mr-1.5 h-3.5 w-3.5" />
+          )}
           Sign in with a passkey
         </Button>
       )}

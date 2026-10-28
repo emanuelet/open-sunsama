@@ -24,22 +24,31 @@ export default function CalendarPage() {
     () => (dateParam ? new Date(`${dateParam}T00:00:00`) : new Date()),
     [dateParam]
   );
-  
+
   // Task detail panel state
   const [selectedTask, setSelectedTask] = React.useState<Task | null>(null);
-  const [selectedTaskId, setSelectedTaskId] = React.useState<string | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = React.useState<string | null>(
+    null
+  );
   const [taskPanelOpen, setTaskPanelOpen] = React.useState(false);
-  
+
   // Time block detail sheet state
-  const [selectedTimeBlock, setSelectedTimeBlock] = React.useState<TimeBlock | null>(null);
+  const [selectedTimeBlock, setSelectedTimeBlock] =
+    React.useState<TimeBlock | null>(null);
   const [timeBlockSheetOpen, setTimeBlockSheetOpen] = React.useState(false);
-  
+
   // Create time block dialog state
-  const [createAnchor, setCreateAnchor] = React.useState<CalendarCreateAnchor>();
+  const [createAnchor, setCreateAnchor] =
+    React.useState<CalendarCreateAnchor>();
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
-  const [createDialogDate, setCreateDialogDate] = React.useState<Date>(new Date());
-  const [createDialogStartTime, setCreateDialogStartTime] = React.useState<Date>(new Date());
-  const [createDialogEndTime, setCreateDialogEndTime] = React.useState<Date>(new Date());
+  const [createDialogDate, setCreateDialogDate] = React.useState<Date>(
+    new Date()
+  );
+  const [createDialogStartTime, setCreateDialogStartTime] =
+    React.useState<Date>(new Date());
+  const [createDialogEndTime, setCreateDialogEndTime] = React.useState<Date>(
+    new Date()
+  );
 
   // Fetch task by ID when viewing from context menu
   const { data: fetchedTask } = useTask(selectedTaskId ?? "");
@@ -92,7 +101,12 @@ export default function CalendarPage() {
     }
   };
 
-  const handleTimeSlotClick = (date: Date, startTime: Date, endTime: Date, anchor?: CalendarCreateAnchor) => {
+  const handleTimeSlotClick = (
+    date: Date,
+    startTime: Date,
+    endTime: Date,
+    anchor?: CalendarCreateAnchor
+  ) => {
     setCreateAnchor(anchor);
     setCreateDialogDate(date);
     setCreateDialogStartTime(startTime);
@@ -125,7 +139,7 @@ export default function CalendarPage() {
           onOpenChange={handleTimeBlockSheetOpenChange}
         />
         <CreateTimeBlockDialog
-        anchor={createAnchor}
+          anchor={createAnchor}
           open={createDialogOpen}
           onOpenChange={setCreateDialogOpen}
           date={createDialogDate}

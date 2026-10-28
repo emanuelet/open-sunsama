@@ -133,7 +133,8 @@ export function IdeasBoardView({
   const handleDragStart = (event: DragStartEvent) => {
     const data = event.active.data.current;
     if (data?.type === "idea") setActiveIdea(data.idea as Idea);
-    else if (data?.type === "column") setActiveColumn(data.column as IdeaColumn);
+    else if (data?.type === "column")
+      setActiveColumn(data.column as IdeaColumn);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -252,7 +253,10 @@ export function IdeasBoardView({
 
       {/* On mobile, snap each column into view while scrolling (Trello/Notion
           style); free horizontal scroll from sm up. Matches the kanban board. */}
-      <div ref={columnsRef} className="flex min-h-0 flex-1 items-start gap-3.5 overflow-x-auto overflow-y-hidden p-3 sm:p-4 snap-x snap-mandatory scroll-pl-3 sm:scroll-pl-4 sm:snap-none">
+      <div
+        ref={columnsRef}
+        className="flex min-h-0 flex-1 items-start gap-3.5 overflow-x-auto overflow-y-hidden p-3 sm:p-4 snap-x snap-mandatory scroll-pl-3 sm:scroll-pl-4 sm:snap-none"
+      >
         <SortableContext
           items={columnIds}
           strategy={horizontalListSortingStrategy}
@@ -356,8 +360,7 @@ export function IdeasBoardView({
                     <p
                       className={cn(
                         "min-w-0 flex-1 text-sm leading-snug line-clamp-2",
-                        idea.completedAt &&
-                          "text-muted-foreground line-through"
+                        idea.completedAt && "text-muted-foreground line-through"
                       )}
                     >
                       {idea.title}

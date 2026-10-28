@@ -140,7 +140,10 @@ export function useTimer({
         startedAt: serverStartedAt,
         accumulatedSeconds: activeTimerTask.timerAccumulatedSeconds,
       });
-    } else if (activeTimerTask === null || (activeTimerTask && activeTimerTask.id !== taskId)) {
+    } else if (
+      activeTimerTask === null ||
+      (activeTimerTask && activeTimerTask.id !== taskId)
+    ) {
       // Server says no active timer for this task.
       // Only reconcile if we locally think it's running (stale state from localStorage).
       if (stateRef.current.isRunning) {
@@ -250,8 +253,8 @@ export function useTimer({
             queryKey: taskKeys.detail(result.stoppedTask.id),
           });
           queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
-      // The kanban range prefetch lives outside lists(); refresh it too.
-      queryClient.invalidateQueries({ queryKey: taskKeys.rangeAll() });
+          // The kanban range prefetch lives outside lists(); refresh it too.
+          queryClient.invalidateQueries({ queryKey: taskKeys.rangeAll() });
         }
       })
       .catch(() => {
@@ -285,8 +288,8 @@ export function useTimer({
           queryKey: taskKeys.detail(taskId),
         });
         queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
-      // The kanban range prefetch lives outside lists(); refresh it too.
-      queryClient.invalidateQueries({ queryKey: taskKeys.rangeAll() });
+        // The kanban range prefetch lives outside lists(); refresh it too.
+        queryClient.invalidateQueries({ queryKey: taskKeys.rangeAll() });
       })
       .catch(() => {
         // On failure, refetch to reconcile

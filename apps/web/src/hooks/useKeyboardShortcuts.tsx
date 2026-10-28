@@ -12,23 +12,45 @@ export interface ShortcutDefinition {
     super?: boolean; // Cmd on Mac, Win/Super elsewhere (desktop global shortcuts)
   };
   description: string;
-  category: "navigation" | "task" | "general" | "focus" | "calendar" | "desktop";
+  category:
+    "navigation" | "task" | "general" | "focus" | "calendar" | "desktop";
 }
 
 export const TIME_EDIT_KEYS = { planned: "e", actual: "w" } as const;
 
-export function matchesTimeEditShortcut(event: KeyboardEvent, field: keyof typeof TIME_EDIT_KEYS) {
-  return !event.repeat && !event.metaKey && !event.ctrlKey && !event.altKey && !event.shiftKey
-    && event.key.toLowerCase() === TIME_EDIT_KEYS[field];
+export function matchesTimeEditShortcut(
+  event: KeyboardEvent,
+  field: keyof typeof TIME_EDIT_KEYS
+) {
+  return (
+    !event.repeat &&
+    !event.metaKey &&
+    !event.ctrlKey &&
+    !event.altKey &&
+    !event.shiftKey &&
+    event.key.toLowerCase() === TIME_EDIT_KEYS[field]
+  );
 }
 
-export function usePriorityShortcut(enabled: boolean, onChange: (priority: TaskPriority) => void) {
+export function usePriorityShortcut(
+  enabled: boolean,
+  onChange: (priority: TaskPriority) => void
+) {
   const changeRef = React.useRef(onChange);
   changeRef.current = onChange;
   React.useEffect(() => {
     if (!enabled) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.defaultPrevented || event.repeat || event.isComposing || event.metaKey || event.ctrlKey || !event.altKey || !event.shiftKey) return;
+      if (
+        event.defaultPrevented ||
+        event.repeat ||
+        event.isComposing ||
+        event.metaKey ||
+        event.ctrlKey ||
+        !event.altKey ||
+        !event.shiftKey
+      )
+        return;
       // Option produces symbols on macOS; the physical digit stays stable.
       const digit = /^(?:Digit|Numpad)([0-3])$/.exec(event.code)?.[1];
       if (!digit) return;
@@ -55,16 +77,22 @@ export const SHORTCUTS: Record<string, ShortcutDefinition> = {
     category: "navigation",
   },
   todayView: {
-    key: "T", modifiers: { shift: true },
-    description: "Switch to Today view", category: "navigation",
+    key: "T",
+    modifiers: { shift: true },
+    description: "Switch to Today view",
+    category: "navigation",
   },
   boardView: {
-    key: "B", modifiers: { shift: true },
-    description: "Switch to Board view", category: "navigation",
+    key: "B",
+    modifiers: { shift: true },
+    description: "Switch to Board view",
+    category: "navigation",
   },
   editPriority: {
-    key: "0–3", modifiers: { alt: true, shift: true },
-    description: "Set priority while creating or editing a task", category: "task",
+    key: "0–3",
+    modifiers: { alt: true, shift: true },
+    description: "Set priority while creating or editing a task",
+    category: "task",
   },
   completeTask: {
     key: "c",
@@ -273,7 +301,9 @@ export function formatShortcut(shortcut: ShortcutDefinition): string {
   const isMac = navigator.platform.includes("Mac");
 
   if (shortcut.modifiers?.super) {
-    parts.push(isMac ? "⌘" : navigator.platform.includes("Win") ? "Win" : "Super");
+    parts.push(
+      isMac ? "⌘" : navigator.platform.includes("Win") ? "Win" : "Super"
+    );
   }
   if (shortcut.modifiers?.cmd) {
     parts.push(isMac ? "⌘" : "Ctrl");
@@ -411,7 +441,9 @@ export function HoveredTaskProvider({
         }
       }
     }
-    setHoveredTask((prev) => (prev?.id === next?.id && prev === next ? prev : next));
+    setHoveredTask((prev) =>
+      prev?.id === next?.id && prev === next ? prev : next
+    );
     setHoveredSubtaskId(null);
   }, [queryClient]);
 
@@ -423,7 +455,11 @@ export function HoveredTaskProvider({
       const key = event?.query?.queryKey as unknown[] | undefined;
       // Board view uses ["tasks","list",...]; list view uses
       // ["tasks","search","infinite",...]. Recompute on either.
-      if (!key || key[0] !== "tasks" || (key[1] !== "list" && key[1] !== "search"))
+      if (
+        !key ||
+        key[0] !== "tasks" ||
+        (key[1] !== "list" && key[1] !== "search")
+      )
         return;
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(recomputeHoveredFromCursor);

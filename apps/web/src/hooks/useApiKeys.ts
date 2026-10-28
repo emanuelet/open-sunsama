@@ -36,7 +36,9 @@ export function useCreateApiKey() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: CreateApiKeyInput): Promise<CreateApiKeyResponse> => {
+    mutationFn: async (
+      data: CreateApiKeyInput
+    ): Promise<CreateApiKeyResponse> => {
       const api = getApi();
       return await api.apiKeys.create(data);
     },

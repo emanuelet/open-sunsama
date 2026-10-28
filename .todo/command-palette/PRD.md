@@ -1,6 +1,7 @@
 # Command Palette Enhancement
 
 ## Problem
+
 The current keyboard shortcuts and search functionality have two significant limitations:
 
 1. **Keyboard shortcuts only work on the tasks page** - The `KeyboardShortcutsHandler` component is rendered inside `TasksPage` (`apps/web/src/routes/app/index.tsx`), so shortcuts like `Cmd+K`, `?`, `A` (add task) don't work on `/app/calendar`, `/app/settings`, or any other routes.
@@ -8,6 +9,7 @@ The current keyboard shortcuts and search functionality have two significant lim
 2. **Cmd+K is just task search, not a command palette** - Modern productivity apps (VS Code, Linear, Raycast) have command palettes that let users navigate anywhere, execute actions, and search content—all from one interface. The current implementation only searches tasks.
 
 ## Solution
+
 Transform the search modal into a full command palette with two-tier architecture:
 
 1. **Global shortcuts handler** - Move non-task-specific shortcuts to `app.tsx` layout so they work everywhere
@@ -73,32 +75,84 @@ After:
 interface Command {
   id: string;
   label: string;
-  keywords: string[];  // For fuzzy search
+  keywords: string[]; // For fuzzy search
   icon: LucideIcon;
-  group: 'navigation' | 'actions' | 'theme';
-  shortcut?: string;   // Display only
-  action: () => void;  // Execute on select
+  group: "navigation" | "actions" | "theme";
+  shortcut?: string; // Display only
+  action: () => void; // Execute on select
 }
 
 const COMMANDS: Command[] = [
   // Navigation
-  { id: 'go-tasks', label: 'Go to Tasks Board', keywords: ['tasks', 'kanban', 'board', 'home'], icon: LayoutList, group: 'navigation', action: () => navigate('/app') },
-  { id: 'go-calendar', label: 'Go to Calendar', keywords: ['calendar', 'schedule', 'timeline', 'time'], icon: Calendar, group: 'navigation', action: () => navigate('/app/calendar') },
-  { id: 'go-settings', label: 'Go to Settings', keywords: ['settings', 'preferences', 'config'], icon: Settings, group: 'navigation', action: () => navigate('/app/settings') },
-  { id: 'go-api-keys', label: 'Go to API Keys', keywords: ['api', 'keys', 'tokens', 'developer'], icon: Key, group: 'navigation', action: () => navigate('/app/settings?tab=api') },
-  
+  {
+    id: "go-tasks",
+    label: "Go to Tasks Board",
+    keywords: ["tasks", "kanban", "board", "home"],
+    icon: LayoutList,
+    group: "navigation",
+    action: () => navigate("/app"),
+  },
+  {
+    id: "go-calendar",
+    label: "Go to Calendar",
+    keywords: ["calendar", "schedule", "timeline", "time"],
+    icon: Calendar,
+    group: "navigation",
+    action: () => navigate("/app/calendar"),
+  },
+  {
+    id: "go-settings",
+    label: "Go to Settings",
+    keywords: ["settings", "preferences", "config"],
+    icon: Settings,
+    group: "navigation",
+    action: () => navigate("/app/settings"),
+  },
+  {
+    id: "go-api-keys",
+    label: "Go to API Keys",
+    keywords: ["api", "keys", "tokens", "developer"],
+    icon: Key,
+    group: "navigation",
+    action: () => navigate("/app/settings?tab=api"),
+  },
+
   // Actions
-  { id: 'add-task', label: 'Add New Task', keywords: ['create', 'new', 'task', 'add'], icon: Plus, group: 'actions', shortcut: 'A', action: openAddTaskModal },
-  { id: 'show-shortcuts', label: 'Show Keyboard Shortcuts', keywords: ['shortcuts', 'keys', 'hotkeys', 'help'], icon: Keyboard, group: 'actions', shortcut: '?', action: openShortcutsModal },
-  
+  {
+    id: "add-task",
+    label: "Add New Task",
+    keywords: ["create", "new", "task", "add"],
+    icon: Plus,
+    group: "actions",
+    shortcut: "A",
+    action: openAddTaskModal,
+  },
+  {
+    id: "show-shortcuts",
+    label: "Show Keyboard Shortcuts",
+    keywords: ["shortcuts", "keys", "hotkeys", "help"],
+    icon: Keyboard,
+    group: "actions",
+    shortcut: "?",
+    action: openShortcutsModal,
+  },
+
   // Theme
-  { id: 'toggle-theme', label: 'Toggle Dark/Light Mode', keywords: ['theme', 'dark', 'light', 'mode', 'appearance'], icon: Moon, group: 'theme', action: toggleTheme },
+  {
+    id: "toggle-theme",
+    label: "Toggle Dark/Light Mode",
+    keywords: ["theme", "dark", "light", "mode", "appearance"],
+    icon: Moon,
+    group: "theme",
+    action: toggleTheme,
+  },
 ];
 ```
 
 ### UI Design
 
 **Empty State (no query)**:
+
 ```
 ┌─────────────────────────────────────────────┐
 │ 🔍 Type a command or search tasks...        │
@@ -121,6 +175,7 @@ const COMMANDS: Command[] = [
 ```
 
 **With Query "cal"**:
+
 ```
 ┌─────────────────────────────────────────────┐
 │ 🔍 cal                                      │
@@ -140,30 +195,30 @@ const COMMANDS: Command[] = [
 
 #### 1. New Files
 
-| File | Purpose |
-|------|---------|
-| `apps/web/src/components/command-palette/command-palette.tsx` | Main command palette component |
-| `apps/web/src/components/command-palette/commands.ts` | Command definitions and registry |
-| `apps/web/src/components/command-palette/command-item.tsx` | Individual command row component |
-| `apps/web/src/components/command-palette/index.ts` | Barrel export |
-| `apps/web/src/components/global-shortcuts-handler.tsx` | Global keyboard shortcuts |
-| `apps/web/src/components/task-shortcuts-handler.tsx` | Task-specific shortcuts |
+| File                                                          | Purpose                          |
+| ------------------------------------------------------------- | -------------------------------- |
+| `apps/web/src/components/command-palette/command-palette.tsx` | Main command palette component   |
+| `apps/web/src/components/command-palette/commands.ts`         | Command definitions and registry |
+| `apps/web/src/components/command-palette/command-item.tsx`    | Individual command row component |
+| `apps/web/src/components/command-palette/index.ts`            | Barrel export                    |
+| `apps/web/src/components/global-shortcuts-handler.tsx`        | Global keyboard shortcuts        |
+| `apps/web/src/components/task-shortcuts-handler.tsx`          | Task-specific shortcuts          |
 
 #### 2. Modified Files
 
-| File | Changes |
-|------|---------|
-| `apps/web/src/routes/app.tsx` | Add `GlobalShortcutsHandler`, replace `TaskSearchModal` with `CommandPalette` |
-| `apps/web/src/routes/app/index.tsx` | Replace `KeyboardShortcutsHandler` with `TaskShortcutsHandler` |
-| `apps/web/src/hooks/useKeyboardShortcuts.tsx` | Split shortcuts into global vs task categories |
-| `apps/web/src/hooks/useSearch.tsx` | Rename to `useCommandPalette.tsx` or extend with command state |
+| File                                          | Changes                                                                       |
+| --------------------------------------------- | ----------------------------------------------------------------------------- |
+| `apps/web/src/routes/app.tsx`                 | Add `GlobalShortcutsHandler`, replace `TaskSearchModal` with `CommandPalette` |
+| `apps/web/src/routes/app/index.tsx`           | Replace `KeyboardShortcutsHandler` with `TaskShortcutsHandler`                |
+| `apps/web/src/hooks/useKeyboardShortcuts.tsx` | Split shortcuts into global vs task categories                                |
+| `apps/web/src/hooks/useSearch.tsx`            | Rename to `useCommandPalette.tsx` or extend with command state                |
 
 #### 3. Deleted Files
 
-| File | Reason |
-|------|--------|
+| File                                                     | Reason                           |
+| -------------------------------------------------------- | -------------------------------- |
 | `apps/web/src/components/keyboard-shortcuts-handler.tsx` | Split into two separate handlers |
-| `apps/web/src/components/search/task-search-modal.tsx` | Replaced by command palette |
+| `apps/web/src/components/search/task-search-modal.tsx`   | Replaced by command palette      |
 
 ### Flow
 
@@ -199,7 +254,7 @@ const COMMANDS: Command[] = [
 function fuzzyMatch(query: string, text: string): boolean {
   const lowerQuery = query.toLowerCase();
   const lowerText = text.toLowerCase();
-  
+
   let queryIndex = 0;
   for (let i = 0; i < lowerText.length && queryIndex < lowerQuery.length; i++) {
     if (lowerText[i] === lowerQuery[queryIndex]) {
@@ -212,7 +267,7 @@ function fuzzyMatch(query: string, text: string): boolean {
 // Match against label and keywords
 function commandMatches(command: Command, query: string): boolean {
   if (fuzzyMatch(query, command.label)) return true;
-  return command.keywords.some(kw => fuzzyMatch(query, kw));
+  return command.keywords.some((kw) => fuzzyMatch(query, kw));
 }
 ```
 
@@ -223,26 +278,58 @@ function commandMatches(command: Command, query: string): boolean {
 
 // Global shortcuts - work everywhere
 export const GLOBAL_SHORTCUTS = {
-  search: { key: 'k', modifiers: { cmd: true }, description: 'Open command palette' },
-  showShortcuts: { key: '?', modifiers: { shift: true }, description: 'Show keyboard shortcuts' },
-  addTask: { key: 'a', description: 'Add new task' },
+  search: {
+    key: "k",
+    modifiers: { cmd: true },
+    description: "Open command palette",
+  },
+  showShortcuts: {
+    key: "?",
+    modifiers: { shift: true },
+    description: "Show keyboard shortcuts",
+  },
+  addTask: { key: "a", description: "Add new task" },
 };
 
 // Task shortcuts - require hoveredTask
 export const TASK_SHORTCUTS = {
-  completeTask: { key: 'c', description: 'Complete task' },
-  deleteTask: { key: 'Backspace', modifiers: { cmd: true }, description: 'Delete task' },
-  editEstimate: { key: 'e', description: 'Edit time estimate' },
-  moveToBacklog: { key: 'z', description: 'Move to backlog' },
-  moveToTop: { key: 'ArrowUp', modifiers: { cmd: true, shift: true }, description: 'Move to top' },
-  moveToBottom: { key: 'ArrowDown', modifiers: { cmd: true, shift: true }, description: 'Move to bottom' },
+  completeTask: { key: "c", description: "Complete task" },
+  deleteTask: {
+    key: "Backspace",
+    modifiers: { cmd: true },
+    description: "Delete task",
+  },
+  editEstimate: { key: "e", description: "Edit time estimate" },
+  moveToBacklog: { key: "z", description: "Move to backlog" },
+  moveToTop: {
+    key: "ArrowUp",
+    modifiers: { cmd: true, shift: true },
+    description: "Move to top",
+  },
+  moveToBottom: {
+    key: "ArrowDown",
+    modifiers: { cmd: true, shift: true },
+    description: "Move to bottom",
+  },
 };
 
 // Navigation shortcuts - only on tasks page
 export const NAVIGATION_SHORTCUTS = {
-  focusToday: { key: ' ', modifiers: { shift: true }, description: 'Focus on Today' },
-  nextDay: { key: 'ArrowRight', modifiers: { shift: true }, description: 'Go to next day' },
-  previousDay: { key: 'ArrowLeft', modifiers: { shift: true }, description: 'Go to previous day' },
+  focusToday: {
+    key: " ",
+    modifiers: { shift: true },
+    description: "Focus on Today",
+  },
+  nextDay: {
+    key: "ArrowRight",
+    modifiers: { shift: true },
+    description: "Go to next day",
+  },
+  previousDay: {
+    key: "ArrowLeft",
+    modifiers: { shift: true },
+    description: "Go to previous day",
+  },
 };
 ```
 
@@ -256,7 +343,7 @@ interface CommandPaletteContextValue {
   open: () => void;
   close: () => void;
   toggle: () => void;
-  
+
   // For actions triggered from commands
   addTaskModalOpen: boolean;
   setAddTaskModalOpen: (open: boolean) => void;
@@ -269,11 +356,11 @@ For "Go to API Keys" command to open settings with API tab active:
 
 ```typescript
 // Option 1: URL param
-navigate('/app/settings?tab=api');
+navigate("/app/settings?tab=api");
 
 // In SettingsPage, read from URL:
 const [searchParams] = useSearchParams();
-const initialTab = searchParams.get('tab') as SettingsTab ?? 'profile';
+const initialTab = (searchParams.get("tab") as SettingsTab) ?? "profile";
 const [activeTab, setActiveTab] = React.useState<SettingsTab>(initialTab);
 ```
 
@@ -283,9 +370,9 @@ Update the shortcuts modal to reflect the new organization:
 
 ```typescript
 const categoryLabels = {
-  global: "Global",       // Work everywhere
+  global: "Global", // Work everywhere
   navigation: "Navigation", // Tasks page day navigation
-  task: "Task Actions",   // Require hovered task
+  task: "Task Actions", // Require hovered task
 };
 ```
 

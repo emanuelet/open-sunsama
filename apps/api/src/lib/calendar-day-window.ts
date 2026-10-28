@@ -9,7 +9,7 @@
  * yesterday's all-day event.
  */
 
-import { fromZonedTime } from 'date-fns-tz';
+import { fromZonedTime } from "date-fns-tz";
 
 export interface LocalDayWindow {
   /** First local day, YYYY-MM-DD. */
@@ -31,15 +31,19 @@ export function addDaysToDate(date: string, days: number): string {
 
 export function isValidTimezone(timezone: string): boolean {
   try {
-    new Intl.DateTimeFormat('en-US', { timeZone: timezone });
+    new Intl.DateTimeFormat("en-US", { timeZone: timezone });
     return true;
   } catch {
     return false;
   }
 }
 
-export function localDayWindow(fromDate: string, toDate: string, timezone: string): LocalDayWindow {
-  const tz = isValidTimezone(timezone) ? timezone : 'UTC';
+export function localDayWindow(
+  fromDate: string,
+  toDate: string,
+  timezone: string
+): LocalDayWindow {
+  const tz = isValidTimezone(timezone) ? timezone : "UTC";
   return {
     fromDate,
     toDate,

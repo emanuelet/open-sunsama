@@ -16,7 +16,10 @@ export interface Command {
 }
 
 // Navigate function type from TanStack Router
-type NavigateFn = (options: { to: string; search?: Record<string, string> }) => void;
+type NavigateFn = (options: {
+  to: string;
+  search?: Record<string, string>;
+}) => void;
 
 export interface CommandContext {
   // Navigation & UI

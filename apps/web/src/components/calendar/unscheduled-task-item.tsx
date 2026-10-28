@@ -65,16 +65,23 @@ export function UnscheduledTaskItem({
           isMobile ? "opacity-40" : "opacity-0 group-hover:opacity-40"
         )}
       >
-        <GripVertical className={cn(isMobile ? "h-5 w-5" : "h-4 w-4", "text-muted-foreground")} />
+        <GripVertical
+          className={cn(
+            isMobile ? "h-5 w-5" : "h-4 w-4",
+            "text-muted-foreground"
+          )}
+        />
       </div>
 
       {/* Content */}
       <div className={cn(isMobile ? "pl-5" : "pl-4")}>
         {/* Title */}
-        <p className={cn(
-          "font-medium truncate pr-2",
-          isMobile ? "text-base" : "text-sm"
-        )}>
+        <p
+          className={cn(
+            "font-medium truncate pr-2",
+            isMobile ? "text-base" : "text-sm"
+          )}
+        >
           {task.title}
         </p>
 
@@ -93,7 +100,6 @@ export function UnscheduledTaskItem({
           </p>
         )}
       </div>
-
     </div>
   );
 }

@@ -15,7 +15,10 @@ export interface TimerFields {
 }
 
 /** Seconds the task has logged at `now`, running or not. */
-export function timerSeconds(task: TimerFields, now: number = Date.now()): number {
+export function timerSeconds(
+  task: TimerFields,
+  now: number = Date.now()
+): number {
   if (task.timerStartedAt) {
     // Rounded, so quick start/stop runs of under a second still count.
     const elapsed = Math.round((now - task.timerStartedAt.getTime()) / 1000);

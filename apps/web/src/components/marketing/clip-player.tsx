@@ -11,7 +11,10 @@
 import * as React from "react";
 import { Pause, Play } from "lucide-react";
 import { BLOG_MEDIA } from "@/lib/blog-media";
-import { useIsDark, usePrefersReducedMotion } from "@/components/blog/media/hooks";
+import {
+  useIsDark,
+  usePrefersReducedMotion,
+} from "@/components/blog/media/hooks";
 import { cn } from "@/lib/utils";
 
 /** Recordings fade in from and out to the page color; loop inside the fades. */
@@ -57,15 +60,23 @@ export function ClipPlayer({
     if (controlled) return;
     const video = videoRef.current;
     if (!video) return;
-    const observer = new IntersectionObserver(([entry]) => setInView(Boolean(entry?.isIntersecting)), {
-      threshold: 0.5,
-    });
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(Boolean(entry?.isIntersecting)),
+      {
+        threshold: 0.5,
+      }
+    );
     observer.observe(video);
     return () => observer.disconnect();
   }, [controlled, src]);
 
   const visible = controlled ? Boolean(active) : inView;
-  const shouldPlay = choice === "pause" ? false : choice === "play" ? visible : visible && !reducedMotion;
+  const shouldPlay =
+    choice === "pause"
+      ? false
+      : choice === "play"
+        ? visible
+        : visible && !reducedMotion;
 
   React.useEffect(() => {
     const video = videoRef.current;
@@ -82,7 +93,8 @@ export function ClipPlayer({
 
   const loopInsideFades = () => {
     const video = videoRef.current;
-    if (video?.duration && video.currentTime > video.duration - FADE_SECONDS) video.currentTime = FADE_SECONDS;
+    if (video?.duration && video.currentTime > video.duration - FADE_SECONDS)
+      video.currentTime = FADE_SECONDS;
   };
 
   return (
@@ -127,7 +139,11 @@ export function ClipPlayer({
           aria-label={playing ? "Pause clip" : "Play clip"}
           className="absolute bottom-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-background/85 text-foreground shadow-xs ring-1 ring-border/60 backdrop-blur-sm transition-colors hover:bg-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         >
-          {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 translate-x-px" />}
+          {playing ? (
+            <Pause className="h-3.5 w-3.5" />
+          ) : (
+            <Play className="h-3.5 w-3.5 translate-x-px" />
+          )}
         </button>
       )}
     </div>

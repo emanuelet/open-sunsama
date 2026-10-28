@@ -2,10 +2,10 @@
  * Calendar account sync handler
  * Syncs events for a single calendar account
  */
-import type { Job } from 'pg-boss';
-import { getDb, eq } from '@open-sunsama/database';
-import { calendarAccounts, calendars } from '@open-sunsama/database/schema';
-import { subDays, addDays, startOfDay, endOfDay } from 'date-fns';
+import type { Job } from "pg-boss";
+import { getDb, eq } from "@open-sunsama/database";
+import { calendarAccounts, calendars } from "@open-sunsama/database/schema";
+import { subDays, addDays, startOfDay, endOfDay } from "date-fns";
 import {
   getProvider,
   refreshTokensIfNeeded,
@@ -17,7 +17,7 @@ import {
   publishSyncEvent,
   ensureGoogleWatches,
   type AccountSyncResult,
-} from '../../services/calendar-sync.js';
+} from "../../services/calendar-sync.js";
 
 // Payload type for the sync account job
 export interface SyncAccountPayload {
@@ -39,7 +39,9 @@ export async function processSyncAccount(
   const { accountId, userId, provider: providerName } = job.data;
   const db = getDb();
 
-  console.log(`[Calendar Sync] Starting sync for account ${accountId} (${providerName})`);
+  console.log(
+    `[Calendar Sync] Starting sync for account ${accountId} (${providerName})`
+  );
 
   try {
     // Get the full account details
@@ -54,7 +56,7 @@ export async function processSyncAccount(
 
     if (!account.isActive) {
       console.log(`[Calendar Sync] Account ${accountId} is inactive, skipping`);
-      await updateSyncStatus(accountId, 'idle', null);
+      await updateSyncStatus(accountId, "idle", null);
       return;
     }
 
@@ -69,8 +71,10 @@ export async function processSyncAccount(
       .where(eq(calendars.accountId, accountId));
 
     if (accountCalendars.length === 0) {
-      console.log(`[Calendar Sync] No calendars found for account ${accountId}`);
-      await updateSyncStatus(accountId, 'idle', null);
+      console.log(
+        `[Calendar Sync] No calendars found for account ${accountId}`
+      );
+      await updateSyncStatus(accountId, "idle", null);
       return;
     }
 
@@ -83,7 +87,7 @@ export async function processSyncAccount(
 
     let result: AccountSyncResult;
 
-    if (providerName === 'icloud') {
+    if (providerName === "icloud") {
       // Handle iCloud (CalDAV) sync
       result = await syncICloudAccount(
         {
@@ -124,7 +128,7 @@ export async function processSyncAccount(
       // Register Google `events.watch` push channels for any
       // calendars that don't yet have one. Idempotent and best-
       // effort — failures don't affect the rest of the sync.
-      if (providerName === 'google') {
+      if (providerName === "google") {
         await ensureGoogleWatches(accountId, accessToken);
       }
     }
@@ -136,7 +140,7 @@ export async function processSyncAccount(
     await upsertEvents(userId, result.perCalendar);
 
     // Update sync status
-    await updateSyncStatus(accountId, 'idle', result.nextSyncToken);
+    await updateSyncStatus(accountId, "idle", result.nextSyncToken);
 
     // Publish sync event via WebSocket
     publishSyncEvent(
@@ -150,10 +154,11 @@ export async function processSyncAccount(
       `[Calendar Sync] Completed sync for account ${accountId}: ${result.totalEvents} events, ${result.totalDeleted} deleted`
     );
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     console.error(`[Calendar Sync] Error syncing account ${accountId}:`, error);
 
     // Update sync status with error
-    await updateSyncStatus(accountId, 'error', null, errorMessage);
+    await updateSyncStatus(accountId, "error", null, errorMessage);
   }
 }

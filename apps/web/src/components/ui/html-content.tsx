@@ -12,19 +12,48 @@ interface HtmlContentProps {
   markdown?: boolean;
 }
 
-export function HtmlContent({ html, className, markdown = false }: HtmlContentProps) {
+export function HtmlContent({
+  html,
+  className,
+  markdown = false,
+}: HtmlContentProps) {
   const lightbox = useLightbox();
   const sanitizedHtml = useMemo(() => {
     if (!html) return null;
-    const clean = DOMPurify.sanitize(markdown ? descriptionToHtml(html) : html, {
-      ALLOWED_TAGS: [
-        "p", "br", "strong", "b", "em", "i", "u", "s", "a",
-        "ul", "ol", "li", "blockquote", "pre", "code", "span", "div", "img",
-        "h1", "h2", "h3", "h4", "h5", "h6", "hr",
-      ],
-      ALLOWED_ATTR: ["href", "target", "rel", "class", "src", "alt", "title"],
-      ADD_ATTR: ["target"],
-    });
+    const clean = DOMPurify.sanitize(
+      markdown ? descriptionToHtml(html) : html,
+      {
+        ALLOWED_TAGS: [
+          "p",
+          "br",
+          "strong",
+          "b",
+          "em",
+          "i",
+          "u",
+          "s",
+          "a",
+          "ul",
+          "ol",
+          "li",
+          "blockquote",
+          "pre",
+          "code",
+          "span",
+          "div",
+          "img",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "hr",
+        ],
+        ALLOWED_ATTR: ["href", "target", "rel", "class", "src", "alt", "title"],
+        ADD_ATTR: ["target"],
+      }
+    );
     // Uploads are stored as relative proxy paths — resolve to the API origin
     // so <img> tags actually load when rendered on the frontend domain.
     return clean.replace(

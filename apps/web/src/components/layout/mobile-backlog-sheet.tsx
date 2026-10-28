@@ -29,7 +29,10 @@ interface MobileBacklogSheetProps {
  * Mobile slide-out sheet for backlog tasks
  * Opens from the left side on mobile devices
  */
-export function MobileBacklogSheet({ trigger, onTaskClick }: MobileBacklogSheetProps) {
+export function MobileBacklogSheet({
+  trigger,
+  onTaskClick,
+}: MobileBacklogSheetProps) {
   const [open, setOpen] = React.useState(false);
   const [isCleanupOpen, setIsCleanupOpen] = React.useState(false);
   const [newTaskTitle, setNewTaskTitle] = React.useState("");
@@ -37,7 +40,10 @@ export function MobileBacklogSheet({ trigger, onTaskClick }: MobileBacklogSheetP
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   // Use high limit to ensure we get all backlog tasks (API default is 50)
-  const { data: tasks, isLoading } = useTasks({ scheduledDate: null, limit: 500 });
+  const { data: tasks, isLoading } = useTasks({
+    scheduledDate: null,
+    limit: 500,
+  });
   const createTask = useCreateTask();
   const completeTask = useCompleteTask();
 
@@ -100,128 +106,132 @@ export function MobileBacklogSheet({ trigger, onTaskClick }: MobileBacklogSheetP
 
   return (
     <>
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>{trigger || defaultTrigger}</SheetTrigger>
-      <SheetContent side="left" className="w-full max-w-sm p-0 flex flex-col">
-        {/* Header */}
-        <SheetHeader className="border-b p-4 shrink-0">
-          <div className="flex items-center justify-between">
-            <div>
-              <SheetTitle className="text-lg">Backlog</SheetTitle>
-              <p className="text-sm text-muted-foreground">
-                {backlogTasks.length} task{backlogTasks.length !== 1 ? "s" : ""}
-              </p>
-            </div>
-            <div className="flex items-center gap-1">
-              {backlogTasks.length > 0 && (
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>{trigger || defaultTrigger}</SheetTrigger>
+        <SheetContent side="left" className="w-full max-w-sm p-0 flex flex-col">
+          {/* Header */}
+          <SheetHeader className="border-b p-4 shrink-0">
+            <div className="flex items-center justify-between">
+              <div>
+                <SheetTitle className="text-lg">Backlog</SheetTitle>
+                <p className="text-sm text-muted-foreground">
+                  {backlogTasks.length} task
+                  {backlogTasks.length !== 1 ? "s" : ""}
+                </p>
+              </div>
+              <div className="flex items-center gap-1">
+                {backlogTasks.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10"
+                    onClick={() => {
+                      setOpen(false);
+                      setIsCleanupOpen(true);
+                    }}
+                  >
+                    <Eraser className="h-5 w-5" />
+                    <span className="sr-only">Clean up backlog</span>
+                  </Button>
+                )}
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-10 w-10"
+                  className="h-10 w-10" // Touch-friendly
+                  onClick={() => setIsAddingTask(true)}
+                >
+                  <Plus className="h-5 w-5" />
+                  <span className="sr-only">Add task</span>
+                </Button>
+              </div>
+            </div>
+          </SheetHeader>
+
+          {/* Quick Add Form */}
+          {isAddingTask && (
+            <form onSubmit={handleSubmit} className="border-b p-4 shrink-0">
+              <Input
+                ref={inputRef}
+                value={newTaskTitle}
+                onChange={(e) => setNewTaskTitle(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="What needs to be done?"
+                className="mb-3 h-12 text-base" // Larger touch target
+              />
+              <div className="flex gap-2">
+                <Button
+                  type="submit"
+                  className="h-11 flex-1" // Touch-friendly
+                  disabled={!newTaskTitle.trim() || createTask.isPending}
+                >
+                  {createTask.isPending ? "Adding..." : "Add Task"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-11" // Touch-friendly
                   onClick={() => {
-                    setOpen(false);
-                    setIsCleanupOpen(true);
+                    setNewTaskTitle("");
+                    setIsAddingTask(false);
                   }}
                 >
-                  <Eraser className="h-5 w-5" />
-                  <span className="sr-only">Clean up backlog</span>
+                  Cancel
                 </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10" // Touch-friendly
-                onClick={() => setIsAddingTask(true)}
-              >
-                <Plus className="h-5 w-5" />
-                <span className="sr-only">Add task</span>
-              </Button>
-            </div>
-          </div>
-        </SheetHeader>
-
-        {/* Quick Add Form */}
-        {isAddingTask && (
-          <form onSubmit={handleSubmit} className="border-b p-4 shrink-0">
-            <Input
-              ref={inputRef}
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="What needs to be done?"
-              className="mb-3 h-12 text-base" // Larger touch target
-            />
-            <div className="flex gap-2">
-              <Button
-                type="submit"
-                className="h-11 flex-1" // Touch-friendly
-                disabled={!newTaskTitle.trim() || createTask.isPending}
-              >
-                {createTask.isPending ? "Adding..." : "Add Task"}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="h-11" // Touch-friendly
-                onClick={() => {
-                  setNewTaskTitle("");
-                  setIsAddingTask(false);
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        )}
-
-        {/* Task List */}
-        <ScrollArea className="flex-1">
-          <div className="p-3">
-            {isLoading ? (
-              <div className="space-y-2">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-20 w-full rounded-lg" />
-                ))}
               </div>
-            ) : backlogTasks.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="mb-4 rounded-full bg-muted p-4">
-                  <Check className="h-8 w-8 text-muted-foreground" />
+            </form>
+          )}
+
+          {/* Task List */}
+          <ScrollArea className="flex-1">
+            <div className="p-3">
+              {isLoading ? (
+                <div className="space-y-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton key={i} className="h-20 w-full rounded-lg" />
+                  ))}
                 </div>
-                <p className="text-base font-medium">All caught up!</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  No tasks in your backlog
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {backlogTasks.map((task) => (
-                  <MobileBacklogTaskCard
-                    key={task.id}
-                    task={task}
-                    onTaskClick={onTaskClick}
-                    onToggleComplete={(completed) =>
-                      completeTask.mutate({ id: task.id, completed })
-                    }
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </ScrollArea>
+              ) : backlogTasks.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <div className="mb-4 rounded-full bg-muted p-4">
+                    <Check className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-base font-medium">All caught up!</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    No tasks in your backlog
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {backlogTasks.map((task) => (
+                    <MobileBacklogTaskCard
+                      key={task.id}
+                      task={task}
+                      onTaskClick={onTaskClick}
+                      onToggleComplete={(completed) =>
+                        completeTask.mutate({ id: task.id, completed })
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </ScrollArea>
 
-        {/* Footer hint */}
-        {!isLoading && backlogTasks.length > 0 && (
-          <div className="border-t p-3 shrink-0">
-            <p className="text-xs text-center text-muted-foreground">
-              Tap and hold to drag tasks to schedule them
-            </p>
-          </div>
-        )}
-      </SheetContent>
-    </Sheet>
+          {/* Footer hint */}
+          {!isLoading && backlogTasks.length > 0 && (
+            <div className="border-t p-3 shrink-0">
+              <p className="text-xs text-center text-muted-foreground">
+                Tap and hold to drag tasks to schedule them
+              </p>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
 
-    <CleanUpBacklogModal open={isCleanupOpen} onOpenChange={setIsCleanupOpen} />
+      <CleanUpBacklogModal
+        open={isCleanupOpen}
+        onOpenChange={setIsCleanupOpen}
+      />
     </>
   );
 }

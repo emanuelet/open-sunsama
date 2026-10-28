@@ -4,8 +4,18 @@
  * marketing pages.
  */
 
-import { Calendar, CheckCircle2, Command, Lightbulb, LayoutGrid, Timer } from "lucide-react";
-import { StoryPinned, type PinnedStep } from "@/components/marketing/story-pinned";
+import {
+  Calendar,
+  CheckCircle2,
+  Command,
+  Lightbulb,
+  LayoutGrid,
+  Timer,
+} from "lucide-react";
+import {
+  StoryPinned,
+  type PinnedStep,
+} from "@/components/marketing/story-pinned";
 import { Reveal } from "./motion";
 import { ThemedShot, type ShotName } from "./product-shot";
 
@@ -91,7 +101,11 @@ const PINNED: PinnedStep[] = STEPS.map((step) => ({
   body: step.body,
   ...(step.clip ? { clip: step.clip } : {}),
   still: (
-    <ThemedShot name={step.shot} alt={step.title} className="absolute inset-0 h-full object-cover object-top" />
+    <ThemedShot
+      name={step.shot}
+      alt={step.title}
+      className="absolute inset-0 h-full object-cover object-top"
+    />
   ),
   zoom: step.zoom,
   ...(step.href ? { link: { label: "Learn more", href: step.href } } : {}),
@@ -105,13 +119,15 @@ export function StorySection() {
       className="py-24"
       header={
         <Reveal className="mx-auto max-w-2xl text-center">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">How it works</p>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
+            How it works
+          </p>
           <h2 className="mt-3 text-[32px] font-semibold leading-[1.08] tracking-[-0.03em] md:text-[44px]">
             A calmer way to run your day.
           </h2>
           <p className="mt-4 text-[16px] leading-relaxed text-muted-foreground">
-            Sunsama-style daily planning: decide what matters, give it a time, and do it. Every clip below
-            is a real recording of the app.
+            Sunsama-style daily planning: decide what matters, give it a time,
+            and do it. Every clip below is a real recording of the app.
           </p>
         </Reveal>
       }

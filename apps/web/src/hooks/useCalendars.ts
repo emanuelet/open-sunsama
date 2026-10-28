@@ -20,10 +20,21 @@ import { trackGoal } from "@/lib/analytics";
  * just gives them friendlier titles and falls back to generic for
  * unknown errors.
  */
-function describeWriteBackError(error: unknown, action: "update" | "delete" | "create"): { title: string; description: string } {
-  const verb = action === "update" ? "updated" : action === "delete" ? "deleted" : "created";
+function describeWriteBackError(
+  error: unknown,
+  action: "update" | "delete" | "create"
+): { title: string; description: string } {
+  const verb =
+    action === "update"
+      ? "updated"
+      : action === "delete"
+        ? "deleted"
+        : "created";
   if (isApiError(error)) {
-    if (error.code === "EVENT_OUT_OF_SYNC" || error.code === "CALENDAR_OUT_OF_SYNC") {
+    if (
+      error.code === "EVENT_OUT_OF_SYNC" ||
+      error.code === "CALENDAR_OUT_OF_SYNC"
+    ) {
       return {
         title: "Event out of sync",
         description: error.message,
@@ -35,7 +46,10 @@ function describeWriteBackError(error: unknown, action: "update" | "delete" | "c
         description: error.message,
       };
     }
-    if (error.code === "PROVIDER_READ_ONLY" || error.code === "CALENDAR_READ_ONLY") {
+    if (
+      error.code === "PROVIDER_READ_ONLY" ||
+      error.code === "CALENDAR_READ_ONLY"
+    ) {
       return {
         title: "Read-only calendar",
         description: error.message,
@@ -48,7 +62,8 @@ function describeWriteBackError(error: unknown, action: "update" | "delete" | "c
   }
   return {
     title: `Failed to ${action} event`,
-    description: error instanceof Error ? error.message : `Couldn't be ${verb}.`,
+    description:
+      error instanceof Error ? error.message : `Couldn't be ${verb}.`,
   };
 }
 
@@ -63,9 +78,10 @@ export function useCalendarAccounts() {
     queryKey: calendarKeys.accounts(),
     queryFn: async (): Promise<CalendarAccount[]> => {
       const client = getApiClient();
-      const response = await client.get<{ success: boolean; data: CalendarAccount[] }>(
-        "calendar/accounts"
-      );
+      const response = await client.get<{
+        success: boolean;
+        data: CalendarAccount[];
+      }>("calendar/accounts");
       return response.data;
     },
     // Always fetch fresh data - important for OAuth redirect flow
@@ -118,10 +134,10 @@ export function useCalendarEvents(from: string, to: string, enabled = true) {
     queryKey: calendarKeys.events(from, to),
     queryFn: async (): Promise<CalendarEvent[]> => {
       const client = getApiClient();
-      const response = await client.get<{ success: boolean; data: CalendarEvent[] }>(
-        "calendar-events",
-        { searchParams: { from, to } }
-      );
+      const response = await client.get<{
+        success: boolean;
+        data: CalendarEvent[];
+      }>("calendar-events", { searchParams: { from, to } });
       return response.data;
     },
     enabled,
@@ -265,12 +281,14 @@ export function useConnectICloud() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: ConnectCalDavRequest): Promise<CalendarAccount> => {
+    mutationFn: async (
+      data: ConnectCalDavRequest
+    ): Promise<CalendarAccount> => {
       const client = getApiClient();
-      const response = await client.post<{ success: boolean; data: CalendarAccount }>(
-        "calendar/caldav/connect",
-        data
-      );
+      const response = await client.post<{
+        success: boolean;
+        data: CalendarAccount;
+      }>("calendar/caldav/connect", data);
       return response.data;
     },
     onSuccess: () => {
@@ -335,7 +353,8 @@ export function useCreateCalendarEvent() {
         startTime: payload.startTime.toISOString(),
         endTime: payload.endTime.toISOString(),
       };
-      if (payload.description !== undefined) body.description = payload.description;
+      if (payload.description !== undefined)
+        body.description = payload.description;
       if (payload.location !== undefined) body.location = payload.location;
       if (payload.isAllDay !== undefined) body.isAllDay = payload.isAllDay;
       if (payload.timezone !== undefined) body.timezone = payload.timezone;
@@ -417,10 +436,10 @@ export function useUpdateCalendarEvent() {
       if (patch.isAllDay !== undefined) body.isAllDay = patch.isAllDay;
       if (patch.timezone !== undefined) body.timezone = patch.timezone;
 
-      const response = await client.patch<{ success: boolean; data: CalendarEvent }>(
-        `calendar-events/${id}`,
-        body
-      );
+      const response = await client.patch<{
+        success: boolean;
+        data: CalendarEvent;
+      }>(`calendar-events/${id}`, body);
       return response.data;
     },
     onMutate: async (input) => {
@@ -528,10 +547,10 @@ export function useRespondToCalendarEvent() {
       response: CalendarRsvpResponse;
     }): Promise<CalendarEvent> => {
       const client = getApiClient();
-      const result = await client.post<{ success: boolean; data: CalendarEvent }>(
-        `calendar-events/${id}/rsvp`,
-        { response }
-      );
+      const result = await client.post<{
+        success: boolean;
+        data: CalendarEvent;
+      }>(`calendar-events/${id}/rsvp`, { response });
       return result.data;
     },
     onMutate: async ({ id, response }) => {
@@ -639,7 +658,9 @@ export function useInitiateOAuth() {
       const response = await client.get<{
         success: boolean;
         data: { authUrl: string; state: string };
-      }>(`calendar/oauth/${provider}/initiate${accountId ? `?accountId=${encodeURIComponent(accountId)}` : ""}`);
+      }>(
+        `calendar/oauth/${provider}/initiate${accountId ? `?accountId=${encodeURIComponent(accountId)}` : ""}`
+      );
       return response.data.authUrl;
     },
     onSuccess: (authUrl) => {

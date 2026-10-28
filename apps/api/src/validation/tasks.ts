@@ -2,25 +2,30 @@
  * Validation schemas for tasks routes
  */
 
-import { z } from 'zod';
-import { uuidSchema, dateSchema } from '@open-sunsama/utils';
+import { z } from "zod";
+import { uuidSchema, dateSchema } from "@open-sunsama/utils";
 
 /**
  * Priority levels for tasks
  */
-export const prioritySchema = z.enum(['P0', 'P1', 'P2', 'P3']);
+export const prioritySchema = z.enum(["P0", "P1", "P2", "P3"]);
 
 /**
  * Sort by options for tasks
  */
-export const sortBySchema = z.enum(['priority', 'position', 'createdAt']);
+export const sortBySchema = z.enum(["priority", "position", "createdAt"]);
 
 /**
  * Schema for creating a task
  */
 export const createTaskSchema = z.object({
-  title: z.string({ error: (issue) => issue.input === undefined ? 'Title is required' : undefined })
-    .min(1, { error: 'Title is required' }).max(500),
+  title: z
+    .string({
+      error: (issue) =>
+        issue.input === undefined ? "Title is required" : undefined,
+    })
+    .min(1, { error: "Title is required" })
+    .max(500),
   notes: z.string().max(5000).optional().nullable(),
   scheduledDate: dateSchema.optional().nullable(),
   estimatedMins: z.number().int().positive().max(1440).optional().nullable(),
@@ -56,8 +61,8 @@ export const taskFilterSchema = z.object({
   date: dateSchema.optional(),
   from: dateSchema.optional(),
   to: dateSchema.optional(),
-  completed: z.enum(['true', 'false']).optional(),
-  backlog: z.enum(['true', 'false']).optional(),
+  completed: z.enum(["true", "false"]).optional(),
+  backlog: z.enum(["true", "false"]).optional(),
   priority: prioritySchema.optional(),
   sortBy: sortBySchema.optional(),
   page: z.coerce.number().int().min(1).default(1),
@@ -68,13 +73,13 @@ export const taskFilterSchema = z.object({
   // Inline-include the subtasks for each task. Used by the kanban range
   // prefetch so we don't have to fire a follow-up `subtasks-batch` request
   // for tasks the client already has in hand.
-  includeSubtasks: z.enum(['true', 'false']).optional(),
+  includeSubtasks: z.enum(["true", "false"]).optional(),
 });
 
 /**
  * Schema for reordering tasks
  */
 export const reorderTasksSchema = z.object({
-  date: z.union([dateSchema, z.literal('backlog')]),
+  date: z.union([dateSchema, z.literal("backlog")]),
   taskIds: z.array(uuidSchema).min(1),
 });

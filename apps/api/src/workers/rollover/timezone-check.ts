@@ -2,19 +2,19 @@
  * Timezone rollover check handler
  * Runs every minute to detect timezones hitting midnight and queue batch jobs
  */
-import type { Job } from 'pg-boss';
-import { getDb, eq, and, isNotNull } from '@open-sunsama/database';
-import { users, rolloverLogs } from '@open-sunsama/database/schema';
-import { toZonedTime } from 'date-fns-tz';
-import { format, subDays } from 'date-fns';
-import { getPgBoss, JOBS } from '../../lib/pgboss.js';
-import { 
-  type RolloverCheckPayload, 
+import type { Job } from "pg-boss";
+import { getDb, eq, and, isNotNull } from "@open-sunsama/database";
+import { users, rolloverLogs } from "@open-sunsama/database/schema";
+import { toZonedTime } from "date-fns-tz";
+import { format, subDays } from "date-fns";
+import { getPgBoss, JOBS } from "../../lib/pgboss.js";
+import {
+  type RolloverCheckPayload,
   type UserBatchRolloverPayload,
-  BATCH_SIZE, 
-  checkDSTTransition, 
-  chunkArray 
-} from './utils.js';
+  BATCH_SIZE,
+  checkDSTTransition,
+  chunkArray,
+} from "./utils.js";
 
 /**
  * Main job handler that checks all timezones and queues rollover batches
@@ -46,18 +46,19 @@ export async function processTimezoneRolloverCheck(
 
       // Check if this is a DST transition day (expand the window)
       const isDSTTransition = checkDSTTransition(timezone, now);
-      
+
       // Normally trigger at midnight (00:00 - 00:10) - 10 minute window for reliability
       // On DST days, use a wider window (23:00 - 01:30) to catch edge cases
       const isMidnightWindow = isDSTTransition
-        ? (currentHour === 23 || currentHour === 0 || currentHour === 1) && currentMinute <= 30
+        ? (currentHour === 23 || currentHour === 0 || currentHour === 1) &&
+          currentMinute <= 30
         : currentHour === 0 && currentMinute <= 10;
 
       if (!isMidnightWindow) continue;
 
       // Format dates in this timezone
-      const todayInTz = format(zonedNow, 'yyyy-MM-dd');
-      const yesterdayInTz = format(subDays(zonedNow, 1), 'yyyy-MM-dd');
+      const todayInTz = format(zonedNow, "yyyy-MM-dd");
+      const yesterdayInTz = format(subDays(zonedNow, 1), "yyyy-MM-dd");
 
       // Check if we already ran rollover for this timezone today
       const existingLog = await db.query.rolloverLogs.findFirst({
@@ -81,7 +82,7 @@ export async function processTimezoneRolloverCheck(
       if (tzUsers.length === 0) continue;
 
       // Create batches
-      const userIds = tzUsers.map(u => u.id);
+      const userIds = tzUsers.map((u) => u.id);
       const batches = chunkArray(userIds, BATCH_SIZE);
 
       // Queue batch jobs
@@ -96,7 +97,9 @@ export async function processTimezoneRolloverCheck(
       }
 
       timezonesQueued++;
-      console.log(`[Rollover] Queued ${batches.length} batches for timezone ${timezone} (${tzUsers.length} users)`);
+      console.log(
+        `[Rollover] Queued ${batches.length} batches for timezone ${timezone} (${tzUsers.length} users)`
+      );
     } catch (error) {
       console.error(`[Rollover] Error processing timezone ${timezone}:`, error);
       // Continue with other timezones
@@ -104,6 +107,8 @@ export async function processTimezoneRolloverCheck(
   }
 
   if (timezonesQueued > 0) {
-    console.log(`[Rollover Check] Queued rollover for ${timezonesQueued} timezones`);
+    console.log(
+      `[Rollover Check] Queued rollover for ${timezonesQueued} timezones`
+    );
   }
 }

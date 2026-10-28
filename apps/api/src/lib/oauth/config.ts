@@ -32,7 +32,9 @@ export function getProtectedResourceMetadataUrl(): string {
 /** Where the consent screen lives (the web app). */
 export function getWebAppUrl(): string {
   return trimTrailingSlash(
-    process.env.WEB_APP_URL || process.env.FRONTEND_URL || "http://localhost:3000"
+    process.env.WEB_APP_URL ||
+      process.env.FRONTEND_URL ||
+      "http://localhost:3000"
   );
 }
 
@@ -42,7 +44,10 @@ export const MCP_DOCS_URL = "https://opensunsama.com/docs/mcp/overview";
 export const RESOURCE_SCOPES: readonly string[] = MCP_TOOL_SCOPES;
 
 /** `offline_access` tells Claude to ask for a refresh token. */
-export const SUPPORTED_SCOPES: readonly string[] = [...RESOURCE_SCOPES, "offline_access"];
+export const SUPPORTED_SCOPES: readonly string[] = [
+  ...RESOURCE_SCOPES,
+  "offline_access",
+];
 
 export const AUTHORIZATION_CODE_TTL_SECONDS = 10 * 60;
 export const CONSENT_REQUEST_TTL_SECONDS = 15 * 60;
@@ -68,7 +73,9 @@ export const CLIENT_SECRET_PREFIX = "oscs_";
  * Normalize a `resource` parameter (RFC 8707) to our canonical MCP resource.
  * Returns null when absent, undefined when it names some other resource.
  */
-export function normalizeResource(resource: string | undefined | null): string | null | undefined {
+export function normalizeResource(
+  resource: string | undefined | null
+): string | null | undefined {
   if (!resource) return null;
   const canonical = getMcpResource();
   const issuer = getIssuer();
@@ -81,7 +88,9 @@ export function normalizeResource(resource: string | undefined | null): string |
  * Parse a space-delimited scope string, keep only scopes we support, and fall
  * back to every resource scope when the client asked for none we know.
  */
-export function resolveRequestedScopes(scope: string | undefined | null): string[] {
+export function resolveRequestedScopes(
+  scope: string | undefined | null
+): string[] {
   const requested = (scope ?? "").split(/\s+/).filter(Boolean);
   const known = requested.filter((s) => SUPPORTED_SCOPES.includes(s));
   const resourceScopes = known.filter((s) => RESOURCE_SCOPES.includes(s));

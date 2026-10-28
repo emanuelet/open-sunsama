@@ -19,7 +19,9 @@ interface GlobalShortcutsHandlerProps {
  * Handles shortcuts that work across all pages (not task-specific).
  * Renders nothing - just listens for keyboard events.
  */
-export function GlobalShortcutsHandler({ onAddTask }: GlobalShortcutsHandlerProps) {
+export function GlobalShortcutsHandler({
+  onAddTask,
+}: GlobalShortcutsHandlerProps) {
   const { showShortcutsModal, setShowShortcutsModal } = useShortcutsModal();
   const { openSearch } = useSearch();
   const { undo, redo } = useUndoRedo();
@@ -30,7 +32,10 @@ export function GlobalShortcutsHandler({ onAddTask }: GlobalShortcutsHandlerProp
       if (shouldIgnoreShortcut(event)) return;
 
       // Show shortcuts modal (Shift + ?)
-      if (SHORTCUTS.showShortcuts && matchesShortcut(event, SHORTCUTS.showShortcuts)) {
+      if (
+        SHORTCUTS.showShortcuts &&
+        matchesShortcut(event, SHORTCUTS.showShortcuts)
+      ) {
         event.preventDefault();
         // Kick the chunk download in flight before React commits the open
         // state — by the time Suspense suspends, the module is loading.
@@ -71,7 +76,14 @@ export function GlobalShortcutsHandler({ onAddTask }: GlobalShortcutsHandlerProp
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showShortcutsModal, setShowShortcutsModal, openSearch, onAddTask, undo, redo]);
+  }, [
+    showShortcutsModal,
+    setShowShortcutsModal,
+    openSearch,
+    onAddTask,
+    undo,
+    redo,
+  ]);
 
   return null; // This component renders nothing
 }

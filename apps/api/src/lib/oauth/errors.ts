@@ -4,7 +4,11 @@ export class OAuthError extends Error {
   readonly status: number;
   readonly basicAuth: boolean;
 
-  constructor(code: string, description: string, options: { status?: number; basicAuth?: boolean } = {}) {
+  constructor(
+    code: string,
+    description: string,
+    options: { status?: number; basicAuth?: boolean } = {}
+  ) {
     super(description);
     this.code = code;
     this.basicAuth = options.basicAuth ?? false;

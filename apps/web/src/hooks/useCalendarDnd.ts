@@ -1,6 +1,10 @@
 import { useState, useCallback, useRef } from "react";
 import type { Task, TimeBlock, CalendarEvent } from "@open-sunsama/types";
-import type { DragState, DropPreview, CalendarDndOptions } from "./calendar-dnd-types";
+import type {
+  DragState,
+  DropPreview,
+  CalendarDndOptions,
+} from "./calendar-dnd-types";
 import {
   calculateTimeFromY,
   calculateYFromTime,
@@ -44,36 +48,30 @@ export function useCalendarDnd(
   /**
    * Start dragging a task from unscheduled list
    */
-  const startTaskDrag = useCallback(
-    (task: Task, startY: number) => {
-      setDragState({
-        type: "task-to-timeline",
-        taskId: task.id,
-        task,
-        startY,
-        currentY: startY,
-      });
-    },
-    []
-  );
+  const startTaskDrag = useCallback((task: Task, startY: number) => {
+    setDragState({
+      type: "task-to-timeline",
+      taskId: task.id,
+      task,
+      startY,
+      currentY: startY,
+    });
+  }, []);
 
   /**
    * Start dragging a time block to move it
    */
-  const startBlockDrag = useCallback(
-    (block: TimeBlock, startY: number) => {
-      setDragState({
-        type: "move-block",
-        blockId: block.id,
-        block,
-        startY,
-        currentY: startY,
-        initialStartTime: new Date(block.startTime),
-        initialEndTime: new Date(block.endTime),
-      });
-    },
-    []
-  );
+  const startBlockDrag = useCallback((block: TimeBlock, startY: number) => {
+    setDragState({
+      type: "move-block",
+      blockId: block.id,
+      block,
+      startY,
+      currentY: startY,
+      initialStartTime: new Date(block.startTime),
+      initialEndTime: new Date(block.endTime),
+    });
+  }, []);
 
   /**
    * Start dragging an external calendar event to a new time slot.
@@ -81,20 +79,17 @@ export function useCalendarDnd(
    * draggable thing is a TimeBlock or a CalendarEvent, only its
    * current start/end pair.
    */
-  const startEventDrag = useCallback(
-    (event: CalendarEvent, startY: number) => {
-      setDragState({
-        type: "move-event",
-        eventId: event.id,
-        event,
-        startY,
-        currentY: startY,
-        initialStartTime: new Date(event.startTime),
-        initialEndTime: new Date(event.endTime),
-      });
-    },
-    []
-  );
+  const startEventDrag = useCallback((event: CalendarEvent, startY: number) => {
+    setDragState({
+      type: "move-event",
+      eventId: event.id,
+      event,
+      startY,
+      currentY: startY,
+      initialStartTime: new Date(event.startTime),
+      initialEndTime: new Date(event.endTime),
+    });
+  }, []);
 
   /**
    * Start resizing an external calendar event from one of its edges.
@@ -148,19 +143,28 @@ export function useCalendarDnd(
 
       if (!timelineRect) return;
 
-      const relativeY = currentY - timelineRect.top + (timelineRef.current?.scrollTop ?? 0);
+      const relativeY =
+        currentY - timelineRect.top + (timelineRef.current?.scrollTop ?? 0);
 
       switch (dragState.type) {
         case "task-to-timeline": {
           const duration = dragState.task?.estimatedMins ?? 60;
-          const preview = calculateTaskDropPreview(relativeY, selectedDate, duration);
+          const preview = calculateTaskDropPreview(
+            relativeY,
+            selectedDate,
+            duration
+          );
           setDropPreview(preview);
           break;
         }
         case "move-block": {
           if (dragState.block) {
             const deltaY = currentY - dragState.startY;
-            const preview = calculateMovePreview(deltaY, dragState.block, selectedDate);
+            const preview = calculateMovePreview(
+              deltaY,
+              dragState.block,
+              selectedDate
+            );
             setDropPreview(preview);
           }
           break;

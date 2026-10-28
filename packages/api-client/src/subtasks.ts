@@ -53,7 +53,11 @@ export interface SubtasksApi {
    * @param taskId Parent task ID
    * @param subtaskId Subtask ID
    */
-  delete(taskId: string, subtaskId: string, options?: RequestOptions): Promise<void>;
+  delete(
+    taskId: string,
+    subtaskId: string,
+    options?: RequestOptions
+  ): Promise<void>;
 
   /**
    * Reorder subtasks within a task
@@ -61,7 +65,11 @@ export interface SubtasksApi {
    * @param subtaskIds Array of subtask IDs in desired order
    * @returns Updated subtasks array
    */
-  reorder(taskId: string, subtaskIds: string[], options?: RequestOptions): Promise<Subtask[]>;
+  reorder(
+    taskId: string,
+    subtaskIds: string[],
+    options?: RequestOptions
+  ): Promise<Subtask[]>;
 
   /**
    * Start timing a subtask. Its task's timer starts too, and any other
@@ -86,7 +94,11 @@ export interface SubtasksApi {
    * @param subtaskId Subtask ID
    * @returns The updated subtask
    */
-  toggle(taskId: string, subtaskId: string, options?: RequestOptions): Promise<Subtask>;
+  toggle(
+    taskId: string,
+    subtaskId: string,
+    options?: RequestOptions
+  ): Promise<Subtask>;
 
   /**
    * Fetch subtasks for many tasks in one request, grouped by task id.
@@ -159,10 +171,18 @@ export function createSubtasksApi(client: OpenSunsamaClient): SubtasksApi {
       );
     },
 
-    async timerStart(taskId: string, subtaskId: string, options?: RequestOptions) {
+    async timerStart(
+      taskId: string,
+      subtaskId: string,
+      options?: RequestOptions
+    ) {
       const response = await client.post<
         ApiResponseWrapper<Subtask> & { task: Task; stoppedTask: Task | null }
-      >(`tasks/${taskId}/subtasks/${subtaskId}/timer/start`, undefined, options);
+      >(
+        `tasks/${taskId}/subtasks/${subtaskId}/timer/start`,
+        undefined,
+        options
+      );
       return {
         subtask: response.data,
         task: response.task,
@@ -170,12 +190,14 @@ export function createSubtasksApi(client: OpenSunsamaClient): SubtasksApi {
       };
     },
 
-    async timerStop(taskId: string, subtaskId: string, options?: RequestOptions) {
-      const response = await client.post<ApiResponseWrapper<Subtask> & { task: Task }>(
-        `tasks/${taskId}/subtasks/${subtaskId}/timer/stop`,
-        undefined,
-        options
-      );
+    async timerStop(
+      taskId: string,
+      subtaskId: string,
+      options?: RequestOptions
+    ) {
+      const response = await client.post<
+        ApiResponseWrapper<Subtask> & { task: Task }
+      >(`tasks/${taskId}/subtasks/${subtaskId}/timer/stop`, undefined, options);
       return { subtask: response.data, task: response.task };
     },
 
@@ -204,7 +226,12 @@ export function createSubtasksApi(client: OpenSunsamaClient): SubtasksApi {
         throw new Error(`Subtask ${subtaskId} not found`);
       }
       // Toggle completion status
-      return this.update(taskId, subtaskId, { completed: !subtask.completed }, options);
+      return this.update(
+        taskId,
+        subtaskId,
+        { completed: !subtask.completed },
+        options
+      );
     },
 
     async batchList(

@@ -30,6 +30,7 @@ interface MobileTaskListViewProps {
 ```
 
 **Layout:**
+
 - Sticky header with date ("Friday January 30") and total time badge ("10:35")
 - Date navigation (swipe or tap arrows)
 - Vertical scrollable list of task cards
@@ -37,6 +38,7 @@ interface MobileTaskListViewProps {
 - Bottom padding for navigation bar
 
 **Header design:**
+
 ```
 ┌──────────────────────────────────────────────┐
 │  Friday January 30                    10:35  │
@@ -45,6 +47,7 @@ interface MobileTaskListViewProps {
 ```
 
 **Key functions:**
+
 - `useMobileTaskList()` - Hook for fetching tasks for selected date
 - Date swipe gesture support via touch events
 - Pull-to-refresh pattern
@@ -65,6 +68,7 @@ interface MobileTaskCardProps {
 ```
 
 **Layout:**
+
 ```
 ┌──────────────────────────────────────────────┐
 │  ○  Task title that can wrap to            0:30 │
@@ -75,6 +79,7 @@ interface MobileTaskCardProps {
 ```
 
 **Design:**
+
 - Large circular checkbox (20px) on left
 - Task title (multi-line allowed, max 3 lines)
 - Metadata row: subtask count, date info, channel/tag
@@ -98,6 +103,7 @@ interface MobileCalendarViewProps {
 ```
 
 **Layout:**
+
 ```
 ┌──────────────────────────────────────────────┐
 │  ☰  Friday, January 30                       │
@@ -115,6 +121,7 @@ interface MobileCalendarViewProps {
 ```
 
 **Features:**
+
 - Hamburger menu opens side drawer with unscheduled tasks
 - Full-width timeline (00:00 to 24:00)
 - Current time indicator (red horizontal line)
@@ -135,6 +142,7 @@ interface MobileMoreMenuProps {
 ```
 
 **Sections:**
+
 ```
 RITUALS
 ├── Daily planning (icon: Sunrise)
@@ -157,6 +165,7 @@ OTHER
 ```
 
 **Design:**
+
 - Clean grouped list with section headers
 - Each item has icon + label
 - Chevron indicator for navigation items
@@ -170,6 +179,7 @@ OTHER
 **Update existing bottom nav to 3 tabs.**
 
 **Current → New:**
+
 ```
 [Board] [Tasks] [Calendar] [Settings]
            ↓
@@ -177,6 +187,7 @@ OTHER
 ```
 
 **Design:**
+
 - 3 tabs with icons
 - Active tab has pill-shaped background (like iOS tab bar)
 - Fixed at bottom with safe area padding
@@ -197,11 +208,13 @@ const navItems = [
 **Fix broken mobile layout.**
 
 **Changes:**
+
 - Remove fixed 192px sidebar on mobile
 - Use full-width tabs or accordion pattern
 - Sheet-based navigation for sections
 
 **Mobile Layout:**
+
 ```
 ┌──────────────────────────────────────────────┐
 │  ← Settings                                  │
@@ -237,6 +250,7 @@ interface MobileFabProps {
 ```
 
 **Design:**
+
 - Blue circular button (56px diameter)
 - Plus icon (24px)
 - Position: bottom-right, 16px margin
@@ -255,6 +269,7 @@ apps/web/src/routes/app/more.tsx  (NEW)
 ```
 
 **Update index.tsx:**
+
 - Conditionally render `MobileTaskListView` or `KanbanBoard` based on viewport
 - Use `useMediaQuery` hook or CSS-only approach
 
@@ -267,16 +282,16 @@ apps/web/src/routes/app/more.tsx  (NEW)
 ```tsx
 export function useIsMobile(): boolean {
   const [isMobile, setIsMobile] = useState(false);
-  
+
   useEffect(() => {
-    const mq = window.matchMedia('(max-width: 1023px)');
+    const mq = window.matchMedia("(max-width: 1023px)");
     setIsMobile(mq.matches);
-    
+
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
   }, []);
-  
+
   return isMobile;
 }
 ```
@@ -286,26 +301,28 @@ export function useIsMobile(): boolean {
 ## File Changes Summary
 
 ### New Files
-| Path | Purpose |
-|------|---------|
-| `apps/web/src/components/mobile/task-list-view.tsx` | Mobile task list replacing kanban |
-| `apps/web/src/components/mobile/mobile-task-card.tsx` | Touch-optimized task card |
-| `apps/web/src/components/mobile/mobile-calendar-view.tsx` | Full-width calendar timeline |
-| `apps/web/src/components/mobile/mobile-more-menu.tsx` | Grouped settings menu |
-| `apps/web/src/components/mobile/mobile-fab.tsx` | Floating action button |
-| `apps/web/src/components/mobile/index.ts` | Mobile component exports |
-| `apps/web/src/routes/app/more.tsx` | More menu route |
-| `apps/web/src/hooks/useIsMobile.ts` | Mobile breakpoint hook |
+
+| Path                                                      | Purpose                           |
+| --------------------------------------------------------- | --------------------------------- |
+| `apps/web/src/components/mobile/task-list-view.tsx`       | Mobile task list replacing kanban |
+| `apps/web/src/components/mobile/mobile-task-card.tsx`     | Touch-optimized task card         |
+| `apps/web/src/components/mobile/mobile-calendar-view.tsx` | Full-width calendar timeline      |
+| `apps/web/src/components/mobile/mobile-more-menu.tsx`     | Grouped settings menu             |
+| `apps/web/src/components/mobile/mobile-fab.tsx`           | Floating action button            |
+| `apps/web/src/components/mobile/index.ts`                 | Mobile component exports          |
+| `apps/web/src/routes/app/more.tsx`                        | More menu route                   |
+| `apps/web/src/hooks/useIsMobile.ts`                       | Mobile breakpoint hook            |
 
 ### Modified Files
-| Path | Changes |
-|------|---------|
-| `apps/web/src/components/layout/mobile-bottom-nav.tsx` | Update to 3 tabs with pill style |
-| `apps/web/src/routes/app/index.tsx` | Conditional mobile/desktop view |
-| `apps/web/src/routes/app/calendar.tsx` | Add mobile calendar view |
-| `apps/web/src/routes/app/settings.tsx` | Fix mobile layout, add sheet navigation |
-| `apps/web/src/components/layout/header.tsx` | Hide on mobile (use bottom nav) |
-| `apps/web/src/routes/app.tsx` | Adjust layout for mobile |
+
+| Path                                                   | Changes                                 |
+| ------------------------------------------------------ | --------------------------------------- |
+| `apps/web/src/components/layout/mobile-bottom-nav.tsx` | Update to 3 tabs with pill style        |
+| `apps/web/src/routes/app/index.tsx`                    | Conditional mobile/desktop view         |
+| `apps/web/src/routes/app/calendar.tsx`                 | Add mobile calendar view                |
+| `apps/web/src/routes/app/settings.tsx`                 | Fix mobile layout, add sheet navigation |
+| `apps/web/src/components/layout/header.tsx`            | Hide on mobile (use bottom nav)         |
+| `apps/web/src/routes/app.tsx`                          | Adjust layout for mobile                |
 
 ---
 

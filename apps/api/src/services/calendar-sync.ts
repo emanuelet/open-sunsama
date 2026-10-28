@@ -10,8 +10,8 @@ import {
   calendarAccounts,
   calendars,
   calendarEvents,
-} from '@open-sunsama/database';
-import { decrypt, encrypt } from './encryption.js';
+} from "@open-sunsama/database";
+import { decrypt, encrypt } from "./encryption.js";
 import {
   GoogleCalendarProvider,
   OutlookCalendarProvider,
@@ -19,20 +19,20 @@ import {
   type CalendarProvider,
   type SyncOptions,
   type ExternalEvent,
-} from './calendar-providers/index.js';
+} from "./calendar-providers/index.js";
 import {
   ICloudCalendarProvider,
   listCalDavEvents,
-} from './calendar-providers/icloud.js';
-import { publishEvent } from '../lib/websocket/index.js';
+} from "./calendar-providers/icloud.js";
+import { publishEvent } from "../lib/websocket/index.js";
 
 export function getProvider(providerName: string): CalendarProvider | null {
   switch (providerName) {
-    case 'google':
+    case "google":
       return new GoogleCalendarProvider();
-    case 'outlook':
+    case "outlook":
       return new OutlookCalendarProvider();
-    case 'icloud':
+    case "icloud":
       // iCloud's provider class accepts CalDAV credentials via the
       // `accessToken` parameter as a JSON string (its constructor's
       // optional credentials field is unused on this code path).
@@ -69,9 +69,9 @@ export async function getAccessTokenForProvider(
   },
   provider: CalendarProvider
 ): Promise<string> {
-  if (account.provider === 'icloud') {
+  if (account.provider === "icloud") {
     if (!account.caldavPasswordEncrypted) {
-      throw new ProviderAuthError('icloud');
+      throw new ProviderAuthError("icloud");
     }
     const password = decrypt(account.caldavPasswordEncrypted);
     return JSON.stringify({
@@ -87,7 +87,7 @@ export async function getAccessTokenForProvider(
  * Refresh OAuth tokens if expired
  */
 export async function refreshTokensIfNeeded(
-  account: { 
+  account: {
     id: string;
     provider: string;
     accessTokenEncrypted: string | null;
@@ -174,7 +174,7 @@ export async function syncICloudAccount(
   syncOptions: SyncOptions
 ): Promise<AccountSyncResult> {
   if (!account.caldavPasswordEncrypted) {
-    throw new Error('CalDAV credentials missing');
+    throw new Error("CalDAV credentials missing");
   }
 
   const password = decrypt(account.caldavPasswordEncrypted);
@@ -214,7 +214,11 @@ export async function syncICloudAccount(
 export async function syncOAuthAccount(
   accessToken: string,
   provider: CalendarProvider,
-  accountCalendars: Array<{ id: string; externalId: string; syncToken: string | null }>,
+  accountCalendars: Array<{
+    id: string;
+    externalId: string;
+    syncToken: string | null;
+  }>,
   syncOptions: SyncOptions
 ): Promise<AccountSyncResult> {
   const db = getDb();
@@ -237,8 +241,8 @@ export async function syncOAuthAccount(
         options
       );
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      if (message !== 'SYNC_TOKEN_INVALID') {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      if (message !== "SYNC_TOKEN_INVALID") {
         throw err;
       }
       // Sync token expired — clear it and re-sync from scratch within
@@ -248,11 +252,10 @@ export async function syncOAuthAccount(
         .set({ syncToken: null, updatedAt: new Date() })
         .where(eq(calendars.id, calendar.id));
 
-      result = await provider.listEvents(
-        accessToken,
-        calendar.externalId,
-        { timeMin: syncOptions.timeMin, timeMax: syncOptions.timeMax }
-      );
+      result = await provider.listEvents(accessToken, calendar.externalId, {
+        timeMin: syncOptions.timeMin,
+        timeMax: syncOptions.timeMax,
+      });
     }
 
     perCalendar.push({
@@ -373,7 +376,10 @@ export async function upsertEvents(
       // account, but in practice doesn't (each VEVENT object has a
       // unique UID per RFC 5545).
       const [misattributed] = await db
-        .select({ id: calendarEvents.id, calendarId: calendarEvents.calendarId })
+        .select({
+          id: calendarEvents.id,
+          calendarId: calendarEvents.calendarId,
+        })
         .from(calendarEvents)
         .where(
           and(
@@ -438,7 +444,7 @@ export async function upsertEvents(
  */
 export async function updateSyncStatus(
   accountId: string,
-  status: 'idle' | 'error',
+  status: "idle" | "error",
   syncToken: string | null,
   errorMessage?: string
 ): Promise<void> {
@@ -447,9 +453,9 @@ export async function updateSyncStatus(
     .update(calendarAccounts)
     .set({
       syncStatus: status,
-      syncToken: status === 'idle' ? syncToken : undefined,
-      lastSyncedAt: status === 'idle' ? new Date() : undefined,
-      syncError: status === 'error' ? errorMessage : null,
+      syncToken: status === "idle" ? syncToken : undefined,
+      lastSyncedAt: status === "idle" ? new Date() : undefined,
+      syncError: status === "error" ? errorMessage : null,
       updatedAt: new Date(),
     })
     .where(eq(calendarAccounts.id, accountId));
@@ -464,7 +470,7 @@ export function publishSyncEvent(
   eventsCount: number,
   deletedCount: number
 ): void {
-  publishEvent(userId, 'calendar:synced', {
+  publishEvent(userId, "calendar:synced", {
     accountId,
     eventsCount,
     deletedCount,
@@ -490,7 +496,7 @@ export async function ensureGoogleWatches(
   // Lazy import keeps the watch service out of the hot sync path
   // when nothing needs registering — the dynamic import is cached
   // after the first call.
-  const { registerWatch } = await import('./google-calendar-watch.js');
+  const { registerWatch } = await import("./google-calendar-watch.js");
   const db = getDb();
   // Refresh window: re-register anything expiring within the next 24h
   // so we don't drop coverage between sync runs. Renewal happens

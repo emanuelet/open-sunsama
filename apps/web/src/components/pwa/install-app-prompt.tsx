@@ -26,7 +26,8 @@ function readState(): TipState {
 }
 
 function shouldOffer(): boolean {
-  if (isRunningInstalled() || currentInstallPlatform() === "desktop") return false;
+  if (isRunningInstalled() || currentInstallPlatform() === "desktop")
+    return false;
   const { dismissedAt = 0, dismissals = 0 } = readState();
   if (dismissals >= MAX_DISMISSALS) return false;
   return Date.now() - dismissedAt > SNOOZE_MS;
@@ -64,8 +65,13 @@ export function InstallAppPrompt() {
       const active = document.activeElement;
       const typing =
         active instanceof HTMLElement &&
-        (active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName));
-      if (Date.now() - lastInput < IDLE_MS || typing || document.querySelector("[role=dialog]")) {
+        (active.isContentEditable ||
+          /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName));
+      if (
+        Date.now() - lastInput < IDLE_MS ||
+        typing ||
+        document.querySelector("[role=dialog]")
+      ) {
         return;
       }
       window.clearInterval(id);

@@ -18,15 +18,15 @@ interface ThemeContextValue {
   themeMode: ThemeMode;
   colorTheme: string;
   fontFamily: FontFamily;
-  
+
   // Computed
   resolvedTheme: "light" | "dark"; // Actual applied theme (after resolving 'system')
-  
+
   // Setters
   setThemeMode: (mode: ThemeMode) => void;
   setColorTheme: (theme: string) => void;
   setFontFamily: (font: FontFamily) => void;
-  
+
   // Utility
   isLoading: boolean;
 }
@@ -36,7 +36,7 @@ const ThemeContext = React.createContext<ThemeContextValue | null>(null);
 // Get stored preferences from localStorage
 function getStoredPreferences(): UserPreferences {
   if (typeof window === "undefined") return DEFAULT_PREFERENCES;
-  
+
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -52,7 +52,7 @@ function getStoredPreferences(): UserPreferences {
   } catch {
     // Ignore parse errors
   }
-  
+
   return DEFAULT_PREFERENCES;
 }
 
@@ -65,7 +65,9 @@ function savePreferences(prefs: UserPreferences) {
 // Resolve system theme preference
 function getSystemTheme(): "light" | "dark" {
   if (typeof window === "undefined") return "dark";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 }
 
 // Get initial resolved theme from stored preferences (for sync initialization)
@@ -78,44 +80,48 @@ function getInitialResolvedTheme(): "light" | "dark" {
 }
 
 // Apply theme to document
-function applyTheme(mode: ThemeMode, colorTheme: string, fontFamily: FontFamily) {
+function applyTheme(
+  mode: ThemeMode,
+  colorTheme: string,
+  fontFamily: FontFamily
+) {
   const root = document.documentElement;
-  
+
   // Resolve actual theme
   const resolvedMode = mode === "system" ? getSystemTheme() : mode;
-  
+
   // Apply dark/light mode
   if (resolvedMode === "dark") {
     root.classList.add("dark");
   } else {
     root.classList.remove("dark");
   }
-  
+
   // Remove all theme classes
-  COLOR_THEMES.forEach(t => {
+  COLOR_THEMES.forEach((t) => {
     root.classList.remove(`theme-${t.id}`);
   });
-  
+
   // Apply color theme (skip for default)
   if (colorTheme !== "default") {
     root.classList.add(`theme-${colorTheme}`);
   }
-  
+
   // Remove all font classes
-  FONT_OPTIONS.forEach(f => {
+  FONT_OPTIONS.forEach((f) => {
     root.classList.remove(`font-${f.id}`);
   });
-  
+
   // Apply font family
   root.classList.add(`font-${fontFamily}`);
-  
+
   // Force browser to recalculate styles immediately
   // This ensures CSS variables are updated before React re-renders
   void root.offsetHeight;
-  
+
   // Also update body's font-family directly for immediate visual feedback
   document.body.style.fontFamily = `var(--font-family)`;
-  
+
   return resolvedMode;
 }
 
@@ -134,10 +140,13 @@ function debounce<T extends (...args: Parameters<T>) => void>(
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Use lazy initialization to read from localStorage on first render
   // This ensures React state is in sync with what index.html script already applied
-  const [preferences, setPreferences] = React.useState<UserPreferences>(getStoredPreferences);
-  const [resolvedTheme, setResolvedTheme] = React.useState<"light" | "dark">(getInitialResolvedTheme);
+  const [preferences, setPreferences] =
+    React.useState<UserPreferences>(getStoredPreferences);
+  const [resolvedTheme, setResolvedTheme] = React.useState<"light" | "dark">(
+    getInitialResolvedTheme
+  );
   const [isLoading] = React.useState(false);
-  
+
   // Get user and save mutation for DB sync
   const { user } = useAuth();
   const savePreferencesMutation = useSavePreferences();
@@ -162,7 +171,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       const prefs = user.preferences as UserPreferences;
       setPreferences(prefs);
       savePreferences(prefs); // Cache to localStorage
-      const resolved = applyTheme(prefs.themeMode, prefs.colorTheme, prefs.fontFamily as FontFamily);
+      const resolved = applyTheme(
+        prefs.themeMode,
+        prefs.colorTheme,
+        prefs.fontFamily as FontFamily
+      );
       setResolvedTheme(resolved);
     }
   }, [user?.preferences]);
@@ -174,15 +187,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       // Apply preferences from WebSocket event
       const newPrefs: UserPreferences = {
         ...preferences,
-        themeMode: (wsPreferences.themeMode as ThemeMode) || preferences.themeMode,
+        themeMode:
+          (wsPreferences.themeMode as ThemeMode) || preferences.themeMode,
         colorTheme: wsPreferences.colorTheme || preferences.colorTheme,
-        fontFamily: (wsPreferences.fontFamily as FontFamily) || preferences.fontFamily,
+        fontFamily:
+          (wsPreferences.fontFamily as FontFamily) || preferences.fontFamily,
       };
-      
+
       // Update state and apply theme
       setPreferences(newPrefs);
       savePreferences(newPrefs); // Cache to localStorage
-      const resolved = applyTheme(newPrefs.themeMode, newPrefs.colorTheme, newPrefs.fontFamily);
+      const resolved = applyTheme(
+        newPrefs.themeMode,
+        newPrefs.colorTheme,
+        newPrefs.fontFamily
+      );
       setResolvedTheme(resolved);
     });
 
@@ -201,53 +220,66 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Listen for system theme changes
   React.useEffect(() => {
     if (preferences.themeMode !== "system") return;
-    
+
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => {
-      const resolved = applyTheme(preferences.themeMode, preferences.colorTheme, preferences.fontFamily);
+      const resolved = applyTheme(
+        preferences.themeMode,
+        preferences.colorTheme,
+        preferences.fontFamily
+      );
       setResolvedTheme(resolved);
     };
-    
+
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [preferences]);
 
-  const setThemeMode = React.useCallback((mode: ThemeMode) => {
-    setPreferences(prev => {
-      const newPrefs = { ...prev, themeMode: mode };
-      savePreferences(newPrefs);
-      if (user) {
-        debouncedSaveToDb(newPrefs);
-      }
-      const resolved = applyTheme(mode, prev.colorTheme, prev.fontFamily);
-      setResolvedTheme(resolved);
-      return newPrefs;
-    });
-  }, [debouncedSaveToDb, user]);
+  const setThemeMode = React.useCallback(
+    (mode: ThemeMode) => {
+      setPreferences((prev) => {
+        const newPrefs = { ...prev, themeMode: mode };
+        savePreferences(newPrefs);
+        if (user) {
+          debouncedSaveToDb(newPrefs);
+        }
+        const resolved = applyTheme(mode, prev.colorTheme, prev.fontFamily);
+        setResolvedTheme(resolved);
+        return newPrefs;
+      });
+    },
+    [debouncedSaveToDb, user]
+  );
 
-  const setColorTheme = React.useCallback((theme: string) => {
-    setPreferences(prev => {
-      const newPrefs = { ...prev, colorTheme: theme };
-      savePreferences(newPrefs);
-      if (user) {
-        debouncedSaveToDb(newPrefs);
-      }
-      applyTheme(prev.themeMode, theme, prev.fontFamily);
-      return newPrefs;
-    });
-  }, [debouncedSaveToDb, user]);
+  const setColorTheme = React.useCallback(
+    (theme: string) => {
+      setPreferences((prev) => {
+        const newPrefs = { ...prev, colorTheme: theme };
+        savePreferences(newPrefs);
+        if (user) {
+          debouncedSaveToDb(newPrefs);
+        }
+        applyTheme(prev.themeMode, theme, prev.fontFamily);
+        return newPrefs;
+      });
+    },
+    [debouncedSaveToDb, user]
+  );
 
-  const setFontFamily = React.useCallback((font: FontFamily) => {
-    setPreferences(prev => {
-      const newPrefs = { ...prev, fontFamily: font };
-      savePreferences(newPrefs);
-      if (user) {
-        debouncedSaveToDb(newPrefs);
-      }
-      applyTheme(prev.themeMode, prev.colorTheme, font);
-      return newPrefs;
-    });
-  }, [debouncedSaveToDb, user]);
+  const setFontFamily = React.useCallback(
+    (font: FontFamily) => {
+      setPreferences((prev) => {
+        const newPrefs = { ...prev, fontFamily: font };
+        savePreferences(newPrefs);
+        if (user) {
+          debouncedSaveToDb(newPrefs);
+        }
+        applyTheme(prev.themeMode, prev.colorTheme, font);
+        return newPrefs;
+      });
+    },
+    [debouncedSaveToDb, user]
+  );
 
   const value = React.useMemo(
     () => ({
@@ -260,13 +292,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       setFontFamily,
       isLoading,
     }),
-    [preferences, resolvedTheme, setThemeMode, setColorTheme, setFontFamily, isLoading]
+    [
+      preferences,
+      resolvedTheme,
+      setThemeMode,
+      setColorTheme,
+      setFontFamily,
+      isLoading,
+    ]
   );
 
   return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 }
 

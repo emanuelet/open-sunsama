@@ -6,7 +6,13 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB for images
 
 // Supported file types
-const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
+const SUPPORTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
+];
 const SUPPORTED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
 const SUPPORTED_DOCUMENT_TYPES = [
   "application/pdf",
@@ -80,9 +86,12 @@ export function getFileIcon(contentType: string): string {
   if (SUPPORTED_IMAGE_TYPES.includes(contentType)) return "🖼️";
   if (SUPPORTED_VIDEO_TYPES.includes(contentType)) return "🎬";
   if (contentType === "application/pdf") return "📄";
-  if (contentType.includes("word") || contentType.includes("document")) return "📝";
-  if (contentType.includes("excel") || contentType.includes("spreadsheet")) return "📊";
-  if (contentType.includes("zip") || contentType.includes("archive")) return "📦";
+  if (contentType.includes("word") || contentType.includes("document"))
+    return "📝";
+  if (contentType.includes("excel") || contentType.includes("spreadsheet"))
+    return "📊";
+  if (contentType.includes("zip") || contentType.includes("archive"))
+    return "📦";
   if (contentType.includes("json")) return "📋";
   if (contentType.includes("text")) return "📃";
   return "📎";
@@ -124,7 +133,9 @@ export function useUploadAttachment() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Upload failed with status ${response.status}`);
+        throw new Error(
+          errorData.message || `Upload failed with status ${response.status}`
+        );
       }
 
       const result = await response.json();

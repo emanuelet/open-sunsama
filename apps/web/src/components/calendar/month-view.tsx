@@ -110,7 +110,8 @@ export function MonthView({
     });
   }, [month, weekStartsOn]);
 
-  const weekdayLabels = weekStartsOn === 1 ? WEEKDAY_LABELS_MON : WEEKDAY_LABELS_SUN;
+  const weekdayLabels =
+    weekStartsOn === 1 ? WEEKDAY_LABELS_MON : WEEKDAY_LABELS_SUN;
 
   return (
     <div className="flex h-full w-full min-w-0 flex-1 flex-col">

@@ -3,7 +3,11 @@ import { useNavigate, Link } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { AuthLayout, AuthHeader, AuthFooter } from "@/components/layout/auth-layout";
+import {
+  AuthLayout,
+  AuthHeader,
+  AuthFooter,
+} from "@/components/layout/auth-layout";
 import { Button, Input, Label } from "@/components/ui";
 import { toast } from "@/hooks/use-toast";
 import { useSEO, SEO_CONFIGS } from "@/hooks/useSEO";
@@ -26,7 +30,7 @@ export default function RegisterPage() {
   }, [navigate, redirect]);
   const { register: registerUser, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
-  
+
   const {
     register,
     handleSubmit,
@@ -133,7 +137,9 @@ export default function RegisterPage() {
             })}
           />
           {errors.password && (
-            <p className="text-sm text-destructive">{errors.password.message}</p>
+            <p className="text-sm text-destructive">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
@@ -158,7 +164,11 @@ export default function RegisterPage() {
           )}
         </div>
 
-        <Button type="submit" disabled={isLoading} className="w-full mt-2 h-9 text-[13px]">
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="w-full mt-2 h-9 text-[13px]"
+        >
           {isLoading && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
           Create account
         </Button>

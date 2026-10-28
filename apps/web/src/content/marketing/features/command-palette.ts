@@ -104,7 +104,10 @@ export default defineMarketingPage({
     description:
       "Open Sunsama is a keyboard-first task manager. Press Cmd+K to find any task, idea or meeting, then plan your day with single-key shortcuts or ask any AI agent.",
   },
-  breadcrumbs: [{ label: "Features", href: "/#features" }, { label: "Command palette" }],
+  breadcrumbs: [
+    { label: "Features", href: "/#features" },
+    { label: "Command palette" },
+  ],
 
   hero: {
     badge: "Feature",
@@ -120,7 +123,11 @@ export default defineMarketingPage({
     chips: [
       { tone: "block", title: "⌘K  review", detail: "5 tasks, 2 ideas" },
       { tone: "timer", title: "F", detail: "Focus on this task" },
-      { tone: "agent", title: "Claude connected", detail: "Or just ask your agent" },
+      {
+        tone: "agent",
+        title: "Claude connected",
+        detail: "Or just ask your agent",
+      },
     ],
   },
 
@@ -191,7 +198,10 @@ export default defineMarketingPage({
             alt: "Open Sunsama week view with meetings and color-coded time blocks",
             caption: "Press W for the week view, D for a single day.",
           },
-          link: { label: "How calendar sync works", href: "/features/calendar-sync" },
+          link: {
+            label: "How calendar sync works",
+            href: "/features/calendar-sync",
+          },
         },
       ],
     },
@@ -204,7 +214,10 @@ export default defineMarketingPage({
       body: SHORTCUT_GROUPS.map(
         (group) =>
           `**${group.title}.** ${group.note} ${group.items
-            .map((item) => `${shortcutText(item.keys)}: ${item.label.toLowerCase()}`)
+            .map(
+              (item) =>
+                `${shortcutText(item.keys)}: ${item.label.toLowerCase()}`
+            )
             .join("; ")}.`
       ),
     },
@@ -223,9 +236,16 @@ export default defineMarketingPage({
         "Move everything I didn't finish today to tomorrow.",
         "What's left on my plate this afternoon?",
       ],
-      tools: ["create_task", "list_tasks", "schedule_task", "complete_task", "update_task"],
+      tools: [
+        "create_task",
+        "list_tasks",
+        "schedule_task",
+        "complete_task",
+        "update_task",
+      ],
       clip: "ai-plan",
-      clipCaption: "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
+      clipCaption:
+        "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
       links: [
         { label: "Claude Code setup", href: "/docs/mcp/claude" },
         { label: "Cursor setup", href: "/docs/mcp/cursor" },
@@ -236,7 +256,8 @@ export default defineMarketingPage({
       kind: "comparison",
       id: "compare",
       eyebrow: "Compare",
-      heading: "Open Sunsama pairs Cmd+K with an API, any agent and code you can run",
+      heading:
+        "Open Sunsama pairs Cmd+K with an API, any agent and code you can run",
       lead: "Sunsama, Akiflow and Todoist all have a Cmd+K palette too. Akiflow's command bar also opens from any app. Here is what else each one gives you.",
       columns: ["Open Sunsama", "Sunsama", "Akiflow", "Todoist"],
       rows: [
@@ -262,7 +283,10 @@ export default defineMarketingPage({
           feature: "Public REST API",
           cells: ["yes", "no", { mark: "no", text: "None listed" }, "yes"],
         },
-        { feature: "Code you can read and self-host", cells: ["yes", "no", "no", "no"] },
+        {
+          feature: "Code you can read and self-host",
+          cells: ["yes", "no", "no", "no"],
+        },
         {
           feature: "Desktop apps",
           cells: [
@@ -316,7 +340,10 @@ export default defineMarketingPage({
         question: "What is the best keyboard-first task manager?",
         answer:
           "We build Open Sunsama, and we think it is the best pick for most people. Every action has a key, Cmd+K finds anything, and any AI agent can do the same actions for you. The desktop app adds a task or starts focus mode from any app. Pick Akiflow if you need its full command bar in every app.",
-        link: { label: "Akiflow alternatives", href: "/blog/akiflow-alternatives" },
+        link: {
+          label: "Akiflow alternatives",
+          href: "/blog/akiflow-alternatives",
+        },
       },
       {
         question: "What is a command palette?",
@@ -325,17 +352,22 @@ export default defineMarketingPage({
       },
       {
         question: "How do I open the command palette in Open Sunsama?",
-        answer: "Press Cmd+K on a Mac or Ctrl+K on Windows and Linux. You can also click Search at the top of the app.",
+        answer:
+          "Press Cmd+K on a Mac or Ctrl+K on Windows and Linux. You can also click Search at the top of the app.",
       },
       {
         question: "How do I see every keyboard shortcut?",
-        answer: "Press ? anywhere in the app. A sheet lists every shortcut by group: general, navigation, task actions, calendar and focus mode. In the desktop app it also lists the keys that work from any app.",
+        answer:
+          "Press ? anywhere in the app. A sheet lists every shortcut by group: general, navigation, task actions, calendar and focus mode. In the desktop app it also lists the keys that work from any app.",
       },
       {
         question: "Can I change the keyboard shortcuts?",
         answer:
           "Not yet. The keys are fixed today. The code is public, so you can change them in a self-hosted copy.",
-        link: { label: "Self-host with Docker", href: "/docs/self-hosting/docker" },
+        link: {
+          label: "Self-host with Docker",
+          href: "/docs/self-hosting/docker",
+        },
       },
       {
         question: "Do the shortcuts work on Windows and Linux?",
@@ -399,7 +431,8 @@ export default defineMarketingPage({
     heading: "Press Cmd+K and plan your day",
     body: "Find anything, move anything and focus on one task at a time, all from the keyboard, or ask the AI agent you already use.",
     shot: "command-palette",
-    shotAlt: "The Open Sunsama command palette with search results for tasks and ideas",
+    shotAlt:
+      "The Open Sunsama command palette with search results for tasks and ideas",
   },
 
   software: {

@@ -12,15 +12,19 @@ interface ShortcutHintProps {
  * Subtle shortcut hint that shows the keyboard shortcut for an action.
  * Linear-style minimal design.
  */
-export function ShortcutHint({ shortcutKey, className, showOnHover }: ShortcutHintProps) {
+export function ShortcutHint({
+  shortcutKey,
+  className,
+  showOnHover,
+}: ShortcutHintProps) {
   const shortcut = SHORTCUTS[shortcutKey];
   if (!shortcut) return null;
-  
+
   const formatted = formatShortcut(shortcut);
   const keys = formatted.split(" ");
 
   return (
-    <span 
+    <span
       className={cn(
         "inline-flex items-center gap-0.5 text-[10px] text-muted-foreground/60",
         showOnHover && "opacity-0 group-hover:opacity-100 transition-opacity",

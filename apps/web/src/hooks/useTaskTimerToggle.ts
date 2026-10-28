@@ -49,7 +49,9 @@ export function loggedSeconds(task: Timed, now = Date.now()): number {
 function findTask(qc: QueryClient, id: string): Task | undefined {
   const detail = qc.getQueryData<Task>(taskKeys.detail(id));
   if (detail) return detail;
-  for (const [, list] of qc.getQueriesData<Task[]>({ queryKey: taskKeys.lists() })) {
+  for (const [, list] of qc.getQueriesData<Task[]>({
+    queryKey: taskKeys.lists(),
+  })) {
     const found = list?.find((t) => t.id === id);
     if (found) return found;
   }
@@ -85,55 +87,61 @@ export function useTaskTimerToggle() {
   const qc = useQueryClient();
 
   return React.useCallback(
-    (taskId: string) => enqueue(async () => {
-      const task = findTask(qc, taskId);
-      if (!task) return;
+    (taskId: string) =>
+      enqueue(async () => {
+        const task = findTask(qc, taskId);
+        if (!task) return;
 
-      const wasRunning = !!task.timerStartedAt;
-      // Task lists, details and the active timer all live under "tasks".
-      const snapshots = [...qc.getQueriesData({ queryKey: taskKeys.all }), ...qc.getQueriesData({ queryKey: subtaskKeys.all })];
+        const wasRunning = !!task.timerStartedAt;
+        // Task lists, details and the active timer all live under "tasks".
+        const snapshots = [
+          ...qc.getQueriesData({ queryKey: taskKeys.all }),
+          ...qc.getQueriesData({ queryKey: subtaskKeys.all }),
+        ];
 
-      if (wasRunning) {
-        writeTask(qc, stopped(task));
-        stopCachedSubtasks(qc);
-        qc.setQueryData(timerKeys.active(), null);
-      } else {
-        stopCachedSubtasks(qc);
-        const others = qc
-          .getQueriesData<Task[]>({ queryKey: taskKeys.lists() })
-          .flatMap(([, list]) => list ?? [])
-          .filter((t) => t.id !== taskId && t.timerStartedAt);
-        for (const other of others) writeTask(qc, stopped(other));
-        const started: Task = {
-          ...task,
-          timerStartedAt: new Date(),
-          timerAccumulatedSeconds: loggedSeconds(task),
-        };
-        writeTask(qc, started);
-        qc.setQueryData(timerKeys.active(), started);
-      }
-
-      try {
-        const api = getApi();
         if (wasRunning) {
-          writeTask(qc, await api.tasks.timerStop(taskId));
+          writeTask(qc, stopped(task));
+          stopCachedSubtasks(qc);
+          qc.setQueryData(timerKeys.active(), null);
         } else {
-          const result = await api.tasks.timerStart(taskId);
-          writeTask(qc, result.task);
-          if (result.stoppedTask) writeTask(qc, result.stoppedTask);
+          stopCachedSubtasks(qc);
+          const others = qc
+            .getQueriesData<Task[]>({ queryKey: taskKeys.lists() })
+            .flatMap(([, list]) => list ?? [])
+            .filter((t) => t.id !== taskId && t.timerStartedAt);
+          for (const other of others) writeTask(qc, stopped(other));
+          const started: Task = {
+            ...task,
+            timerStartedAt: new Date(),
+            timerAccumulatedSeconds: loggedSeconds(task),
+          };
+          writeTask(qc, started);
+          qc.setQueryData(timerKeys.active(), started);
         }
-      } catch (error) {
-        for (const [key, data] of snapshots) qc.setQueryData(key, data);
-        toast({
-          variant: "destructive",
-          title: wasRunning ? "Couldn't stop the timer" : "Couldn't start the timer",
-          description: error instanceof Error ? error.message : undefined,
-        });
-      } finally {
-        void qc.invalidateQueries({ queryKey: timerKeys.active() });
-        void qc.invalidateQueries({ queryKey: subtaskKeys.all });
-      }
-    }),
+
+        try {
+          const api = getApi();
+          if (wasRunning) {
+            writeTask(qc, await api.tasks.timerStop(taskId));
+          } else {
+            const result = await api.tasks.timerStart(taskId);
+            writeTask(qc, result.task);
+            if (result.stoppedTask) writeTask(qc, result.stoppedTask);
+          }
+        } catch (error) {
+          for (const [key, data] of snapshots) qc.setQueryData(key, data);
+          toast({
+            variant: "destructive",
+            title: wasRunning
+              ? "Couldn't stop the timer"
+              : "Couldn't start the timer",
+            description: error instanceof Error ? error.message : undefined,
+          });
+        } finally {
+          void qc.invalidateQueries({ queryKey: timerKeys.active() });
+          void qc.invalidateQueries({ queryKey: subtaskKeys.all });
+        }
+      }),
     [qc]
   );
 }
@@ -172,70 +180,73 @@ export function useSubtaskTimerToggle() {
   const qc = useQueryClient();
 
   return React.useCallback(
-    (taskId: string, subtaskId: string) => enqueue(async () => {
-      const subtask = qc
-        .getQueryData<Subtask[]>(subtaskKeys.list(taskId))
-        ?.find((s) => s.id === subtaskId);
-      const task = findTask(qc, taskId);
-      if (!subtask || !task) return;
+    (taskId: string, subtaskId: string) =>
+      enqueue(async () => {
+        const subtask = qc
+          .getQueryData<Subtask[]>(subtaskKeys.list(taskId))
+          ?.find((s) => s.id === subtaskId);
+        const task = findTask(qc, taskId);
+        if (!subtask || !task) return;
 
-      const wasRunning = !!subtask.timerStartedAt;
-      const snapshots = [
-        ...qc.getQueriesData({ queryKey: taskKeys.all }),
-        ...qc.getQueriesData({ queryKey: subtaskKeys.all }),
-      ];
+        const wasRunning = !!subtask.timerStartedAt;
+        const snapshots = [
+          ...qc.getQueriesData({ queryKey: taskKeys.all }),
+          ...qc.getQueriesData({ queryKey: subtaskKeys.all }),
+        ];
 
-      if (wasRunning) {
-        writeSubtask(qc, stopped(subtask));
-        if (task.timerStartedAt) writeTask(qc, stopped(task));
-        qc.setQueryData(timerKeys.active(), null);
-      } else {
-        stopCachedSubtasks(qc, subtaskId);
-        writeSubtask(qc, {
-          ...subtask,
-          timerStartedAt: new Date(),
-          timerAccumulatedSeconds: loggedSeconds(subtask),
-        });
-        if (!task.timerStartedAt) {
-          const others = qc
-            .getQueriesData<Task[]>({ queryKey: taskKeys.lists() })
-            .flatMap(([, list]) => list ?? [])
-            .filter((t) => t.id !== taskId && t.timerStartedAt);
-          for (const other of others) writeTask(qc, stopped(other));
-          const started: Task = {
-            ...task,
-            timerStartedAt: new Date(),
-            timerAccumulatedSeconds: loggedSeconds(task),
-          };
-          writeTask(qc, started);
-          qc.setQueryData(timerKeys.active(), started);
-        }
-      }
-
-      try {
-        const api = getApi();
         if (wasRunning) {
-          const result = await api.subtasks.timerStop(taskId, subtaskId);
-          writeSubtask(qc, result.subtask);
-          writeTask(qc, result.task);
+          writeSubtask(qc, stopped(subtask));
+          if (task.timerStartedAt) writeTask(qc, stopped(task));
+          qc.setQueryData(timerKeys.active(), null);
         } else {
-          const result = await api.subtasks.timerStart(taskId, subtaskId);
-          writeSubtask(qc, result.subtask);
-          writeTask(qc, result.task);
-          if (result.stoppedTask) writeTask(qc, result.stoppedTask);
+          stopCachedSubtasks(qc, subtaskId);
+          writeSubtask(qc, {
+            ...subtask,
+            timerStartedAt: new Date(),
+            timerAccumulatedSeconds: loggedSeconds(subtask),
+          });
+          if (!task.timerStartedAt) {
+            const others = qc
+              .getQueriesData<Task[]>({ queryKey: taskKeys.lists() })
+              .flatMap(([, list]) => list ?? [])
+              .filter((t) => t.id !== taskId && t.timerStartedAt);
+            for (const other of others) writeTask(qc, stopped(other));
+            const started: Task = {
+              ...task,
+              timerStartedAt: new Date(),
+              timerAccumulatedSeconds: loggedSeconds(task),
+            };
+            writeTask(qc, started);
+            qc.setQueryData(timerKeys.active(), started);
+          }
         }
-      } catch (error) {
-        for (const [key, data] of snapshots) qc.setQueryData(key, data);
-        toast({
-          variant: "destructive",
-          title: wasRunning ? "Couldn't stop the timer" : "Couldn't start the timer",
-          description: error instanceof Error ? error.message : undefined,
-        });
-      } finally {
-        void qc.invalidateQueries({ queryKey: timerKeys.active() });
-        void qc.invalidateQueries({ queryKey: subtaskKeys.all });
-      }
-    }),
+
+        try {
+          const api = getApi();
+          if (wasRunning) {
+            const result = await api.subtasks.timerStop(taskId, subtaskId);
+            writeSubtask(qc, result.subtask);
+            writeTask(qc, result.task);
+          } else {
+            const result = await api.subtasks.timerStart(taskId, subtaskId);
+            writeSubtask(qc, result.subtask);
+            writeTask(qc, result.task);
+            if (result.stoppedTask) writeTask(qc, result.stoppedTask);
+          }
+        } catch (error) {
+          for (const [key, data] of snapshots) qc.setQueryData(key, data);
+          toast({
+            variant: "destructive",
+            title: wasRunning
+              ? "Couldn't stop the timer"
+              : "Couldn't start the timer",
+            description: error instanceof Error ? error.message : undefined,
+          });
+        } finally {
+          void qc.invalidateQueries({ queryKey: timerKeys.active() });
+          void qc.invalidateQueries({ queryKey: subtaskKeys.all });
+        }
+      }),
     [qc]
   );
 }

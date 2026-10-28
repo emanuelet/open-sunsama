@@ -3,9 +3,9 @@
  * Fetch events for display, plus write-back (edit / delete) for providers
  * that support it.
  */
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
+import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import {
   getDb,
   eq,
@@ -17,37 +17,37 @@ import {
   calendarAccounts,
   calendarEvents,
   users,
-} from '@open-sunsama/database';
+} from "@open-sunsama/database";
 import {
   auth,
   requireScopes,
   requireAnyScope,
   type AuthVariables,
-} from '../middleware/auth.js';
+} from "../middleware/auth.js";
 import {
   localDayWindow,
   eventFallsInWindow,
   type LocalDayWindow,
-} from '../lib/calendar-day-window.js';
+} from "../lib/calendar-day-window.js";
 import {
   calendarEventsQuerySchema,
   parseCalendarIds,
-} from '../validation/calendar.js';
+} from "../validation/calendar.js";
 import {
   getProvider,
   getAccessTokenForProvider,
-} from '../services/calendar-sync.js';
+} from "../services/calendar-sync.js";
 import {
   ProviderReadOnlyError,
   ProviderEventNotFoundError,
   ProviderAuthError,
   type EventPatch,
   type CalendarProvider,
-} from '../services/calendar-providers/index.js';
-import { publishEvent } from '../lib/websocket/index.js';
+} from "../services/calendar-providers/index.js";
+import { publishEvent } from "../lib/websocket/index.js";
 
 const calendarEventsRouter = new Hono<{ Variables: AuthVariables }>();
-calendarEventsRouter.use('*', auth);
+calendarEventsRouter.use("*", auth);
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
@@ -64,12 +64,12 @@ const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
  * API keys used it before `calendar:read` existed.
  */
 calendarEventsRouter.get(
-  '/',
-  requireAnyScope('calendar:read', 'user:read'),
-  zValidator('query', calendarEventsQuerySchema),
+  "/",
+  requireAnyScope("calendar:read", "user:read"),
+  zValidator("query", calendarEventsQuerySchema),
   async (c) => {
-    const userId = c.get('userId');
-    const query = c.req.valid('query');
+    const userId = c.get("userId");
+    const query = c.req.valid("query");
     const calendarIdsParam = query.calendarIds;
     const db = getDb();
 
@@ -78,7 +78,7 @@ calendarEventsRouter.get(
       .from(users)
       .where(eq(users.id, userId))
       .limit(1);
-    const userTimezone = user?.timezone || 'UTC';
+    const userTimezone = user?.timezone || "UTC";
 
     // Local-day mode when the caller speaks in dates, not instants.
     const dayWindow: LocalDayWindow | null = query.date
@@ -103,12 +103,7 @@ calendarEventsRouter.get(
     const enabledCalendarQuery = db
       .select({ id: calendars.id })
       .from(calendars)
-      .where(
-        and(
-          eq(calendars.userId, userId),
-          eq(calendars.isEnabled, true)
-        )
-      );
+      .where(and(eq(calendars.userId, userId), eq(calendars.isEnabled, true)));
 
     // If specific calendar IDs are provided, filter to those
     const enabledCalendars = await enabledCalendarQuery;
@@ -177,9 +172,7 @@ calendarEventsRouter.get(
       .from(calendars)
       .where(inArray(calendars.id, calendarIdFilter));
 
-    const calendarsMap = new Map(
-      calendarsInfo.map((cal) => [cal.id, cal])
-    );
+    const calendarsMap = new Map(calendarsInfo.map((cal) => [cal.id, cal]));
 
     const inRange = dayWindow
       ? events.filter((event) => eventFallsInWindow(event, dayWindow))
@@ -208,7 +201,9 @@ calendarEventsRouter.get(
         to: (dayWindow?.end ?? toDate).toISOString(),
         total: enrichedEvents.length,
         timezone: dayWindow?.timezone ?? userTimezone,
-        ...(dayWindow ? { fromDate: dayWindow.fromDate, toDate: dayWindow.toDate } : {}),
+        ...(dayWindow
+          ? { fromDate: dayWindow.fromDate, toDate: dayWindow.toDate }
+          : {}),
       },
     });
   }
@@ -227,7 +222,11 @@ async function resolveAccessTokenOrAuthFail(
   provider: CalendarProvider
 ): Promise<
   | { ok: true; accessToken: string }
-  | { ok: false; status: 401; body: { success: false; error: { code: string; message: string } } }
+  | {
+      ok: false;
+      status: 401;
+      body: { success: false; error: { code: string; message: string } };
+    }
 > {
   try {
     const accessToken = await getAccessTokenForProvider(account, provider);
@@ -240,9 +239,9 @@ async function resolveAccessTokenOrAuthFail(
         body: {
           success: false,
           error: {
-            code: 'PROVIDER_AUTH_FAILED',
+            code: "PROVIDER_AUTH_FAILED",
             message:
-              'Your calendar connection needs to be re-authorized. Reconnect the account in Settings.',
+              "Your calendar connection needs to be re-authorized. Reconnect the account in Settings.",
           },
         },
       };
@@ -266,15 +265,9 @@ async function loadEventForWrite(eventId: string, userId: string) {
     })
     .from(calendarEvents)
     .innerJoin(calendars, eq(calendars.id, calendarEvents.calendarId))
-    .innerJoin(
-      calendarAccounts,
-      eq(calendarAccounts.id, calendars.accountId)
-    )
+    .innerJoin(calendarAccounts, eq(calendarAccounts.id, calendars.accountId))
     .where(
-      and(
-        eq(calendarEvents.id, eventId),
-        eq(calendarEvents.userId, userId)
-      )
+      and(eq(calendarEvents.id, eventId), eq(calendarEvents.userId, userId))
     )
     .limit(1);
 
@@ -297,8 +290,8 @@ const createEventBodySchema = z
     timezone: z.string().max(100).nullable().optional(),
   })
   .refine((b) => new Date(b.endTime) > new Date(b.startTime), {
-    error: 'endTime must be after startTime',
-    path: ['endTime'],
+    error: "endTime must be after startTime",
+    path: ["endTime"],
   });
 
 /**
@@ -308,12 +301,12 @@ const createEventBodySchema = z
  * Returns the created event with calendar metadata enriched.
  */
 calendarEventsRouter.post(
-  '/',
-  requireScopes('user:write'),
-  zValidator('json', createEventBodySchema),
+  "/",
+  requireScopes("user:write"),
+  zValidator("json", createEventBodySchema),
   async (c) => {
-    const userId = c.get('userId');
-    const body = c.req.valid('json');
+    const userId = c.get("userId");
+    const body = c.req.valid("json");
     const db = getDb();
 
     // Resolve calendar + account; verify ownership and write capability.
@@ -323,21 +316,18 @@ calendarEventsRouter.post(
         account: calendarAccounts,
       })
       .from(calendars)
-      .innerJoin(
-        calendarAccounts,
-        eq(calendarAccounts.id, calendars.accountId)
-      )
+      .innerJoin(calendarAccounts, eq(calendarAccounts.id, calendars.accountId))
       .where(
-        and(
-          eq(calendars.id, body.calendarId),
-          eq(calendars.userId, userId)
-        )
+        and(eq(calendars.id, body.calendarId), eq(calendars.userId, userId))
       )
       .limit(1);
 
     if (!target) {
       return c.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'Calendar not found' } },
+        {
+          success: false,
+          error: { code: "NOT_FOUND", message: "Calendar not found" },
+        },
         404
       );
     }
@@ -347,8 +337,9 @@ calendarEventsRouter.post(
         {
           success: false,
           error: {
-            code: 'CALENDAR_READ_ONLY',
-            message: 'This calendar is read-only — events cannot be created here.',
+            code: "CALENDAR_READ_ONLY",
+            message:
+              "This calendar is read-only — events cannot be created here.",
           },
         },
         409
@@ -361,7 +352,7 @@ calendarEventsRouter.post(
         {
           success: false,
           error: {
-            code: 'PROVIDER_READ_ONLY',
+            code: "PROVIDER_READ_ONLY",
             message: `Creating ${target.account.provider} events is not yet supported.`,
           },
         },
@@ -398,7 +389,7 @@ calendarEventsRouter.post(
         return c.json(
           {
             success: false,
-            error: { code: 'PROVIDER_READ_ONLY', message: err.message },
+            error: { code: "PROVIDER_READ_ONLY", message: err.message },
           },
           409
         );
@@ -408,7 +399,7 @@ calendarEventsRouter.post(
           {
             success: false,
             error: {
-              code: 'CALENDAR_OUT_OF_SYNC',
+              code: "CALENDAR_OUT_OF_SYNC",
               message:
                 'This calendar is out of sync. Run "Reset & re-sync" in Settings.',
             },
@@ -421,19 +412,19 @@ calendarEventsRouter.post(
           {
             success: false,
             error: {
-              code: 'PROVIDER_AUTH_FAILED',
+              code: "PROVIDER_AUTH_FAILED",
               message:
-                'Your calendar connection needs to be re-authorized. Reconnect the account in Settings.',
+                "Your calendar connection needs to be re-authorized. Reconnect the account in Settings.",
             },
           },
           401
         );
       }
-      const message = err instanceof Error ? err.message : 'Unknown error';
+      const message = err instanceof Error ? err.message : "Unknown error";
       return c.json(
         {
           success: false,
-          error: { code: 'PROVIDER_ERROR', message },
+          error: { code: "PROVIDER_ERROR", message },
         },
         502
       );
@@ -464,7 +455,7 @@ calendarEventsRouter.post(
       .returning();
 
     if (created) {
-      await publishEvent(userId, 'calendar-event:updated', {
+      await publishEvent(userId, "calendar-event:updated", {
         id: created.id,
         calendarId: created.calendarId,
       });
@@ -506,8 +497,8 @@ const updateEventBodySchema = z
       (b.startTime === undefined && b.endTime === undefined) ||
       (b.startTime !== undefined && b.endTime !== undefined),
     {
-      error: 'startTime and endTime must be provided together',
-      path: ['endTime'],
+      error: "startTime and endTime must be provided together",
+      path: ["endTime"],
     }
   )
   .refine(
@@ -516,8 +507,8 @@ const updateEventBodySchema = z
       b.endTime === undefined ||
       new Date(b.endTime) > new Date(b.startTime),
     {
-      error: 'endTime must be after startTime',
-      path: ['endTime'],
+      error: "endTime must be after startTime",
+      path: ["endTime"],
     }
   );
 
@@ -529,19 +520,22 @@ const updateEventBodySchema = z
  * or the provider is down. Returns the updated event payload.
  */
 calendarEventsRouter.patch(
-  '/:id',
-  requireScopes('user:write'),
-  zValidator('json', updateEventBodySchema),
+  "/:id",
+  requireScopes("user:write"),
+  zValidator("json", updateEventBodySchema),
   async (c) => {
-    const userId = c.get('userId');
-    const eventId = c.req.param('id');
-    const body = c.req.valid('json');
+    const userId = c.get("userId");
+    const eventId = c.req.param("id");
+    const body = c.req.valid("json");
     const db = getDb();
 
     const row = await loadEventForWrite(eventId, userId);
     if (!row) {
       return c.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'Event not found' } },
+        {
+          success: false,
+          error: { code: "NOT_FOUND", message: "Event not found" },
+        },
         404
       );
     }
@@ -551,8 +545,8 @@ calendarEventsRouter.patch(
         {
           success: false,
           error: {
-            code: 'CALENDAR_READ_ONLY',
-            message: 'This calendar is read-only — events cannot be edited.',
+            code: "CALENDAR_READ_ONLY",
+            message: "This calendar is read-only — events cannot be edited.",
           },
         },
         409
@@ -565,7 +559,7 @@ calendarEventsRouter.patch(
         {
           success: false,
           error: {
-            code: 'PROVIDER_READ_ONLY',
+            code: "PROVIDER_READ_ONLY",
             message: `Editing ${row.account.provider} events is not yet supported.`,
           },
         },
@@ -609,7 +603,7 @@ calendarEventsRouter.patch(
         return c.json(
           {
             success: false,
-            error: { code: 'PROVIDER_READ_ONLY', message: err.message },
+            error: { code: "PROVIDER_READ_ONLY", message: err.message },
           },
           409
         );
@@ -622,14 +616,12 @@ calendarEventsRouter.patch(
         // is stale; remove it so the next refetch hides it instead of
         // surfacing the same broken event again. Return 410 with a
         // clean, actionable message.
-        await db
-          .delete(calendarEvents)
-          .where(eq(calendarEvents.id, eventId));
+        await db.delete(calendarEvents).where(eq(calendarEvents.id, eventId));
         return c.json(
           {
             success: false,
             error: {
-              code: 'EVENT_OUT_OF_SYNC',
+              code: "EVENT_OUT_OF_SYNC",
               message:
                 'This event is out of sync with your calendar. Refresh or run "Reset & re-sync" in Settings.',
             },
@@ -642,19 +634,19 @@ calendarEventsRouter.patch(
           {
             success: false,
             error: {
-              code: 'PROVIDER_AUTH_FAILED',
+              code: "PROVIDER_AUTH_FAILED",
               message:
-                'Your calendar connection needs to be re-authorized. Reconnect the account in Settings.',
+                "Your calendar connection needs to be re-authorized. Reconnect the account in Settings.",
             },
           },
           401
         );
       }
-      const message = err instanceof Error ? err.message : 'Unknown error';
+      const message = err instanceof Error ? err.message : "Unknown error";
       return c.json(
         {
           success: false,
-          error: { code: 'PROVIDER_ERROR', message },
+          error: { code: "PROVIDER_ERROR", message },
         },
         502
       );
@@ -687,7 +679,7 @@ calendarEventsRouter.patch(
     if (updated) {
       // Notify other tabs / devices via the realtime channel; the client
       // invalidates the calendar-events query on receipt.
-      await publishEvent(userId, 'calendar-event:updated', {
+      await publishEvent(userId, "calendar-event:updated", {
         id: updated.id,
         calendarId: updated.calendarId,
       });
@@ -708,7 +700,7 @@ calendarEventsRouter.patch(
 );
 
 const rsvpBodySchema = z.object({
-  response: z.enum(['accepted', 'declined', 'tentative']),
+  response: z.enum(["accepted", "declined", "tentative"]),
 });
 
 /**
@@ -717,19 +709,22 @@ const rsvpBodySchema = z.object({
  * account. The provider notifies the organizer, as its own app would.
  */
 calendarEventsRouter.post(
-  '/:id/rsvp',
-  requireScopes('user:write'),
-  zValidator('json', rsvpBodySchema),
+  "/:id/rsvp",
+  requireScopes("user:write"),
+  zValidator("json", rsvpBodySchema),
   async (c) => {
-    const userId = c.get('userId');
-    const eventId = c.req.param('id');
-    const { response } = c.req.valid('json');
+    const userId = c.get("userId");
+    const eventId = c.req.param("id");
+    const { response } = c.req.valid("json");
     const db = getDb();
 
     const row = await loadEventForWrite(eventId, userId);
     if (!row) {
       return c.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'Event not found' } },
+        {
+          success: false,
+          error: { code: "NOT_FOUND", message: "Event not found" },
+        },
         404
       );
     }
@@ -740,7 +735,7 @@ calendarEventsRouter.post(
         {
           success: false,
           error: {
-            code: 'PROVIDER_READ_ONLY',
+            code: "PROVIDER_READ_ONLY",
             message: `Answering ${row.account.provider} invitations is not supported yet.`,
           },
         },
@@ -768,8 +763,8 @@ calendarEventsRouter.post(
           {
             success: false,
             error: {
-              code: 'NOT_INVITED',
-              message: 'Only guests can answer an invitation.',
+              code: "NOT_INVITED",
+              message: "Only guests can answer an invitation.",
             },
           },
           409
@@ -780,7 +775,7 @@ calendarEventsRouter.post(
           {
             success: false,
             error: {
-              code: 'EVENT_OUT_OF_SYNC',
+              code: "EVENT_OUT_OF_SYNC",
               message:
                 'This event is out of sync with your calendar. Refresh or run "Reset & re-sync" in Settings.',
             },
@@ -793,17 +788,17 @@ calendarEventsRouter.post(
           {
             success: false,
             error: {
-              code: 'PROVIDER_AUTH_FAILED',
+              code: "PROVIDER_AUTH_FAILED",
               message:
-                'Your calendar connection needs to be re-authorized. Reconnect the account in Settings.',
+                "Your calendar connection needs to be re-authorized. Reconnect the account in Settings.",
             },
           },
           401
         );
       }
-      const message = err instanceof Error ? err.message : 'Unknown error';
+      const message = err instanceof Error ? err.message : "Unknown error";
       return c.json(
-        { success: false, error: { code: 'PROVIDER_ERROR', message } },
+        { success: false, error: { code: "PROVIDER_ERROR", message } },
         502
       );
     }
@@ -822,7 +817,7 @@ calendarEventsRouter.post(
       .returning();
 
     if (updated) {
-      await publishEvent(userId, 'calendar-event:updated', {
+      await publishEvent(userId, "calendar-event:updated", {
         id: updated.id,
         calendarId: updated.calendarId,
       });
@@ -846,130 +841,126 @@ calendarEventsRouter.post(
  * DELETE /calendar-events/:id
  * Delete an external calendar event upstream and locally.
  */
-calendarEventsRouter.delete(
-  '/:id',
-  requireScopes('user:write'),
-  async (c) => {
-    const userId = c.get('userId');
-    const eventId = c.req.param('id');
-    const db = getDb();
+calendarEventsRouter.delete("/:id", requireScopes("user:write"), async (c) => {
+  const userId = c.get("userId");
+  const eventId = c.req.param("id");
+  const db = getDb();
 
-    const row = await loadEventForWrite(eventId, userId);
-    if (!row) {
-      return c.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'Event not found' } },
-        404
-      );
-    }
-
-    if (row.calendar.isReadOnly) {
-      return c.json(
-        {
-          success: false,
-          error: {
-            code: 'CALENDAR_READ_ONLY',
-            message: 'This calendar is read-only — events cannot be deleted.',
-          },
-        },
-        409
-      );
-    }
-
-    const provider = getProvider(row.account.provider);
-    if (!provider || !provider.deleteEvent) {
-      return c.json(
-        {
-          success: false,
-          error: {
-            code: 'PROVIDER_READ_ONLY',
-            message: `Deleting ${row.account.provider} events is not yet supported.`,
-          },
-        },
-        409
-      );
-    }
-
-    const tokenResult = await resolveAccessTokenOrAuthFail(
-      row.account,
-      provider
+  const row = await loadEventForWrite(eventId, userId);
+  if (!row) {
+    return c.json(
+      {
+        success: false,
+        error: { code: "NOT_FOUND", message: "Event not found" },
+      },
+      404
     );
-    if (!tokenResult.ok) return c.json(tokenResult.body, tokenResult.status);
-    const accessToken = tokenResult.accessToken;
+  }
 
-    try {
-      await provider.deleteEvent(
-        accessToken,
-        row.calendar.externalId,
-        row.event.externalId,
-        // iCloud needs the resource URL + etag to delete; Google /
-        // Outlook ignore the extras.
-        { eventUrl: row.event.htmlLink, etag: row.event.etag }
-      );
-    } catch (err) {
-      if (err instanceof ProviderReadOnlyError) {
-        return c.json(
-          {
-            success: false,
-            error: { code: 'PROVIDER_READ_ONLY', message: err.message },
-          },
-          409
-        );
-      }
-      if (err instanceof ProviderEventNotFoundError) {
-        // Same out-of-sync semantics as PATCH: the upstream says
-        // the event doesn't exist (or our local row is stale, e.g.
-        // pre-PR iCloud row with null htmlLink). Treat as success
-        // from the user's POV — the event is gone either way.
-        // Clean up the local row + publish so other tabs refetch.
-        await db.delete(calendarEvents).where(eq(calendarEvents.id, eventId));
-        await publishEvent(userId, 'calendar-event:deleted', {
-          id: eventId,
-          calendarId: row.calendar.id,
-        });
-        return c.json(
-          {
-            success: false,
-            error: {
-              code: 'EVENT_OUT_OF_SYNC',
-              message:
-                'This event is out of sync with your calendar. Refresh or run "Reset & re-sync" in Settings.',
-            },
-          },
-          410
-        );
-      }
-      if (err instanceof ProviderAuthError) {
-        return c.json(
-          {
-            success: false,
-            error: {
-              code: 'PROVIDER_AUTH_FAILED',
-              message:
-                'Your calendar connection needs to be re-authorized. Reconnect the account in Settings.',
-            },
-          },
-          401
-        );
-      }
-      const message = err instanceof Error ? err.message : 'Unknown error';
+  if (row.calendar.isReadOnly) {
+    return c.json(
+      {
+        success: false,
+        error: {
+          code: "CALENDAR_READ_ONLY",
+          message: "This calendar is read-only — events cannot be deleted.",
+        },
+      },
+      409
+    );
+  }
+
+  const provider = getProvider(row.account.provider);
+  if (!provider || !provider.deleteEvent) {
+    return c.json(
+      {
+        success: false,
+        error: {
+          code: "PROVIDER_READ_ONLY",
+          message: `Deleting ${row.account.provider} events is not yet supported.`,
+        },
+      },
+      409
+    );
+  }
+
+  const tokenResult = await resolveAccessTokenOrAuthFail(row.account, provider);
+  if (!tokenResult.ok) return c.json(tokenResult.body, tokenResult.status);
+  const accessToken = tokenResult.accessToken;
+
+  try {
+    await provider.deleteEvent(
+      accessToken,
+      row.calendar.externalId,
+      row.event.externalId,
+      // iCloud needs the resource URL + etag to delete; Google /
+      // Outlook ignore the extras.
+      { eventUrl: row.event.htmlLink, etag: row.event.etag }
+    );
+  } catch (err) {
+    if (err instanceof ProviderReadOnlyError) {
       return c.json(
         {
           success: false,
-          error: { code: 'PROVIDER_ERROR', message },
+          error: { code: "PROVIDER_READ_ONLY", message: err.message },
         },
-        502
+        409
       );
     }
-
-    await db.delete(calendarEvents).where(eq(calendarEvents.id, eventId));
-
-    await publishEvent(userId, 'calendar-event:deleted', {
-      id: eventId,
-      calendarId: row.calendar.id,
-    });
-
-    return c.json({ success: true });
+    if (err instanceof ProviderEventNotFoundError) {
+      // Same out-of-sync semantics as PATCH: the upstream says
+      // the event doesn't exist (or our local row is stale, e.g.
+      // pre-PR iCloud row with null htmlLink). Treat as success
+      // from the user's POV — the event is gone either way.
+      // Clean up the local row + publish so other tabs refetch.
+      await db.delete(calendarEvents).where(eq(calendarEvents.id, eventId));
+      await publishEvent(userId, "calendar-event:deleted", {
+        id: eventId,
+        calendarId: row.calendar.id,
+      });
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "EVENT_OUT_OF_SYNC",
+            message:
+              'This event is out of sync with your calendar. Refresh or run "Reset & re-sync" in Settings.',
+          },
+        },
+        410
+      );
+    }
+    if (err instanceof ProviderAuthError) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "PROVIDER_AUTH_FAILED",
+            message:
+              "Your calendar connection needs to be re-authorized. Reconnect the account in Settings.",
+          },
+        },
+        401
+      );
+    }
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return c.json(
+      {
+        success: false,
+        error: { code: "PROVIDER_ERROR", message },
+      },
+      502
+    );
   }
-);
+
+  await db.delete(calendarEvents).where(eq(calendarEvents.id, eventId));
+
+  await publishEvent(userId, "calendar-event:deleted", {
+    id: eventId,
+    calendarId: row.calendar.id,
+  });
+
+  return c.json({ success: true });
+});
 
 export { calendarEventsRouter };

@@ -8,7 +8,12 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   retries: process.env.CI ? 1 : 0,
   workers: 1,
-  reporter: process.env.CI ? [["list"], ["html", { open: "never", outputFolder: "./playwright-report" }]] : "list",
+  reporter: process.env.CI
+    ? [
+        ["list"],
+        ["html", { open: "never", outputFolder: "./playwright-report" }],
+      ]
+    : "list",
   use: {
     baseURL: `http://localhost:${process.env.WEB_PORT ?? 3207}`,
     viewport: { width: 1440, height: 900 },

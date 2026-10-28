@@ -15,11 +15,7 @@ export function useSearchEvents(query: string, limit = 20): CalendarEvent[] {
   const from = format(subDays(today, 30), "yyyy-MM-dd");
   const to = format(addDays(today, 90), "yyyy-MM-dd");
 
-  const { data: events = [] } = useCalendarEvents(
-    from,
-    to,
-    trimmed.length > 0
-  );
+  const { data: events = [] } = useCalendarEvents(from, to, trimmed.length > 0);
 
   if (!trimmed) return [];
 

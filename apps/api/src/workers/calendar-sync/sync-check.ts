@@ -2,12 +2,12 @@
  * Calendar sync check handler
  * Runs every 5 minutes to find accounts needing sync and queue sync jobs
  */
-import type { Job } from 'pg-boss';
-import { getDb, and, lt, eq, or, isNull } from '@open-sunsama/database';
-import { calendarAccounts } from '@open-sunsama/database/schema';
-import { subMinutes } from 'date-fns';
-import { getPgBoss, JOBS } from '../../lib/pgboss.js';
-import { type SyncAccountPayload } from './sync-account.js';
+import type { Job } from "pg-boss";
+import { getDb, and, lt, eq, or, isNull } from "@open-sunsama/database";
+import { calendarAccounts } from "@open-sunsama/database/schema";
+import { subMinutes } from "date-fns";
+import { getPgBoss, JOBS } from "../../lib/pgboss.js";
+import { type SyncAccountPayload } from "./sync-account.js";
 
 // Payload type for the scheduled check job
 export type CalendarSyncCheckPayload = Record<string, never>;
@@ -68,7 +68,7 @@ export async function processCalendarSyncCheck(
           // Normal path: idle / never-synced, due for a refresh.
           and(
             or(
-              eq(calendarAccounts.syncStatus, 'idle'),
+              eq(calendarAccounts.syncStatus, "idle"),
               isNull(calendarAccounts.syncStatus)
             ),
             or(
@@ -78,12 +78,12 @@ export async function processCalendarSyncCheck(
           ),
           // Recovery: a sync that never reported back.
           and(
-            eq(calendarAccounts.syncStatus, 'syncing'),
+            eq(calendarAccounts.syncStatus, "syncing"),
             lt(calendarAccounts.updatedAt, stuckThreshold)
           ),
           // Retry: a sync that failed a while ago.
           and(
-            eq(calendarAccounts.syncStatus, 'error'),
+            eq(calendarAccounts.syncStatus, "error"),
             lt(calendarAccounts.updatedAt, errorRetryThreshold)
           )
         )
@@ -95,11 +95,13 @@ export async function processCalendarSyncCheck(
   }
 
   const recovered = accountsNeedingSync.filter(
-    (a) => a.syncStatus === 'syncing' || a.syncStatus === 'error'
+    (a) => a.syncStatus === "syncing" || a.syncStatus === "error"
   ).length;
   console.log(
     `[Calendar Sync Check] Found ${accountsNeedingSync.length} accounts needing sync` +
-      (recovered > 0 ? ` (${recovered} recovered from stuck/errored state)` : '')
+      (recovered > 0
+        ? ` (${recovered} recovered from stuck/errored state)`
+        : "")
   );
 
   // Queue sync jobs for each account
@@ -110,7 +112,7 @@ export async function processCalendarSyncCheck(
       await db
         .update(calendarAccounts)
         .set({
-          syncStatus: 'syncing',
+          syncStatus: "syncing",
           updatedAt: new Date(),
         })
         .where(eq(calendarAccounts.id, account.id));
@@ -123,14 +125,18 @@ export async function processCalendarSyncCheck(
 
       jobsQueued++;
     } catch (error) {
-      console.error(`[Calendar Sync Check] Error queuing sync for account ${account.id}:`, error);
-      
+      console.error(
+        `[Calendar Sync Check] Error queuing sync for account ${account.id}:`,
+        error
+      );
+
       // Reset sync status if queueing failed
       await db
         .update(calendarAccounts)
         .set({
-          syncStatus: 'error',
-          syncError: error instanceof Error ? error.message : 'Failed to queue sync job',
+          syncStatus: "error",
+          syncError:
+            error instanceof Error ? error.message : "Failed to queue sync job",
           updatedAt: new Date(),
         })
         .where(eq(calendarAccounts.id, account.id));

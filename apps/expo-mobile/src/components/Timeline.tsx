@@ -1,7 +1,13 @@
-import { View, Text, ScrollView, RefreshControl, StyleSheet } from 'react-native';
-import { TimeBlockCard } from '@/components/TimeBlockCard';
-import type { TimeBlock } from '@open-sunsama/types';
-import { useThemeColors, type ThemeColors } from '@/lib/theme';
+import {
+  View,
+  Text,
+  ScrollView,
+  RefreshControl,
+  StyleSheet,
+} from "react-native";
+import { TimeBlockCard } from "@/components/TimeBlockCard";
+import type { TimeBlock } from "@open-sunsama/types";
+import { useThemeColors, type ThemeColors } from "@/lib/theme";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 export const HOUR_HEIGHT = 60;
@@ -17,15 +23,25 @@ interface TimelineProps {
 /**
  * Timeline component for displaying time blocks
  */
-export function Timeline({ timeBlocks, isLoading, isRefetching, onRefresh, isToday }: TimelineProps) {
+export function Timeline({
+  timeBlocks,
+  isLoading,
+  isRefetching,
+  onRefresh,
+  isToday,
+}: TimelineProps) {
   const colors = useThemeColors();
   const styles = createStyles(colors);
   const now = new Date();
   const currentHour = now.getHours() + now.getMinutes() / 60;
 
   const getBlockStyle = (block: TimeBlock) => {
-    const startDate = block.startTime instanceof Date ? block.startTime : new Date(block.startTime);
-    const endDate = block.endTime instanceof Date ? block.endTime : new Date(block.endTime);
+    const startDate =
+      block.startTime instanceof Date
+        ? block.startTime
+        : new Date(block.startTime);
+    const endDate =
+      block.endTime instanceof Date ? block.endTime : new Date(block.endTime);
     const startHour = startDate.getHours() + startDate.getMinutes() / 60;
     const endHour = endDate.getHours() + endDate.getMinutes() / 60;
     const duration = endHour - startHour;
@@ -36,9 +52,9 @@ export function Timeline({ timeBlocks, isLoading, isRefetching, onRefresh, isTod
   };
 
   const formatHour = (hour: number) => {
-    if (hour === 0) return '12 AM';
+    if (hour === 0) return "12 AM";
     if (hour < 12) return `${hour} AM`;
-    if (hour === 12) return '12 PM';
+    if (hour === 12) return "12 PM";
     return `${hour - 12} PM`;
   };
 
@@ -47,7 +63,11 @@ export function Timeline({ timeBlocks, isLoading, isRefetching, onRefresh, isTod
       style={styles.timeline}
       contentContainerStyle={styles.content}
       refreshControl={
-        <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} tintColor={colors.accent} />
+        <RefreshControl
+          refreshing={isRefetching}
+          onRefresh={onRefresh}
+          tintColor={colors.accent}
+        />
       }
     >
       {HOURS.map((hour) => (
@@ -66,7 +86,10 @@ export function Timeline({ timeBlocks, isLoading, isRefetching, onRefresh, isTod
 
       <View style={styles.blocksContainer}>
         {timeBlocks?.map((block) => (
-          <View key={block.id} style={[styles.blockWrapper, getBlockStyle(block)]}>
+          <View
+            key={block.id}
+            style={[styles.blockWrapper, getBlockStyle(block)]}
+          >
             <TimeBlockCard timeBlock={block} />
           </View>
         ))}
@@ -75,69 +98,77 @@ export function Timeline({ timeBlocks, isLoading, isRefetching, onRefresh, isTod
       {!isLoading && (!timeBlocks || timeBlocks.length === 0) && (
         <View style={styles.emptyState}>
           <Text style={styles.emptyTitle}>No time blocks</Text>
-          <Text style={styles.emptySubtitle}>Schedule tasks from the Tasks tab</Text>
+          <Text style={styles.emptySubtitle}>
+            Schedule tasks from the Tasks tab
+          </Text>
         </View>
       )}
     </ScrollView>
   );
 }
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  timeline: { flex: 1, backgroundColor: colors.background },
-  content: {
-    position: 'relative',
-    height: HOURS.length * HOUR_HEIGHT + 40,
-    paddingTop: 20,
-    paddingBottom: 40,
-  },
-  hourRow: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 1,
-  },
-  hourLabel: {
-    width: 54,
-    fontSize: 11,
-    color: colors.secondary,
-    textAlign: 'right',
-    paddingRight: 8,
-  },
-  hourLine: { flex: 1, height: 1, backgroundColor: colors.border },
-  currentTime: {
-    position: 'absolute',
-    left: 54,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    zIndex: 100,
-  },
-  currentTimeDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#ef4444',
-    marginLeft: -4,
-  },
-  currentTimeLine: { flex: 1, height: 2, backgroundColor: '#ef4444' },
-  blocksContainer: {
-    position: 'absolute',
-    left: 62,
-    right: 16,
-    top: 20,
-    bottom: 0,
-  },
-  blockWrapper: { position: 'absolute', left: 0, right: 0 },
-  emptyState: {
-    position: 'absolute',
-    top: 200,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    paddingVertical: 48,
-  },
-  emptyTitle: { fontSize: 18, fontWeight: '600', color: colors.text, marginBottom: 8 },
-  emptySubtitle: { fontSize: 14, color: colors.secondary },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    timeline: { flex: 1, backgroundColor: colors.background },
+    content: {
+      position: "relative",
+      height: HOURS.length * HOUR_HEIGHT + 40,
+      paddingTop: 20,
+      paddingBottom: 40,
+    },
+    hourRow: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      flexDirection: "row",
+      alignItems: "center",
+      height: 1,
+    },
+    hourLabel: {
+      width: 54,
+      fontSize: 11,
+      color: colors.secondary,
+      textAlign: "right",
+      paddingRight: 8,
+    },
+    hourLine: { flex: 1, height: 1, backgroundColor: colors.border },
+    currentTime: {
+      position: "absolute",
+      left: 54,
+      right: 0,
+      flexDirection: "row",
+      alignItems: "center",
+      zIndex: 100,
+    },
+    currentTimeDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: "#ef4444",
+      marginLeft: -4,
+    },
+    currentTimeLine: { flex: 1, height: 2, backgroundColor: "#ef4444" },
+    blocksContainer: {
+      position: "absolute",
+      left: 62,
+      right: 16,
+      top: 20,
+      bottom: 0,
+    },
+    blockWrapper: { position: "absolute", left: 0, right: 0 },
+    emptyState: {
+      position: "absolute",
+      top: 200,
+      left: 0,
+      right: 0,
+      alignItems: "center",
+      paddingVertical: 48,
+    },
+    emptyTitle: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: colors.text,
+      marginBottom: 8,
+    },
+    emptySubtitle: { fontSize: 14, color: colors.secondary },
+  });

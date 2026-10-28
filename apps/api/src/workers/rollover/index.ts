@@ -3,17 +3,20 @@
  * Automatically moves incomplete tasks from past dates to today
  * Runs timezone-aware to handle midnight in each user's timezone
  */
-import type { Job } from 'pg-boss';
-import { getPgBoss, JOBS } from '../../lib/pgboss.js';
-import { type RolloverCheckPayload, type UserBatchRolloverPayload } from './utils.js';
-import { processTimezoneRolloverCheck } from './timezone-check.js';
-import { processUserBatchRollover } from './batch-processor.js';
+import type { Job } from "pg-boss";
+import { getPgBoss, JOBS } from "../../lib/pgboss.js";
+import {
+  type RolloverCheckPayload,
+  type UserBatchRolloverPayload,
+} from "./utils.js";
+import { processTimezoneRolloverCheck } from "./timezone-check.js";
+import { processUserBatchRollover } from "./batch-processor.js";
 
 /**
  * Check if rollover feature is enabled via environment variable
  */
 function isRolloverEnabled(): boolean {
-  return process.env.ROLLOVER_ENABLED !== 'false';
+  return process.env.ROLLOVER_ENABLED !== "false";
 }
 
 /**
@@ -21,7 +24,7 @@ function isRolloverEnabled(): boolean {
  */
 export async function registerRolloverWorkers(): Promise<void> {
   if (!isRolloverEnabled()) {
-    console.log('[Rollover Worker] Disabled via ROLLOVER_ENABLED=false');
+    console.log("[Rollover Worker] Disabled via ROLLOVER_ENABLED=false");
     return;
   }
 
@@ -33,10 +36,15 @@ export async function registerRolloverWorkers(): Promise<void> {
 
   // Schedule the timezone check to run every minute
   // singletonKey prevents duplicate schedules on server restarts
-  await boss.schedule(JOBS.TIMEZONE_ROLLOVER_CHECK, '* * * * *', {}, {
-    tz: 'UTC',
-    singletonKey: 'timezone-rollover-check-schedule',
-  });
+  await boss.schedule(
+    JOBS.TIMEZONE_ROLLOVER_CHECK,
+    "* * * * *",
+    {},
+    {
+      tz: "UTC",
+      singletonKey: "timezone-rollover-check-schedule",
+    }
+  );
 
   // Register the timezone check handler
   // In PG Boss v10, work() handler receives an array of jobs
@@ -56,12 +64,15 @@ export async function registerRolloverWorkers(): Promise<void> {
     { batchSize: 5 }, // Process 5 batches concurrently
     async (jobs: Job<UserBatchRolloverPayload>[]) => {
       // Process jobs concurrently within the batch
-      await Promise.all(jobs.map(job => processUserBatchRollover(job)));
+      await Promise.all(jobs.map((job) => processUserBatchRollover(job)));
     }
   );
 
-  console.log('[Rollover Worker] Registered and scheduled');
+  console.log("[Rollover Worker] Registered and scheduled");
 }
 
 // Re-export types for convenience
-export type { RolloverCheckPayload, UserBatchRolloverPayload } from './utils.js';
+export type {
+  RolloverCheckPayload,
+  UserBatchRolloverPayload,
+} from "./utils.js";

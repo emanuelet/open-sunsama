@@ -1,9 +1,11 @@
 # Landing Page
 
 ## Problem
+
 Currently, the Open Sunsama web app redirects users directly to `/login` when accessing the root URL `/`. There's no public-facing landing page to explain what the product is, showcase its features, or convert visitors into users. This is a barrier for new users discovering the app.
 
 ## Solution
+
 Create a modern, Linear-style landing page at the `/` route that serves as the public entry point. The page will showcase the app's key features (AI agent compatibility, time blocking, task management) and provide clear CTAs to sign up or log in. Authenticated users visiting `/` will still be redirected to `/app`.
 
 ## Technical Implementation
@@ -47,6 +49,7 @@ Create a modern, Linear-style landing page at the `/` route that serves as the p
    - Optional: link to GitHub repo
 
 ### Flow
+
 1. User visits `/` → Landing page renders (no auth check blocks rendering)
 2. User clicks "Get Started" → Navigates to `/register`
 3. User clicks "Sign In" → Navigates to `/login`
@@ -54,12 +57,13 @@ Create a modern, Linear-style landing page at the `/` route that serves as the p
 
 ### File Changes
 
-| File | Change |
-|------|--------|
-| `apps/web/src/routes/landing.tsx` | New file - Landing page component |
-| `apps/web/src/routeTree.gen.tsx` | Update indexRoute to use LandingPage component |
+| File                              | Change                                         |
+| --------------------------------- | ---------------------------------------------- |
+| `apps/web/src/routes/landing.tsx` | New file - Landing page component              |
+| `apps/web/src/routeTree.gen.tsx`  | Update indexRoute to use LandingPage component |
 
 ### Design Guidelines
+
 - Follow existing Linear-style aesthetic (clean, minimal, lots of whitespace)
 - Use existing color scheme from `index.css` (`--background`, `--foreground`, `--muted`, etc.)
 - Typography: `font-semibold` for headings, `text-muted-foreground` for secondary text
@@ -68,22 +72,24 @@ Create a modern, Linear-style landing page at the `/` route that serves as the p
 - Support both light and dark modes automatically
 
 ### Component Structure
+
 ```tsx
 // apps/web/src/routes/landing.tsx
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
-      <Header />      {/* Logo + nav links */}
-      <Hero />        {/* Main headline + CTAs */}
-      <Features />    {/* 3-column feature grid */}
-      <CTA />         {/* Final call-to-action */}
-      <Footer />      {/* Minimal footer */}
+      <Header /> {/* Logo + nav links */}
+      <Hero /> {/* Main headline + CTAs */}
+      <Features /> {/* 3-column feature grid */}
+      <CTA /> {/* Final call-to-action */}
+      <Footer /> {/* Minimal footer */}
     </div>
   );
 }
 ```
 
 ## Edge Cases
+
 - Authenticated users should be redirected to `/app` (preserve existing behavior)
 - Handle dark/light mode transitions smoothly
 - Ensure all links work correctly (`/login`, `/register`)

@@ -234,7 +234,9 @@ function PlatformCard({
             <a
               href={release.downloadUrl}
               download
-              onClick={() => trackGoal("download_app", { platform: release.platform })}
+              onClick={() =>
+                trackGoal("download_app", { platform: release.platform })
+              }
             >
               <Download className="h-3.5 w-3.5" />
               Download
@@ -368,7 +370,11 @@ export default function DownloadPage() {
                 <a
                   href={detectedRelease.downloadUrl}
                   download
-                  onClick={() => trackGoal("download_app", { platform: detectedRelease.platform })}
+                  onClick={() =>
+                    trackGoal("download_app", {
+                      platform: detectedRelease.platform,
+                    })
+                  }
                 >
                   <detectedPlatformInfo.icon className="h-4 w-4" />
                   Download for {detectedPlatformInfo.shortName}
@@ -436,10 +442,10 @@ export default function DownloadPage() {
               <PlatformCard
                 key={platform.key}
                 platform={platform}
-                  release={releases[platform.key]}
-                  debRelease={
-                    platform.key === "linux" ? releases["linux-deb"] : undefined
-                  }
+                release={releases[platform.key]}
+                debRelease={
+                  platform.key === "linux" ? releases["linux-deb"] : undefined
+                }
                 isDetected={platform.key === detectedPlatform}
                 isLoading={isLoading}
                 delay={i * 50}
@@ -454,9 +460,7 @@ export default function DownloadPage() {
         <div className="container px-4 mx-auto max-w-2xl">
           <div className="rounded-xl border border-border/40 bg-card/50 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <h3 className="text-[13px] font-semibold">
-                Prefer the browser?
-              </h3>
+              <h3 className="text-[13px] font-semibold">Prefer the browser?</h3>
               <p className="text-xs text-muted-foreground">
                 Access from any device with our web app.
               </p>

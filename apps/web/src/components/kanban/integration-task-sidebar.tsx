@@ -48,7 +48,9 @@ function PickerTask({
     >
       <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       <span className={isDragging ? "opacity-40" : "min-w-0"}>
-        <span className="line-clamp-2 block font-medium">{renderInlineMarkdown(task.title)}</span>
+        <span className="line-clamp-2 block font-medium">
+          {renderInlineMarkdown(task.title)}
+        </span>
         {(task.containerName || task.dueDate) && (
           <span className="mt-0.5 block truncate text-[11px] text-muted-foreground">
             {[task.containerName, task.dueDate ? `Due ${task.dueDate}` : null]
@@ -119,7 +121,8 @@ function AccountTasks({ account }: { account: IntegrationAccount }) {
   ].sort((a, b) => a.localeCompare(b));
   const filteredTasks = openTasks.filter(
     (task) =>
-      (project === "all" || (task.projectName ?? task.containerName) === project) &&
+      (project === "all" ||
+        (task.projectName ?? task.containerName) === project) &&
       task.title.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())
   );
 
@@ -164,7 +167,9 @@ function AccountTasks({ account }: { account: IntegrationAccount }) {
         </select>
       </div>
       {filteredTasks.length === 0 && (
-        <p className="px-0.5 py-2 text-xs text-muted-foreground">No matching tasks.</p>
+        <p className="px-0.5 py-2 text-xs text-muted-foreground">
+          No matching tasks.
+        </p>
       )}
       {filteredTasks.map((task) => (
         <PickerTask key={task.externalId} accountId={account.id} task={task} />

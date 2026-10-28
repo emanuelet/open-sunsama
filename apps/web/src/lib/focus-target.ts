@@ -45,5 +45,7 @@ export function pickFocusTarget({
   const next = incomplete[0];
   if (next) return { kind: "task", taskId: next.id };
 
-  return todayTasks.length > 0 ? { kind: "all-done" } : { kind: "nothing-planned" };
+  return todayTasks.length > 0
+    ? { kind: "all-done" }
+    : { kind: "nothing-planned" };
 }

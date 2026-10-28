@@ -25,7 +25,8 @@ export type OssCategory =
   | "time-tracking"
   | "notes";
 
-export type OssPlatform = "web" | "macos" | "windows" | "linux" | "ios" | "android" | "server";
+export type OssPlatform =
+  "web" | "macos" | "windows" | "linux" | "ios" | "android" | "server";
 
 /** active: recent commits and releases. maintenance: fixes only. unmaintained: the README says so. archived: the repo is read-only. */
 export type OssStatus = "active" | "maintenance" | "unmaintained" | "archived";
@@ -84,7 +85,13 @@ function resolveScreenshot(shot: OssScreenshot): OssScreenshot {
   if (!shot.blogShot) return shot;
   const media = BLOG_MEDIA.shots[shot.blogShot];
   if (!media) return shot;
-  return { ...shot, light: media.light, dark: media.dark, width: media.width, height: media.height };
+  return {
+    ...shot,
+    light: media.light,
+    dark: media.dark,
+    width: media.width,
+    height: media.height,
+  };
 }
 
 export const OSS_APPS: Record<string, OssApp> = Object.fromEntries(
@@ -202,21 +209,32 @@ export function licenseShort(app: OssApp): string {
 export function outboundLink(url: string, follow = false) {
   const own = url.match(/^https:\/\/opensunsama\.com(\/.*)?$/);
   if (own) return { href: own[1] || "/" };
-  return { href: url, target: "_blank", rel: follow ? "noopener" : "nofollow noopener" };
+  return {
+    href: url,
+    target: "_blank",
+    rel: follow ? "noopener" : "nofollow noopener",
+  };
 }
 
-export const isInactive = (app: OssApp) => app.status === "archived" || app.status === "unmaintained";
+export const isInactive = (app: OssApp) =>
+  app.status === "archived" || app.status === "unmaintained";
 
 /**
  * The apps a post's ItemList JSON-LD lists: its <OssApp> cards by rank (ties
  * keep page order), or, in a post with only tables, the first <OssTable>'s order.
  */
-export function itemListApps(cards: { id: string; rank?: number }[], tables: string[][]): OssApp[] {
+export function itemListApps(
+  cards: { id: string; rank?: number }[],
+  tables: string[][]
+): OssApp[] {
   if (cards.length) {
     const seen = new Set<string>();
     return cards
       .map((card, order) => ({ ...card, order }))
-      .sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity) || a.order - b.order)
+      .sort(
+        (a, b) =>
+          (a.rank ?? Infinity) - (b.rank ?? Infinity) || a.order - b.order
+      )
       .filter((card) => !seen.has(card.id) && seen.add(card.id))
       .map((card) => getOssApp(card.id))
       .filter((a): a is OssApp => Boolean(a));

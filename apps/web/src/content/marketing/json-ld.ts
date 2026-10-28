@@ -22,7 +22,10 @@ export const JSON_LD_IDS = {
 
 export function faqJsonLd(page: MarketingPageContent) {
   return faqPageJsonLd(
-    page.faqs.items.map(({ question, answer }) => ({ question, answer: plainText(answer) }))
+    page.faqs.items.map(({ question, answer }) => ({
+      question,
+      answer: plainText(answer),
+    }))
   );
 }
 
@@ -44,9 +47,14 @@ export function pageVideos(page: MarketingPageContent): string[] {
   return [...ids];
 }
 
-export function marketingJsonLd(page: MarketingPageContent): Record<string, object> {
+export function marketingJsonLd(
+  page: MarketingPageContent
+): Record<string, object> {
   const blocks: Record<string, object> = {
-    [JSON_LD_IDS.breadcrumbs]: breadcrumbListJsonLd(page.breadcrumbs, page.path),
+    [JSON_LD_IDS.breadcrumbs]: breadcrumbListJsonLd(
+      page.breadcrumbs,
+      page.path
+    ),
     [JSON_LD_IDS.faq]: faqJsonLd(page),
   };
   if (page.software) blocks[JSON_LD_IDS.software] = softwareJsonLd(page);

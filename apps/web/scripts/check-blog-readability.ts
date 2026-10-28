@@ -45,7 +45,9 @@ function syllables(raw: string): number {
   if (!word) return 0;
   if (TERMS.has(word) || TERMS.has(word.replace(/s$/, ""))) return 1;
   if (word.length <= 3) return 1;
-  const cleaned = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, "").replace(/^y/, "");
+  const cleaned = word
+    .replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, "")
+    .replace(/^y/, "");
   const groups = cleaned.match(/[aeiouy]{1,2}/g);
   return Math.max(1, groups?.length ?? 1);
 }
@@ -93,16 +95,28 @@ interface Report {
 }
 
 function check(slug: string): Report {
-  const source = fs.readFileSync(path.join(BLOG_DIR, slug, "index.mdx"), "utf-8");
+  const source = fs.readFileSync(
+    path.join(BLOG_DIR, slug, "index.mdx"),
+    "utf-8"
+  );
   const paragraphs = proseParagraphs(source);
   const allSentences = paragraphs.flatMap(sentences);
-  const words = allSentences.flatMap((s) => s.split(/\s+/).filter((w) => /[a-z]/i.test(w)));
+  const words = allSentences.flatMap((s) =>
+    s.split(/\s+/).filter((w) => /[a-z]/i.test(w))
+  );
   const syllableCount = words.reduce((sum, w) => sum + syllables(w), 0);
   const avgWords = words.length / Math.max(1, allSentences.length);
-  const grade = 0.39 * avgWords + 11.8 * (syllableCount / Math.max(1, words.length)) - 15.59;
+  const grade =
+    0.39 * avgWords +
+    11.8 * (syllableCount / Math.max(1, words.length)) -
+    15.59;
 
-  const longParagraphs = paragraphs.filter((p) => sentences(p).length > LIMITS.maxSentencesPerParagraph);
-  const longSentences = allSentences.filter((s) => s.split(/\s+/).length > LIMITS.maxWordsPerSentence);
+  const longParagraphs = paragraphs.filter(
+    (p) => sentences(p).length > LIMITS.maxSentencesPerParagraph
+  );
+  const longSentences = allSentences.filter(
+    (s) => s.split(/\s+/).length > LIMITS.maxWordsPerSentence
+  );
   const pass =
     grade <= LIMITS.grade &&
     avgWords <= LIMITS.avgWordsPerSentence &&
@@ -115,19 +129,31 @@ function check(slug: string): Report {
 const named = process.argv.slice(2);
 const slugs = named.length
   ? named
-  : fs.readdirSync(BLOG_DIR).filter((d) => fs.existsSync(path.join(BLOG_DIR, d, "index.mdx")));
+  : fs
+      .readdirSync(BLOG_DIR)
+      .filter((d) => fs.existsSync(path.join(BLOG_DIR, d, "index.mdx")));
 
 let failed = 0;
 for (const slug of slugs) {
   const r = check(slug);
   if (!r.pass) failed++;
   const status = r.pass ? "PASS" : "FAIL";
-  console.log(`${status}  ${slug}  grade ${r.grade.toFixed(1)}  avg ${r.avgWords.toFixed(1)} words/sentence`);
+  console.log(
+    `${status}  ${slug}  grade ${r.grade.toFixed(1)}  avg ${r.avgWords.toFixed(1)} words/sentence`
+  );
   if (named.length && !r.pass) {
-    for (const p of r.longParagraphs) console.log(`  paragraph over ${LIMITS.maxSentencesPerParagraph} sentences: "${p.slice(0, 90)}..."`);
-    for (const s of r.longSentences) console.log(`  sentence over ${LIMITS.maxWordsPerSentence} words: "${s.slice(0, 110)}..."`);
+    for (const p of r.longParagraphs)
+      console.log(
+        `  paragraph over ${LIMITS.maxSentencesPerParagraph} sentences: "${p.slice(0, 90)}..."`
+      );
+    for (const s of r.longSentences)
+      console.log(
+        `  sentence over ${LIMITS.maxWordsPerSentence} words: "${s.slice(0, 110)}..."`
+      );
   }
 }
 
-console.log(`\n${slugs.length - failed}/${slugs.length} pass (grade <= ${LIMITS.grade}, <= ${LIMITS.maxSentencesPerParagraph} sentences per paragraph, <= ${LIMITS.maxWordsPerSentence} words per sentence)`);
+console.log(
+  `\n${slugs.length - failed}/${slugs.length} pass (grade <= ${LIMITS.grade}, <= ${LIMITS.maxSentencesPerParagraph} sentences per paragraph, <= ${LIMITS.maxWordsPerSentence} words per sentence)`
+);
 if (named.length && failed) process.exit(1);

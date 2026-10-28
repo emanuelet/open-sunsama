@@ -24,9 +24,7 @@ export function DescriptionField({
 }: DescriptionFieldProps) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs font-medium text-muted-foreground">
-        Notes
-      </Label>
+      <Label className="text-xs font-medium text-muted-foreground">Notes</Label>
       {isEditing ? (
         <div onBlur={onBlur}>
           <RichTextEditor

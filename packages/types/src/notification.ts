@@ -6,12 +6,12 @@
 /**
  * Where incomplete tasks should be moved during rollover
  */
-export type RolloverDestination = 'next_day' | 'backlog';
+export type RolloverDestination = "next_day" | "backlog";
 
 /**
  * Position where rolled-over tasks should be placed in the destination
  */
-export type RolloverPosition = 'top' | 'bottom';
+export type RolloverPosition = "top" | "bottom";
 
 /**
  * Represents a user's notification preferences
@@ -101,9 +101,9 @@ export interface ReminderTimingOption {
  * Available reminder timing options
  */
 export const REMINDER_TIMING_OPTIONS: readonly ReminderTimingOption[] = [
-  { value: 5, label: '5 minutes before' },
-  { value: 15, label: '15 minutes before' },
-  { value: 30, label: '30 minutes before' },
-  { value: 60, label: '1 hour before' },
-  { value: 120, label: '2 hours before' },
+  { value: 5, label: "5 minutes before" },
+  { value: 15, label: "15 minutes before" },
+  { value: 30, label: "30 minutes before" },
+  { value: 60, label: "1 hour before" },
+  { value: 120, label: "2 hours before" },
 ] as const;

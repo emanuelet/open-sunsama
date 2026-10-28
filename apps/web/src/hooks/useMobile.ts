@@ -1,13 +1,13 @@
-import { useEffect, useState, useCallback } from 'react';
-import { 
-  isTauriMobile, 
-  getPlatform, 
+import { useEffect, useState, useCallback } from "react";
+import {
+  isTauriMobile,
+  getPlatform,
   triggerHaptic as doTriggerHaptic,
   requestNotificationPermission as doRequestNotificationPermission,
   setBadgeCount as doSetBadgeCount,
   type HapticType,
   type Platform,
-} from '@/lib/mobile';
+} from "@/lib/mobile";
 
 interface UseMobileReturn {
   /** Whether running on Tauri mobile (iOS/Android) */
@@ -26,17 +26,17 @@ interface UseMobileReturn {
 
 /**
  * Hook for accessing mobile-specific features
- * 
+ *
  * @example
  * ```tsx
  * function MyComponent() {
  *   const { isMobile, triggerHaptic, platform } = useMobile();
- *   
+ *
  *   const handlePress = async () => {
  *     await triggerHaptic('light');
  *     // do something
  *   };
- *   
+ *
  *   return (
  *     <button onClick={handlePress}>
  *       {isMobile ? 'Tap me' : 'Click me'}
@@ -48,7 +48,7 @@ interface UseMobileReturn {
 export function useMobile(): UseMobileReturn {
   const [isMobile, setIsMobile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [platform, setPlatform] = useState<Platform>('web');
+  const [platform, setPlatform] = useState<Platform>("web");
 
   useEffect(() => {
     async function detectPlatform() {
@@ -61,7 +61,7 @@ export function useMobile(): UseMobileReturn {
         setPlatform(plat);
       } catch {
         setIsMobile(false);
-        setPlatform('web');
+        setPlatform("web");
       } finally {
         setIsLoading(false);
       }
@@ -70,21 +70,27 @@ export function useMobile(): UseMobileReturn {
     detectPlatform();
   }, []);
 
-  const triggerHaptic = useCallback(async (type: HapticType) => {
-    if (isMobile) {
-      await doTriggerHaptic(type);
-    }
-  }, [isMobile]);
+  const triggerHaptic = useCallback(
+    async (type: HapticType) => {
+      if (isMobile) {
+        await doTriggerHaptic(type);
+      }
+    },
+    [isMobile]
+  );
 
   const requestNotificationPermission = useCallback(async () => {
     return doRequestNotificationPermission();
   }, []);
 
-  const setBadgeCount = useCallback(async (count: number) => {
-    if (isMobile) {
-      await doSetBadgeCount(count);
-    }
-  }, [isMobile]);
+  const setBadgeCount = useCallback(
+    async (count: number) => {
+      if (isMobile) {
+        await doSetBadgeCount(count);
+      }
+    },
+    [isMobile]
+  );
 
   return {
     isMobile,

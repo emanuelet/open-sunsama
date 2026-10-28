@@ -29,15 +29,11 @@
       "mobile": [
         {
           "host": "opensunsama.com",
-          "pathPrefix": [
-            "/"
-          ]
+          "pathPrefix": ["/"]
         },
         {
           "host": "*.opensunsama.com",
-          "pathPrefix": [
-            "/"
-          ]
+          "pathPrefix": ["/"]
         }
       ]
     }

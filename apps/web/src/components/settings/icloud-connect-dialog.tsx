@@ -55,7 +55,7 @@ export function ICloudConnectDialog({
         appPassword: appPassword.trim(),
         caldavUrl: caldavUrl.trim() || undefined,
       });
-      
+
       // Reset form and close dialog on success
       setEmail("");
       setAppPassword("");
@@ -140,7 +140,9 @@ export function ICloudConnectDialog({
           <div className="space-y-2">
             <Label htmlFor="icloud-caldav-url">
               CalDAV URL{" "}
-              <span className="font-normal text-muted-foreground">(optional)</span>
+              <span className="font-normal text-muted-foreground">
+                (optional)
+              </span>
             </Label>
             <Input
               id="icloud-caldav-url"

@@ -1,4 +1,10 @@
-import { MarketingLayout, MarketingSeo, SectionRenderer, FaqSection, RelatedLinks } from "@/components/marketing";
+import {
+  MarketingLayout,
+  MarketingSeo,
+  SectionRenderer,
+  FaqSection,
+  RelatedLinks,
+} from "@/components/marketing";
 import { OpenSourceComparison } from "@/components/marketing/pages/open-source/comparison";
 import { OpenSourceCta } from "@/components/marketing/pages/open-source/cta";
 import { ExtendSection } from "@/components/marketing/pages/open-source/extend-section";
@@ -16,9 +22,11 @@ import type { MarketingSection } from "@/content/marketing/types";
  * followed repo links, and a CTA whose second path is self-hosting.
  */
 function Section({ section }: { section: MarketingSection }) {
-  if (section.kind === "comparison") return <OpenSourceComparison section={section} />;
+  if (section.kind === "comparison")
+    return <OpenSourceComparison section={section} />;
   if (section.kind === "custom") {
-    if (section.id === "self-host") return <SelfHostSection section={section} />;
+    if (section.id === "self-host")
+      return <SelfHostSection section={section} />;
     if (section.id === "extend") return <ExtendSection section={section} />;
     if (section.id === "license") return <LicenseSection section={section} />;
   }
@@ -33,8 +41,16 @@ export default function OpenSourceTaskManagerPage() {
       {page.sections.map((section) => (
         <Section key={section.id} section={section} />
       ))}
-      <FaqSection heading={page.faqs.heading} lead={page.faqs.lead} items={page.faqs.items} />
-      <RelatedLinks heading={page.related.heading} lead={page.related.lead} links={page.related.links} />
+      <FaqSection
+        heading={page.faqs.heading}
+        lead={page.faqs.lead}
+        items={page.faqs.items}
+      />
+      <RelatedLinks
+        heading={page.related.heading}
+        lead={page.related.lead}
+        links={page.related.links}
+      />
       <OpenSourceCta cta={page.cta} />
     </MarketingLayout>
   );

@@ -172,7 +172,9 @@ export function NotificationSettings() {
       if (await setAutoLaunch(enabled)) {
         setAutoLaunchState(enabled);
         toast({
-          title: enabled ? "Launch at login enabled" : "Launch at login disabled",
+          title: enabled
+            ? "Launch at login enabled"
+            : "Launch at login disabled",
           description: enabled
             ? "Open Sunsama will start minimized when you sign in."
             : "Open Sunsama will no longer start when you sign in.",

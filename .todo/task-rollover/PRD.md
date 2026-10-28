@@ -52,7 +52,7 @@ Implement automatic task rollover using **PG Boss** (PostgreSQL-based job queue)
 
 ```typescript
 // Add index for rollover queries - finding incomplete tasks by user
-export const tasksUserScheduledIdx = index('tasks_user_scheduled_idx')
+export const tasksUserScheduledIdx = index("tasks_user_scheduled_idx")
   .on(tasks.userId, tasks.scheduledDate)
   .where(isNull(tasks.completedAt));
 ```
@@ -60,21 +60,22 @@ export const tasksUserScheduledIdx = index('tasks_user_scheduled_idx')
 #### New Table for Rollover Tracking (`packages/database/src/schema/rollover-log.ts`)
 
 ```typescript
-export const rolloverLogs = pgTable('rollover_logs', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  timezone: varchar('timezone', { length: 50 }).notNull(),
-  rolloverDate: date('rollover_date').notNull(), // The date that was rolled over FROM
-  usersProcessed: integer('users_processed').notNull().default(0),
-  tasksRolledOver: integer('tasks_rolled_over').notNull().default(0),
-  executedAt: timestamp('executed_at').defaultNow().notNull(),
-  durationMs: integer('duration_ms'),
-  status: varchar('status', { length: 20 }).notNull().default('completed'), // completed, failed, partial
-  errorMessage: text('error_message'),
+export const rolloverLogs = pgTable("rollover_logs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  timezone: varchar("timezone", { length: 50 }).notNull(),
+  rolloverDate: date("rollover_date").notNull(), // The date that was rolled over FROM
+  usersProcessed: integer("users_processed").notNull().default(0),
+  tasksRolledOver: integer("tasks_rolled_over").notNull().default(0),
+  executedAt: timestamp("executed_at").defaultNow().notNull(),
+  durationMs: integer("duration_ms"),
+  status: varchar("status", { length: 20 }).notNull().default("completed"), // completed, failed, partial
+  errorMessage: text("error_message"),
 });
 
 // Unique constraint to prevent duplicate rollover for same timezone+date
-export const rolloverLogsUniqueIdx = uniqueIndex('rollover_logs_tz_date_idx')
-  .on(rolloverLogs.timezone, rolloverLogs.rolloverDate);
+export const rolloverLogsUniqueIdx = uniqueIndex(
+  "rollover_logs_tz_date_idx"
+).on(rolloverLogs.timezone, rolloverLogs.rolloverDate);
 ```
 
 ### 2. PG Boss Setup
@@ -93,7 +94,7 @@ export const rolloverLogsUniqueIdx = uniqueIndex('rollover_logs_tz_date_idx')
 #### PG Boss Client (`apps/api/src/lib/pgboss.ts`)
 
 ```typescript
-import PgBoss from 'pg-boss';
+import PgBoss from "pg-boss";
 
 let boss: PgBoss | null = null;
 
@@ -101,7 +102,7 @@ export async function getPgBoss(): Promise<PgBoss> {
   if (!boss) {
     boss = new PgBoss({
       connectionString: process.env.DATABASE_URL!,
-      schema: 'pgboss', // Separate schema for PG Boss tables
+      schema: "pgboss", // Separate schema for PG Boss tables
       retryLimit: 3,
       retryDelay: 60, // 1 minute between retries
       retryBackoff: true,
@@ -110,8 +111,8 @@ export async function getPgBoss(): Promise<PgBoss> {
       deleteAfterDays: 7, // Delete archived jobs after 7 days
     });
 
-    boss.on('error', (error) => {
-      console.error('[PG Boss Error]', error);
+    boss.on("error", (error) => {
+      console.error("[PG Boss Error]", error);
     });
 
     await boss.start();
@@ -128,20 +129,29 @@ export async function stopPgBoss(): Promise<void> {
 
 // Job names
 export const JOBS = {
-  TIMEZONE_ROLLOVER_CHECK: 'timezone-rollover-check',
-  USER_BATCH_ROLLOVER: 'user-batch-rollover',
+  TIMEZONE_ROLLOVER_CHECK: "timezone-rollover-check",
+  USER_BATCH_ROLLOVER: "user-batch-rollover",
 } as const;
 ```
 
 ### 3. Rollover Worker (`apps/api/src/workers/rollover.ts`)
 
 ```typescript
-import PgBoss from 'pg-boss';
-import { getDb, eq, and, lt, isNull, sql, users, tasks } from '@open-sunsama/database';
-import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
-import { format, subDays } from 'date-fns';
-import { getPgBoss, JOBS } from '../lib/pgboss.js';
-import { rolloverLogs } from '@open-sunsama/database/schema';
+import PgBoss from "pg-boss";
+import {
+  getDb,
+  eq,
+  and,
+  lt,
+  isNull,
+  sql,
+  users,
+  tasks,
+} from "@open-sunsama/database";
+import { formatInTimeZone, toZonedTime } from "date-fns-tz";
+import { format, subDays } from "date-fns";
+import { getPgBoss, JOBS } from "../lib/pgboss.js";
+import { rolloverLogs } from "@open-sunsama/database/schema";
 
 // All IANA timezones grouped by UTC offset
 // We only need to check timezones at their midnight
@@ -164,9 +174,14 @@ export async function registerRolloverWorkers(): Promise<void> {
   const boss = await getPgBoss();
 
   // Schedule the timezone check to run every minute
-  await boss.schedule(JOBS.TIMEZONE_ROLLOVER_CHECK, '* * * * *', {}, {
-    tz: 'UTC',
-  });
+  await boss.schedule(
+    JOBS.TIMEZONE_ROLLOVER_CHECK,
+    "* * * * *",
+    {},
+    {
+      tz: "UTC",
+    }
+  );
 
   // Register the timezone check handler
   boss.work<RolloverCheckPayload>(
@@ -178,14 +193,14 @@ export async function registerRolloverWorkers(): Promise<void> {
   // Register the batch rollover handler with concurrency
   boss.work<UserBatchRolloverPayload>(
     JOBS.USER_BATCH_ROLLOVER,
-    { 
+    {
       teamSize: 5, // Process 5 batches concurrently
       teamConcurrency: 2,
     },
     processUserBatchRollover
   );
 
-  console.log('[Rollover Worker] Registered and scheduled');
+  console.log("[Rollover Worker] Registered and scheduled");
 }
 
 async function processTimezoneRolloverCheck(
@@ -194,7 +209,7 @@ async function processTimezoneRolloverCheck(
   const db = getDb();
   const boss = await getPgBoss();
   const now = new Date();
-  
+
   // Find all unique timezones from users
   const userTimezones = await db
     .selectDistinct({ timezone: users.timezone })
@@ -213,8 +228,12 @@ async function processTimezoneRolloverCheck(
     if (currentHour !== 0 || currentMinute > 1) continue;
 
     // Check if we already ran rollover for this timezone today
-    const todayInTz = formatInTimeZone(now, timezone, 'yyyy-MM-dd');
-    const yesterdayInTz = formatInTimeZone(subDays(now, 1), timezone, 'yyyy-MM-dd');
+    const todayInTz = formatInTimeZone(now, timezone, "yyyy-MM-dd");
+    const yesterdayInTz = formatInTimeZone(
+      subDays(now, 1),
+      timezone,
+      "yyyy-MM-dd"
+    );
 
     const existingLog = await db.query.rolloverLogs.findFirst({
       where: and(
@@ -237,8 +256,11 @@ async function processTimezoneRolloverCheck(
     if (tzUsers.length === 0) continue;
 
     // Create batches
-    const batches = chunkArray(tzUsers.map(u => u.id), BATCH_SIZE);
-    
+    const batches = chunkArray(
+      tzUsers.map((u) => u.id),
+      BATCH_SIZE
+    );
+
     // Queue batch jobs
     for (let i = 0; i < batches.length; i++) {
       await boss.send(JOBS.USER_BATCH_ROLLOVER, {
@@ -249,7 +271,9 @@ async function processTimezoneRolloverCheck(
       } as UserBatchRolloverPayload);
     }
 
-    console.log(`[Rollover] Queued ${batches.length} batches for timezone ${timezone}`);
+    console.log(
+      `[Rollover] Queued ${batches.length} batches for timezone ${timezone}`
+    );
   }
 }
 
@@ -284,20 +308,23 @@ async function processUserBatchRollover(
 
     // Log the rollover for the last batch
     if (batchNumber === Math.ceil(userIds.length / BATCH_SIZE)) {
-      await db.insert(rolloverLogs).values({
-        timezone,
-        rolloverDate: format(subDays(new Date(targetDate), 1), 'yyyy-MM-dd'),
-        usersProcessed: userIds.length,
-        tasksRolledOver,
-        durationMs,
-        status: 'completed',
-      }).onConflictDoUpdate({
-        target: [rolloverLogs.timezone, rolloverLogs.rolloverDate],
-        set: {
-          usersProcessed: sql`${rolloverLogs.usersProcessed} + ${userIds.length}`,
-          tasksRolledOver: sql`${rolloverLogs.tasksRolledOver} + ${tasksRolledOver}`,
-        },
-      });
+      await db
+        .insert(rolloverLogs)
+        .values({
+          timezone,
+          rolloverDate: format(subDays(new Date(targetDate), 1), "yyyy-MM-dd"),
+          usersProcessed: userIds.length,
+          tasksRolledOver,
+          durationMs,
+          status: "completed",
+        })
+        .onConflictDoUpdate({
+          target: [rolloverLogs.timezone, rolloverLogs.rolloverDate],
+          set: {
+            usersProcessed: sql`${rolloverLogs.usersProcessed} + ${userIds.length}`,
+            tasksRolledOver: sql`${rolloverLogs.tasksRolledOver} + ${tasksRolledOver}`,
+          },
+        });
     }
 
     console.log(
@@ -322,14 +349,14 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 
 ```typescript
 // Add at the top
-import { registerRolloverWorkers } from './workers/rollover.js';
-import { stopPgBoss } from './lib/pgboss.js';
+import { registerRolloverWorkers } from "./workers/rollover.js";
+import { stopPgBoss } from "./lib/pgboss.js";
 
 // After app setup, before serve()
 async function startServer() {
   // Initialize PG Boss and register workers
   await registerRolloverWorkers();
-  
+
   // Start HTTP server
   serve({
     fetch: app.fetch,
@@ -338,14 +365,14 @@ async function startServer() {
 }
 
 // Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('Shutting down...');
+process.on("SIGTERM", async () => {
+  console.log("Shutting down...");
   await stopPgBoss();
   process.exit(0);
 });
 
-process.on('SIGINT', async () => {
-  console.log('Shutting down...');
+process.on("SIGINT", async () => {
+  console.log("Shutting down...");
   await stopPgBoss();
   process.exit(0);
 });
@@ -358,8 +385,8 @@ startServer().catch(console.error);
 #### New Hook (`apps/web/src/hooks/useTimezoneSync.ts`)
 
 ```typescript
-import { useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 /**
  * Automatically syncs user's device timezone with the server.
@@ -372,7 +399,7 @@ export function useTimezoneSync() {
     if (!user) return;
 
     const deviceTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    
+
     // Only update if different from server
     if (deviceTimezone && deviceTimezone !== user.timezone) {
       updateProfile({ timezone: deviceTimezone });
@@ -384,7 +411,7 @@ export function useTimezoneSync() {
 #### Integration in App Root (`apps/web/src/routes/__root.tsx`)
 
 ```typescript
-import { useTimezoneSync } from '@/hooks/useTimezoneSync';
+import { useTimezoneSync } from "@/hooks/useTimezoneSync";
 
 function RootComponent() {
   useTimezoneSync(); // Add this near the top of the component
@@ -395,10 +422,10 @@ function RootComponent() {
 #### Mobile App (`apps/mobile/src/lib/timezone.ts`)
 
 ```typescript
-import * as Localization from 'expo-localization';
+import * as Localization from "expo-localization";
 
 export function getDeviceTimezone(): string {
-  return Localization.timezone || 'UTC';
+  return Localization.timezone || "UTC";
 }
 ```
 
@@ -467,7 +494,7 @@ CMD ["node", "dist/index.js"]
 #### New docker-compose.yml (for local development)
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -523,10 +550,10 @@ volumes:
 
 #### Why This Approach?
 
-| Approach | Pros | Cons |
-|----------|------|------|
-| **Per-user scheduled jobs** | Precise timing | Millions of jobs to manage |
-| **Single nightly job** | Simple | Can't handle timezones |
+| Approach                            | Pros                     | Cons                       |
+| ----------------------------------- | ------------------------ | -------------------------- |
+| **Per-user scheduled jobs**         | Precise timing           | Millions of jobs to manage |
+| **Single nightly job**              | Simple                   | Can't handle timezones     |
 | **Minute-by-minute check (chosen)** | Timezone-aware, scalable | Slight delay (up to 1 min) |
 
 ### 8. Edge Cases & Handling
@@ -535,17 +562,17 @@ volumes:
 
 ```typescript
 // In rollover.ts, handle DST by checking if timezone is in DST transition
-import { getTimezoneOffset } from 'date-fns-tz';
+import { getTimezoneOffset } from "date-fns-tz";
 
 function isDSTTransitionDay(timezone: string): boolean {
   const now = new Date();
   const yesterday = subDays(now, 1);
   const tomorrow = addDays(now, 1);
-  
+
   const offsetNow = getTimezoneOffset(timezone, now);
   const offsetYesterday = getTimezoneOffset(timezone, yesterday);
   const offsetTomorrow = getTimezoneOffset(timezone, tomorrow);
-  
+
   return offsetNow !== offsetYesterday || offsetNow !== offsetTomorrow;
 }
 ```
@@ -555,6 +582,7 @@ On DST transition days, we use a 2-hour window (23:00-01:00) instead of 1-minute
 #### User Changes Timezone
 
 When a user's timezone changes (via auto-detect or manual), their overdue tasks are NOT immediately rolled over. They will be rolled over at the next midnight in their NEW timezone. This prevents:
+
 - Double-rollover if moving to an earlier timezone
 - Missed rollover if moving to a later timezone
 
@@ -565,6 +593,7 @@ The `rollover_logs` table with a unique constraint on `(timezone, rollover_date)
 #### Job Failure & Retry
 
 PG Boss handles retry automatically with exponential backoff:
+
 - 3 retry attempts
 - 1-minute initial delay, increasing with each retry
 - Failed jobs are logged and can be monitored
@@ -572,6 +601,7 @@ PG Boss handles retry automatically with exponential backoff:
 #### Server Restart During Rollover
 
 PG Boss stores job state in PostgreSQL. If the server restarts:
+
 - In-progress jobs will timeout and be retried
 - Scheduled jobs will be picked up by the new instance
 - No jobs are lost
@@ -581,49 +611,52 @@ PG Boss stores job state in PostgreSQL. If the server restarts:
 #### Unit Tests (`apps/api/src/workers/__tests__/rollover.test.ts`)
 
 ```typescript
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { processTimezoneRolloverCheck, processUserBatchRollover } from '../rollover';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import {
+  processTimezoneRolloverCheck,
+  processUserBatchRollover,
+} from "../rollover";
 
-describe('Task Rollover', () => {
-  describe('processTimezoneRolloverCheck', () => {
-    it('should queue batches for timezones at midnight', async () => {
+describe("Task Rollover", () => {
+  describe("processTimezoneRolloverCheck", () => {
+    it("should queue batches for timezones at midnight", async () => {
       // Mock current time to be midnight in America/New_York
-      vi.setSystemTime(new Date('2024-01-15T05:00:00Z')); // 00:00 EST
+      vi.setSystemTime(new Date("2024-01-15T05:00:00Z")); // 00:00 EST
       // ... test implementation
     });
 
-    it('should skip timezones not at midnight', async () => {
-      vi.setSystemTime(new Date('2024-01-15T12:00:00Z')); // 07:00 EST
+    it("should skip timezones not at midnight", async () => {
+      vi.setSystemTime(new Date("2024-01-15T12:00:00Z")); // 07:00 EST
       // ... test implementation
     });
 
-    it('should not process same timezone twice in a day', async () => {
+    it("should not process same timezone twice in a day", async () => {
       // Insert existing rollover log
       // Run check
       // Verify no new jobs queued
     });
   });
 
-  describe('processUserBatchRollover', () => {
-    it('should move incomplete tasks from past dates to today', async () => {
+  describe("processUserBatchRollover", () => {
+    it("should move incomplete tasks from past dates to today", async () => {
       // Create user with overdue tasks
       // Run batch rollover
       // Verify tasks moved to today
     });
 
-    it('should not move completed tasks', async () => {
+    it("should not move completed tasks", async () => {
       // Create user with completed overdue tasks
       // Run batch rollover
       // Verify tasks unchanged
     });
 
-    it('should not move backlog tasks (null scheduledDate)', async () => {
+    it("should not move backlog tasks (null scheduledDate)", async () => {
       // Create user with backlog tasks
       // Run batch rollover
       // Verify backlog tasks unchanged
     });
 
-    it('should handle DST transition correctly', async () => {
+    it("should handle DST transition correctly", async () => {
       // Test with America/New_York on DST change date
     });
   });
@@ -633,14 +666,14 @@ describe('Task Rollover', () => {
 #### Integration Tests
 
 ```typescript
-describe('Rollover Integration', () => {
-  it('should complete full rollover cycle', async () => {
+describe("Rollover Integration", () => {
+  it("should complete full rollover cycle", async () => {
     // Setup: Create users in multiple timezones with overdue tasks
     // Action: Trigger rollover check at appropriate time
     // Assert: All overdue tasks moved to today, logs created
   });
 
-  it('should handle large user bases efficiently', async () => {
+  it("should handle large user bases efficiently", async () => {
     // Setup: Create 10,000 users with tasks
     // Action: Run rollover
     // Assert: Completes within acceptable time, no memory issues
@@ -664,11 +697,11 @@ describe('Rollover Integration', () => {
 
 ```typescript
 // In rollover.ts
-const ROLLOVER_ENABLED = process.env.ROLLOVER_ENABLED !== 'false';
+const ROLLOVER_ENABLED = process.env.ROLLOVER_ENABLED !== "false";
 
 export async function registerRolloverWorkers(): Promise<void> {
   if (!ROLLOVER_ENABLED) {
-    console.log('[Rollover Worker] Disabled via feature flag');
+    console.log("[Rollover Worker] Disabled via feature flag");
     return;
   }
   // ... rest of setup
@@ -700,14 +733,14 @@ psql $DATABASE_URL -c "DELETE FROM pgboss.schedule WHERE name = 'timezone-rollov
 
 ```typescript
 // In apps/api/src/index.ts
-app.get('/health', async (c) => {
+app.get("/health", async (c) => {
   const boss = await getPgBoss();
   const queueStats = await boss.getQueueSize(JOBS.USER_BATCH_ROLLOVER);
-  
+
   return c.json({
-    status: 'ok',
+    status: "ok",
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '0.0.0',
+    version: process.env.npm_package_version || "0.0.0",
     jobs: {
       pendingRolloverBatches: queueStats,
     },
@@ -717,17 +750,18 @@ app.get('/health', async (c) => {
 
 #### Metrics to Track
 
-| Metric | Target | Alert Threshold |
-|--------|--------|-----------------|
-| Rollover job success rate | >99% | <95% |
-| Avg tasks rolled per day | N/A (baseline) | 2x baseline (potential bug) |
-| Rollover duration (per timezone) | <5 sec | >30 sec |
-| Pending job queue size | <100 | >1000 |
-| Failed jobs in 24h | 0 | >10 |
+| Metric                           | Target         | Alert Threshold             |
+| -------------------------------- | -------------- | --------------------------- |
+| Rollover job success rate        | >99%           | <95%                        |
+| Avg tasks rolled per day         | N/A (baseline) | 2x baseline (potential bug) |
+| Rollover duration (per timezone) | <5 sec         | >30 sec                     |
+| Pending job queue size           | <100           | >1000                       |
+| Failed jobs in 24h               | 0              | >10                         |
 
 #### Logging
 
 All rollover activity is logged:
+
 - Timezone check triggers
 - Batch starts/completions
 - Tasks rolled over count
@@ -735,6 +769,7 @@ All rollover activity is logged:
 - Errors with full stack traces
 
 Query rollover history:
+
 ```sql
 SELECT timezone, rollover_date, users_processed, tasks_rolled_over, duration_ms, status
 FROM rollover_logs
@@ -745,24 +780,26 @@ LIMIT 100;
 ### 12. Files to Create/Modify
 
 #### New Files
-| Path | Purpose |
-|------|---------|
-| `apps/api/src/lib/pgboss.ts` | PG Boss client singleton |
-| `apps/api/src/workers/rollover.ts` | Rollover job handlers |
-| `apps/api/src/workers/index.ts` | Worker registration entry point |
-| `packages/database/src/schema/rollover-log.ts` | Rollover audit log table |
-| `apps/web/src/hooks/useTimezoneSync.ts` | Auto-sync timezone hook |
-| `docker-compose.yml` | Local development with PostgreSQL |
+
+| Path                                           | Purpose                           |
+| ---------------------------------------------- | --------------------------------- |
+| `apps/api/src/lib/pgboss.ts`                   | PG Boss client singleton          |
+| `apps/api/src/workers/rollover.ts`             | Rollover job handlers             |
+| `apps/api/src/workers/index.ts`                | Worker registration entry point   |
+| `packages/database/src/schema/rollover-log.ts` | Rollover audit log table          |
+| `apps/web/src/hooks/useTimezoneSync.ts`        | Auto-sync timezone hook           |
+| `docker-compose.yml`                           | Local development with PostgreSQL |
 
 #### Modified Files
-| Path | Change |
-|------|--------|
-| `apps/api/package.json` | Add pg-boss, date-fns-tz |
-| `apps/api/src/index.ts` | Initialize PG Boss, register workers |
-| `packages/database/src/schema/tasks.ts` | Add performance index |
-| `packages/database/src/schema/index.ts` | Export rollover-log schema |
-| `apps/web/src/routes/__root.tsx` | Add useTimezoneSync hook |
-| `Dockerfile.api` | Add health check, native deps |
+
+| Path                                    | Change                               |
+| --------------------------------------- | ------------------------------------ |
+| `apps/api/package.json`                 | Add pg-boss, date-fns-tz             |
+| `apps/api/src/index.ts`                 | Initialize PG Boss, register workers |
+| `packages/database/src/schema/tasks.ts` | Add performance index                |
+| `packages/database/src/schema/index.ts` | Export rollover-log schema           |
+| `apps/web/src/routes/__root.tsx`        | Add useTimezoneSync hook             |
+| `Dockerfile.api`                        | Add health check, native deps        |
 
 ### 13. Migration Plan
 
@@ -771,8 +808,8 @@ LIMIT 100;
 ```sql
 -- Migration: Add rollover support
 -- 1. Add index for faster rollover queries
-CREATE INDEX CONCURRENTLY IF NOT EXISTS tasks_user_scheduled_incomplete_idx 
-ON tasks (user_id, scheduled_date) 
+CREATE INDEX CONCURRENTLY IF NOT EXISTS tasks_user_scheduled_incomplete_idx
+ON tasks (user_id, scheduled_date)
 WHERE completed_at IS NULL;
 
 -- 2. Create rollover logs table
@@ -804,11 +841,11 @@ CREATE TABLE IF NOT EXISTS rollover_logs (
 
 #### Estimated Performance
 
-| Users | Est. Rollover Time | Notes |
-|-------|-------------------|-------|
-| 1,000 | <1 second | Single batch |
-| 10,000 | <10 seconds | 100 batches, 5 concurrent |
-| 100,000 | <2 minutes | 1000 batches, 5 concurrent |
-| 1,000,000 | <20 minutes | 10000 batches, spread across timezones |
+| Users     | Est. Rollover Time | Notes                                  |
+| --------- | ------------------ | -------------------------------------- |
+| 1,000     | <1 second          | Single batch                           |
+| 10,000    | <10 seconds        | 100 batches, 5 concurrent              |
+| 100,000   | <2 minutes         | 1000 batches, 5 concurrent             |
+| 1,000,000 | <20 minutes        | 10000 batches, spread across timezones |
 
 Note: Rollover naturally spreads across 24 hours as different timezones reach midnight, so the load is distributed.

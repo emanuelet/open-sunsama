@@ -1,5 +1,8 @@
 import * as React from "react";
-import type { CreateApiKeyInput, CreateApiKeyResponse } from "@open-sunsama/types";
+import type {
+  CreateApiKeyInput,
+  CreateApiKeyResponse,
+} from "@open-sunsama/types";
 import { ApiKeyCreatedView } from "./api-key-created-view";
 import { ApiKeyForm } from "./api-key-form";
 
@@ -20,7 +23,8 @@ export function CreateApiKeyDialog({
   onSubmit,
   isLoading = false,
 }: CreateApiKeyDialogProps) {
-  const [createdKey, setCreatedKey] = React.useState<CreateApiKeyResponse | null>(null);
+  const [createdKey, setCreatedKey] =
+    React.useState<CreateApiKeyResponse | null>(null);
 
   const handleFormSubmit = async (data: CreateApiKeyInput) => {
     try {

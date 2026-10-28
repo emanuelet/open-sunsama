@@ -129,7 +129,9 @@ function CleanUpBacklogBody({ onClose }: { onClose: () => void }) {
     }
     return BUCKETS.map((b) => ({
       ...b,
-      tasks: (byBucket.get(b.key) ?? []).sort((a, c) => ageDays(c) - ageDays(a)),
+      tasks: (byBucket.get(b.key) ?? []).sort(
+        (a, c) => ageDays(c) - ageDays(a)
+      ),
     })).filter((g) => g.tasks.length > 0);
   }, [tasks]);
 
@@ -259,123 +261,123 @@ function CleanUpBacklogBody({ onClose }: { onClose: () => void }) {
           chain, so the list wouldn't scroll; a plain overflow-y-auto flex
           child does. */}
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-1">
-          {isLoading ? (
-            <div className="space-y-2 p-2">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-8 w-full rounded-md" />
-              ))}
+        {isLoading ? (
+          <div className="space-y-2 p-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-8 w-full rounded-md" />
+            ))}
+          </div>
+        ) : total === 0 ? (
+          <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-muted">
+              <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
             </div>
-          ) : total === 0 ? (
-            <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-muted">
-                <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <p className="text-sm font-medium">Backlog's clean</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                No unscheduled tasks to review.
-              </p>
-            </div>
-          ) : (
-            groups.map((group, gi) => {
-              const isCollapsed = collapsed.has(group.key);
-              return (
-                <div
-                  key={group.key}
-                  className={cn(
-                    "group/sec",
-                    gi > 0 && "border-t border-border/60"
-                  )}
-                >
-                  <div className="flex items-center gap-2.5 px-2 py-2.5">
-                    <button
-                      type="button"
-                      onClick={() => toggleCollapse(group.key)}
-                      className="shrink-0 text-muted-foreground"
-                      aria-label={isCollapsed ? "Expand" : "Collapse"}
-                    >
-                      <ChevronRight
-                        className={cn(
-                          "h-4 w-4 transition-transform",
-                          !isCollapsed && "rotate-90"
-                        )}
-                      />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => toggleBucket(group.key)}
+            <p className="text-sm font-medium">Backlog's clean</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              No unscheduled tasks to review.
+            </p>
+          </div>
+        ) : (
+          groups.map((group, gi) => {
+            const isCollapsed = collapsed.has(group.key);
+            return (
+              <div
+                key={group.key}
+                className={cn(
+                  "group/sec",
+                  gi > 0 && "border-t border-border/60"
+                )}
+              >
+                <div className="flex items-center gap-2.5 px-2 py-2.5">
+                  <button
+                    type="button"
+                    onClick={() => toggleCollapse(group.key)}
+                    className="shrink-0 text-muted-foreground"
+                    aria-label={isCollapsed ? "Expand" : "Collapse"}
+                  >
+                    <ChevronRight
                       className={cn(
-                        "shrink-0 transition-opacity",
-                        selecting
-                          ? "opacity-100"
-                          : "opacity-0 group-hover/sec:opacity-100"
+                        "h-4 w-4 transition-transform",
+                        !isCollapsed && "rotate-90"
                       )}
-                      aria-label={`Select ${group.label}`}
-                    >
-                      <CheckBox state={bucketState(group)} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => toggleCollapse(group.key)}
-                      className="text-sm font-semibold"
-                    >
-                      {group.label}
-                    </button>
-                    <span className="text-xs text-muted-foreground">
-                      {group.tasks.length}
-                    </span>
-                  </div>
-
-                  {!isCollapsed && (
-                    <div className="pb-2">
-                      {group.tasks.map((task) => {
-                        const isSel = selected.has(task.id);
-                        const days = ageDays(task);
-                        return (
-                          <button
-                            key={task.id}
-                            type="button"
-                            onClick={() => toggleTask(task.id)}
-                            className={cn(
-                              "group/row flex w-full items-center gap-3 rounded-md py-1.5 pl-9 pr-2 text-left transition-colors",
-                              isSel ? "bg-primary/[0.07]" : "hover:bg-accent/60"
-                            )}
-                          >
-                            <span className="relative flex h-4 w-4 shrink-0 items-center justify-center">
-                              <span
-                                className={cn(
-                                  "absolute h-1.5 w-1.5 rounded-full",
-                                  PRIORITY_DOT[task.priority],
-                                  isSel || selecting
-                                    ? "opacity-0"
-                                    : "opacity-100 group-hover/row:opacity-0"
-                                )}
-                              />
-                              <span
-                                className={cn(
-                                  "absolute transition-opacity",
-                                  isSel || selecting
-                                    ? "opacity-100"
-                                    : "opacity-0 group-hover/row:opacity-100"
-                                )}
-                              >
-                                <CheckBox state={isSel ? "on" : "off"} />
-                              </span>
-                            </span>
-                            <span className="flex-1 truncate text-sm">
-                              {task.title}
-                            </span>
-                            <span className="shrink-0 text-xs text-muted-foreground">
-                              {ageLabel(days)}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleBucket(group.key)}
+                    className={cn(
+                      "shrink-0 transition-opacity",
+                      selecting
+                        ? "opacity-100"
+                        : "opacity-0 group-hover/sec:opacity-100"
+                    )}
+                    aria-label={`Select ${group.label}`}
+                  >
+                    <CheckBox state={bucketState(group)} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleCollapse(group.key)}
+                    className="text-sm font-semibold"
+                  >
+                    {group.label}
+                  </button>
+                  <span className="text-xs text-muted-foreground">
+                    {group.tasks.length}
+                  </span>
                 </div>
-              );
-            })
-          )}
+
+                {!isCollapsed && (
+                  <div className="pb-2">
+                    {group.tasks.map((task) => {
+                      const isSel = selected.has(task.id);
+                      const days = ageDays(task);
+                      return (
+                        <button
+                          key={task.id}
+                          type="button"
+                          onClick={() => toggleTask(task.id)}
+                          className={cn(
+                            "group/row flex w-full items-center gap-3 rounded-md py-1.5 pl-9 pr-2 text-left transition-colors",
+                            isSel ? "bg-primary/[0.07]" : "hover:bg-accent/60"
+                          )}
+                        >
+                          <span className="relative flex h-4 w-4 shrink-0 items-center justify-center">
+                            <span
+                              className={cn(
+                                "absolute h-1.5 w-1.5 rounded-full",
+                                PRIORITY_DOT[task.priority],
+                                isSel || selecting
+                                  ? "opacity-0"
+                                  : "opacity-100 group-hover/row:opacity-0"
+                              )}
+                            />
+                            <span
+                              className={cn(
+                                "absolute transition-opacity",
+                                isSel || selecting
+                                  ? "opacity-100"
+                                  : "opacity-0 group-hover/row:opacity-100"
+                              )}
+                            >
+                              <CheckBox state={isSel ? "on" : "off"} />
+                            </span>
+                          </span>
+                          <span className="flex-1 truncate text-sm">
+                            {task.title}
+                          </span>
+                          <span className="shrink-0 text-xs text-muted-foreground">
+                            {ageLabel(days)}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
       </div>
 
       {/* Footer */}

@@ -35,7 +35,12 @@ export function useTaskAttachments(taskId: string) {
   const queryClient = useQueryClient();
 
   // Fetch attachments for this task
-  const { data: attachments = [], isLoading, error, isError } = useQuery({
+  const {
+    data: attachments = [],
+    isLoading,
+    error,
+    isError,
+  } = useQuery({
     queryKey: attachmentKeys.list(taskId),
     queryFn: async (): Promise<Attachment[]> => {
       const token = localStorage.getItem("open_sunsama_token");
@@ -129,7 +134,8 @@ export function useTaskAttachments(taskId: string) {
       toast({
         variant: "destructive",
         title: "Upload failed",
-        description: error instanceof Error ? error.message : "Could not upload file",
+        description:
+          error instanceof Error ? error.message : "Could not upload file",
       });
     },
   });
@@ -143,15 +149,12 @@ export function useTaskAttachments(taskId: string) {
       }
 
       const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3001";
-      const response = await fetch(
-        `${baseUrl}/attachments/${attachmentId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${baseUrl}/attachments/${attachmentId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -178,7 +181,8 @@ export function useTaskAttachments(taskId: string) {
       toast({
         variant: "destructive",
         title: "Delete failed",
-        description: error instanceof Error ? error.message : "Could not delete file",
+        description:
+          error instanceof Error ? error.message : "Could not delete file",
       });
     },
   });

@@ -20,7 +20,7 @@ export const day: DayEntry[] = [
     time: "8:40 AM",
     tone: "agent",
     tag: "ChatGPT",
-    title: "\"Plan my day around my meetings\"",
+    title: '"Plan my day around my meetings"',
     body: "Your agent reads your tasks and today's meetings, then suggests time blocks in the gaps. You keep the ones you like.",
   },
   {
@@ -82,8 +82,16 @@ export default defineMarketingPage({
       alt: "A task dragged onto the day calendar next to meetings in Open Sunsama, then resized",
     },
     chips: [
-      { tone: "block", title: "Deep work: proposal", detail: "9:00 - 11:00 AM" },
-      { tone: "agent", title: "ChatGPT connected", detail: "Planned 3 blocks around 4 meetings" },
+      {
+        tone: "block",
+        title: "Deep work: proposal",
+        detail: "9:00 - 11:00 AM",
+      },
+      {
+        tone: "agent",
+        title: "ChatGPT connected",
+        detail: "Planned 3 blocks around 4 meetings",
+      },
       { tone: "timer", title: "47:10 / 2:00:00", detail: "Focus" },
     ],
   },
@@ -93,7 +101,8 @@ export default defineMarketingPage({
       kind: "answer",
       id: "answer",
       eyebrow: "The short answer",
-      heading: "Open Sunsama is a daily planner for remote workers that puts tasks and meetings in one place",
+      heading:
+        "Open Sunsama is a daily planner for remote workers that puts tasks and meetings in one place",
       body: [
         "Open Sunsama is a daily planner for remote workers who juggle meetings, messages and real work from home. Your tasks sit on a board of days. Your meetings from Google Calendar, Outlook and iCloud sit on the calendar next to them.",
         "Time blocking for remote work means you drag each task into a gap between calls. You see what fits before the day starts.",
@@ -126,7 +135,10 @@ export default defineMarketingPage({
             alt: "Open Sunsama week view with synced meetings and color-coded time blocks side by side",
             caption: "The week view: meetings and time blocks together.",
           },
-          link: { label: "How calendar sync works", href: "/features/calendar-sync" },
+          link: {
+            label: "How calendar sync works",
+            href: "/features/calendar-sync",
+          },
         },
         {
           title: "Real work gets a slot between your calls",
@@ -142,9 +154,13 @@ export default defineMarketingPage({
           media: {
             shot: "calendar-day",
             alt: "Open Sunsama day view with the task list beside a calendar of meetings and time blocks",
-            caption: "Day view: tasks on the left, your meetings and blocks on the right.",
+            caption:
+              "Day view: tasks on the left, your meetings and blocks on the right.",
           },
-          link: { label: "Time blocking in Open Sunsama", href: "/features/time-blocking" },
+          link: {
+            label: "Time blocking in Open Sunsama",
+            href: "/features/time-blocking",
+          },
         },
         {
           title: "Focus mode shuts out the rest of the list",
@@ -170,7 +186,10 @@ export default defineMarketingPage({
             alt: "Checking off the day's tasks in Open Sunsama at the end of the day",
             caption: "Check off what's done. The rest rolls to tomorrow.",
           },
-          link: { label: "How to stop working late", href: "/blog/how-to-stop-working-late" },
+          link: {
+            label: "How to stop working late",
+            href: "/blog/how-to-stop-working-late",
+          },
         },
       ],
     },
@@ -178,7 +197,8 @@ export default defineMarketingPage({
       kind: "agent",
       id: "ai",
       eyebrow: "AI native",
-      heading: "Claude, ChatGPT or any AI agent can plan your day around your meetings",
+      heading:
+        "Claude, ChatGPT or any AI agent can plan your day around your meetings",
       lead: "Paste one URL into your AI app and sign in. Your agent sees your meetings and tasks together, then blocks time in the gaps.",
       body: [
         "Your agent can read your calendar events, but it can't change them. It only adds and moves your tasks and time blocks.",
@@ -189,13 +209,23 @@ export default defineMarketingPage({
         "My calls ran long. Move what's left into free slots today and tomorrow.",
         "What's on my calendar this week, and where do I have 2 open hours?",
       ],
-      tools: ["get_schedule_for_day", "list_calendar_events", "list_tasks", "create_time_block", "schedule_task"],
+      tools: [
+        "get_schedule_for_day",
+        "list_calendar_events",
+        "list_tasks",
+        "create_time_block",
+        "schedule_task",
+      ],
       clip: "ai-plan",
-      clipCaption: "Claude plans the afternoon around meetings over MCP. Blocks appear live.",
+      clipCaption:
+        "Claude plans the afternoon around meetings over MCP. Blocks appear live.",
       links: [
         { label: "ChatGPT setup", href: "/docs/mcp/chatgpt" },
         { label: "Claude setup", href: "/docs/mcp/claude" },
-        { label: "Plan your day with ChatGPT", href: "/blog/plan-your-day-with-chatgpt" },
+        {
+          label: "Plan your day with ChatGPT",
+          href: "/blog/plan-your-day-with-chatgpt",
+        },
       ],
     },
     {
@@ -252,7 +282,8 @@ export default defineMarketingPage({
       kind: "comparison",
       id: "compare",
       eyebrow: "Compare",
-      heading: "Open Sunsama plans around your meetings and leaves you in charge",
+      heading:
+        "Open Sunsama plans around your meetings and leaves you in charge",
       lead: "Remote workers often look at Sunsama, Motion and Reclaim. Here is how each one handles a day full of calls.",
       columns: ["Open Sunsama", "Sunsama", "Motion", "Reclaim"],
       rows: [
@@ -267,7 +298,12 @@ export default defineMarketingPage({
         },
         {
           feature: "Moves tasks without asking",
-          cells: [{ text: "No" }, { text: "No" }, { text: "Yes" }, { text: "Yes" }],
+          cells: [
+            { text: "No" },
+            { text: "No" },
+            { text: "Yes" },
+            { text: "Yes" },
+          ],
         },
         {
           feature: "Calendars",
@@ -287,7 +323,10 @@ export default defineMarketingPage({
             { mark: "yes", text: "Hosted" },
           ],
         },
-        { feature: "Code you can read and self-host", cells: ["yes", "no", "no", "no"] },
+        {
+          feature: "Code you can read and self-host",
+          cells: ["yes", "no", "no", "no"],
+        },
         {
           feature: "Desktop apps",
           cells: [
@@ -320,19 +359,28 @@ export default defineMarketingPage({
         question: "What is the best daily planner for remote workers?",
         answer:
           "We build Open Sunsama, and we think it is the best pick for most remote workers. Tasks and meetings share one view, you block time between calls, and any AI agent can plan with you. Pick Motion or Reclaim if you want AI to schedule every task for you.",
-        link: { label: "Daily planners for remote workers", href: "/blog/best-daily-planner-remote-workers" },
+        link: {
+          label: "Daily planners for remote workers",
+          href: "/blog/best-daily-planner-remote-workers",
+        },
       },
       {
         question: "How do I time block when my day is full of meetings?",
         answer:
           "Block only the gaps. Look at the day view, find the open stretches between calls, and drag one task into each. Keep a 30-minute block for email and chat so it doesn't eat the whole day.",
-        link: { label: "How to protect focus time", href: "/blog/how-to-protect-focus-time" },
+        link: {
+          label: "How to protect focus time",
+          href: "/blog/how-to-protect-focus-time",
+        },
       },
       {
         question: "Does Open Sunsama work with Outlook and Google Calendar?",
         answer:
           "Yes. Connect Google Calendar, Outlook or iCloud in Settings. Your meetings show up next to your tasks and time blocks.",
-        link: { label: "How calendar sync works", href: "/features/calendar-sync" },
+        link: {
+          label: "How calendar sync works",
+          href: "/features/calendar-sync",
+        },
       },
       {
         question: "How does Open Sunsama handle time zones?",
@@ -355,7 +403,10 @@ export default defineMarketingPage({
         question: "Is Open Sunsama open source?",
         answer:
           "The code is public on GitHub. It uses a non-commercial license: you can read it, run it and self-host it for personal use. Companies need a commercial license.",
-        link: { label: "See the code", href: "https://github.com/ShadowWalker2014/open-sunsama" },
+        link: {
+          label: "See the code",
+          href: "https://github.com/ShadowWalker2014/open-sunsama",
+        },
       },
     ],
   },
@@ -425,7 +476,8 @@ export default defineMarketingPage({
     heading: "Plan tomorrow around your meetings, then log off",
     body: "Drag your tasks into the gaps between calls, work one block at a time, and let the rest roll over when the day is done.",
     shot: "calendar-week",
-    shotAlt: "Open Sunsama week calendar with meetings and time blocks side by side",
+    shotAlt:
+      "Open Sunsama week calendar with meetings and time blocks side by side",
   },
 
   software: {

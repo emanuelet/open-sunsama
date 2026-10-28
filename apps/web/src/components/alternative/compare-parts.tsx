@@ -7,17 +7,44 @@
 
 import { ArrowRight, Check, X } from "lucide-react";
 import { Reveal } from "@/components/landing/motion";
-import { CARD, CONTAINER, SECTION, SectionHeading, SmartLink, RichText, type SectionSlots } from "@/components/marketing";
-import type { AlternativeExtras, GiveUp, Verdict } from "@/content/marketing/alternatives/shared";
-import type { MarketingPageContent, MarketingSection, TextLink } from "@/content/marketing/types";
+import {
+  CARD,
+  CONTAINER,
+  SECTION,
+  SectionHeading,
+  SmartLink,
+  RichText,
+  type SectionSlots,
+} from "@/components/marketing";
+import type {
+  AlternativeExtras,
+  GiveUp,
+  Verdict,
+} from "@/content/marketing/alternatives/shared";
+import type {
+  MarketingPageContent,
+  MarketingSection,
+  TextLink,
+} from "@/content/marketing/types";
 import { cn } from "@/lib/utils";
 
-type SectionCopy = Pick<Extract<MarketingSection, { kind: "custom" }>, "id" | "eyebrow" | "heading" | "lead">;
+type SectionCopy = Pick<
+  Extract<MarketingSection, { kind: "custom" }>,
+  "id" | "eyebrow" | "heading" | "lead"
+>;
 
-function CardLink({ link, tone }: { link: TextLink; tone: "primary" | "muted" }) {
+function CardLink({
+  link,
+  tone,
+}: {
+  link: TextLink;
+  tone: "primary" | "muted";
+}) {
   const className = cn(
     "group mt-6 inline-flex items-center gap-1.5 rounded-sm text-[14px] font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
-    tone === "primary" ? "text-primary hover:text-primary/80" : "text-foreground/75 hover:text-foreground"
+    tone === "primary"
+      ? "text-primary hover:text-primary/80"
+      : "text-foreground/75 hover:text-foreground"
   );
   const body = (
     <>
@@ -38,12 +65,23 @@ function CardLink({ link, tone }: { link: TextLink; tone: "primary" | "muted" })
 }
 
 /** Two honest cards: who should switch, and who should stay. */
-export function VerdictSection({ section, verdict }: { section: SectionCopy; verdict: Verdict }) {
+export function VerdictSection({
+  section,
+  verdict,
+}: {
+  section: SectionCopy;
+  verdict: Verdict;
+}) {
   const headingId = `${section.id}-heading`;
   return (
     <section id={section.id} className={SECTION} aria-labelledby={headingId}>
       <div className={cn(CONTAINER, "max-w-5xl")}>
-        <SectionHeading id={headingId} eyebrow={section.eyebrow} heading={section.heading} lead={section.lead} />
+        <SectionHeading
+          id={headingId}
+          eyebrow={section.eyebrow}
+          heading={section.heading}
+          lead={section.lead}
+        />
         <div className="mt-12 grid gap-4 md:grid-cols-2 md:gap-5">
           <Reveal className="relative flex min-w-0 flex-col overflow-hidden rounded-2xl border border-primary/35 bg-linear-to-b from-primary/[0.07] to-primary/2 p-6 shadow-[0_24px_60px_-40px_hsl(var(--primary)/0.6)] md:p-7">
             <div
@@ -51,13 +89,25 @@ export function VerdictSection({ section, verdict }: { section: SectionCopy; ver
               aria-hidden
             />
             <h3 className="relative flex items-center gap-2.5 text-[17px] font-semibold tracking-[-0.01em]">
-              <img src="/open-sunsama-logo.png" alt="" width={24} height={24} className="h-6 w-6 rounded-md shadow-xs" />
+              <img
+                src="/open-sunsama-logo.png"
+                alt=""
+                width={24}
+                height={24}
+                className="h-6 w-6 rounded-md shadow-xs"
+              />
               Switch to Open Sunsama if…
             </h3>
             <ul className="relative mt-5 space-y-3.5">
               {verdict.switchIf.map((item) => (
-                <li key={item} className="flex gap-3 text-[15px] leading-relaxed text-foreground/90">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground" aria-hidden>
+                <li
+                  key={item}
+                  className="flex gap-3 text-[15px] leading-relaxed text-foreground/90"
+                >
+                  <span
+                    className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
+                    aria-hidden
+                  >
                     <Check className="h-3 w-3" strokeWidth={3} />
                   </span>
                   <span>
@@ -66,10 +116,15 @@ export function VerdictSection({ section, verdict }: { section: SectionCopy; ver
                 </li>
               ))}
             </ul>
-            {verdict.switchLink && <CardLink link={verdict.switchLink} tone="primary" />}
+            {verdict.switchLink && (
+              <CardLink link={verdict.switchLink} tone="primary" />
+            )}
           </Reveal>
 
-          <Reveal delay={100} className={cn(CARD, "flex min-w-0 flex-col p-6 md:p-7")}>
+          <Reveal
+            delay={100}
+            className={cn(CARD, "flex min-w-0 flex-col p-6 md:p-7")}
+          >
             <h3 className="flex items-center gap-2.5 text-[17px] font-semibold tracking-[-0.01em]">
               <span
                 className="flex h-6 w-6 items-center justify-center rounded-md border border-border/80 bg-muted text-[12px] font-semibold text-muted-foreground"
@@ -81,8 +136,14 @@ export function VerdictSection({ section, verdict }: { section: SectionCopy; ver
             </h3>
             <ul className="mt-5 space-y-3.5">
               {verdict.stayIf.map((item) => (
-                <li key={item} className="flex gap-3 text-[15px] leading-relaxed text-foreground/80">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-foreground/60" aria-hidden>
+                <li
+                  key={item}
+                  className="flex gap-3 text-[15px] leading-relaxed text-foreground/80"
+                >
+                  <span
+                    className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-foreground/60"
+                    aria-hidden
+                  >
                     <Check className="h-3 w-3" strokeWidth={3} />
                   </span>
                   <span>
@@ -91,7 +152,9 @@ export function VerdictSection({ section, verdict }: { section: SectionCopy; ver
                 </li>
               ))}
             </ul>
-            {verdict.stayLink && <CardLink link={verdict.stayLink} tone="muted" />}
+            {verdict.stayLink && (
+              <CardLink link={verdict.stayLink} tone="muted" />
+            )}
           </Reveal>
         </div>
       </div>
@@ -100,21 +163,40 @@ export function VerdictSection({ section, verdict }: { section: SectionCopy; ver
 }
 
 /** The true gaps, one row each, so nobody switches blind. */
-export function GiveUpSection({ section, items, rival }: { section: SectionCopy; items: GiveUp[]; rival: string }) {
+export function GiveUpSection({
+  section,
+  items,
+  rival,
+}: {
+  section: SectionCopy;
+  items: GiveUp[];
+  rival: string;
+}) {
   const headingId = `${section.id}-heading`;
   return (
     <section id={section.id} className={SECTION} aria-labelledby={headingId}>
       <div className={cn(CONTAINER, "max-w-5xl")}>
-        <SectionHeading id={headingId} eyebrow={section.eyebrow} heading={section.heading} lead={section.lead} />
+        <SectionHeading
+          id={headingId}
+          eyebrow={section.eyebrow}
+          heading={section.heading}
+          lead={section.lead}
+        />
         <Reveal delay={100} className="mt-12">
           <ul
             className="divide-y divide-border/60 overflow-hidden rounded-2xl border border-border/70 bg-card dark:border-white/8"
             aria-label={`What ${rival} does that Open Sunsama doesn't`}
           >
             {items.map((item) => (
-              <li key={item.title} className="grid gap-2 px-5 py-5 sm:grid-cols-[240px_1fr] sm:gap-8 sm:px-7 sm:py-6">
+              <li
+                key={item.title}
+                className="grid gap-2 px-5 py-5 sm:grid-cols-[240px_1fr] sm:gap-8 sm:px-7 sm:py-6"
+              >
                 <h3 className="flex items-start gap-2.5 text-[15.5px] font-semibold leading-snug tracking-[-0.01em]">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground" aria-hidden>
+                  <span
+                    className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground"
+                    aria-hidden
+                  >
                     <X className="h-3 w-3" strokeWidth={2.75} />
                   </span>
                   {item.title}
@@ -154,14 +236,34 @@ export function GiveUpSection({ section, items, rival }: { section: SectionCopy;
 
 function copyOf(page: MarketingPageContent, id: string): SectionCopy {
   const section = page.sections.find((s) => s.id === id);
-  if (!section || section.kind === "stats") throw new Error(`${page.path}: no section "${id}"`);
-  return { id: section.id, eyebrow: section.eyebrow, heading: section.heading, lead: section.lead };
+  if (!section || section.kind === "stats")
+    throw new Error(`${page.path}: no section "${id}"`);
+  return {
+    id: section.id,
+    eyebrow: section.eyebrow,
+    heading: section.heading,
+    lead: section.lead,
+  };
 }
 
 /** Slots for MarketingPageView: the verdict cards and the give-up list. */
-export function alternativeSlots(page: MarketingPageContent, extras: AlternativeExtras): SectionSlots {
+export function alternativeSlots(
+  page: MarketingPageContent,
+  extras: AlternativeExtras
+): SectionSlots {
   return {
-    verdict: <VerdictSection section={copyOf(page, "verdict")} verdict={extras.verdict} />,
-    "give-up": <GiveUpSection section={copyOf(page, "give-up")} items={extras.giveUps} rival={extras.verdict.rival} />,
+    verdict: (
+      <VerdictSection
+        section={copyOf(page, "verdict")}
+        verdict={extras.verdict}
+      />
+    ),
+    "give-up": (
+      <GiveUpSection
+        section={copyOf(page, "give-up")}
+        items={extras.giveUps}
+        rival={extras.verdict.rival}
+      />
+    ),
   };
 }

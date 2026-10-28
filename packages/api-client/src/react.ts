@@ -197,7 +197,9 @@ export interface OpenSunsamaHooks {
 
   useCreateTimeBlock: (
     options?: UseMutationOptions<TimeBlock, ApiError, CreateTimeBlockInput>
-  ) => ReturnType<typeof useMutation<TimeBlock, ApiError, CreateTimeBlockInput>>;
+  ) => ReturnType<
+    typeof useMutation<TimeBlock, ApiError, CreateTimeBlockInput>
+  >;
 
   useUpdateTimeBlock: (
     options?: UseMutationOptions<
@@ -241,7 +243,11 @@ export interface OpenSunsamaHooks {
   ) => ReturnType<typeof useQuery<ApiKey, ApiError>>;
 
   useCreateApiKey: (
-    options?: UseMutationOptions<CreateApiKeyResponse, ApiError, CreateApiKeyInput>
+    options?: UseMutationOptions<
+      CreateApiKeyResponse,
+      ApiError,
+      CreateApiKeyInput
+    >
   ) => ReturnType<
     typeof useMutation<CreateApiKeyResponse, ApiError, CreateApiKeyInput>
   >;
@@ -253,7 +259,11 @@ export interface OpenSunsamaHooks {
       { id: string; input: UpdateApiKeyInput }
     >
   ) => ReturnType<
-    typeof useMutation<ApiKey, ApiError, { id: string; input: UpdateApiKeyInput }>
+    typeof useMutation<
+      ApiKey,
+      ApiError,
+      { id: string; input: UpdateApiKeyInput }
+    >
   >;
 
   useRevokeApiKey: (
@@ -485,7 +495,8 @@ export function createReactHooks(client: OpenSunsamaClient): OpenSunsamaHooks {
     useCreateTimeBlock: (options) => {
       const queryClient = useQueryClient();
       return useMutation({
-        mutationFn: (input: CreateTimeBlockInput) => timeBlocksApi.create(input),
+        mutationFn: (input: CreateTimeBlockInput) =>
+          timeBlocksApi.create(input),
         onSuccess: () => {
           queryClient.invalidateQueries({
             queryKey: queryKeys.timeBlocks.lists(),

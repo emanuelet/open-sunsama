@@ -14,9 +14,9 @@ import {
   startOfDay,
   setHours,
   setMinutes,
-} from 'date-fns';
+} from "date-fns";
 
-import { DATE_FORMAT, TIME_FORMAT } from './constants.js';
+import { DATE_FORMAT, TIME_FORMAT } from "./constants.js";
 
 /**
  * Format a date as YYYY-MM-DD
@@ -48,10 +48,14 @@ export function parseDate(dateStr: string): Date {
  * @param daysForward - Number of days after center date
  * @returns Array of dates in the range
  */
-export function getDateRange(centerDate: Date, daysBack: number, daysForward: number): Date[] {
+export function getDateRange(
+  centerDate: Date,
+  daysBack: number,
+  daysForward: number
+): Date[] {
   const start = addDays(startOfDay(centerDate), -daysBack);
   const end = addDays(startOfDay(centerDate), daysForward);
-  
+
   return eachDayOfInterval({ start, end });
 }
 
@@ -106,14 +110,14 @@ export function formatTime(date: Date): string {
 export function parseTime(timeStr: string, date: Date): Date {
   const timeRegex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/;
   const match = timeStr.match(timeRegex);
-  
+
   if (!match) {
     throw new Error(`Invalid time string: ${timeStr}`);
   }
-  
+
   const hours = parseInt(match[1]!, 10);
   const minutes = parseInt(match[2]!, 10);
-  
+
   return setMinutes(setHours(date, hours), minutes);
 }
 
@@ -174,22 +178,28 @@ export function parseTaskSchedule(
   const relativeMatch = /\b(?:for\s+)?(today|tomorrow)\b/i.exec(remaining);
   if (relativeMatch) {
     scheduledDate = startOfDay(referenceDate);
-    if (relativeMatch[1]!.toLowerCase() === 'tomorrow') {
+    if (relativeMatch[1]!.toLowerCase() === "tomorrow") {
       scheduledDate = addDaysDate(scheduledDate, 1);
     }
-    remaining = remaining.replace(relativeMatch[0], ' ');
+    remaining = remaining.replace(relativeMatch[0], " ");
   } else {
-    const weekdayMatch = /\b(?:(next)\s+)?(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/i.exec(remaining);
+    const weekdayMatch =
+      /\b(?:(next)\s+)?(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/i.exec(
+        remaining
+      );
     if (weekdayMatch) {
       const targetDay = WEEKDAYS[weekdayMatch[2]!.toLowerCase()]!;
       let offset = (targetDay - referenceDate.getDay() + 7) % 7;
       if (offset === 0) offset = 7;
       scheduledDate = startOfDay(addDaysDate(referenceDate, offset));
-      remaining = remaining.replace(weekdayMatch[0], ' ');
+      remaining = remaining.replace(weekdayMatch[0], " ");
     }
   }
 
-  const timeMatch = /\bat\s+(?:(2[0-3]|[01]?\d):([0-5]\d)|(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*(am|pm)?)(?!\w)/i.exec(remaining);
+  const timeMatch =
+    /\bat\s+(?:(2[0-3]|[01]?\d):([0-5]\d)|(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*(am|pm)?)(?!\w)/i.exec(
+      remaining
+    );
   let time: string | undefined;
   if (timeMatch) {
     let hours: number;
@@ -201,15 +211,15 @@ export function parseTaskSchedule(
       hours = Number(timeMatch[3]);
       minutes = Number(timeMatch[4] ?? 0);
       const meridiem = timeMatch[5]?.toLowerCase();
-      if (meridiem === 'pm' && hours !== 12) hours += 12;
-      if (meridiem === 'am' && hours === 12) hours = 0;
+      if (meridiem === "pm" && hours !== 12) hours += 12;
+      if (meridiem === "am" && hours === 12) hours = 0;
     }
-    time = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-    remaining = remaining.replace(timeMatch[0], ' ');
+    time = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+    remaining = remaining.replace(timeMatch[0], " ");
   }
 
   return {
-    title: remaining.replace(/\s+/g, ' ').trim() || title.trim(),
+    title: remaining.replace(/\s+/g, " ").trim() || title.trim(),
     ...(scheduledDate ? { scheduledDate: formatDate(scheduledDate) } : {}),
     ...(time ? { time } : {}),
   };

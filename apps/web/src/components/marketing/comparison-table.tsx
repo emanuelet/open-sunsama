@@ -1,6 +1,11 @@
 import { Check, Minus, X } from "lucide-react";
 import { Reveal } from "@/components/landing/motion";
-import { markLabel, type ComparisonCell, type ComparisonRow, type Mark } from "@/content/marketing/types";
+import {
+  markLabel,
+  type ComparisonCell,
+  type ComparisonRow,
+  type Mark,
+} from "@/content/marketing/types";
 import { cn } from "@/lib/utils";
 import { RichText } from "./rich-text";
 import { SectionHeading } from "./section-heading";
@@ -12,7 +17,9 @@ function MarkIcon({ mark, primary }: { mark: Mark; primary: boolean }) {
       <span
         className={cn(
           "flex h-6 w-6 items-center justify-center rounded-full",
-          primary ? "bg-primary text-primary-foreground" : "bg-emerald-500/12 text-emerald-600 dark:text-emerald-400"
+          primary
+            ? "bg-primary text-primary-foreground"
+            : "bg-emerald-500/12 text-emerald-600 dark:text-emerald-400"
         )}
         aria-hidden
       >
@@ -22,13 +29,19 @@ function MarkIcon({ mark, primary }: { mark: Mark; primary: boolean }) {
   }
   if (mark === "partial") {
     return (
-      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400" aria-hidden>
+      <span
+        className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400"
+        aria-hidden
+      >
         <Minus className="h-3.5 w-3.5" strokeWidth={3} />
       </span>
     );
   }
   return (
-    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-muted-foreground/70" aria-hidden>
+    <span
+      className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-muted-foreground/70"
+      aria-hidden
+    >
       <X className="h-3.5 w-3.5" strokeWidth={2.5} />
     </span>
   );
@@ -41,7 +54,12 @@ function Cell({ cell, primary }: { cell: ComparisonCell; primary: boolean }) {
     <div className="flex flex-col items-center gap-1.5 text-center">
       {mark && <MarkIcon mark={mark} primary={primary} />}
       {text ? (
-        <span className={cn("text-[12.5px] leading-snug", primary ? "font-medium text-foreground" : "text-muted-foreground")}>
+        <span
+          className={cn(
+            "text-[12.5px] leading-snug",
+            primary ? "font-medium text-foreground" : "text-muted-foreground"
+          )}
+        >
           {mark && <span className="sr-only">{markLabel[mark]}: </span>}
           {text}
         </span>
@@ -79,7 +97,12 @@ export function ComparisonTable({
         tabIndex={0}
         className="overflow-x-auto rounded-2xl border border-border/70 bg-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring dark:border-white/8"
       >
-        <table className={cn("w-full border-collapse text-[14px]", wide && "min-w-[680px]")}>
+        <table
+          className={cn(
+            "w-full border-collapse text-[14px]",
+            wide && "min-w-[680px]"
+          )}
+        >
           <caption className="sr-only">{caption}</caption>
           <thead>
             <tr className="border-b border-border/70">
@@ -95,12 +118,18 @@ export function ComparisonTable({
                   scope="col"
                   className={cn(
                     "px-3 py-3.5 text-center text-[13px] font-semibold",
-                    i === 0 ? "bg-primary/8 text-primary" : "bg-muted/60 text-foreground/80"
+                    i === 0
+                      ? "bg-primary/8 text-primary"
+                      : "bg-muted/60 text-foreground/80"
                   )}
                 >
                   {i === 0 ? (
                     <span className="inline-flex items-center gap-1.5">
-                      <img src="/open-sunsama-logo.png" alt="" className="h-4 w-4 rounded" />
+                      <img
+                        src="/open-sunsama-logo.png"
+                        alt=""
+                        className="h-4 w-4 rounded"
+                      />
                       {column}
                     </span>
                   ) : (
@@ -112,7 +141,10 @@ export function ComparisonTable({
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.feature} className="border-b border-border/50 last:border-0">
+              <tr
+                key={row.feature}
+                className="border-b border-border/50 last:border-0"
+              >
                 <th
                   scope="row"
                   className="sticky left-0 z-10 bg-background px-4 py-3.5 text-left text-[13.5px] font-medium leading-snug text-foreground/90 sm:w-[30%] sm:px-5"
@@ -120,7 +152,13 @@ export function ComparisonTable({
                   {row.feature}
                 </th>
                 {row.cells.map((cell, i) => (
-                  <td key={`${row.feature}-${columns[i]}`} className={cn("px-3 py-3.5 align-middle", i === 0 && "bg-primary/4")}>
+                  <td
+                    key={`${row.feature}-${columns[i]}`}
+                    className={cn(
+                      "px-3 py-3.5 align-middle",
+                      i === 0 && "bg-primary/4"
+                    )}
+                  >
                     <Cell cell={cell} primary={i === 0} />
                   </td>
                 ))}
@@ -132,10 +170,17 @@ export function ComparisonTable({
       <div className="mt-4 flex flex-col gap-2 text-[12.5px] text-muted-foreground sm:flex-row sm:items-start sm:justify-between">
         {sources && (
           <p className="max-w-3xl leading-relaxed">
-            <RichText text={sources} linkClassName="font-normal text-muted-foreground" />
+            <RichText
+              text={sources}
+              linkClassName="font-normal text-muted-foreground"
+            />
           </p>
         )}
-        {wide && <p className="shrink-0 sm:hidden">Scroll sideways to see every app →</p>}
+        {wide && (
+          <p className="shrink-0 sm:hidden">
+            Scroll sideways to see every app →
+          </p>
+        )}
       </div>
     </div>
   );
@@ -162,9 +207,19 @@ export function ComparisonSection({
   return (
     <section id={id} className={SECTION} aria-labelledby={`${id}-heading`}>
       <div className={cn(CONTAINER, "max-w-5xl")}>
-        <SectionHeading id={`${id}-heading`} eyebrow={eyebrow} heading={heading} lead={lead} />
+        <SectionHeading
+          id={`${id}-heading`}
+          eyebrow={eyebrow}
+          heading={heading}
+          lead={lead}
+        />
         <Reveal delay={100} className="mt-12">
-          <ComparisonTable caption={heading} columns={columns} rows={rows} sources={sources} />
+          <ComparisonTable
+            caption={heading}
+            columns={columns}
+            rows={rows}
+            sources={sources}
+          />
         </Reveal>
       </div>
     </section>

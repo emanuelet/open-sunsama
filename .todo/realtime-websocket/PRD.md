@@ -65,7 +65,7 @@ apps/web/src/
 ### 1. Redis Client (`apps/api/src/lib/redis.ts`)
 
 ```typescript
-import Redis from 'ioredis';
+import Redis from "ioredis";
 
 let redisClient: Redis | null = null;
 let redisSub: Redis | null = null;
@@ -74,7 +74,7 @@ let redisPub: Redis | null = null;
 export function getRedisClient(): Redis {
   if (!redisClient) {
     const url = process.env.REDIS_URL;
-    if (!url) throw new Error('REDIS_URL not configured');
+    if (!url) throw new Error("REDIS_URL not configured");
     redisClient = new Redis(url);
   }
   return redisClient;
@@ -83,7 +83,7 @@ export function getRedisClient(): Redis {
 export function getRedisSubscriber(): Redis {
   if (!redisSub) {
     const url = process.env.REDIS_URL;
-    if (!url) throw new Error('REDIS_URL not configured');
+    if (!url) throw new Error("REDIS_URL not configured");
     redisSub = new Redis(url);
   }
   return redisSub;
@@ -92,18 +92,14 @@ export function getRedisSubscriber(): Redis {
 export function getRedisPublisher(): Redis {
   if (!redisPub) {
     const url = process.env.REDIS_URL;
-    if (!url) throw new Error('REDIS_URL not configured');
+    if (!url) throw new Error("REDIS_URL not configured");
     redisPub = new Redis(url);
   }
   return redisPub;
 }
 
 export async function closeRedisConnections(): Promise<void> {
-  await Promise.all([
-    redisClient?.quit(),
-    redisSub?.quit(),
-    redisPub?.quit(),
-  ]);
+  await Promise.all([redisClient?.quit(), redisSub?.quit(), redisPub?.quit()]);
   redisClient = null;
   redisSub = null;
   redisPub = null;
@@ -115,17 +111,17 @@ export async function closeRedisConnections(): Promise<void> {
 ```typescript
 export type WebSocketEventType =
   // Task events
-  | 'task:created'
-  | 'task:updated'
-  | 'task:deleted'
-  | 'task:completed'
-  | 'task:reordered'
+  | "task:created"
+  | "task:updated"
+  | "task:deleted"
+  | "task:completed"
+  | "task:reordered"
   // Time block events
-  | 'timeblock:created'
-  | 'timeblock:updated'
-  | 'timeblock:deleted'
+  | "timeblock:created"
+  | "timeblock:updated"
+  | "timeblock:deleted"
   // User events
-  | 'user:updated';
+  | "user:updated";
 
 export interface WebSocketEvent<T = unknown> {
   type: WebSocketEventType;
@@ -161,7 +157,7 @@ export function getUserChannel(userId: string): string {
 ### 3. WebSocket Auth (`apps/api/src/lib/websocket/auth.ts`)
 
 ```typescript
-import { verifyToken } from '../jwt.js';
+import { verifyToken } from "../jwt.js";
 
 export interface AuthResult {
   success: boolean;
@@ -175,11 +171,11 @@ export interface AuthResult {
  */
 export function authenticateWebSocket(url: string): AuthResult {
   try {
-    const urlObj = new URL(url, 'http://localhost');
-    const token = urlObj.searchParams.get('token');
+    const urlObj = new URL(url, "http://localhost");
+    const token = urlObj.searchParams.get("token");
 
     if (!token) {
-      return { success: false, error: 'Token required' };
+      return { success: false, error: "Token required" };
     }
 
     const { userId } = verifyToken(token);
@@ -187,7 +183,7 @@ export function authenticateWebSocket(url: string): AuthResult {
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Invalid token',
+      error: error instanceof Error ? error.message : "Invalid token",
     };
   }
 }
@@ -196,8 +192,8 @@ export function authenticateWebSocket(url: string): AuthResult {
 ### 4. Connection Manager (`apps/api/src/lib/websocket/manager.ts`)
 
 ```typescript
-import type { WebSocket } from 'ws';
-import type { WebSocketEvent } from './events.js';
+import type { WebSocket } from "ws";
+import type { WebSocketEvent } from "./events.js";
 
 interface Connection {
   ws: WebSocket;
@@ -224,7 +220,9 @@ class WebSocketManager {
     }
     this.userConnections.get(userId)!.add(ws);
 
-    console.log(`[WS] User ${userId} connected. Total: ${this.connections.size}`);
+    console.log(
+      `[WS] User ${userId} connected. Total: ${this.connections.size}`
+    );
   }
 
   removeConnection(ws: WebSocket): void {
@@ -242,7 +240,9 @@ class WebSocketManager {
       }
     }
 
-    console.log(`[WS] User ${connection.userId} disconnected. Total: ${this.connections.size}`);
+    console.log(
+      `[WS] User ${connection.userId} disconnected. Total: ${this.connections.size}`
+    );
   }
 
   /**
@@ -276,12 +276,12 @@ export const wsManager = new WebSocketManager();
 ### 5. WebSocket Server (`apps/api/src/lib/websocket/index.ts`)
 
 ```typescript
-import { WebSocketServer, type WebSocket } from 'ws';
-import type { Server } from 'http';
-import { wsManager } from './manager.js';
-import { authenticateWebSocket } from './auth.js';
-import { getUserChannel, type WebSocketEvent } from './events.js';
-import { getRedisSubscriber, getRedisPublisher } from '../redis.js';
+import { WebSocketServer, type WebSocket } from "ws";
+import type { Server } from "http";
+import { wsManager } from "./manager.js";
+import { authenticateWebSocket } from "./auth.js";
+import { getUserChannel, type WebSocketEvent } from "./events.js";
+import { getRedisSubscriber, getRedisPublisher } from "../redis.js";
 
 let wss: WebSocketServer | null = null;
 
@@ -291,16 +291,16 @@ let wss: WebSocketServer | null = null;
 export function initWebSocket(server: Server): WebSocketServer {
   wss = new WebSocketServer({
     server,
-    path: '/ws',
+    path: "/ws",
   });
 
-  wss.on('connection', (ws: WebSocket, req) => {
+  wss.on("connection", (ws: WebSocket, req) => {
     // Authenticate connection
-    const url = req.url || '';
+    const url = req.url || "";
     const auth = authenticateWebSocket(url);
 
     if (!auth.success || !auth.userId) {
-      ws.close(4001, auth.error || 'Unauthorized');
+      ws.close(4001, auth.error || "Unauthorized");
       return;
     }
 
@@ -313,26 +313,28 @@ export function initWebSocket(server: Server): WebSocketServer {
     subscribeToUserChannel(userId);
 
     // Handle ping/pong for connection health
-    ws.on('pong', () => {
+    ws.on("pong", () => {
       // Connection is alive
     });
 
-    ws.on('close', () => {
+    ws.on("close", () => {
       wsManager.removeConnection(ws);
       // Note: Redis subscription persists (shared across connections)
     });
 
-    ws.on('error', (error) => {
+    ws.on("error", (error) => {
       console.error(`[WS] Error for user ${userId}:`, error);
       wsManager.removeConnection(ws);
     });
 
     // Send connection confirmation
-    ws.send(JSON.stringify({
-      type: 'connected',
-      payload: { userId },
-      timestamp: new Date().toISOString(),
-    }));
+    ws.send(
+      JSON.stringify({
+        type: "connected",
+        payload: { userId },
+        timestamp: new Date().toISOString(),
+      })
+    );
   });
 
   // Heartbeat interval to detect dead connections
@@ -344,11 +346,11 @@ export function initWebSocket(server: Server): WebSocketServer {
     });
   }, 30000);
 
-  wss.on('close', () => {
+  wss.on("close", () => {
     clearInterval(heartbeatInterval);
   });
 
-  console.log('[WS] WebSocket server initialized at /ws');
+  console.log("[WS] WebSocket server initialized at /ws");
   return wss;
 }
 
@@ -377,7 +379,7 @@ function subscribeToUserChannel(userId: string): void {
 export function initRedisSubscriber(): void {
   const subscriber = getRedisSubscriber();
 
-  subscriber.on('message', (channel: string, message: string) => {
+  subscriber.on("message", (channel: string, message: string) => {
     // Extract userId from channel name (user:{userId}:events)
     const match = channel.match(/^user:([^:]+):events$/);
     if (!match) return;
@@ -388,11 +390,11 @@ export function initRedisSubscriber(): void {
       const event = JSON.parse(message) as WebSocketEvent;
       wsManager.broadcastToUser(userId, event);
     } catch (error) {
-      console.error('[WS] Failed to parse Redis message:', error);
+      console.error("[WS] Failed to parse Redis message:", error);
     }
   });
 
-  console.log('[WS] Redis subscriber initialized');
+  console.log("[WS] Redis subscriber initialized");
 }
 
 /**
@@ -400,7 +402,7 @@ export function initRedisSubscriber(): void {
  */
 export async function publishEvent(
   userId: string,
-  type: WebSocketEvent['type'],
+  type: WebSocketEvent["type"],
   payload: unknown
 ): Promise<void> {
   const publisher = getRedisPublisher();
@@ -426,9 +428,9 @@ Add WebSocket initialization to the server startup:
 
 ```typescript
 // ... existing imports ...
-import { createServer } from 'http';
-import { initWebSocket, initRedisSubscriber } from './lib/websocket/index.js';
-import { closeRedisConnections } from './lib/redis.js';
+import { createServer } from "http";
+import { initWebSocket, initRedisSubscriber } from "./lib/websocket/index.js";
+import { closeRedisConnections } from "./lib/redis.js";
 
 // ... existing app setup ...
 
@@ -441,9 +443,9 @@ async function startServer(): Promise<void> {
       new Request(`http://${req.headers.host}${req.url}`, {
         method: req.method,
         headers: req.headers as HeadersInit,
-        body: req.method !== 'GET' && req.method !== 'HEAD' ? req : undefined,
+        body: req.method !== "GET" && req.method !== "HEAD" ? req : undefined,
         // @ts-expect-error duplex is required for streaming
-        duplex: 'half',
+        duplex: "half",
       })
     );
 
@@ -474,7 +476,7 @@ async function startServer(): Promise<void> {
     initRedisSubscriber();
     initWebSocket(server);
   } else {
-    console.log('[WS] REDIS_URL not set, WebSocket disabled');
+    console.log("[WS] REDIS_URL not set, WebSocket disabled");
   }
 
   server.listen(port, () => {
@@ -489,9 +491,9 @@ async function gracefulShutdown(signal: string): Promise<void> {
   try {
     await stopPgBoss();
     await closeRedisConnections();
-    console.log('[Server] Cleanup complete');
+    console.log("[Server] Cleanup complete");
   } catch (error) {
-    console.error('[Server] Error during shutdown:', error);
+    console.error("[Server] Error during shutdown:", error);
   }
 
   process.exit(0);
@@ -580,16 +582,16 @@ Apply the same pattern to `time-blocks.ts` and `auth.ts` (for user profile updat
 
 ```typescript
 export type WebSocketEventType =
-  | 'task:created'
-  | 'task:updated'
-  | 'task:deleted'
-  | 'task:completed'
-  | 'task:reordered'
-  | 'timeblock:created'
-  | 'timeblock:updated'
-  | 'timeblock:deleted'
-  | 'user:updated'
-  | 'connected';
+  | "task:created"
+  | "task:updated"
+  | "task:deleted"
+  | "task:completed"
+  | "task:reordered"
+  | "timeblock:created"
+  | "timeblock:updated"
+  | "timeblock:deleted"
+  | "user:updated"
+  | "connected";
 
 export interface WebSocketEvent<T = unknown> {
   type: WebSocketEventType;
@@ -599,7 +601,7 @@ export interface WebSocketEvent<T = unknown> {
 
 type EventHandler = (event: WebSocketEvent) => void;
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3001';
+const WS_URL = import.meta.env.VITE_WS_URL || "ws://localhost:3001";
 
 class WebSocketClient {
   private ws: WebSocket | null = null;
@@ -626,7 +628,7 @@ class WebSocketClient {
       this.ws = new WebSocket(url);
 
       this.ws.onopen = () => {
-        console.log('[WS] Connected');
+        console.log("[WS] Connected");
         this.reconnectAttempts = 0;
         this.reconnectDelay = 1000;
       };
@@ -636,7 +638,7 @@ class WebSocketClient {
           const data = JSON.parse(event.data) as WebSocketEvent;
           this.handlers.forEach((handler) => handler(data));
         } catch (error) {
-          console.error('[WS] Failed to parse message:', error);
+          console.error("[WS] Failed to parse message:", error);
         }
       };
 
@@ -649,17 +651,17 @@ class WebSocketClient {
       };
 
       this.ws.onerror = (error) => {
-        console.error('[WS] Error:', error);
+        console.error("[WS] Error:", error);
       };
     } catch (error) {
-      console.error('[WS] Failed to connect:', error);
+      console.error("[WS] Failed to connect:", error);
       this.scheduleReconnect();
     }
   }
 
   private scheduleReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.log('[WS] Max reconnect attempts reached');
+      console.log("[WS] Max reconnect attempts reached");
       return;
     }
 
@@ -670,7 +672,9 @@ class WebSocketClient {
       30000
     );
 
-    console.log(`[WS] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts + 1})`);
+    console.log(
+      `[WS] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts + 1})`
+    );
 
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;
@@ -688,7 +692,7 @@ class WebSocketClient {
     }
 
     if (this.ws) {
-      this.ws.close(1000, 'User disconnected');
+      this.ws.close(1000, "User disconnected");
       this.ws = null;
     }
 
@@ -712,12 +716,12 @@ export const wsClient = new WebSocketClient();
 ### 2. WebSocket Hook (`apps/web/src/hooks/useWebSocket.ts`)
 
 ```typescript
-import { useEffect, useRef } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { wsClient, type WebSocketEvent } from '@/lib/websocket';
-import { useAuth } from '@/hooks/useAuth';
-import { taskKeys } from '@/hooks/useTasks';
-import { timeBlockKeys } from '@/hooks/useTimeBlocks';
+import { useEffect, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { wsClient, type WebSocketEvent } from "@/lib/websocket";
+import { useAuth } from "@/hooks/useAuth";
+import { taskKeys } from "@/hooks/useTasks";
+import { timeBlockKeys } from "@/hooks/useTimeBlocks";
 
 /**
  * Hook that manages WebSocket connection and query invalidation
@@ -756,45 +760,47 @@ function handleWebSocketEvent(
   event: WebSocketEvent,
   queryClient: ReturnType<typeof useQueryClient>
 ): void {
-  console.log('[WS] Event received:', event.type, event.payload);
+  console.log("[WS] Event received:", event.type, event.payload);
 
   switch (event.type) {
     // Task events
-    case 'task:created':
-    case 'task:updated':
-    case 'task:deleted':
-    case 'task:completed':
-    case 'task:reordered':
+    case "task:created":
+    case "task:updated":
+    case "task:deleted":
+    case "task:completed":
+    case "task:reordered":
       // Invalidate all task lists to refetch
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
 
       // For individual task changes, also invalidate the specific task
-      if ('taskId' in (event.payload as object)) {
+      if ("taskId" in (event.payload as object)) {
         const { taskId } = event.payload as { taskId: string };
         queryClient.invalidateQueries({ queryKey: taskKeys.detail(taskId) });
       }
       break;
 
     // Time block events
-    case 'timeblock:created':
-    case 'timeblock:updated':
-    case 'timeblock:deleted':
+    case "timeblock:created":
+    case "timeblock:updated":
+    case "timeblock:deleted":
       // Invalidate all time block lists
       queryClient.invalidateQueries({ queryKey: timeBlockKeys.lists() });
 
-      if ('timeBlockId' in (event.payload as object)) {
+      if ("timeBlockId" in (event.payload as object)) {
         const { timeBlockId } = event.payload as { timeBlockId: string };
-        queryClient.invalidateQueries({ queryKey: timeBlockKeys.detail(timeBlockId) });
+        queryClient.invalidateQueries({
+          queryKey: timeBlockKeys.detail(timeBlockId),
+        });
       }
       break;
 
     // User events
-    case 'user:updated':
-      queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+    case "user:updated":
+      queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
       break;
 
-    case 'connected':
-      console.log('[WS] Connection confirmed');
+    case "connected":
+      console.log("[WS] Connection confirmed");
       break;
   }
 }
@@ -849,6 +855,7 @@ VITE_WS_URL=ws://localhost:3001
 ```
 
 For production with TLS:
+
 ```env
 VITE_WS_URL=wss://api.yourdomain.com
 ```

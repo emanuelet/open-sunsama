@@ -8,5 +8,7 @@ import page, { extras } from "@/content/marketing/alternatives/todoist";
  * for crawlers (scripts/prerender-marketing.ts).
  */
 export default function AlternativeTodoistPage() {
-  return <MarketingPageView page={page} slots={alternativeSlots(page, extras)} />;
+  return (
+    <MarketingPageView page={page} slots={alternativeSlots(page, extras)} />
+  );
 }

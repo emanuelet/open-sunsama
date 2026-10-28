@@ -93,7 +93,8 @@ export const FONT_OPTIONS: FontOption[] = [
   {
     id: "system",
     name: "System",
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    fontFamily:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
     description: "Native system font",
   },
   {
@@ -131,12 +132,16 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
 };
 
 // CSS variable generation for a theme
-export function generateThemeCSS(theme: ColorTheme, mode: "light" | "dark"): Record<string, string> {
+export function generateThemeCSS(
+  theme: ColorTheme,
+  mode: "light" | "dark"
+): Record<string, string> {
   const primary = theme.primary[mode];
-  
+
   return {
     "--primary": primary,
-    "--primary-foreground": mode === "dark" ? "222.2 47.4% 11.2%" : "210 40% 98%",
+    "--primary-foreground":
+      mode === "dark" ? "222.2 47.4% 11.2%" : "210 40% 98%",
     "--ring": primary,
   };
 }

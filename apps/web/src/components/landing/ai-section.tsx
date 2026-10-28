@@ -7,7 +7,16 @@
 
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Copy, KeyRound, Link2, MessageSquareText, RotateCcw, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Copy,
+  KeyRound,
+  Link2,
+  MessageSquareText,
+  RotateCcw,
+  ShieldCheck,
+} from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { cn } from "@/lib/utils";
 import { Clip } from "@/components/blog/media";
@@ -26,12 +35,32 @@ interface Block {
   color: string;
 }
 
-const EXISTING: Block[] = [{ title: "Lunch", start: 12, end: 12.75, color: "#10B981" }];
+const EXISTING: Block[] = [
+  { title: "Lunch", start: 12, end: 12.75, color: "#10B981" },
+];
 
 const PLANNED: Array<Block & { tool: string }> = [
-  { title: "Draft the one-page narrative", start: 13, end: 14, color: "#EF4444", tool: "create_time_block" },
-  { title: "Send pre-read to leadership", start: 14.25, end: 14.75, color: "#F59E0B", tool: "create_time_block" },
-  { title: "Hiring plan", start: 15, end: 16, color: "#8B5CF6", tool: "create_time_block" },
+  {
+    title: "Draft the one-page narrative",
+    start: 13,
+    end: 14,
+    color: "#EF4444",
+    tool: "create_time_block",
+  },
+  {
+    title: "Send pre-read to leadership",
+    start: 14.25,
+    end: 14.75,
+    color: "#F59E0B",
+    tool: "create_time_block",
+  },
+  {
+    title: "Hiring plan",
+    start: 15,
+    end: 16,
+    color: "#8B5CF6",
+    tool: "create_time_block",
+  },
 ];
 
 const READ_CALLS = ["list_tasks", "get_schedule_for_day"];
@@ -58,7 +87,15 @@ function hourLabel(h: number): string {
 }
 
 /** Mirrors components/calendar/time-block.tsx so the demo looks exactly like the app. */
-function DemoBlock({ block, visible, fresh }: { block: Block; visible: boolean; fresh?: boolean }) {
+function DemoBlock({
+  block,
+  visible,
+  fresh,
+}: {
+  block: Block;
+  visible: boolean;
+  fresh?: boolean;
+}) {
   const top = (block.start - START_HOUR) * HOUR;
   const height = (block.end - block.start) * HOUR;
   const compact = height < 48;
@@ -66,7 +103,9 @@ function DemoBlock({ block, visible, fresh }: { block: Block; visible: boolean; 
     <div
       className={cn(
         "absolute left-1 right-1 z-10 my-0.5 origin-top rounded-md border-l-[3px] transition-[opacity,transform] duration-500 ease-spring",
-        visible ? "opacity-100 transform-none" : "opacity-0 transform-[scaleY(0.6)_translateY(-6px)]",
+        visible
+          ? "opacity-100 transform-none"
+          : "opacity-0 transform-[scaleY(0.6)_translateY(-6px)]",
         fresh && visible && "animate-[landing-ring_1.6s_ease-out_1]"
       )}
       style={{
@@ -77,8 +116,20 @@ function DemoBlock({ block, visible, fresh }: { block: Block; visible: boolean; 
         ["--ring" as string]: hexToRgba(block.color, 0.45),
       }}
     >
-      <div className={cn("flex h-full flex-col overflow-hidden px-2", compact ? "py-0.5" : "py-1")}>
-        <p className={cn("truncate font-medium text-foreground", compact ? "text-xs" : "text-sm")}>{block.title}</p>
+      <div
+        className={cn(
+          "flex h-full flex-col overflow-hidden px-2",
+          compact ? "py-0.5" : "py-1"
+        )}
+      >
+        <p
+          className={cn(
+            "truncate font-medium text-foreground",
+            compact ? "text-xs" : "text-sm"
+          )}
+        >
+          {block.title}
+        </p>
         {!compact && (
           <p className="truncate text-xs text-muted-foreground">
             {formatTime(block.start, false)} - {formatTime(block.end, true)}
@@ -90,12 +141,17 @@ function DemoBlock({ block, visible, fresh }: { block: Block; visible: boolean; 
 }
 
 function MiniTimeline({ shown }: { shown: number }) {
-  const hours = Array.from({ length: END_HOUR - START_HOUR }, (_, i) => START_HOUR + i);
+  const hours = Array.from(
+    { length: END_HOUR - START_HOUR },
+    (_, i) => START_HOUR + i
+  );
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-baseline justify-between border-b border-border/60 px-4 py-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Tue</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Tue
+          </p>
           <p className="text-[15px] font-semibold leading-tight">Sep 22</p>
         </div>
         <p className="text-[11px] text-muted-foreground">
@@ -105,9 +161,15 @@ function MiniTimeline({ shown }: { shown: number }) {
       <div className="relative flex flex-1 overflow-hidden">
         <div className="w-12 shrink-0 border-r bg-muted/30">
           {hours.map((h) => (
-            <div key={h} className="relative border-b border-border/50" style={{ height: HOUR }}>
+            <div
+              key={h}
+              className="relative border-b border-border/50"
+              style={{ height: HOUR }}
+            >
               {h !== START_HOUR && (
-                <span className="absolute -top-2 right-2 text-xs font-medium text-muted-foreground">{hourLabel(h)}</span>
+                <span className="absolute -top-2 right-2 text-xs font-medium text-muted-foreground">
+                  {hourLabel(h)}
+                </span>
               )}
             </div>
           ))}
@@ -115,18 +177,32 @@ function MiniTimeline({ shown }: { shown: number }) {
         <div className="relative flex-1">
           {hours.map((h) => (
             <React.Fragment key={h}>
-              <div className="absolute left-0 right-0 border-b border-border/50" style={{ top: (h - START_HOUR + 1) * HOUR }} />
-              <div className="absolute left-0 right-0 border-b border-border/15" style={{ top: (h - START_HOUR + 0.5) * HOUR }} />
+              <div
+                className="absolute left-0 right-0 border-b border-border/50"
+                style={{ top: (h - START_HOUR + 1) * HOUR }}
+              />
+              <div
+                className="absolute left-0 right-0 border-b border-border/15"
+                style={{ top: (h - START_HOUR + 0.5) * HOUR }}
+              />
             </React.Fragment>
           ))}
           {EXISTING.map((block) => (
             <DemoBlock key={block.title} block={block} visible />
           ))}
           {PLANNED.map((block, i) => (
-            <DemoBlock key={block.title} block={block} visible={i < shown} fresh />
+            <DemoBlock
+              key={block.title}
+              block={block}
+              visible={i < shown}
+              fresh
+            />
           ))}
           {/* Now line, as in the app. */}
-          <div className="absolute left-0 right-0 z-30 flex items-center" style={{ top: (12.55 - START_HOUR) * HOUR }}>
+          <div
+            className="absolute left-0 right-0 z-30 flex items-center"
+            style={{ top: (12.55 - START_HOUR) * HOUR }}
+          >
             <div className="-ml-1.5 h-3 w-3 rounded-full bg-red-500 shadow-xs" />
             <div className="h-0.5 flex-1 bg-red-500 shadow-xs" />
           </div>
@@ -136,18 +212,30 @@ function MiniTimeline({ shown }: { shown: number }) {
   );
 }
 
-function ToolCall({ name, detail, state }: { name: string; detail?: string; state: "hidden" | "running" | "done" }) {
+function ToolCall({
+  name,
+  detail,
+  state,
+}: {
+  name: string;
+  detail?: string;
+  state: "hidden" | "running" | "done";
+}) {
   return (
     <div
       className={cn(
         "flex items-center gap-2 rounded-lg border border-border/70 bg-muted/40 px-2.5 py-1.5 text-[12px] transition-[opacity,transform] duration-300",
-        state === "hidden" ? "h-0 -translate-y-1 overflow-hidden border-transparent py-0 opacity-0" : "opacity-100"
+        state === "hidden"
+          ? "h-0 -translate-y-1 overflow-hidden border-transparent py-0 opacity-0"
+          : "opacity-100"
       )}
     >
       <span
         className={cn(
           "flex h-4 w-4 shrink-0 items-center justify-center rounded-full",
-          state === "done" ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"
+          state === "done"
+            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+            : "text-muted-foreground"
         )}
       >
         {state === "done" ? (
@@ -156,9 +244,15 @@ function ToolCall({ name, detail, state }: { name: string; detail?: string; stat
           <span className="h-3 w-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent" />
         )}
       </span>
-      <span className="font-mono text-[11.5px] font-medium text-foreground">{name}</span>
-      {detail && <span className="truncate text-muted-foreground">{detail}</span>}
-      <span className="ml-auto shrink-0 text-[10px] text-muted-foreground">Open Sunsama</span>
+      <span className="font-mono text-[11.5px] font-medium text-foreground">
+        {name}
+      </span>
+      {detail && (
+        <span className="truncate text-muted-foreground">{detail}</span>
+      )}
+      <span className="ml-auto shrink-0 text-[10px] text-muted-foreground">
+        Open Sunsama
+      </span>
     </div>
   );
 }
@@ -189,7 +283,11 @@ function useDemoScript(active: boolean, reduced: boolean) {
     return () => timers.forEach(window.clearTimeout);
   }, [active, reduced, run]);
 
-  return { step, replay: () => setRun((r) => r + 1), done: step >= SCRIPT_LENGTH };
+  return {
+    step,
+    replay: () => setRun((r) => r + 1),
+    done: step >= SCRIPT_LENGTH,
+  };
 }
 
 export function AssistantDemo() {
@@ -203,7 +301,9 @@ export function AssistantDemo() {
     if (step < startStep) return "hidden";
     return step === startStep ? "running" : "done";
   };
-  const plannedShown = PLANNED.filter((_, i) => callState(READ_CALLS.length + i) === "done").length;
+  const plannedShown = PLANNED.filter(
+    (_, i) => callState(READ_CALLS.length + i) === "done"
+  ).length;
   const replyVisible = step >= SCRIPT_LENGTH - 1;
 
   return (
@@ -215,7 +315,9 @@ export function AssistantDemo() {
           <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
             <div className="flex items-center gap-2">
               <MessageSquareText className="h-4 w-4 text-muted-foreground" />
-              <span className="text-[13px] font-semibold">Your AI assistant</span>
+              <span className="text-[13px] font-semibold">
+                Your AI assistant
+              </span>
             </div>
             <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -228,7 +330,12 @@ export function AssistantDemo() {
             </div>
             <div className="flex flex-col gap-1.5">
               {READ_CALLS.map((name, i) => (
-                <ToolCall key={name} name={name} detail={i === 0 ? "Today" : "Tue, Sep 22"} state={callState(i)} />
+                <ToolCall
+                  key={name}
+                  name={name}
+                  detail={i === 0 ? "Today" : "Tue, Sep 22"}
+                  state={callState(i)}
+                />
               ))}
               {PLANNED.map((block, i) => (
                 <ToolCall
@@ -242,13 +349,17 @@ export function AssistantDemo() {
             <div
               className={cn(
                 "max-w-[92%] rounded-2xl rounded-bl-md bg-muted/60 px-3.5 py-2 text-[13.5px] leading-snug text-foreground transition-[opacity,transform] duration-500",
-                replyVisible ? "opacity-100 transform-none" : "translate-y-1 opacity-0"
+                replyVisible
+                  ? "opacity-100 transform-none"
+                  : "translate-y-1 opacity-0"
               )}
             >
               {REPLY}
             </div>
             <div className="mt-auto flex items-center justify-between pt-2">
-              <p className="text-[11px] text-muted-foreground">Illustration of the connector's real tool calls</p>
+              <p className="text-[11px] text-muted-foreground">
+                Illustration of the connector's real tool calls
+              </p>
               <button
                 type="button"
                 onClick={replay}
@@ -284,7 +395,11 @@ function CopyUrl() {
     >
       <span className="w-0 min-w-0 flex-1 truncate">{MCP_URL}</span>
       <span className="ml-auto flex items-center gap-1 font-sans text-[11px] font-medium text-muted-foreground group-hover:text-foreground">
-        {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+        {copied ? (
+          <Check className="h-3.5 w-3.5 text-emerald-500" />
+        ) : (
+          <Copy className="h-3.5 w-3.5" />
+        )}
         {copied ? "Copied" : "Copy"}
       </span>
     </button>
@@ -312,7 +427,10 @@ const STEPS = [
 
 export function AiSection() {
   return (
-    <section id="ai" className="relative scroll-mt-16 overflow-hidden border-t border-border/50 py-24 md:py-32">
+    <section
+      id="ai"
+      className="relative scroll-mt-16 overflow-hidden border-t border-border/50 py-24 md:py-32"
+    >
       {/* Warm light from the right, behind the recording. */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute -right-40 top-10 h-[560px] w-[760px] rounded-full bg-[radial-gradient(closest-side,hsl(var(--primary)/0.16),transparent)] blur-2xl" />
@@ -322,38 +440,55 @@ export function AiSection() {
       <div className="container mx-auto grid max-w-6xl items-center gap-14 px-4 lg:grid-cols-[0.82fr_1.18fr] lg:gap-16">
         <div className="mx-auto min-w-0 max-w-2xl lg:mx-0 lg:max-w-none">
           <Reveal>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">AI native</p>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
+              AI native
+            </p>
             <h2 className="mt-3 text-[34px] font-semibold leading-[1.05] tracking-[-0.035em] md:text-[48px]">
               Let your AI plan your day.
             </h2>
             <p className="mt-4 text-[16px] leading-relaxed text-muted-foreground md:text-[17px]">
-              Connect Claude, ChatGPT, Cursor or any MCP app once. Then just ask. It reads your tasks, sets
-              priorities and blocks time on your calendar.
+              Connect Claude, ChatGPT, Cursor or any MCP app once. Then just
+              ask. It reads your tasks, sets priorities and blocks time on your
+              calendar.
             </p>
           </Reveal>
 
           <ol className="mt-9 space-y-6">
             {STEPS.map((step, i) => (
-              <Reveal key={step.title} as="li" delay={100 + i * 90} className="flex gap-4">
+              <Reveal
+                key={step.title}
+                as="li"
+                delay={100 + i * 90}
+                className="flex gap-4"
+              >
                 <div className="relative flex flex-col items-center">
                   <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/70 bg-background text-primary shadow-xs">
                     <step.icon className="h-4 w-4" />
                   </span>
-                  {i < STEPS.length - 1 && <span className="mt-2 w-px flex-1 bg-border" />}
+                  {i < STEPS.length - 1 && (
+                    <span className="mt-2 w-px flex-1 bg-border" />
+                  )}
                 </div>
                 <div className="min-w-0 pb-1">
                   <p className="text-[15px] font-semibold">
-                    <span className="mr-1.5 text-muted-foreground">{i + 1}.</span>
+                    <span className="mr-1.5 text-muted-foreground">
+                      {i + 1}.
+                    </span>
                     {step.title}
                   </p>
-                  <p className="mt-1 text-[14.5px] leading-relaxed text-muted-foreground">{step.body}</p>
+                  <p className="mt-1 text-[14.5px] leading-relaxed text-muted-foreground">
+                    {step.body}
+                  </p>
                   {step.extra}
                 </div>
               </Reveal>
             ))}
           </ol>
 
-          <Reveal delay={380} className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
+          <Reveal
+            delay={380}
+            className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3"
+          >
             <Link
               to="/docs/$"
               params={{ _splat: "mcp/overview" }}
@@ -369,7 +504,11 @@ export function AiSection() {
           </Reveal>
         </div>
 
-        <Reveal delay={120} y={28} className="mx-auto w-full min-w-0 max-w-3xl lg:max-w-none">
+        <Reveal
+          delay={120}
+          y={28}
+          className="mx-auto w-full min-w-0 max-w-3xl lg:max-w-none"
+        >
           <div className="mb-3 flex items-center gap-2 text-[12.5px] font-medium text-muted-foreground">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-60 motion-safe:animate-ping" />
@@ -378,10 +517,17 @@ export function AiSection() {
             Real recording: Claude plans the afternoon over MCP
           </div>
           <div className="[&_figure]:my-0">
-            <Clip id="ai-plan" caption="Tasks and time blocks appear as the agent works." />
+            <Clip
+              id="ai-plan"
+              caption="Tasks and time blocks appear as the agent works."
+            />
           </div>
           <VideoLightbox id="ai">
-            <VideoCard id="ai" label="Watch the full demo: Claude plans a day" className="mt-6" />
+            <VideoCard
+              id="ai"
+              label="Watch the full demo: Claude plans a day"
+              className="mt-6"
+            />
           </VideoLightbox>
         </Reveal>
       </div>

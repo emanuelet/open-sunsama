@@ -1,8 +1,23 @@
-import * as React from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { User, LoginInput, CreateUserInput, AuthResponse, UpdateUserInput } from '@open-sunsama/types';
-import { getApi, setAuthToken, clearAuthToken, getToken, setToken, removeToken, initializeApi, onTokenRefreshed } from './api';
-import { getDeviceTimezone } from './timezone';
+import * as React from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type {
+  User,
+  LoginInput,
+  CreateUserInput,
+  AuthResponse,
+  UpdateUserInput,
+} from "@open-sunsama/types";
+import {
+  getApi,
+  setAuthToken,
+  clearAuthToken,
+  getToken,
+  setToken,
+  removeToken,
+  initializeApi,
+  onTokenRefreshed,
+} from "./api";
+import { getDeviceTimezone } from "./timezone";
 
 interface AuthState {
   user: User | null;
@@ -51,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Fetch current user
   const { data: user, isLoading: isUserLoading } = useQuery({
-    queryKey: ['auth', 'me'],
+    queryKey: ["auth", "me"],
     queryFn: async () => {
       if (!token) return null;
       try {
@@ -73,23 +88,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sync device timezone with server
   React.useEffect(() => {
     if (!user || timezoneSyncAttempted.current) return;
-    
+
     const deviceTimezone = getDeviceTimezone();
-    
+
     // Only update if different from server
     if (user.preferences?.timezoneManuallySet) {
       timezoneSyncAttempted.current = true;
     } else if (deviceTimezone && deviceTimezone !== user.timezone) {
       timezoneSyncAttempted.current = true;
-      console.log(`[Timezone Sync] Updating timezone from ${user.timezone} to ${deviceTimezone}`);
-      
+      console.log(
+        `[Timezone Sync] Updating timezone from ${user.timezone} to ${deviceTimezone}`
+      );
+
       const api = getApi();
-      api.auth.updateMe({ timezone: deviceTimezone, timezoneManuallySet: false })
+      api.auth
+        .updateMe({ timezone: deviceTimezone, timezoneManuallySet: false })
         .then((updatedUser) => {
-          queryClient.setQueryData(['auth', 'me'], updatedUser);
+          queryClient.setQueryData(["auth", "me"], updatedUser);
         })
         .catch((error) => {
-          console.error('[Timezone Sync] Failed to update timezone:', error);
+          console.error("[Timezone Sync] Failed to update timezone:", error);
           // Reset flag so we can try again later
           timezoneSyncAttempted.current = false;
         });
@@ -108,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await setToken(data.token);
       setAuthToken(data.token);
       setTokenState(data.token);
-      queryClient.setQueryData(['auth', 'me'], data.user);
+      queryClient.setQueryData(["auth", "me"], data.user);
     },
   });
 
@@ -122,7 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await setToken(data.token);
       setAuthToken(data.token);
       setTokenState(data.token);
-      queryClient.setQueryData(['auth', 'me'], data.user);
+      queryClient.setQueryData(["auth", "me"], data.user);
     },
   });
 
@@ -133,48 +151,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return await api.auth.updateMe(data);
     },
     onSuccess: (updatedUser) => {
-      queryClient.setQueryData(['auth', 'me'], updatedUser);
+      queryClient.setQueryData(["auth", "me"], updatedUser);
     },
   });
 
-  const login = React.useCallback(async (credentials: LoginInput) => {
-    await loginMutation.mutateAsync(credentials);
-  }, [loginMutation]);
+  const login = React.useCallback(
+    async (credentials: LoginInput) => {
+      await loginMutation.mutateAsync(credentials);
+    },
+    [loginMutation]
+  );
 
-  const register = React.useCallback(async (data: CreateUserInput) => {
-    await registerMutation.mutateAsync(data);
-  }, [registerMutation]);
+  const register = React.useCallback(
+    async (data: CreateUserInput) => {
+      await registerMutation.mutateAsync(data);
+    },
+    [registerMutation]
+  );
 
   const logout = React.useCallback(async () => {
     await removeToken();
     clearAuthToken();
     setTokenState(null);
-    queryClient.setQueryData(['auth', 'me'], null);
+    queryClient.setQueryData(["auth", "me"], null);
     queryClient.clear();
   }, [queryClient]);
 
-  const updateUser = React.useCallback(async (data: UpdateUserInput) => {
-    await updateUserMutation.mutateAsync(data);
-  }, [updateUserMutation]);
+  const updateUser = React.useCallback(
+    async (data: UpdateUserInput) => {
+      await updateUserMutation.mutateAsync(data);
+    },
+    [updateUserMutation]
+  );
 
   const isLoading = !initialized || (!!token && isUserLoading);
 
-  const value = React.useMemo<AuthContextValue>(() => ({
-    user: user ?? null,
-    token,
-    isAuthenticated: !!token && !!user,
-    isLoading,
-    login,
-    register,
-    logout,
-    updateUser,
-  }), [user, token, isLoading, login, register, logout, updateUser]);
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
+  const value = React.useMemo<AuthContextValue>(
+    () => ({
+      user: user ?? null,
+      token,
+      isAuthenticated: !!token && !!user,
+      isLoading,
+      login,
+      register,
+      logout,
+      updateUser,
+    }),
+    [user, token, isLoading, login, register, logout, updateUser]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 /**
@@ -183,7 +209,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth(): AuthContextValue {
   const context = React.useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

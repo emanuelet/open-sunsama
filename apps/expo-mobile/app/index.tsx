@@ -1,7 +1,7 @@
-import { Redirect } from 'expo-router';
-import { useAuth } from '@/lib/auth';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { useThemeColors } from '@/lib/theme';
+import { Redirect } from "expo-router";
+import { useAuth } from "@/lib/auth";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { useThemeColors } from "@/lib/theme";
 
 /**
  * Root index - redirects based on auth state
@@ -28,7 +28,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

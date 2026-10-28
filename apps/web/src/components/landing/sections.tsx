@@ -13,7 +13,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { BenefitGrid, type BenefitItem } from "@/components/marketing/benefit-grid";
+import {
+  BenefitGrid,
+  type BenefitItem,
+} from "@/components/marketing/benefit-grid";
 import { CountUp, Reveal } from "./motion";
 
 const GITHUB_URL = "https://github.com/ShadowWalker2014/open-sunsama";
@@ -70,14 +73,21 @@ const FEATURES: BenefitItem[] = [
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="scroll-mt-16 border-t border-border/50 py-24 md:py-28">
+    <section
+      id="features"
+      className="scroll-mt-16 border-t border-border/50 py-24 md:py-28"
+    >
       <div className="container mx-auto max-w-6xl px-4">
         <Reveal className="mx-auto max-w-3xl text-balance text-center">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">Features</p>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
+            Features
+          </p>
           <h2 className="mt-3 text-[32px] font-semibold leading-[1.08] tracking-[-0.03em] md:text-[44px]">
             Everything else a good day needs.
           </h2>
-          <p className="mt-4 text-[16px] leading-relaxed text-muted-foreground">The small things that keep your plan honest.</p>
+          <p className="mt-4 text-[16px] leading-relaxed text-muted-foreground">
+            The small things that keep your plan honest.
+          </p>
         </Reveal>
         <div className="mt-12">
           <BenefitGrid items={FEATURES} />
@@ -95,7 +105,11 @@ const SNIPPETS = [
   {
     id: "claude-code",
     label: "Claude Code",
-    lines: ["$ claude mcp add --transport http open-sunsama \\", "    https://api.opensunsama.com/mcp", "✓ Added MCP server open-sunsama"],
+    lines: [
+      "$ claude mcp add --transport http open-sunsama \\",
+      "    https://api.opensunsama.com/mcp",
+      "✓ Added MCP server open-sunsama",
+    ],
   },
   {
     id: "api",
@@ -143,8 +157,8 @@ export function OpenSourceSection() {
                 Yours to run, read and change.
               </h2>
               <p className="mt-4 max-w-md text-[15px] leading-relaxed text-white/60">
-                The code is public on GitHub. Run it on your own server with Docker. Script it with the REST
-                API. Your data stays yours.
+                The code is public on GitHub. Run it on your own server with
+                Docker. Script it with the REST API. Your data stays yours.
               </p>
               <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-4">
                 {STATS.map((stat) => (
@@ -152,13 +166,19 @@ export function OpenSourceSection() {
                     <div className="text-[28px] font-semibold tabular-nums tracking-tight">
                       <CountUp value={stat.value} />
                     </div>
-                    <div className="mt-0.5 text-[11px] uppercase tracking-wider text-white/45">{stat.label}</div>
+                    <div className="mt-0.5 text-[11px] uppercase tracking-wider text-white/45">
+                      {stat.label}
+                    </div>
                   </div>
                 ))}
               </div>
               <div className="mt-8 flex flex-wrap gap-2.5">
                 <Button size="sm" className="h-9 px-4 text-[13px]" asChild>
-                  <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={GITHUB_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Github className="h-4 w-4" />
                     Star on GitHub
                   </a>
@@ -186,20 +206,29 @@ export function OpenSourceSection() {
                       onClick={() => setTab(s.id)}
                       className={cn(
                         "rounded-md px-2.5 py-1 text-[12px] font-medium transition-colors",
-                        tab === s.id ? "bg-white/10 text-white" : "text-white/45 hover:text-white/80"
+                        tab === s.id
+                          ? "bg-white/10 text-white"
+                          : "text-white/45 hover:text-white/80"
                       )}
                     >
                       {s.label}
                     </button>
                   ))}
                 </div>
-                <pre key={tab} className="min-h-[148px] overflow-x-auto p-4 font-mono text-[11.5px] leading-7 sm:p-5 sm:text-[12.5px]">
+                <pre
+                  key={tab}
+                  className="min-h-[148px] overflow-x-auto p-4 font-mono text-[11.5px] leading-7 sm:p-5 sm:text-[12.5px]"
+                >
                   {snippet.lines.map((line, i) => (
                     <div
                       key={line}
                       className={cn(
                         "motion-safe:animate-[landing-line_500ms_cubic-bezier(0.2,0.8,0.2,1)_both]",
-                        line.startsWith("✓") ? "text-emerald-400" : line.startsWith("$") ? "text-white" : "text-white/60"
+                        line.startsWith("✓")
+                          ? "text-emerald-400"
+                          : line.startsWith("$")
+                            ? "text-white"
+                            : "text-white/60"
                       )}
                       style={{ animationDelay: `${i * 140}ms` }}
                     >
@@ -228,28 +257,45 @@ export function FinalCta() {
         <div className="absolute left-1/2 top-1/2 h-[420px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,hsl(var(--primary)/0.14),transparent)] blur-2xl" />
       </div>
       <Reveal className="container mx-auto max-w-2xl px-4 text-center">
-        <img src="/open-sunsama-logo.png" alt="" className="mx-auto h-12 w-12 rounded-2xl shadow-lg" />
+        <img
+          src="/open-sunsama-logo.png"
+          alt=""
+          className="mx-auto h-12 w-12 rounded-2xl shadow-lg"
+        />
         <h2 className="mt-6 text-[34px] font-semibold leading-[1.08] tracking-[-0.035em] md:text-[48px]">
           Ready for a calmer day?
         </h2>
         <p className="mx-auto mt-4 max-w-lg text-[16px] leading-relaxed text-muted-foreground">
-          Plan on a board, block time on your calendar, and let your AI agent help.
+          Plan on a board, block time on your calendar, and let your AI agent
+          help.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-2.5 sm:flex-row">
-          <Button size="lg" className="h-11 rounded-lg px-5 text-[14px] shadow-[0_8px_24px_-8px_hsl(var(--primary)/0.6)]" asChild>
+          <Button
+            size="lg"
+            className="h-11 rounded-lg px-5 text-[14px] shadow-[0_8px_24px_-8px_hsl(var(--primary)/0.6)]"
+            asChild
+          >
             <Link to="/register">
               Get started
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
-          <Button variant="outline" size="lg" className="h-11 rounded-lg px-5 text-[14px]" asChild>
+          <Button
+            variant="outline"
+            size="lg"
+            className="h-11 rounded-lg px-5 text-[14px]"
+            asChild
+          >
             <Link to="/download">
               <Download className="h-4 w-4" />
               Download for desktop
             </Link>
           </Button>
         </div>
-        <p className="mt-4 text-[12px] text-muted-foreground">Open source · Works with Claude, ChatGPT and any MCP app · Self-host any time</p>
+        <p className="mt-4 text-[12px] text-muted-foreground">
+          Open source · Works with Claude, ChatGPT and any MCP app · Self-host
+          any time
+        </p>
       </Reveal>
     </section>
   );

@@ -70,7 +70,12 @@ const DEFAULT_TASK_BLOCK_MINS = 30;
 const VIEW_MODE_STORAGE_KEY = "open_sunsama_calendar_view_mode";
 
 function isCalendarViewMode(value: unknown): value is CalendarViewMode {
-  return value === "day" || value === "3-day" || value === "week" || value === "month";
+  return (
+    value === "day" ||
+    value === "3-day" ||
+    value === "week" ||
+    value === "month"
+  );
 }
 
 function getStoredViewMode(): CalendarViewMode | null {
@@ -147,7 +152,12 @@ interface CalendarViewProps {
   onBlockClick?: (block: TimeBlock) => void;
   onEditBlock?: (block: TimeBlock) => void;
   onViewTask?: (taskId: string) => void;
-  onTimeSlotClick?: (date: Date, startTime: Date, endTime: Date, anchor?: CalendarCreateAnchor) => void;
+  onTimeSlotClick?: (
+    date: Date,
+    startTime: Date,
+    endTime: Date,
+    anchor?: CalendarCreateAnchor
+  ) => void;
   className?: string;
 }
 
@@ -175,7 +185,7 @@ export function CalendarView({
   // then to "day".
   const [viewMode, setViewModeRaw] = React.useState<CalendarViewMode>(() => {
     const remote = user?.preferences?.calendarViewMode;
-    return isCalendarViewMode(remote) ? remote : getStoredViewMode() ?? "day";
+    return isCalendarViewMode(remote) ? remote : (getStoredViewMode() ?? "day");
   });
   // If the server preference loads *after* mount (typical: /auth/me
   // resolves shortly after the first paint), seed it into local state
@@ -522,8 +532,8 @@ export function CalendarView({
       if (
         document.querySelector(
           '[role="dialog"][data-state="open"], ' +
-          '[role="alertdialog"][data-state="open"], ' +
-          '[role="menu"][data-state="open"]'
+            '[role="alertdialog"][data-state="open"], ' +
+            '[role="menu"][data-state="open"]'
         )
       ) {
         return;
@@ -561,7 +571,10 @@ export function CalendarView({
   // Mouse handlers for drag
   const handleTimelineMouseMove = (e: React.MouseEvent) => {
     if (isDragging) {
-      updateDrag(e.clientY, (e.currentTarget as HTMLElement).getBoundingClientRect());
+      updateDrag(
+        e.clientY,
+        (e.currentTarget as HTMLElement).getBoundingClientRect()
+      );
     }
   };
 
@@ -579,21 +592,24 @@ export function CalendarView({
         updateDrag(e.clientY, timelineRef.current.getBoundingClientRect());
       }
     };
-    
+
     // Touch event handlers for mobile
     const handleGlobalTouchEnd = () => endDrag();
     const handleGlobalTouchMove = (e: TouchEvent) => {
       if (timelineRef.current && e.touches.length > 0) {
         const touch = e.touches[0];
         if (touch) {
-          updateDrag(touch.clientY, timelineRef.current.getBoundingClientRect());
+          updateDrag(
+            touch.clientY,
+            timelineRef.current.getBoundingClientRect()
+          );
           // Prevent page scrolling while dragging
           e.preventDefault();
         }
       }
     };
     const handleGlobalTouchCancel = () => cancelDrag();
-    
+
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") cancelDrag();
     };
@@ -601,12 +617,14 @@ export function CalendarView({
     // Mouse events
     document.addEventListener("mouseup", handleGlobalMouseUp);
     document.addEventListener("mousemove", handleGlobalMouseMove);
-    
+
     // Touch events with passive: false to allow preventDefault
     document.addEventListener("touchend", handleGlobalTouchEnd);
-    document.addEventListener("touchmove", handleGlobalTouchMove, { passive: false });
+    document.addEventListener("touchmove", handleGlobalTouchMove, {
+      passive: false,
+    });
     document.addEventListener("touchcancel", handleGlobalTouchCancel);
-    
+
     document.addEventListener("keydown", handleEscape);
 
     return () => {
@@ -690,10 +708,13 @@ export function CalendarView({
 
   // When the user clicks a day cell in month view, switch to day view
   // anchored on that date — common UX pattern (Google / Outlook).
-  const handleDayCellClick = React.useCallback((date: Date) => {
-    setSelectedDate(startOfDay(date));
-    setViewMode("day");
-  }, [setViewMode]);
+  const handleDayCellClick = React.useCallback(
+    (date: Date) => {
+      setSelectedDate(startOfDay(date));
+      setViewMode("day");
+    },
+    [setViewMode]
+  );
 
   // Drag handlers for external events — start the move/resize, then
   // useCalendarDnd's `onEventMove` / `onEventResize` callbacks fire on
@@ -720,8 +741,7 @@ export function CalendarView({
       // Don't allow drag for all-day events from the timeline path —
       // they live in the banner row and have different semantics.
       if (event.isAllDay) return false;
-      const isReadOnly =
-        calendarReadOnlyById.get(event.calendarId) ?? true;
+      const isReadOnly = calendarReadOnlyById.get(event.calendarId) ?? true;
       return !isReadOnly;
     },
     [calendarReadOnlyById]
@@ -778,7 +798,11 @@ export function CalendarView({
               {...(onViewTask ? { onViewTask } : {})}
               {...(onTimeSlotClick
                 ? {
-                    onTimeSlotClick: (startTime: Date, endTime: Date, anchor?: CalendarCreateAnchor) =>
+                    onTimeSlotClick: (
+                      startTime: Date,
+                      endTime: Date,
+                      anchor?: CalendarCreateAnchor
+                    ) =>
                       onTimeSlotClick(selectedDate, startTime, endTime, anchor),
                   }
                 : {})}
@@ -841,9 +865,8 @@ export function CalendarView({
         rangeTo={toDate}
         calendarReadOnly={
           selectedExternalEvent
-            ? (calendarReadOnlyById.get(
-                selectedExternalEvent.calendarId
-              ) ?? true)
+            ? (calendarReadOnlyById.get(selectedExternalEvent.calendarId) ??
+              true)
             : true
         }
         calendarProvider={

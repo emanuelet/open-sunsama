@@ -1,6 +1,20 @@
-import { CalendarClock, CalendarDays, CheckSquare, ListChecks, Lock, User, type LucideIcon } from "lucide-react";
+import {
+  CalendarClock,
+  CalendarDays,
+  CheckSquare,
+  ListChecks,
+  Lock,
+  User,
+  type LucideIcon,
+} from "lucide-react";
 import { Reveal } from "@/components/landing/motion";
-import { CARD, CONTAINER, MarketingPageView, SECTION, SectionHeading } from "@/components/marketing";
+import {
+  CARD,
+  CONTAINER,
+  MarketingPageView,
+  SECTION,
+  SectionHeading,
+} from "@/components/marketing";
 import page, {
   ACCESS_LABEL,
   TOOL_GROUPS,
@@ -26,7 +40,12 @@ const ACCESS_STYLE: Record<ToolAccess, string> = {
 
 function AccessBadge({ access }: { access: ToolAccess }) {
   return (
-    <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium leading-4", ACCESS_STYLE[access])}>
+    <span
+      className={cn(
+        "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium leading-4",
+        ACCESS_STYLE[access]
+      )}
+    >
       {ACCESS_LABEL[access]}
     </span>
   );
@@ -38,7 +57,11 @@ function GroupCard({ group, delay }: { group: McpToolGroup; delay: number }) {
   return (
     <Reveal
       delay={delay}
-      className={cn(CARD, "overflow-hidden", readOnly && "ring-1 ring-primary/30 dark:ring-primary/40")}
+      className={cn(
+        CARD,
+        "overflow-hidden",
+        readOnly && "ring-1 ring-primary/30 dark:ring-primary/40"
+      )}
     >
       <div className="flex items-start gap-3 border-b border-border/60 px-5 py-4">
         <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -47,9 +70,13 @@ function GroupCard({ group, delay }: { group: McpToolGroup; delay: number }) {
         <div className="min-w-0 flex-1">
           <h3 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em]">
             {group.title}
-            <span className="text-[12px] font-medium tabular-nums text-muted-foreground">{group.tools.length}</span>
+            <span className="text-[12px] font-medium tabular-nums text-muted-foreground">
+              {group.tools.length}
+            </span>
           </h3>
-          <p className="mt-0.5 text-[13px] text-muted-foreground">{group.note}</p>
+          <p className="mt-0.5 text-[13px] text-muted-foreground">
+            {group.note}
+          </p>
         </div>
         {readOnly && (
           <span className="flex shrink-0 items-center gap-1 rounded-full border border-primary/30 px-2 py-0.5 text-[11px] font-medium text-primary">
@@ -62,10 +89,14 @@ function GroupCard({ group, delay }: { group: McpToolGroup; delay: number }) {
         {group.tools.map((tool) => (
           <li key={tool.name} className="py-3">
             <div className="flex items-center justify-between gap-3">
-              <code className="min-w-0 break-all font-mono text-[13px] font-medium text-foreground">{tool.name}</code>
+              <code className="min-w-0 break-all font-mono text-[13px] font-medium text-foreground">
+                {tool.name}
+              </code>
               <AccessBadge access={tool.access} />
             </div>
-            <p className="mt-1 text-[13.5px] leading-snug text-muted-foreground">{tool.does}</p>
+            <p className="mt-1 text-[13.5px] leading-snug text-muted-foreground">
+              {tool.does}
+            </p>
           </li>
         ))}
       </ul>
@@ -75,17 +106,26 @@ function GroupCard({ group, delay }: { group: McpToolGroup; delay: number }) {
 
 /** Every MCP tool, grouped, with what it can touch: the "tools" custom section. */
 function ToolsReference() {
-  const section = page.sections.find((s): s is CustomSection => s.kind === "custom" && s.id === "tools");
+  const section = page.sections.find(
+    (s): s is CustomSection => s.kind === "custom" && s.id === "tools"
+  );
   const byTitle = (title: string) => TOOL_GROUPS.find((g) => g.title === title);
   const columns = [
     ["Tasks", "Calendar events", "Profile"],
     ["Time blocks", "Subtasks"],
-  ].map((titles) => titles.map(byTitle).filter((g): g is McpToolGroup => Boolean(g)));
+  ].map((titles) =>
+    titles.map(byTitle).filter((g): g is McpToolGroup => Boolean(g))
+  );
 
   return (
     <section id="tools" className={SECTION} aria-labelledby="tools-heading">
       <div className={CONTAINER}>
-        <SectionHeading id="tools-heading" eyebrow={section?.eyebrow} heading={section?.heading ?? ""} lead={section?.lead} />
+        <SectionHeading
+          id="tools-heading"
+          eyebrow={section?.eyebrow}
+          heading={section?.heading ?? ""}
+          lead={section?.lead}
+        />
         <Reveal className="mt-8 flex flex-wrap items-center justify-center gap-2 text-[12.5px] text-muted-foreground">
           {(Object.keys(ACCESS_LABEL) as ToolAccess[]).map((access) => (
             <AccessBadge key={access} access={access} />
@@ -101,7 +141,11 @@ function ToolsReference() {
           {columns.map((groups, col) => (
             <div key={col} className="flex min-w-0 flex-col gap-5">
               {groups.map((group, i) => (
-                <GroupCard key={group.title} group={group} delay={(col + i) * 80} />
+                <GroupCard
+                  key={group.title}
+                  group={group}
+                  delay={(col + i) * 80}
+                />
               ))}
             </div>
           ))}
@@ -116,5 +160,7 @@ function ToolsReference() {
  * list live in src/content/marketing/features/ai-integration.ts.
  */
 export default function AiIntegrationFeaturePage() {
-  return <MarketingPageView page={page} slots={{ tools: <ToolsReference /> }} />;
+  return (
+    <MarketingPageView page={page} slots={{ tools: <ToolsReference /> }} />
+  );
 }

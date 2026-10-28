@@ -53,4 +53,8 @@ export interface PaginatedResponse<T> {
 /**
  * API client configuration (re-exported from client for convenience)
  */
-export type { ApiClientConfig, OpenSunsamaClient, ChronoflowClient } from "./client.js";
+export type {
+  ApiClientConfig,
+  OpenSunsamaClient,
+  ChronoflowClient,
+} from "./client.js";

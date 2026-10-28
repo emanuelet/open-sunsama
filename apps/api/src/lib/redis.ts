@@ -3,7 +3,7 @@
  * Uses lazy initialization to avoid accessing env vars at module level
  */
 
-import Redis from 'ioredis';
+import Redis from "ioredis";
 
 let redisClient: Redis | null = null;
 let redisSub: Redis | null = null;
@@ -16,10 +16,10 @@ let redisPub: Redis | null = null;
 export function getRedisClient(): Redis {
   if (!redisClient) {
     const url = process.env.REDIS_URL;
-    if (!url) throw new Error('REDIS_URL not configured');
+    if (!url) throw new Error("REDIS_URL not configured");
     redisClient = new Redis(url);
-    redisClient.on('error', (err) => {
-      console.error('[Redis] Client error:', err);
+    redisClient.on("error", (err) => {
+      console.error("[Redis] Client error:", err);
     });
   }
   return redisClient;
@@ -33,10 +33,10 @@ export function getRedisClient(): Redis {
 export function getRedisSubscriber(): Redis {
   if (!redisSub) {
     const url = process.env.REDIS_URL;
-    if (!url) throw new Error('REDIS_URL not configured');
+    if (!url) throw new Error("REDIS_URL not configured");
     redisSub = new Redis(url);
-    redisSub.on('error', (err) => {
-      console.error('[Redis] Subscriber error:', err);
+    redisSub.on("error", (err) => {
+      console.error("[Redis] Subscriber error:", err);
     });
   }
   return redisSub;
@@ -49,10 +49,10 @@ export function getRedisSubscriber(): Redis {
 export function getRedisPublisher(): Redis {
   if (!redisPub) {
     const url = process.env.REDIS_URL;
-    if (!url) throw new Error('REDIS_URL not configured');
+    if (!url) throw new Error("REDIS_URL not configured");
     redisPub = new Redis(url);
-    redisPub.on('error', (err) => {
-      console.error('[Redis] Publisher error:', err);
+    redisPub.on("error", (err) => {
+      console.error("[Redis] Publisher error:", err);
     });
   }
   return redisPub;
@@ -81,5 +81,5 @@ export async function closeRedisConnections(): Promise<void> {
   redisSub = null;
   redisPub = null;
 
-  console.log('[Redis] All connections closed');
+  console.log("[Redis] All connections closed");
 }

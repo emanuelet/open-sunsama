@@ -14,25 +14,25 @@ export interface ApiError {
   /** Human-readable error message */
   message: string;
 
-  /** 
+  /**
    * Additional error details.
    * May contain field-specific validation errors or other context.
    */
   details?: Record<string, unknown>;
 
-  /** 
+  /**
    * HTTP status code associated with this error.
    * Included for convenience when the error is embedded in a response body.
    */
   statusCode?: number;
 
-  /** 
+  /**
    * Unique identifier for this error instance.
    * Useful for debugging and support requests.
    */
   errorId?: string;
 
-  /** 
+  /**
    * Timestamp when the error occurred.
    * ISO 8601 format.
    */
@@ -44,27 +44,27 @@ export interface ApiError {
  */
 export type ApiErrorCode =
   /** Request validation failed */
-  | 'VALIDATION_ERROR'
+  | "VALIDATION_ERROR"
   /** Authentication required but not provided */
-  | 'UNAUTHORIZED'
+  | "UNAUTHORIZED"
   /** Authentication provided but insufficient permissions */
-  | 'FORBIDDEN'
+  | "FORBIDDEN"
   /** Requested resource not found */
-  | 'NOT_FOUND'
+  | "NOT_FOUND"
   /** Request conflicts with current state (e.g., duplicate entry) */
-  | 'CONFLICT'
+  | "CONFLICT"
   /** Rate limit exceeded */
-  | 'RATE_LIMITED'
+  | "RATE_LIMITED"
   /** Internal server error */
-  | 'INTERNAL_ERROR'
+  | "INTERNAL_ERROR"
   /** Service temporarily unavailable */
-  | 'SERVICE_UNAVAILABLE'
+  | "SERVICE_UNAVAILABLE"
   /** Request timeout */
-  | 'TIMEOUT'
+  | "TIMEOUT"
   /** Invalid or expired token */
-  | 'INVALID_TOKEN'
+  | "INVALID_TOKEN"
   /** Resource has been deleted */
-  | 'GONE';
+  | "GONE";
 
 /**
  * Paginated response wrapper.
@@ -116,7 +116,7 @@ export interface PaginationInput {
 /**
  * Sort direction for ordered queries.
  */
-export type SortDirection = 'asc' | 'desc';
+export type SortDirection = "asc" | "desc";
 
 /**
  * Generic sort input for list endpoints.
@@ -167,31 +167,31 @@ export interface ListResponse<T> {
  */
 export type FilterOperator =
   /** Equal to */
-  | 'eq'
+  | "eq"
   /** Not equal to */
-  | 'neq'
+  | "neq"
   /** Greater than */
-  | 'gt'
+  | "gt"
   /** Greater than or equal to */
-  | 'gte'
+  | "gte"
   /** Less than */
-  | 'lt'
+  | "lt"
   /** Less than or equal to */
-  | 'lte'
+  | "lte"
   /** Value is in the provided array */
-  | 'in'
+  | "in"
   /** Value is not in the provided array */
-  | 'notIn'
+  | "notIn"
   /** String contains (case-insensitive) */
-  | 'contains'
+  | "contains"
   /** String starts with */
-  | 'startsWith'
+  | "startsWith"
   /** String ends with */
-  | 'endsWith'
+  | "endsWith"
   /** Value is null */
-  | 'isNull'
+  | "isNull"
   /** Value is not null */
-  | 'isNotNull';
+  | "isNotNull";
 
 /**
  * Generic filter condition for advanced queries.
@@ -252,7 +252,7 @@ export interface RequestContext {
   /** Timestamp when the request was received */
   timestamp: Date;
 
-  /** 
+  /**
    * API key ID if request was authenticated via API key.
    * null if authenticated via session/JWT or not authenticated.
    */
@@ -282,7 +282,7 @@ export interface BatchResult<T = unknown> {
  */
 export interface HealthCheckResponse {
   /** Overall health status */
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: "healthy" | "degraded" | "unhealthy";
 
   /** Timestamp of the health check */
   timestamp: string;
@@ -296,7 +296,7 @@ export interface HealthCheckResponse {
     name: string;
 
     /** Service health status */
-    status: 'healthy' | 'unhealthy';
+    status: "healthy" | "unhealthy";
 
     /** Response time in milliseconds */
     responseTimeMs?: number;
@@ -326,7 +326,7 @@ export interface RateLimitInfo {
 /**
  * HTTP methods
  */
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 /**
  * API endpoint definition

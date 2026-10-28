@@ -45,18 +45,25 @@ export function calculateYFromTime(time: Date): number {
 /**
  * Snap time to nearest interval
  */
-export function snapToInterval(time: Date, intervalMinutes: number = SNAP_INTERVAL): Date {
+export function snapToInterval(
+  time: Date,
+  intervalMinutes: number = SNAP_INTERVAL
+): Date {
   const minutes = time.getMinutes();
-  const snappedMinutes = Math.round(minutes / intervalMinutes) * intervalMinutes;
-  
+  const snappedMinutes =
+    Math.round(minutes / intervalMinutes) * intervalMinutes;
+
   let result = setMinutes(time, snappedMinutes % 60);
-  
+
   // Handle overflow to next hour
   if (snappedMinutes >= 60) {
-    result = setHours(result, result.getHours() + Math.floor(snappedMinutes / 60));
+    result = setHours(
+      result,
+      result.getHours() + Math.floor(snappedMinutes / 60)
+    );
     result = setMinutes(result, snappedMinutes % 60);
   }
-  
+
   return result;
 }
 
@@ -151,7 +158,7 @@ export function calculateResizePreview(
 ): DropPreview {
   const originalStart = new Date(block.startTime);
   const originalEnd = new Date(block.endTime);
-  
+
   let startTime: Date;
   let endTime: Date;
 
@@ -161,7 +168,7 @@ export function calculateResizePreview(
     const rawStartTime = calculateTimeFromY(newTop, baseDate);
     startTime = snapToInterval(rawStartTime);
     endTime = originalEnd;
-    
+
     // Ensure minimum duration
     const duration = differenceInMinutes(endTime, startTime);
     if (duration < MIN_BLOCK_DURATION) {

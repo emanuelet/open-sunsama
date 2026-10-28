@@ -2,7 +2,11 @@ import * as React from "react";
 import { Pause, Play } from "lucide-react";
 import type { Subtask } from "@open-sunsama/types";
 import { cn, formatDuration } from "@/lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { DurationPicker } from "@/components/ui/duration-picker";
 import { useUpdateSubtask } from "@/hooks/useSubtasks";
 import {
@@ -71,8 +75,10 @@ export function SubtaskTiming({ subtask }: { subtask: Subtask }) {
   const toggle = useSubtaskTimerToggle();
   const update = useUpdateSubtask();
   const { running, seconds } = useLiveSeconds(subtask);
-  const save = (data: { actualMins?: number | null; estimatedMins?: number | null }) =>
-    update.mutate({ taskId: subtask.taskId, subtaskId: subtask.id, data });
+  const save = (data: {
+    actualMins?: number | null;
+    estimatedMins?: number | null;
+  }) => update.mutate({ taskId: subtask.taskId, subtaskId: subtask.id, data });
 
   return (
     <div className="ml-auto flex shrink-0 items-center gap-2 pl-3 max-sm:justify-start max-sm:pl-0 max-sm:pb-1">
@@ -94,7 +100,9 @@ export function SubtaskTiming({ subtask }: { subtask: Subtask }) {
       />
       <button
         type="button"
-        onClick={(e) => isSingleClick(e) && void toggle(subtask.taskId, subtask.id)}
+        onClick={(e) =>
+          isSingleClick(e) && void toggle(subtask.taskId, subtask.id)
+        }
         // Done subtasks keep the column for alignment but can't be started.
         disabled={subtask.completed && !running}
         aria-label={running ? "Stop subtask timer" : "Start subtask timer"}
@@ -107,7 +115,11 @@ export function SubtaskTiming({ subtask }: { subtask: Subtask }) {
               : "border-emerald-500 bg-emerald-500 text-white opacity-0 hover:bg-emerald-600 focus-visible:opacity-100 group-hover:opacity-100 max-sm:opacity-100 [@media(hover:none)]:opacity-100"
         )}
       >
-        {running ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+        {running ? (
+          <Pause className="h-3.5 w-3.5" />
+        ) : (
+          <Play className="h-3.5 w-3.5" />
+        )}
         {running ? "Stop" : "Start"}
       </button>
     </div>

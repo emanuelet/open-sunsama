@@ -1,5 +1,5 @@
-import { Stack } from 'expo-router';
-import { useThemeColors } from '@/lib/theme';
+import { Stack } from "expo-router";
+import { useThemeColors } from "@/lib/theme";
 
 /**
  * Auth layout - stack navigator for login/register screens
@@ -15,7 +15,7 @@ export default function AuthLayout() {
         },
         headerTintColor: colors.text,
         headerTitleStyle: {
-          fontWeight: '600',
+          fontWeight: "600",
         },
         headerShadowVisible: false,
       }}
@@ -23,15 +23,15 @@ export default function AuthLayout() {
       <Stack.Screen
         name="login"
         options={{
-          title: 'Sign In',
+          title: "Sign In",
           headerShown: false,
         }}
       />
       <Stack.Screen
         name="register"
         options={{
-          title: 'Create Account',
-          headerBackTitle: 'Back',
+          title: "Create Account",
+          headerBackTitle: "Back",
         }}
       />
     </Stack>

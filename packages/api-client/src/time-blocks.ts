@@ -21,8 +21,8 @@ import type { OpenSunsamaClient, RequestOptions } from "./client.js";
  */
 function formatTimeForApi(time: Date | string): string {
   const date = time instanceof Date ? time : new Date(time);
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
   return `${hours}:${minutes}`;
 }
 
@@ -32,8 +32,8 @@ function formatTimeForApi(time: Date | string): string {
 function formatDateForApi(time: Date | string): string {
   const date = time instanceof Date ? time : new Date(time);
   const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -66,7 +66,7 @@ function transformTimeBlock(raw: RawTimeBlock): TimeBlock {
   // Use local time interpretation (not UTC)
   const startDateTime = `${raw.date}T${raw.startTime}:00`;
   const endDateTime = `${raw.date}T${raw.endTime}:00`;
-  
+
   return {
     id: raw.id,
     userId: raw.userId,
@@ -84,11 +84,13 @@ function transformTimeBlock(raw: RawTimeBlock): TimeBlock {
 /**
  * Transform raw API response to TimeBlockWithTask
  */
-function transformTimeBlockWithTask(raw: RawTimeBlock & { task?: unknown }): TimeBlockWithTask {
+function transformTimeBlockWithTask(
+  raw: RawTimeBlock & { task?: unknown }
+): TimeBlockWithTask {
   const timeBlock = transformTimeBlock(raw);
   return {
     ...timeBlock,
-    task: (raw.task as TimeBlockWithTask['task']) ?? null,
+    task: (raw.task as TimeBlockWithTask["task"]) ?? null,
   };
 }
 
@@ -102,21 +104,59 @@ interface ApiResponseWrapper<T> {
  * Time Blocks API interface
  */
 export interface TimeBlocksApi {
-  list(filters?: TimeBlockFilterInput, options?: RequestOptions): Promise<TimeBlock[]>;
-  listWithTasks(filters?: TimeBlockFilterInput, options?: RequestOptions): Promise<TimeBlockWithTask[]>;
-  create(input: CreateTimeBlockInput, options?: RequestOptions): Promise<TimeBlock>;
+  list(
+    filters?: TimeBlockFilterInput,
+    options?: RequestOptions
+  ): Promise<TimeBlock[]>;
+  listWithTasks(
+    filters?: TimeBlockFilterInput,
+    options?: RequestOptions
+  ): Promise<TimeBlockWithTask[]>;
+  create(
+    input: CreateTimeBlockInput,
+    options?: RequestOptions
+  ): Promise<TimeBlock>;
   get(id: string, options?: RequestOptions): Promise<TimeBlock>;
   getWithTask(id: string, options?: RequestOptions): Promise<TimeBlockWithTask>;
-  update(id: string, input: UpdateTimeBlockInput, options?: RequestOptions): Promise<TimeBlock>;
+  update(
+    id: string,
+    input: UpdateTimeBlockInput,
+    options?: RequestOptions
+  ): Promise<TimeBlock>;
   delete(id: string, options?: RequestOptions): Promise<void>;
-  quickSchedule(input: QuickScheduleInput, options?: RequestOptions): Promise<TimeBlock>;
-  autoSchedule(input: AutoScheduleInput, options?: RequestOptions): Promise<TimeBlock>;
-  getSummary(startDate: string, endDate: string, options?: RequestOptions): Promise<TimeBlockSummary>;
-  checkConflicts(startTime: Date | string, endTime: Date | string, excludeId?: string, options?: RequestOptions): Promise<TimeBlockConflict[]>;
-  batchCreate(inputs: CreateTimeBlockInput[], options?: RequestOptions): Promise<TimeBlock[]>;
-  batchUpdate(updates: Array<{ id: string; input: UpdateTimeBlockInput }>, options?: RequestOptions): Promise<TimeBlock[]>;
+  quickSchedule(
+    input: QuickScheduleInput,
+    options?: RequestOptions
+  ): Promise<TimeBlock>;
+  autoSchedule(
+    input: AutoScheduleInput,
+    options?: RequestOptions
+  ): Promise<TimeBlock>;
+  getSummary(
+    startDate: string,
+    endDate: string,
+    options?: RequestOptions
+  ): Promise<TimeBlockSummary>;
+  checkConflicts(
+    startTime: Date | string,
+    endTime: Date | string,
+    excludeId?: string,
+    options?: RequestOptions
+  ): Promise<TimeBlockConflict[]>;
+  batchCreate(
+    inputs: CreateTimeBlockInput[],
+    options?: RequestOptions
+  ): Promise<TimeBlock[]>;
+  batchUpdate(
+    updates: Array<{ id: string; input: UpdateTimeBlockInput }>,
+    options?: RequestOptions
+  ): Promise<TimeBlock[]>;
   batchDelete(ids: string[], options?: RequestOptions): Promise<void>;
-  cascadeResize(id: string, data: { startTime: Date | string; endTime: Date | string }, options?: RequestOptions): Promise<TimeBlock[]>;
+  cascadeResize(
+    id: string,
+    data: { startTime: Date | string; endTime: Date | string },
+    options?: RequestOptions
+  ): Promise<TimeBlock[]>;
 }
 
 /**
@@ -128,8 +168,14 @@ function filtersToSearchParams(
   if (!filters) return {};
   return {
     date: filters.date,
-    startTimeFrom: filters.startTimeFrom instanceof Date ? filters.startTimeFrom.toISOString() : filters.startTimeFrom,
-    startTimeTo: filters.startTimeTo instanceof Date ? filters.startTimeTo.toISOString() : filters.startTimeTo,
+    startTimeFrom:
+      filters.startTimeFrom instanceof Date
+        ? filters.startTimeFrom.toISOString()
+        : filters.startTimeFrom,
+    startTimeTo:
+      filters.startTimeTo instanceof Date
+        ? filters.startTimeTo.toISOString()
+        : filters.startTimeTo,
     taskId: filters.taskId,
     unassignedOnly: filters.unassignedOnly,
   };
@@ -140,25 +186,44 @@ function filtersToSearchParams(
  */
 export function createTimeBlocksApi(client: OpenSunsamaClient): TimeBlocksApi {
   return {
-    async list(filters?: TimeBlockFilterInput, options?: RequestOptions): Promise<TimeBlock[]> {
+    async list(
+      filters?: TimeBlockFilterInput,
+      options?: RequestOptions
+    ): Promise<TimeBlock[]> {
       const searchParams = filtersToSearchParams(filters);
-      const response = await client.get<ApiResponseWrapper<RawTimeBlock[]>>("time-blocks", {
-        ...options,
-        searchParams: { ...options?.searchParams, ...searchParams },
-      });
+      const response = await client.get<ApiResponseWrapper<RawTimeBlock[]>>(
+        "time-blocks",
+        {
+          ...options,
+          searchParams: { ...options?.searchParams, ...searchParams },
+        }
+      );
       return response.data.map(transformTimeBlock);
     },
 
-    async listWithTasks(filters?: TimeBlockFilterInput, options?: RequestOptions): Promise<TimeBlockWithTask[]> {
+    async listWithTasks(
+      filters?: TimeBlockFilterInput,
+      options?: RequestOptions
+    ): Promise<TimeBlockWithTask[]> {
       const searchParams = filtersToSearchParams(filters);
-      const response = await client.get<ApiResponseWrapper<RawTimeBlock[]>>("time-blocks", {
-        ...options,
-        searchParams: { ...options?.searchParams, ...searchParams, includeTasks: true },
-      });
+      const response = await client.get<ApiResponseWrapper<RawTimeBlock[]>>(
+        "time-blocks",
+        {
+          ...options,
+          searchParams: {
+            ...options?.searchParams,
+            ...searchParams,
+            includeTasks: true,
+          },
+        }
+      );
       return response.data.map(transformTimeBlockWithTask);
     },
 
-    async create(input: CreateTimeBlockInput, options?: RequestOptions): Promise<TimeBlock> {
+    async create(
+      input: CreateTimeBlockInput,
+      options?: RequestOptions
+    ): Promise<TimeBlock> {
       // Backend expects date in YYYY-MM-DD and times in HH:mm format
       const payload = {
         ...input,
@@ -166,74 +231,126 @@ export function createTimeBlocksApi(client: OpenSunsamaClient): TimeBlocksApi {
         startTime: formatTimeForApi(input.startTime),
         endTime: formatTimeForApi(input.endTime),
       };
-      const response = await client.post<ApiResponseWrapper<RawTimeBlock>>("time-blocks", payload, options);
+      const response = await client.post<ApiResponseWrapper<RawTimeBlock>>(
+        "time-blocks",
+        payload,
+        options
+      );
       return transformTimeBlock(response.data);
     },
 
     async get(id: string, options?: RequestOptions): Promise<TimeBlock> {
-      const response = await client.get<ApiResponseWrapper<RawTimeBlock>>(`time-blocks/${id}`, options);
+      const response = await client.get<ApiResponseWrapper<RawTimeBlock>>(
+        `time-blocks/${id}`,
+        options
+      );
       return transformTimeBlock(response.data);
     },
 
-    async getWithTask(id: string, options?: RequestOptions): Promise<TimeBlockWithTask> {
-      const response = await client.get<ApiResponseWrapper<RawTimeBlock>>(`time-blocks/${id}`, {
-        ...options,
-        searchParams: { ...options?.searchParams, includeTask: true },
-      });
+    async getWithTask(
+      id: string,
+      options?: RequestOptions
+    ): Promise<TimeBlockWithTask> {
+      const response = await client.get<ApiResponseWrapper<RawTimeBlock>>(
+        `time-blocks/${id}`,
+        {
+          ...options,
+          searchParams: { ...options?.searchParams, includeTask: true },
+        }
+      );
       return transformTimeBlockWithTask(response.data);
     },
 
-    async update(id: string, input: UpdateTimeBlockInput, options?: RequestOptions): Promise<TimeBlock> {
+    async update(
+      id: string,
+      input: UpdateTimeBlockInput,
+      options?: RequestOptions
+    ): Promise<TimeBlock> {
       // Backend expects date in YYYY-MM-DD and times in HH:mm format
       const payload: Record<string, unknown> = { ...input };
-      
+
       // If startTime is provided, extract date and format time
       if (input.startTime) {
         payload.date = formatDateForApi(input.startTime);
         payload.startTime = formatTimeForApi(input.startTime);
       }
-      
+
       // If endTime is provided, format it
       if (input.endTime) {
         payload.endTime = formatTimeForApi(input.endTime);
       }
-      
-      const response = await client.patch<ApiResponseWrapper<RawTimeBlock>>(`time-blocks/${id}`, payload, options);
+
+      const response = await client.patch<ApiResponseWrapper<RawTimeBlock>>(
+        `time-blocks/${id}`,
+        payload,
+        options
+      );
       return transformTimeBlock(response.data);
     },
 
     async delete(id: string, options?: RequestOptions): Promise<void> {
-      await client.delete<ApiResponseWrapper<void>>(`time-blocks/${id}`, options);
+      await client.delete<ApiResponseWrapper<void>>(
+        `time-blocks/${id}`,
+        options
+      );
     },
 
-    async quickSchedule(input: QuickScheduleInput, options?: RequestOptions): Promise<TimeBlock> {
+    async quickSchedule(
+      input: QuickScheduleInput,
+      options?: RequestOptions
+    ): Promise<TimeBlock> {
       // Backend expects date in YYYY-MM-DD and time in HH:mm format
       const payload = {
         ...input,
         date: formatDateForApi(input.startTime),
         startTime: formatTimeForApi(input.startTime),
       };
-      const response = await client.post<ApiResponseWrapper<RawTimeBlock>>("time-blocks/quick-schedule", payload, options);
+      const response = await client.post<ApiResponseWrapper<RawTimeBlock>>(
+        "time-blocks/quick-schedule",
+        payload,
+        options
+      );
       return transformTimeBlock(response.data);
     },
 
-    async autoSchedule(input: AutoScheduleInput, options?: RequestOptions): Promise<TimeBlock> {
+    async autoSchedule(
+      input: AutoScheduleInput,
+      options?: RequestOptions
+    ): Promise<TimeBlock> {
       // Backend automatically determines the best time slot
-      const response = await client.post<ApiResponseWrapper<RawTimeBlock>>("time-blocks/auto-schedule", input, options);
+      const response = await client.post<ApiResponseWrapper<RawTimeBlock>>(
+        "time-blocks/auto-schedule",
+        input,
+        options
+      );
       return transformTimeBlock(response.data);
     },
 
-    async getSummary(startDate: string, endDate: string, options?: RequestOptions): Promise<TimeBlockSummary> {
-      const response = await client.get<ApiResponseWrapper<TimeBlockSummary>>("time-blocks/summary", {
-        ...options,
-        searchParams: { ...options?.searchParams, startDate, endDate },
-      });
+    async getSummary(
+      startDate: string,
+      endDate: string,
+      options?: RequestOptions
+    ): Promise<TimeBlockSummary> {
+      const response = await client.get<ApiResponseWrapper<TimeBlockSummary>>(
+        "time-blocks/summary",
+        {
+          ...options,
+          searchParams: { ...options?.searchParams, startDate, endDate },
+        }
+      );
       return response.data;
     },
 
-    async checkConflicts(startTime: Date | string, endTime: Date | string, excludeId?: string, options?: RequestOptions): Promise<TimeBlockConflict[]> {
+    async checkConflicts(
+      startTime: Date | string,
+      endTime: Date | string,
+      excludeId?: string,
+      options?: RequestOptions
+    ): Promise<TimeBlockConflict[]> {
       // Backend expects date in YYYY-MM-DD and times in HH:mm format
-      const response = await client.get<ApiResponseWrapper<TimeBlockConflict[]>>("time-blocks/conflicts", {
+      const response = await client.get<
+        ApiResponseWrapper<TimeBlockConflict[]>
+      >("time-blocks/conflicts", {
         ...options,
         searchParams: {
           ...options?.searchParams,
@@ -246,7 +363,10 @@ export function createTimeBlocksApi(client: OpenSunsamaClient): TimeBlocksApi {
       return response.data;
     },
 
-    async batchCreate(inputs: CreateTimeBlockInput[], options?: RequestOptions): Promise<TimeBlock[]> {
+    async batchCreate(
+      inputs: CreateTimeBlockInput[],
+      options?: RequestOptions
+    ): Promise<TimeBlock[]> {
       // Backend expects date in YYYY-MM-DD and times in HH:mm format
       const timeBlocksPayload = inputs.map((input) => ({
         ...input,
@@ -254,27 +374,38 @@ export function createTimeBlocksApi(client: OpenSunsamaClient): TimeBlocksApi {
         startTime: formatTimeForApi(input.startTime),
         endTime: formatTimeForApi(input.endTime),
       }));
-      const response = await client.post<ApiResponseWrapper<RawTimeBlock[]>>("time-blocks/batch", { timeBlocks: timeBlocksPayload }, options);
+      const response = await client.post<ApiResponseWrapper<RawTimeBlock[]>>(
+        "time-blocks/batch",
+        { timeBlocks: timeBlocksPayload },
+        options
+      );
       return response.data.map(transformTimeBlock);
     },
 
-    async batchUpdate(updates: Array<{ id: string; input: UpdateTimeBlockInput }>, options?: RequestOptions): Promise<TimeBlock[]> {
+    async batchUpdate(
+      updates: Array<{ id: string; input: UpdateTimeBlockInput }>,
+      options?: RequestOptions
+    ): Promise<TimeBlock[]> {
       // Backend expects date in YYYY-MM-DD and times in HH:mm format
       const serializedUpdates = updates.map(({ id, input }) => {
         const serializedInput: Record<string, unknown> = { ...input };
-        
+
         if (input.startTime) {
           serializedInput.date = formatDateForApi(input.startTime);
           serializedInput.startTime = formatTimeForApi(input.startTime);
         }
-        
+
         if (input.endTime) {
           serializedInput.endTime = formatTimeForApi(input.endTime);
         }
-        
+
         return { id, input: serializedInput };
       });
-      const response = await client.patch<ApiResponseWrapper<RawTimeBlock[]>>("time-blocks/batch", { updates: serializedUpdates }, options);
+      const response = await client.patch<ApiResponseWrapper<RawTimeBlock[]>>(
+        "time-blocks/batch",
+        { updates: serializedUpdates },
+        options
+      );
       return response.data.map(transformTimeBlock);
     },
 
@@ -285,13 +416,21 @@ export function createTimeBlocksApi(client: OpenSunsamaClient): TimeBlocksApi {
       });
     },
 
-    async cascadeResize(id: string, data: { startTime: Date | string; endTime: Date | string }, options?: RequestOptions): Promise<TimeBlock[]> {
+    async cascadeResize(
+      id: string,
+      data: { startTime: Date | string; endTime: Date | string },
+      options?: RequestOptions
+    ): Promise<TimeBlock[]> {
       // Backend expects times in HH:mm format
       const payload = {
         startTime: formatTimeForApi(data.startTime),
         endTime: formatTimeForApi(data.endTime),
       };
-      const response = await client.patch<ApiResponseWrapper<RawTimeBlock[]>>(`time-blocks/${id}/cascade-resize`, payload, options);
+      const response = await client.patch<ApiResponseWrapper<RawTimeBlock[]>>(
+        `time-blocks/${id}/cascade-resize`,
+        payload,
+        options
+      );
       return response.data.map(transformTimeBlock);
     },
   };

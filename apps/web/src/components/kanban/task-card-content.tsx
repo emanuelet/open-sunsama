@@ -49,7 +49,6 @@ interface TaskCardContentProps {
   onUpdateTask?: (data: UpdateTaskInput) => void;
 }
 
-
 /**
  * Shared content component for task cards.
  * Sunsama-inspired design with circle checkbox, duration badge, and tag support.
@@ -166,41 +165,46 @@ export function TaskCardContent({
     </Popover>
   );
 
-  const timeChip = hasEstimateOnly ? (
-    estimatePicker(
-      <WithShortcut label="Planned time" shortcut="editEstimate">
-        <button
-          type="button"
-          onClick={(e) => e.stopPropagation()}
-          className="shrink-0 rounded bg-black/[0.06] px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-muted-foreground transition-colors hover:text-foreground dark:bg-black/30"
-        >
-          {formatDuration(task.estimatedMins!)}
-        </button>
-      </WithShortcut>
-    )
-  ) : hasTimeInfo ? (
-    estimatePicker(
-      <WithShortcut label="Planned time" shortcut="editEstimate">
-        <button type="button" aria-label="Edit planned time" onClick={(e) => e.stopPropagation()}>
-          <TaskTimeBadge task={task} isCompleted={isCompleted}
-            className="pointer-events-none shrink-0 bg-black/[0.06] dark:bg-black/30" />
-        </button>
-      </WithShortcut>
-    )
-  ) : (
-    estimatePicker(
-      <WithShortcut label="Planned time" shortcut="editEstimate">
-        <button
-          type="button"
-          onClick={(e) => e.stopPropagation()}
-          aria-label="Set planned time"
-          className="-mr-1 flex h-5 w-6 shrink-0 items-center justify-center rounded text-muted-foreground/70 opacity-0 transition-opacity hover:bg-muted hover:text-foreground group-hover:opacity-100 data-[state=open]:opacity-100"
-        >
-          <Clock className="h-3.5 w-3.5" />
-        </button>
-      </WithShortcut>
-    )
-  );
+  const timeChip = hasEstimateOnly
+    ? estimatePicker(
+        <WithShortcut label="Planned time" shortcut="editEstimate">
+          <button
+            type="button"
+            onClick={(e) => e.stopPropagation()}
+            className="shrink-0 rounded bg-black/[0.06] px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-muted-foreground transition-colors hover:text-foreground dark:bg-black/30"
+          >
+            {formatDuration(task.estimatedMins!)}
+          </button>
+        </WithShortcut>
+      )
+    : hasTimeInfo
+      ? estimatePicker(
+          <WithShortcut label="Planned time" shortcut="editEstimate">
+            <button
+              type="button"
+              aria-label="Edit planned time"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <TaskTimeBadge
+                task={task}
+                isCompleted={isCompleted}
+                className="pointer-events-none shrink-0 bg-black/[0.06] dark:bg-black/30"
+              />
+            </button>
+          </WithShortcut>
+        )
+      : estimatePicker(
+          <WithShortcut label="Planned time" shortcut="editEstimate">
+            <button
+              type="button"
+              onClick={(e) => e.stopPropagation()}
+              aria-label="Set planned time"
+              className="-mr-1 flex h-5 w-6 shrink-0 items-center justify-center rounded text-muted-foreground/70 opacity-0 transition-opacity hover:bg-muted hover:text-foreground group-hover:opacity-100 data-[state=open]:opacity-100"
+            >
+              <Clock className="h-3.5 w-3.5" />
+            </button>
+          </WithShortcut>
+        );
 
   const hasSubtasks = !!subtasks?.length && !subtasksHidden;
   const showMeta = !!formattedTime || task.priority !== "P2" || !!tag;

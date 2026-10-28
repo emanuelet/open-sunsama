@@ -56,7 +56,9 @@ export function readFrontmatter(source: string, file: string): PostFrontmatter {
   if (!match?.[1]) throw new Error(`No frontmatter export in ${file}`);
   const data = new Function(`return (${match[1]});`)() as PostFrontmatter;
   if (!data.title || !data.description || !data.date) {
-    throw new Error(`Frontmatter in ${file} is missing title, description or date`);
+    throw new Error(
+      `Frontmatter in ${file} is missing title, description or date`
+    );
   }
   return data;
 }
@@ -85,9 +87,16 @@ const el = (
 const text = (value: string): ElementContent => ({ type: "text", value });
 
 const figure = (media: Element, caption?: string) =>
-  el("figure", {}, caption ? [media, el("figcaption", {}, [text(caption)])] : [media]);
+  el(
+    "figure",
+    {},
+    caption ? [media, el("figcaption", {}, [text(caption)])] : [media]
+  );
 
-type JsxNode = Extract<RootContent, { type: "mdxJsxFlowElement" | "mdxJsxTextElement" }>;
+type JsxNode = Extract<
+  RootContent,
+  { type: "mdxJsxFlowElement" | "mdxJsxTextElement" }
+>;
 
 /** An attribute's value: a string, or a plain literal in braces (rank={2}, ids={["a", "b"]}). */
 function attrValue(node: JsxNode, name: string): unknown {
@@ -110,7 +119,15 @@ function attr(node: JsxNode, name: string): string | undefined {
 
 const link = (url: string, label: string, follow = false): Element => {
   const { href, target, rel } = outboundLink(url, follow);
-  return el("a", { href, ...(target ? { target } : {}), ...(rel ? { rel: rel.split(" ") } : {}) }, [text(label)]);
+  return el(
+    "a",
+    {
+      href,
+      ...(target ? { target } : {}),
+      ...(rel ? { rel: rel.split(" ") } : {}),
+    },
+    [text(label)]
+  );
 };
 
 /** The used <OssApp>s and <OssTable>s, for the ItemList JSON-LD. */
@@ -120,7 +137,11 @@ export interface OssUsage {
 }
 
 /** Mirrors components/blog/media/oss-app.tsx: the same facts, links and credit. */
-function renderOssApp(app: OssApp, rank: number | undefined, bestFor: string | undefined): Element {
+function renderOssApp(
+  app: OssApp,
+  rank: number | undefined,
+  bestFor: string | undefined
+): Element {
   const checked = monthYear(app.checkedAt);
   const shot = app.screenshot;
   const title = `${rank != null ? `${rank}. ` : ""}${app.name}`;
@@ -131,12 +152,20 @@ function renderOssApp(app: OssApp, rank: number | undefined, bestFor: string | u
   const children: ElementContent[] = [
     el("p", {}, [
       el("strong", {}, [text(title)]),
-      ...(app.status !== "active" ? [text(` (${STATUS_LABELS[app.status]})`)] : []),
+      ...(app.status !== "active"
+        ? [text(` (${STATUS_LABELS[app.status]})`)]
+        : []),
     ]),
     el("p", {}, [text(app.tagline)]),
   ];
-  if (bestFor) children.push(el("p", {}, [el("strong", {}, [text("Best for:")]), text(` ${bestFor}`)]));
-  if (app.caveat) children.push(el("p", {}, [el("strong", {}, [text("Note:")]), text(` ${app.caveat}`)]));
+  if (bestFor)
+    children.push(
+      el("p", {}, [el("strong", {}, [text("Best for:")]), text(` ${bestFor}`)])
+    );
+  if (app.caveat)
+    children.push(
+      el("p", {}, [el("strong", {}, [text("Note:")]), text(` ${app.caveat}`)])
+    );
   if (shot.light) {
     children.push(
       figure(
@@ -156,17 +185,25 @@ function renderOssApp(app: OssApp, rank: number | undefined, bestFor: string | u
     el("dl", {}, [
       ...fact("License", [
         link(licenseUrl(app), licenseShort(app)),
-        ...(licenseShort(app) !== app.license.name ? [text(` (${app.license.name})`)] : []),
+        ...(licenseShort(app) !== app.license.name
+          ? [text(` (${app.license.name})`)]
+          : []),
       ]),
       ...fact("Stars", [text(`${formatStars(app.stars)} (as of ${checked})`)]),
       ...fact("Latest release", [
-        text(app.latestRelease ? `${app.latestRelease.version} (${monthYear(app.latestRelease.date)})` : "No tagged releases"),
+        text(
+          app.latestRelease
+            ? `${app.latestRelease.version} (${monthYear(app.latestRelease.date)})`
+            : "No tagged releases"
+        ),
       ]),
       ...fact("Language", [text(app.primaryLanguage ?? "n/a")]),
       ...fact("Platforms", [text(platformList(app))]),
       ...fact("Self-host", [text(app.selfHost ?? "No server")]),
       ...fact("API", [text(app.api.length ? app.api.join(", ") : "None")]),
-      ...fact("MCP", [app.mcp.url ? link(app.mcp.url, mcpLabel(app)) : text(mcpLabel(app))]),
+      ...fact("MCP", [
+        app.mcp.url ? link(app.mcp.url, mcpLabel(app)) : text(mcpLabel(app)),
+      ]),
     ]),
     el("p", {}, [
       link(app.repo, "Source code", true),
@@ -185,23 +222,44 @@ function renderOssTable(apps: OssApp[]): Element {
     el(
       "tr",
       {},
-      values.map((v) => el(tag, tag === "th" ? { scope: "col" } : {}, [typeof v === "string" ? text(v) : v]))
+      values.map((v) =>
+        el(tag, tag === "th" ? { scope: "col" } : {}, [
+          typeof v === "string" ? text(v) : v,
+        ])
+      )
     );
   const checked = monthYear(apps.map((a) => a.checkedAt).sort()[0]);
   return figure(
     el("table", {}, [
       el("thead", {}, [
-        cells("th", ["App", "License", "Stars", "Latest release", "Platforms", "Self-host", "API", "MCP"]),
+        cells("th", [
+          "App",
+          "License",
+          "Stars",
+          "Latest release",
+          "Platforms",
+          "Self-host",
+          "API",
+          "MCP",
+        ]),
       ]),
       el(
         "tbody",
         {},
         apps.map((app) =>
           cells("td", [
-            link(app.repo, app.status === "active" ? app.name : `${app.name} (${STATUS_LABELS[app.status]})`, true),
+            link(
+              app.repo,
+              app.status === "active"
+                ? app.name
+                : `${app.name} (${STATUS_LABELS[app.status]})`,
+              true
+            ),
             licenseShort(app),
             formatStars(app.stars),
-            app.latestRelease ? `${app.latestRelease.version} (${monthYear(app.latestRelease.date)})` : "None",
+            app.latestRelease
+              ? `${app.latestRelease.version} (${monthYear(app.latestRelease.date)})`
+              : "None",
             platformList(app),
             app.selfHost ?? "No",
             app.api.length ? app.api.join(", ") : "None",
@@ -218,7 +276,11 @@ function renderOssTable(apps: OssApp[]): Element {
  * The HTML each media component stands for, mirroring what
  * src/components/blog/media renders (light theme, same captions).
  */
-function renderMedia(node: JsxNode, videosUsed: Set<string>, oss: OssUsage): Element | null {
+function renderMedia(
+  node: JsxNode,
+  videosUsed: Set<string>,
+  oss: OssUsage
+): Element | null {
   const id = attr(node, "id") ?? "";
   const caption = attr(node, "caption");
 
@@ -233,7 +295,9 @@ function renderMedia(node: JsxNode, videosUsed: Set<string>, oss: OssUsage): Ele
 
   if (node.name === "OssTable") {
     const ids = attrValue(node, "ids");
-    const apps = Array.isArray(ids) ? tableOrder(ids.filter((i): i is string => typeof i === "string")) : [];
+    const apps = Array.isArray(ids)
+      ? tableOrder(ids.filter((i): i is string => typeof i === "string"))
+      : [];
     if (!apps.length) return null;
     oss.tables.push(apps.map((a) => a.id));
     return renderOssTable(apps);
@@ -279,7 +343,15 @@ function renderMedia(node: JsxNode, videosUsed: Set<string>, oss: OssUsage): Ele
     if (!video) return null;
     videosUsed.add(id);
     const track = video.captions
-      ? [el("track", { kind: "captions", src: video.captions, srcLang: "en", label: "English", default: true })]
+      ? [
+          el("track", {
+            kind: "captions",
+            src: video.captions,
+            srcLang: "en",
+            label: "English",
+            default: true,
+          }),
+        ]
       : [];
     return figure(
       el(
@@ -316,23 +388,32 @@ function mapMdxNodes(videosUsed: Set<string>, oss: OssUsage) {
           return [];
         case "mdxJsxFlowElement":
         case "mdxJsxTextElement": {
-          if (!node.name || !MEDIA.has(node.name)) return walk(node.children as RootContent[]);
+          if (!node.name || !MEDIA.has(node.name))
+            return walk(node.children as RootContent[]);
           const media = renderMedia(node, videosUsed, oss);
           if (!media) {
-            console.warn(`  <${node.name} id="${attr(node, "id")}"> is not in blog-media.json or oss-apps.json; skipped`);
+            console.warn(
+              `  <${node.name} id="${attr(node, "id")}"> is not in blog-media.json or oss-apps.json; skipped`
+            );
             return [];
           }
           // mdast-util-to-hast turns an unknown node into its data.hName/hProperties/hChildren
           return [
             {
               type: "blogMedia",
-              data: { hName: media.tagName, hProperties: media.properties, hChildren: media.children },
+              data: {
+                hName: media.tagName,
+                hProperties: media.properties,
+                hChildren: media.children,
+              },
             } as unknown as RootContent,
           ];
         }
         default:
           if ("children" in node) {
-            (node as { children: RootContent[] }).children = walk(node.children as RootContent[]);
+            (node as { children: RootContent[] }).children = walk(
+              node.children as RootContent[]
+            );
           }
           return [node];
       }
@@ -352,16 +433,22 @@ export const headingId = (value: string) =>
 
 function textOf(node: ElementContent | HastRoot): string {
   if (node.type === "text") return node.value;
-  return "children" in node ? node.children.map((c) => textOf(c as ElementContent)).join("") : "";
+  return "children" in node
+    ? node.children.map((c) => textOf(c as ElementContent)).join("")
+    : "";
 }
 
 function addHeadingIds() {
   return (tree: HastRoot) => {
     const visit = (node: HastRoot | ElementContent) => {
-      if (node.type === "element" && (node.tagName === "h2" || node.tagName === "h3")) {
+      if (
+        node.type === "element" &&
+        (node.tagName === "h2" || node.tagName === "h3")
+      ) {
         node.properties.id ??= headingId(textOf(node));
       }
-      if ("children" in node) node.children.forEach((c) => visit(c as ElementContent));
+      if ("children" in node)
+        node.children.forEach((c) => visit(c as ElementContent));
     };
     visit(tree);
   };

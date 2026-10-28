@@ -12,7 +12,9 @@ describe("parseSubtaskTitles", () => {
 
   it("strips bullet, checkbox and number markers", () => {
     expect(
-      parseSubtaskTitles("- [ ] Buy milk\n* Call Sam\n• Book\n1. First\n2) Second\n[x] Done")
+      parseSubtaskTitles(
+        "- [ ] Buy milk\n* Call Sam\n• Book\n1. First\n2) Second\n[x] Done"
+      )
     ).toEqual(["Buy milk", "Call Sam", "Book", "First", "Second", "Done"]);
   });
 

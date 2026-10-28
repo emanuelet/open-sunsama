@@ -6,13 +6,13 @@ Guide for building and releasing the Open Sunsama desktop app across all platfor
 
 ## Quick Reference
 
-| Action | Command |
-|--------|---------|
-| **Release** | `bun run release` (patch), `bun run release minor`, or `bun run release 1.2.3` |
-| **Rebuild a version** | GitHub → Actions → Desktop Release → Run workflow → version `1.x.x` |
-| **Re-run one platform** | Open the failed run → **Re-run failed jobs** (the API upserts, so re-runs are safe) |
-| **Check Status** | https://github.com/ShadowWalker2014/open-sunsama/actions/workflows/desktop-release.yml |
-| **Downloads Page** | https://opensunsama.com/download |
+| Action                  | Command                                                                                |
+| ----------------------- | -------------------------------------------------------------------------------------- |
+| **Release**             | `bun run release` (patch), `bun run release minor`, or `bun run release 1.2.3`         |
+| **Rebuild a version**   | GitHub → Actions → Desktop Release → Run workflow → version `1.x.x`                    |
+| **Re-run one platform** | Open the failed run → **Re-run failed jobs** (the API upserts, so re-runs are safe)    |
+| **Check Status**        | https://github.com/ShadowWalker2014/open-sunsama/actions/workflows/desktop-release.yml |
+| **Downloads Page**      | https://opensunsama.com/download                                                       |
 
 ---
 
@@ -43,12 +43,12 @@ bun run release
 
 ## Build Outputs
 
-| Platform | Architecture | File Type | Location |
-|----------|--------------|-----------|----------|
-| macOS | Apple Silicon (arm64) | `.dmg` | `releases/v{version}/` |
-| macOS | Intel (x64) | `.dmg` | `releases/v{version}/` |
-| Windows | x64 | `.exe` (NSIS) | `releases/v{version}/` |
-| Linux | x64 | `.AppImage` | `releases/v{version}/` |
+| Platform | Architecture          | File Type     | Location               |
+| -------- | --------------------- | ------------- | ---------------------- |
+| macOS    | Apple Silicon (arm64) | `.dmg`        | `releases/v{version}/` |
+| macOS    | Intel (x64)           | `.dmg`        | `releases/v{version}/` |
+| Windows  | x64                   | `.exe` (NSIS) | `releases/v{version}/` |
+| Linux    | x64                   | `.AppImage`   | `releases/v{version}/` |
 
 ---
 
@@ -58,21 +58,21 @@ bun run release
 
 Location: **Repo → Settings → Secrets and variables → Actions**
 
-| Secret | Description |
-|--------|-------------|
-| `AWS_S3_BUCKET_NAME` | Railway S3 bucket name |
-| `AWS_ACCESS_KEY_ID` | S3 access key |
-| `AWS_SECRET_ACCESS_KEY` | S3 secret key |
-| `AWS_ENDPOINT_URL` | Railway S3 endpoint |
-| `AWS_DEFAULT_REGION` | S3 region (e.g., `us-east-1`) |
-| `RELEASE_SECRET` | API auth for registering releases |
+| Secret                  | Description                       |
+| ----------------------- | --------------------------------- |
+| `AWS_S3_BUCKET_NAME`    | Railway S3 bucket name            |
+| `AWS_ACCESS_KEY_ID`     | S3 access key                     |
+| `AWS_SECRET_ACCESS_KEY` | S3 secret key                     |
+| `AWS_ENDPOINT_URL`      | Railway S3 endpoint               |
+| `AWS_DEFAULT_REGION`    | S3 region (e.g., `us-east-1`)     |
+| `RELEASE_SECRET`        | API auth for registering releases |
 
 ### Railway API Environment Variables
 
 Location: **Railway → API Service → Variables**
 
-| Variable | Description |
-|----------|-------------|
+| Variable         | Description              |
+| ---------------- | ------------------------ |
 | `RELEASE_SECRET` | Must match GitHub secret |
 
 ### Generate RELEASE_SECRET
@@ -85,12 +85,12 @@ openssl rand -base64 32
 
 ## API Endpoints
 
-| Endpoint | Method | Auth | Description |
-|----------|--------|------|-------------|
-| `/releases` | GET | Public | List all releases |
-| `/releases/latest` | GET | Public | Latest release per platform |
-| `/releases/:platform` | GET | Public | Latest for specific platform |
-| `/releases` | POST | `X-Release-Secret` | Register new release (CI only) |
+| Endpoint              | Method | Auth               | Description                    |
+| --------------------- | ------ | ------------------ | ------------------------------ |
+| `/releases`           | GET    | Public             | List all releases              |
+| `/releases/latest`    | GET    | Public             | Latest release per platform    |
+| `/releases/:platform` | GET    | Public             | Latest for specific platform   |
+| `/releases`           | POST   | `X-Release-Secret` | Register new release (CI only) |
 
 ---
 
@@ -141,10 +141,12 @@ cd apps/desktop && bun run tauri build
 Location: `.github/workflows/desktop-release.yml`
 
 Triggers:
+
 - Push tags matching `v*`
 - Manual workflow dispatch
 
 Matrix builds:
+
 - `macos-latest` (builds both arm64 and x64)
 - `ubuntu-22.04` (Linux)
 - `windows-latest` (Windows)

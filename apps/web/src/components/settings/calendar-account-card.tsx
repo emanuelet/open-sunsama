@@ -67,7 +67,11 @@ export function SyncStatusBadge({
 
   if (status === "error") {
     return (
-      <Badge variant="destructive" className="gap-1" title={syncError || undefined}>
+      <Badge
+        variant="destructive"
+        className="gap-1"
+        title={syncError || undefined}
+      >
         <AlertCircle className="h-3 w-3" />
         Error
       </Badge>
@@ -146,9 +150,7 @@ export function CalendarItem({
         <button
           type="button"
           onClick={onSetDefaultEvents}
-          disabled={
-            isUpdating || !calendar.isEnabled || calendar.isReadOnly
-          }
+          disabled={isUpdating || !calendar.isEnabled || calendar.isReadOnly}
           className={cn(
             "flex h-7 items-center gap-1 rounded-md border px-2 text-xs transition-colors",
             defaultForEvents
@@ -278,9 +280,7 @@ export function AccountCard({
             disabled={isSyncing || account.syncStatus === "syncing"}
             title="Sync now"
           >
-            <RefreshCw
-              className={cn("h-4 w-4", isSyncing && "animate-spin")}
-            />
+            <RefreshCw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -315,7 +315,9 @@ export function AccountCard({
           account.syncStatus === "syncing" || isSyncing ? (
             <div className="flex items-center justify-center gap-2 py-4">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Syncing calendars...</span>
+              <span className="text-sm text-muted-foreground">
+                Syncing calendars...
+              </span>
             </div>
           ) : !account.lastSyncedAt ? (
             <p className="py-4 text-center text-sm text-muted-foreground">
@@ -334,7 +336,9 @@ export function AccountCard({
               defaultForEvents={calendar.isDefaultForEvents}
               defaultForTasks={calendar.isDefaultForTasks}
               onToggleEnabled={() =>
-                onUpdateCalendar(calendar.id, { isEnabled: !calendar.isEnabled })
+                onUpdateCalendar(calendar.id, {
+                  isEnabled: !calendar.isEnabled,
+                })
               }
               onSetDefaultEvents={() => handleSetDefaultEvents(calendar.id)}
               onSetDefaultTasks={() => handleSetDefaultTasks(calendar.id)}

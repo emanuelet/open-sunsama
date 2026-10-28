@@ -17,8 +17,13 @@ export function safeEqual(a: string, b: string): boolean {
 const PKCE_VERIFIER = /^[A-Za-z0-9\-._~]{43,128}$/;
 
 /** RFC 7636 S256: BASE64URL(SHA256(verifier)) === challenge */
-export function verifyPkceS256(codeVerifier: string, codeChallenge: string): boolean {
+export function verifyPkceS256(
+  codeVerifier: string,
+  codeChallenge: string
+): boolean {
   if (!PKCE_VERIFIER.test(codeVerifier)) return false;
-  const computed = createHash("sha256").update(codeVerifier).digest("base64url");
+  const computed = createHash("sha256")
+    .update(codeVerifier)
+    .digest("base64url");
   return safeEqual(computed, codeChallenge);
 }

@@ -32,7 +32,12 @@ interface CommandPaletteProps {
   onAddTask: () => void;
 }
 
-export function CommandPalette({ open, onOpenChange, onSelectTask, onAddTask }: CommandPaletteProps) {
+export function CommandPalette({
+  open,
+  onOpenChange,
+  onSelectTask,
+  onAddTask,
+}: CommandPaletteProps) {
   const [query, setQuery] = React.useState("");
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [debouncedQuery, setDebouncedQuery] = React.useState("");
@@ -42,9 +47,9 @@ export function CommandPalette({ open, onOpenChange, onSelectTask, onAddTask }: 
 
   const createTask = useCreateTask();
   const navigate = useNavigate();
-  const commandContext = useCommandContext({ 
-    onAddTask, 
-    closeSearch: () => onOpenChange(false) 
+  const commandContext = useCommandContext({
+    onAddTask,
+    closeSearch: () => onOpenChange(false),
   });
 
   React.useEffect(() => {
@@ -53,11 +58,10 @@ export function CommandPalette({ open, onOpenChange, onSelectTask, onAddTask }: 
   }, [query]);
 
   // Combine all commands
-  const allCommands = React.useMemo(() => [
-    ...TASK_COMMANDS,
-    ...MCP_COMMANDS,
-    ...COMMANDS,
-  ], []);
+  const allCommands = React.useMemo(
+    () => [...TASK_COMMANDS, ...MCP_COMMANDS, ...COMMANDS],
+    []
+  );
 
   // Use contextual filtering instead of simple filterCommands
   const filteredCommands = React.useMemo(
@@ -120,8 +124,8 @@ export function CommandPalette({ open, onOpenChange, onSelectTask, onAddTask }: 
     if (isCreating || !debouncedQuery.trim()) return;
     setIsCreating(true);
     try {
-      const newTask = await createTask.mutateAsync({ 
-        title: debouncedQuery.trim(), 
+      const newTask = await createTask.mutateAsync({
+        title: debouncedQuery.trim(),
         priority: "P2",
         scheduledDate: format(new Date(), "yyyy-MM-dd"),
       });
@@ -220,7 +224,9 @@ export function CommandPalette({ open, onOpenChange, onSelectTask, onAddTask }: 
             placeholder="Search tasks, ideas, events — or run a command…"
             className="flex-1 bg-transparent text-[13px] outline-hidden placeholder:text-muted-foreground/60"
           />
-          {isSearchingTasks && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground/60" />}
+          {isSearchingTasks && (
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground/60" />
+          )}
         </div>
 
         {/* Sections can stack (commands + tasks + ideas + events), so the list
@@ -249,7 +255,7 @@ export function CommandPalette({ open, onOpenChange, onSelectTask, onAddTask }: 
                       </span>
                     </div>
                   )}
-                  
+
                   {/* Section header */}
                   <div className="px-3 py-1.5 text-[11px] font-medium text-muted-foreground/70 uppercase tracking-wider flex items-center gap-1.5">
                     {!query.trim() ? (
@@ -350,9 +356,15 @@ export function CommandPalette({ open, onOpenChange, onSelectTask, onAddTask }: 
 
         <div className="flex items-center justify-between px-3 py-1.5 border-t bg-muted/20 text-[11px] text-muted-foreground">
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-0.5"><Kbd>↑↓</Kbd> navigate</span>
-            <span className="flex items-center gap-0.5"><Kbd>↵</Kbd> select</span>
-            <span className="flex items-center gap-0.5"><Kbd>esc</Kbd> close</span>
+            <span className="flex items-center gap-0.5">
+              <Kbd>↑↓</Kbd> navigate
+            </span>
+            <span className="flex items-center gap-0.5">
+              <Kbd>↵</Kbd> select
+            </span>
+            <span className="flex items-center gap-0.5">
+              <Kbd>esc</Kbd> close
+            </span>
           </div>
         </div>
       </DialogContent>
@@ -393,7 +405,8 @@ function formatTaskDate(scheduledDate: string | null | undefined) {
 function formatEventWhen(startTime: string, isAllDay: boolean) {
   const start = new Date(startTime);
   if (isAllDay) return format(start, "MMM d");
-  if (isSameDay(start, new Date())) return format(start, "h:mm a").toLowerCase();
+  if (isSameDay(start, new Date()))
+    return format(start, "h:mm a").toLowerCase();
   return format(start, "MMM d");
 }
 

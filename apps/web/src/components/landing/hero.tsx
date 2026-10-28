@@ -1,11 +1,25 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Calendar, Command, LayoutGrid, Play, Sparkles, Timer } from "lucide-react";
+import {
+  ArrowRight,
+  Calendar,
+  Command,
+  LayoutGrid,
+  Play,
+  Sparkles,
+  Timer,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { clockDuration } from "@/lib/blog-media";
 import { cn } from "@/lib/utils";
 import { BorderBeam } from "./border-beam";
-import { HeadlineReveal, introStyle, useIntro, useReducedMotion, useScrollProgress } from "./motion";
+import {
+  HeadlineReveal,
+  introStyle,
+  useIntro,
+  useReducedMotion,
+  useScrollProgress,
+} from "./motion";
 import { BrowserFrame, ThemedShot, type ShotName } from "./product-shot";
 import { getVideo, VideoLightbox } from "./video-lightbox";
 
@@ -14,7 +28,12 @@ const HEADLINE = [
   { text: "done right.", accent: true },
 ];
 
-const VIEWS: Array<{ id: ShotName; label: string; icon: typeof LayoutGrid; alt: string }> = [
+const VIEWS: Array<{
+  id: ShotName;
+  label: string;
+  icon: typeof LayoutGrid;
+  alt: string;
+}> = [
   {
     id: "board",
     label: "Board",
@@ -27,7 +46,12 @@ const VIEWS: Array<{ id: ShotName; label: string; icon: typeof LayoutGrid; alt: 
     icon: Calendar,
     alt: "Week calendar with color-coded time blocks",
   },
-  { id: "focus", label: "Focus", icon: Timer, alt: "Focus mode with a running timer" },
+  {
+    id: "focus",
+    label: "Focus",
+    icon: Timer,
+    alt: "Focus mode with a running timer",
+  },
   {
     id: "command-palette",
     label: "Search",
@@ -37,7 +61,14 @@ const VIEWS: Array<{ id: ShotName; label: string; icon: typeof LayoutGrid; alt: 
 ];
 
 const AUTOPLAY_MS = 4800;
-export const WORKS_WITH = ["Claude", "ChatGPT", "Claude Code", "Cursor", "VS Code", "Any MCP client"];
+export const WORKS_WITH = [
+  "Claude",
+  "ChatGPT",
+  "Claude Code",
+  "Cursor",
+  "VS Code",
+  "Any MCP client",
+];
 
 function Showcase({ ready, reduced }: { ready: boolean; reduced: boolean }) {
   const [active, setActive] = React.useState(0);
@@ -46,7 +77,10 @@ function Showcase({ ready, reduced }: { ready: boolean; reduced: boolean }) {
 
   React.useEffect(() => {
     if (paused || reduced || !ready) return;
-    const id = window.setTimeout(() => setActive((i) => (i + 1) % VIEWS.length), AUTOPLAY_MS);
+    const id = window.setTimeout(
+      () => setActive((i) => (i + 1) % VIEWS.length),
+      AUTOPLAY_MS
+    );
     return () => window.clearTimeout(id);
   }, [active, paused, reduced, ready]);
 
@@ -57,7 +91,8 @@ function Showcase({ ready, reduced }: { ready: boolean; reduced: boolean }) {
         reduced
           ? undefined
           : {
-              transition: "opacity 1000ms cubic-bezier(0.2,0.8,0.2,1), transform 1200ms cubic-bezier(0.2,0.8,0.2,1)",
+              transition:
+                "opacity 1000ms cubic-bezier(0.2,0.8,0.2,1), transform 1200ms cubic-bezier(0.2,0.8,0.2,1)",
               transitionDelay: "520ms",
               opacity: ready ? 1 : 0,
               transform: ready ? "none" : "translateY(48px)",
@@ -91,11 +126,17 @@ function Showcase({ ready, reduced }: { ready: boolean; reduced: boolean }) {
                   key={view.id}
                   className={cn(
                     "absolute inset-0 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.2,0.8,0.2,1)]",
-                    i === active ? "opacity-100 transform-none" : "opacity-0 transform-[scale(1.015)]"
+                    i === active
+                      ? "opacity-100 transform-none"
+                      : "opacity-0 transform-[scale(1.015)]"
                   )}
                   aria-hidden={i !== active}
                 >
-                  <ThemedShot name={view.id} alt={view.alt} priority={i === 0} />
+                  <ThemedShot
+                    name={view.id}
+                    alt={view.alt}
+                    priority={i === 0}
+                  />
                 </div>
               ))}
             </div>
@@ -114,8 +155,12 @@ function Showcase({ ready, reduced }: { ready: boolean; reduced: boolean }) {
               <Sparkles className="h-3.5 w-3.5" />
             </span>
             <span className="leading-tight">
-              <span className="block text-[12px] font-semibold text-foreground">Claude connected</span>
-              <span className="block text-[11px] text-muted-foreground">Planned 3 blocks for you</span>
+              <span className="block text-[12px] font-semibold text-foreground">
+                Claude connected
+              </span>
+              <span className="block text-[11px] text-muted-foreground">
+                Planned 3 blocks for you
+              </span>
             </span>
           </FloatingChip>
 
@@ -128,10 +173,17 @@ function Showcase({ ready, reduced }: { ready: boolean; reduced: boolean }) {
           >
             <div
               className="w-[204px] rounded-md border-l-[3px] px-2 py-1"
-              style={{ backgroundColor: "rgba(239,68,68,0.15)", borderColor: "rgba(239,68,68,0.6)" }}
+              style={{
+                backgroundColor: "rgba(239,68,68,0.15)",
+                borderColor: "rgba(239,68,68,0.6)",
+              }}
             >
-              <p className="truncate text-sm font-medium text-foreground">Deep work: Q4 roadmap</p>
-              <p className="truncate text-xs text-muted-foreground">9:30 - 11:00 AM</p>
+              <p className="truncate text-sm font-medium text-foreground">
+                Deep work: Q4 roadmap
+              </p>
+              <p className="truncate text-xs text-muted-foreground">
+                9:30 - 11:00 AM
+              </p>
             </div>
           </FloatingChip>
 
@@ -143,9 +195,15 @@ function Showcase({ ready, reduced }: { ready: boolean; reduced: boolean }) {
             reduced={reduced}
           >
             <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_3px_rgb(16_185_129/0.18)]" />
-            <span className="font-mono text-[13px] font-semibold tabular-nums text-foreground">23:02</span>
-            <span className="font-mono text-[12px] text-muted-foreground">/ 1:30</span>
-            <span className="ml-1 text-[11px] text-muted-foreground">Focus</span>
+            <span className="font-mono text-[13px] font-semibold tabular-nums text-foreground">
+              23:02
+            </span>
+            <span className="font-mono text-[12px] text-muted-foreground">
+              / 1:30
+            </span>
+            <span className="ml-1 text-[11px] text-muted-foreground">
+              Focus
+            </span>
           </FloatingChip>
         </div>
       </div>
@@ -173,13 +231,20 @@ function Showcase({ ready, reduced }: { ready: boolean; reduced: boolean }) {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <view.icon className={cn("hidden h-3.5 w-3.5 sm:block", i === active ? "text-primary" : "")} />
+              <view.icon
+                className={cn(
+                  "hidden h-3.5 w-3.5 sm:block",
+                  i === active ? "text-primary" : ""
+                )}
+              />
               <span>{view.label}</span>
               {i === active && !paused && !reduced && ready && (
                 <span
                   key={`progress-${active}`}
                   className="absolute inset-x-3 bottom-0.5 h-[2px] origin-left rounded-full bg-primary/70"
-                  style={{ animation: `landing-progress ${AUTOPLAY_MS}ms linear forwards` }}
+                  style={{
+                    animation: `landing-progress ${AUTOPLAY_MS}ms linear forwards`,
+                  }}
                 />
               )}
             </button>
@@ -209,8 +274,15 @@ export function FloatingChip({
 }) {
   return (
     <div
-      className={cn("pointer-events-none absolute z-10 hidden lg:block", className)}
-      style={reduced ? undefined : { transform: `translateY(calc(var(--p) * ${depth}px))` }}
+      className={cn(
+        "pointer-events-none absolute z-10 hidden lg:block",
+        className
+      )}
+      style={
+        reduced
+          ? undefined
+          : { transform: `translateY(calc(var(--p) * ${depth}px))` }
+      }
     >
       <div
         className="flex items-center gap-2 rounded-xl border border-border/70 bg-background/90 p-2.5 pr-3.5 shadow-[0_12px_40px_-12px_rgb(0_0_0/0.25)] backdrop-blur-md dark:border-white/10 dark:bg-[hsl(228_14%_11%/0.92)]"
@@ -218,7 +290,8 @@ export function FloatingChip({
           reduced
             ? undefined
             : {
-                transition: "opacity 600ms ease, transform 700ms cubic-bezier(0.34,1.56,0.64,1)",
+                transition:
+                  "opacity 600ms ease, transform 700ms cubic-bezier(0.34,1.56,0.64,1)",
                 transitionDelay: `${delay}ms`,
                 opacity: visible ? 1 : 0,
                 transform: visible ? "none" : "translateY(10px) scale(0.92)",
@@ -273,15 +346,20 @@ export function Hero() {
           className="mx-auto mt-6 max-w-2xl text-balance text-[16px] leading-relaxed text-muted-foreground md:text-[18px]"
           style={introStyle(ready, 520, reduced)}
         >
-          The open-source daily planner. Plan your day, block time on your calendar, and focus on one thing
-          at a time. Claude, ChatGPT or any AI agent can plan it with you.
+          The open-source daily planner. Plan your day, block time on your
+          calendar, and focus on one thing at a time. Claude, ChatGPT or any AI
+          agent can plan it with you.
         </p>
 
         <div
           className="mt-8 flex flex-col items-center justify-center gap-2.5 sm:flex-row"
           style={introStyle(ready, 640, reduced)}
         >
-          <Button size="lg" className="h-11 rounded-lg px-5 text-[14px] shadow-[0_8px_24px_-8px_hsl(var(--primary)/0.6)]" asChild>
+          <Button
+            size="lg"
+            className="h-11 rounded-lg px-5 text-[14px] shadow-[0_8px_24px_-8px_hsl(var(--primary)/0.6)]"
+            asChild
+          >
             <Link to="/register">
               Get started
               <ArrowRight className="h-4 w-4" />

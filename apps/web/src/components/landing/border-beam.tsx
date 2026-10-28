@@ -18,7 +18,7 @@ export const BorderBeam = ({
   anchor = 90,
   borderWidth = 1.5,
   colorFrom = "hsl(var(--primary))", // primary color
-  colorTo = "hsl(var(--primary-glow))",   // secondary color
+  colorTo = "hsl(var(--primary-glow))", // secondary color
   delay = 0,
 }: BorderBeamProps) => {
   return (
@@ -42,7 +42,7 @@ export const BorderBeam = ({
 
         // pseudo-element
         "after:absolute after:aspect-square after:w-[calc(var(--size)*1px)] after:animate-border-beam after:[animation-delay:var(--delay)] after:[background:linear-gradient(to_left,var(--color-from),var(--color-to),transparent)] after:[offset-anchor:calc(var(--anchor)*1%)_50%] after:[offset-path:rect(0_auto_auto_0_round_calc(var(--size)*1px))]",
-        className,
+        className
       )}
     />
   );

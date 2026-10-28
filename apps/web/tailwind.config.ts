@@ -3,10 +3,7 @@ import typography from "@tailwindcss/typography";
 
 const config: Config = {
   darkMode: ["class"],
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     container: {
       center: true,
@@ -17,12 +14,25 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-family)', 'system-ui', 'sans-serif'],
-        display: ['"Space Grotesk"', 'var(--font-family)', 'system-ui', 'sans-serif'],
-        geist: ['"Geist"', '"Geist Sans"', 'system-ui', 'sans-serif'],
-        system: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
-        inter: ['"Inter"', 'system-ui', 'sans-serif'],
-        jetbrains: ['"JetBrains Mono"', '"Fira Code"', 'monospace'],
+        sans: ["var(--font-family)", "system-ui", "sans-serif"],
+        display: [
+          '"Space Grotesk"',
+          "var(--font-family)",
+          "system-ui",
+          "sans-serif",
+        ],
+        geist: ['"Geist"', '"Geist Sans"', "system-ui", "sans-serif"],
+        system: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"Segoe UI"',
+          "Roboto",
+          '"Helvetica Neue"',
+          "Arial",
+          "sans-serif",
+        ],
+        inter: ['"Inter"', "system-ui", "sans-serif"],
+        jetbrains: ['"JetBrains Mono"', '"Fira Code"', "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -75,16 +85,18 @@ const config: Config = {
         "2xl": "calc(var(--radius) + 8px)",
       },
       boxShadow: {
-        'glow': 'var(--shadow-glow)',
-        'card': 'var(--shadow-card)',
-        'card-hover': 'var(--shadow-card-hover)',
-        'glow-sm': '0 0 20px hsl(var(--primary-glow) / 0.1)',
-        'glow-lg': '0 0 60px hsl(var(--primary-glow) / 0.3)',
+        glow: "var(--shadow-glow)",
+        card: "var(--shadow-card)",
+        "card-hover": "var(--shadow-card-hover)",
+        "glow-sm": "0 0 20px hsl(var(--primary-glow) / 0.1)",
+        "glow-lg": "0 0 60px hsl(var(--primary-glow) / 0.3)",
       },
       backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-primary': 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-end)))',
-        'gradient-subtle': 'linear-gradient(135deg, hsl(var(--gradient-start) / 0.1), hsl(var(--gradient-end) / 0.1))',
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-primary":
+          "linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-end)))",
+        "gradient-subtle":
+          "linear-gradient(135deg, hsl(var(--gradient-start) / 0.1), hsl(var(--gradient-end) / 0.1))",
       },
       keyframes: {
         "accordion-down": {
@@ -123,7 +135,7 @@ const config: Config = {
           from: { opacity: "0", transform: "scale(0.95)" },
           to: { opacity: "1", transform: "scale(1)" },
         },
-        "float": {
+        float: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
         },
@@ -140,7 +152,7 @@ const config: Config = {
             "offset-distance": "100%",
           },
         },
-        "shimmer": {
+        shimmer: {
           "0%, 90%, 100%": {
             "background-position": "calc(-100% - var(--shimmer-width)) 0",
           },
@@ -159,19 +171,19 @@ const config: Config = {
         "fade-up": "fade-up 0.5s ease-out both",
         "fade-down": "fade-down 0.5s ease-out both",
         "scale-in": "scale-in 0.3s ease-out both",
-        "float": "float 6s ease-in-out infinite",
+        float: "float 6s ease-in-out infinite",
         "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",
         "spin-slow": "spin-slow 20s linear infinite",
         "border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
-        "shimmer": "shimmer 8s infinite",
+        shimmer: "shimmer 8s infinite",
       },
       transitionDuration: {
-        'fast': '150ms',
-        'base': '200ms',
-        'slow': '300ms',
+        fast: "150ms",
+        base: "200ms",
+        slow: "300ms",
       },
       transitionTimingFunction: {
-        'spring': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+        spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
       },
     },
   },

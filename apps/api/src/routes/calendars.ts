@@ -2,8 +2,8 @@
  * Calendar management routes for Open Sunsama API
  * Handles listing calendars and updating calendar settings
  */
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
+import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
 import {
   getDb,
   eq,
@@ -11,100 +11,94 @@ import {
   ne,
   calendars,
   calendarAccounts,
-} from '@open-sunsama/database';
-import { NotFoundError } from '@open-sunsama/utils';
-import { auth, requireScopes, type AuthVariables } from '../middleware/auth.js';
+} from "@open-sunsama/database";
+import { NotFoundError } from "@open-sunsama/utils";
+import { auth, requireScopes, type AuthVariables } from "../middleware/auth.js";
 import {
   calendarIdParamSchema,
   updateCalendarSettingsSchema,
-} from '../validation/calendar.js';
-import { publishEvent } from '../lib/websocket/index.js';
+} from "../validation/calendar.js";
+import { publishEvent } from "../lib/websocket/index.js";
 
 const calendarsRouter = new Hono<{ Variables: AuthVariables }>();
-calendarsRouter.use('*', auth);
+calendarsRouter.use("*", auth);
 
 /**
  * GET /calendars
  * List all calendars grouped by account
  */
-calendarsRouter.get(
-  '/',
-  requireScopes('user:read'),
-  async (c) => {
-    const userId = c.get('userId');
-    const db = getDb();
+calendarsRouter.get("/", requireScopes("user:read"), async (c) => {
+  const userId = c.get("userId");
+  const db = getDb();
 
-    // Fetch accounts
-    const accounts = await db
-      .select({
-        id: calendarAccounts.id,
-        provider: calendarAccounts.provider,
-        email: calendarAccounts.email,
-        isActive: calendarAccounts.isActive,
-      })
-      .from(calendarAccounts)
-      .where(eq(calendarAccounts.userId, userId))
-      .orderBy(calendarAccounts.createdAt);
+  // Fetch accounts
+  const accounts = await db
+    .select({
+      id: calendarAccounts.id,
+      provider: calendarAccounts.provider,
+      email: calendarAccounts.email,
+      isActive: calendarAccounts.isActive,
+    })
+    .from(calendarAccounts)
+    .where(eq(calendarAccounts.userId, userId))
+    .orderBy(calendarAccounts.createdAt);
 
-    // Fetch all calendars for user
-    const allCalendars = await db
-      .select()
-      .from(calendars)
-      .where(eq(calendars.userId, userId))
-      .orderBy(calendars.name);
+  // Fetch all calendars for user
+  const allCalendars = await db
+    .select()
+    .from(calendars)
+    .where(eq(calendars.userId, userId))
+    .orderBy(calendars.name);
 
-    // Group calendars by account
-    const result = accounts.map((account) => ({
-      ...account,
-      calendars: allCalendars
-        .filter((cal) => cal.accountId === account.id)
-        .map((cal) => ({
-          id: cal.id,
-          externalId: cal.externalId,
-          name: cal.name,
-          color: cal.color,
-          isEnabled: cal.isEnabled,
-          isDefaultForEvents: cal.isDefaultForEvents,
-          isDefaultForTasks: cal.isDefaultForTasks,
-          isReadOnly: cal.isReadOnly,
-          createdAt: cal.createdAt,
-          updatedAt: cal.updatedAt,
-        })),
-    }));
+  // Group calendars by account
+  const result = accounts.map((account) => ({
+    ...account,
+    calendars: allCalendars
+      .filter((cal) => cal.accountId === account.id)
+      .map((cal) => ({
+        id: cal.id,
+        externalId: cal.externalId,
+        name: cal.name,
+        color: cal.color,
+        isEnabled: cal.isEnabled,
+        isDefaultForEvents: cal.isDefaultForEvents,
+        isDefaultForTasks: cal.isDefaultForTasks,
+        isReadOnly: cal.isReadOnly,
+        createdAt: cal.createdAt,
+        updatedAt: cal.updatedAt,
+      })),
+  }));
 
-    return c.json({
-      success: true,
-      data: result,
-    });
-  }
-);
+  return c.json({
+    success: true,
+    data: result,
+  });
+});
 
 /**
  * PATCH /calendars/:id
  * Update calendar settings (isEnabled, isDefaultForEvents, isDefaultForTasks)
  */
 calendarsRouter.patch(
-  '/:id',
-  requireScopes('user:write'),
-  zValidator('param', calendarIdParamSchema),
-  zValidator('json', updateCalendarSettingsSchema),
+  "/:id",
+  requireScopes("user:write"),
+  zValidator("param", calendarIdParamSchema),
+  zValidator("json", updateCalendarSettingsSchema),
   async (c) => {
-    const userId = c.get('userId');
-    const { id } = c.req.valid('param');
-    const updates = c.req.valid('json');
+    const userId = c.get("userId");
+    const { id } = c.req.valid("param");
+    const updates = c.req.valid("json");
     const db = getDb();
 
     // Verify calendar belongs to user
     const [calendar] = await db
       .select()
       .from(calendars)
-      .where(
-        and(eq(calendars.id, id), eq(calendars.userId, userId))
-      )
+      .where(and(eq(calendars.id, id), eq(calendars.userId, userId)))
       .limit(1);
 
     if (!calendar) {
-      throw new NotFoundError('Calendar', id);
+      throw new NotFoundError("Calendar", id);
     }
 
     // Server-side guard: a read-only calendar can't be the default
@@ -112,17 +106,13 @@ calendarsRouter.patch(
     // The settings UI already disables this button (per PR #33), but
     // any non-UI client (mobile, MCP, scripted) would otherwise be
     // able to set it and produce confusing failures down the line.
-    if (
-      updates.isDefaultForEvents === true &&
-      calendar.isReadOnly
-    ) {
+    if (updates.isDefaultForEvents === true && calendar.isReadOnly) {
       return c.json(
         {
           success: false,
           error: {
-            code: 'CALENDAR_READ_ONLY',
-            message:
-              "Read-only calendars can't be the default for new events.",
+            code: "CALENDAR_READ_ONLY",
+            message: "Read-only calendars can't be the default for new events.",
           },
         },
         409
@@ -130,17 +120,13 @@ calendarsRouter.patch(
     }
     // Same guard for tasks default — can't put your tasks under a
     // read-only calendar either.
-    if (
-      updates.isDefaultForTasks === true &&
-      calendar.isReadOnly
-    ) {
+    if (updates.isDefaultForTasks === true && calendar.isReadOnly) {
       return c.json(
         {
           success: false,
           error: {
-            code: 'CALENDAR_READ_ONLY',
-            message:
-              "Read-only calendars can't be the default for tasks.",
+            code: "CALENDAR_READ_ONLY",
+            message: "Read-only calendars can't be the default for tasks.",
           },
         },
         409
@@ -199,7 +185,7 @@ calendarsRouter.patch(
       .returning();
 
     // Publish realtime event
-    publishEvent(userId, 'calendar:updated', {
+    publishEvent(userId, "calendar:updated", {
       calendarId: id,
       changes: Object.keys(updates),
     });

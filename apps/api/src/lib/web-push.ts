@@ -3,13 +3,14 @@
  * Handles sending push notifications to subscribed browsers
  */
 
-import webpush from 'web-push';
-import { getDb, eq, pushSubscriptions } from '@open-sunsama/database';
+import webpush from "web-push";
+import { getDb, eq, pushSubscriptions } from "@open-sunsama/database";
 
 // VAPID keys for authentication with push services
 const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
-const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:admin@opensunsama.com';
+const VAPID_SUBJECT =
+  process.env.VAPID_SUBJECT || "mailto:admin@opensunsama.com";
 
 // Track if VAPID is configured
 let vapidConfigured = false;
@@ -20,17 +21,19 @@ let vapidConfigured = false;
  */
 export function initWebPush(): boolean {
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    console.warn('[WebPush] VAPID keys not configured - push notifications disabled');
+    console.warn(
+      "[WebPush] VAPID keys not configured - push notifications disabled"
+    );
     return false;
   }
 
   try {
     webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
     vapidConfigured = true;
-    console.log('[WebPush] Initialized with VAPID keys');
+    console.log("[WebPush] Initialized with VAPID keys");
     return true;
   } catch (error) {
-    console.error('[WebPush] Failed to initialize:', error);
+    console.error("[WebPush] Failed to initialize:", error);
     return false;
   }
 }
@@ -75,7 +78,7 @@ export async function sendPushNotification(
   payload: PushNotificationPayload
 ): Promise<{ success: boolean; error?: string }> {
   if (!vapidConfigured) {
-    return { success: false, error: 'Web push not configured' };
+    return { success: false, error: "Web push not configured" };
   }
 
   const pushSubscription = {
@@ -99,15 +102,21 @@ export async function sendPushNotification(
         await db
           .delete(pushSubscriptions)
           .where(eq(pushSubscriptions.endpoint, subscription.endpoint));
-        
-        return { success: false, error: 'Subscription expired or invalid - removed' };
+
+        return {
+          success: false,
+          error: "Subscription expired or invalid - removed",
+        };
       }
-      return { success: false, error: `Push failed: ${error.message} (${error.statusCode})` };
+      return {
+        success: false,
+        error: `Push failed: ${error.message} (${error.statusCode})`,
+      };
     }
 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
@@ -120,7 +129,7 @@ export async function sendPushToUser(
   payload: PushNotificationPayload
 ): Promise<{ sent: number; failed: number; errors: string[] }> {
   if (!vapidConfigured) {
-    return { sent: 0, failed: 0, errors: ['Web push not configured'] };
+    return { sent: 0, failed: 0, errors: ["Web push not configured"] };
   }
 
   const db = getDb();
@@ -161,19 +170,19 @@ export async function sendTaskReminderPush(
   task: { id: string; title: string; scheduledTime?: string | null }
 ): Promise<void> {
   const payload: PushNotificationPayload = {
-    title: 'Task Reminder',
+    title: "Task Reminder",
     body: task.title,
-    icon: '/android-chrome-192x192.png',
-    badge: '/favicon-32x32.png',
+    icon: "/android-chrome-192x192.png",
+    badge: "/favicon-32x32.png",
     tag: `task-reminder-${task.id}`,
     data: {
-      type: 'task-reminder',
+      type: "task-reminder",
       taskId: task.id,
       url: `/tasks?task=${task.id}`,
     },
     actions: [
-      { action: 'complete', title: 'Mark Complete' },
-      { action: 'snooze', title: 'Snooze 15min' },
+      { action: "complete", title: "Mark Complete" },
+      { action: "snooze", title: "Snooze 15min" },
     ],
     requireInteraction: true,
   };

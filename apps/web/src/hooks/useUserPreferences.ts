@@ -34,7 +34,10 @@ export function useSavePreferences() {
       }
     },
     onError: (error) => {
-      console.error("[useSavePreferences] Failed to save to server:", error.message);
+      console.error(
+        "[useSavePreferences] Failed to save to server:",
+        error.message
+      );
     },
   });
 }

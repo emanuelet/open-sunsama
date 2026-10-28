@@ -3,7 +3,9 @@ import { projectTaskStarts } from "./task-projection";
 
 const at = (h: number, m = 0) => new Date(2026, 8, 29, h, m);
 const hhmm = (d?: Date) =>
-  d ? `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}` : undefined;
+  d
+    ? `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`
+    : undefined;
 
 describe("projectTaskStarts", () => {
   const base = {

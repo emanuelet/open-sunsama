@@ -8,7 +8,12 @@ const today = new Date().toISOString().slice(0, 10); // the browser runs in UTC
 
 type Session = { token: string; user: unknown };
 
-async function api<T>(method: string, path: string, body?: unknown, token?: string): Promise<T> {
+async function api<T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  token?: string
+): Promise<T> {
   const res = await fetch(`${API}${path}`, {
     method,
     headers: {
@@ -18,13 +23,20 @@ async function api<T>(method: string, path: string, body?: unknown, token?: stri
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const json = await res.json();
-  if (!res.ok) throw new Error(`${method} ${path} → ${res.status}: ${JSON.stringify(json)}`);
+  if (!res.ok)
+    throw new Error(
+      `${method} ${path} → ${res.status}: ${JSON.stringify(json)}`
+    );
   return json.data as T;
 }
 
 async function register(): Promise<Session & { email: string }> {
   const email = `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
-  const session = await api<Session>("POST", "/auth/register", { email, password: PASSWORD, name: "E2E User" });
+  const session = await api<Session>("POST", "/auth/register", {
+    email,
+    password: PASSWORD,
+    name: "E2E User",
+  });
   return { ...session, email };
 }
 
@@ -45,8 +57,7 @@ test.afterEach(() => {
   expect(uncaught, "uncaught errors in the page").toEqual([]);
 });
 
-const todayColumn = (page: Page) =>
-  page.locator(`[data-board-day="${today}"]`);
+const todayColumn = (page: Page) => page.locator(`[data-board-day="${today}"]`);
 
 test("signs in with email and password", async ({ page }) => {
   const { email } = await register();
@@ -69,7 +80,9 @@ test("creates a task, adds a subtask and completes it", async ({ page }) => {
   await composer.getByRole("textbox", { name: "Task title" }).fill(title);
   // Tab starts a subtask line; Enter on the empty line after it adds the task.
   await page.keyboard.press("Tab");
-  await composer.getByRole("textbox", { name: "Subtask 1" }).fill("Collect feedback");
+  await composer
+    .getByRole("textbox", { name: "Subtask 1" })
+    .fill("Collect feedback");
   // The card shows before the save lands; wait for the subtask save, which
   // runs after the task's, so the reload below proves both were stored.
   const subtaskSaved = page.waitForResponse(
@@ -104,39 +117,91 @@ test("creates a task, adds a subtask and completes it", async ({ page }) => {
   await expect(page.getByText(/^Completed \(1\)/)).toBeVisible();
   expect((await completed).ok()).toBe(true);
 
-  const tasks = await api<Array<{ title: string; completedAt: string | null; id: string }>>(
+  const tasks = await api<
+    Array<{ title: string; completedAt: string | null; id: string }>
+  >("GET", `/tasks?from=${today}&to=${today}`, undefined, session.token);
+  const saved = tasks.find((t) => t.title === title);
+  expect(saved?.completedAt, "task is completed in the database").toBeTruthy();
+  const subtasks = await api<Array<{ title: string }>>(
     "GET",
-    `/tasks?from=${today}&to=${today}`,
+    `/tasks/${saved!.id}/subtasks`,
     undefined,
     session.token
   );
-  const saved = tasks.find((t) => t.title === title);
-  expect(saved?.completedAt, "task is completed in the database").toBeTruthy();
-  const subtasks = await api<Array<{ title: string }>>("GET", `/tasks/${saved!.id}/subtasks`, undefined, session.token);
-  expect(subtasks.map((s) => s.title)).toEqual(["Collect feedback", "Draft the outline"]);
+  expect(subtasks.map((s) => s.title)).toEqual([
+    "Collect feedback",
+    "Draft the outline",
+  ]);
 });
 
-test("shows and resizes a time block on the full calendar", async ({ page }) => {
+test("shows and resizes a time block on the full calendar", async ({
+  page,
+}) => {
   await page.clock.setFixedTime(new Date(`${today}T09:00:00Z`));
   const session = await register();
-  const block = await api<{id: string}>("POST", "/time-blocks", { title: "Deep work", date: today, startTime: "09:00", endTime: "10:30" }, session.token);
+  const block = await api<{ id: string }>(
+    "POST",
+    "/time-blocks",
+    { title: "Deep work", date: today, startTime: "09:00", endTime: "10:30" },
+    session.token
+  );
   await signInWithToken(page, session);
   await page.goto(`/app/calendar?date=${today}`);
-  await expect(page.getByRole("button", { name: /^Time block: Deep work from 9:00 AM to 10:30 AM/ })).toBeVisible();
-  await page.locator('[data-time-block]').filter({ hasText: 'Deep work' }).scrollIntoViewIfNeeded();
-  const handle = (await page.locator('[data-time-block]').filter({ hasText: 'Deep work' }).locator('[data-resize="bottom"]').boundingBox())!;
-  await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
+  await expect(
+    page.getByRole("button", {
+      name: /^Time block: Deep work from 9:00 AM to 10:30 AM/,
+    })
+  ).toBeVisible();
+  await page
+    .locator("[data-time-block]")
+    .filter({ hasText: "Deep work" })
+    .scrollIntoViewIfNeeded();
+  const handle = (await page
+    .locator("[data-time-block]")
+    .filter({ hasText: "Deep work" })
+    .locator('[data-resize="bottom"]')
+    .boundingBox())!;
+  await page.mouse.move(
+    handle.x + handle.width / 2,
+    handle.y + handle.height / 2
+  );
   await page.mouse.down();
-  await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2 + 32, { steps: 8 });
+  await page.mouse.move(
+    handle.x + handle.width / 2,
+    handle.y + handle.height / 2 + 32,
+    { steps: 8 }
+  );
   await page.mouse.up();
-  await expect.poll(async () => (await api<{durationMins:number}>('GET', `/time-blocks/${block.id}`, undefined, session.token)).durationMins).toBe(120);
-  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect
+    .poll(
+      async () =>
+        (
+          await api<{ durationMins: number }>(
+            "GET",
+            `/time-blocks/${block.id}`,
+            undefined,
+            session.token
+          )
+        ).durationMins
+    )
+    .toBe(120);
+  await expect(page.getByRole("dialog")).toBeHidden();
 });
 
 test("a subtask timer also times its task", async ({ page }) => {
   const session = await register();
-  const task = await api<{ id: string }>("POST", "/tasks", { title: "Ship the release", scheduledDate: today }, session.token);
-  const subtask = await api<{ id: string }>("POST", `/tasks/${task.id}/subtasks`, { title: "Write the changelog" }, session.token);
+  const task = await api<{ id: string }>(
+    "POST",
+    "/tasks",
+    { title: "Ship the release", scheduledDate: today },
+    session.token
+  );
+  const subtask = await api<{ id: string }>(
+    "POST",
+    `/tasks/${task.id}/subtasks`,
+    { title: "Write the changelog" },
+    session.token
+  );
   await signInWithToken(page, session);
   await page.goto(`/app/focus/${task.id}`);
 
@@ -145,7 +210,9 @@ test("a subtask timer also times its task", async ({ page }) => {
   const started = page.waitForResponse((r) => /\/timer\/start$/.test(r.url()));
   await row.getByRole("button", { name: "Start subtask timer" }).click();
   expect((await started).ok()).toBe(true);
-  await expect(row.getByRole("button", { name: "Stop subtask timer" })).toBeVisible();
+  await expect(
+    row.getByRole("button", { name: "Stop subtask timer" })
+  ).toBeVisible();
   await expect(page.getByRole("button", { name: "Stop timer" })).toBeVisible();
 
   const stopped = page.waitForResponse((r) => /\/timer\/stop$/.test(r.url()));
@@ -153,14 +220,19 @@ test("a subtask timer also times its task", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Start timer" })).toBeVisible();
   expect((await stopped).ok()).toBe(true);
 
-  const saved = await api<{ timerStartedAt: string | null }>("GET", `/tasks/${task.id}`, undefined, session.token);
-  expect(saved.timerStartedAt, "stopping the subtask stops the task").toBeNull();
-  const subtasks = await api<Array<{ timerStartedAt: string | null; timerAccumulatedSeconds: number }>>(
+  const saved = await api<{ timerStartedAt: string | null }>(
     "GET",
-    `/tasks/${task.id}/subtasks`,
+    `/tasks/${task.id}`,
     undefined,
     session.token
   );
+  expect(
+    saved.timerStartedAt,
+    "stopping the subtask stops the task"
+  ).toBeNull();
+  const subtasks = await api<
+    Array<{ timerStartedAt: string | null; timerAccumulatedSeconds: number }>
+  >("GET", `/tasks/${task.id}/subtasks`, undefined, session.token);
   expect(subtasks[0]?.timerStartedAt).toBeNull();
 });
 
@@ -172,9 +244,13 @@ test("an idea with subtasks becomes a task for today", async ({ page }) => {
 
   await page.getByRole("button", { name: "Add idea" }).first().click();
   const composer = page.getByRole("dialog", { name: /Add idea/ });
-  await composer.getByRole("textbox", { name: "Task title" }).fill("AI meal planner");
+  await composer
+    .getByRole("textbox", { name: "Task title" })
+    .fill("AI meal planner");
   await page.keyboard.press("Tab");
-  await composer.getByRole("textbox", { name: "Subtask 1" }).fill("Interview parents");
+  await composer
+    .getByRole("textbox", { name: "Subtask 1" })
+    .fill("Interview parents");
   await page.keyboard.press("Enter");
   await page.keyboard.press("Enter");
   await expect(composer).toBeHidden();
@@ -193,64 +269,195 @@ test("an idea with subtasks becomes a task for today", async ({ page }) => {
   );
   const task = tasks.find((t) => t.title === "AI meal planner");
   expect(task, "the idea is on today's list").toBeTruthy();
-  const subtasks = await api<Array<{ title: string }>>("GET", `/tasks/${task!.id}/subtasks`, undefined, session.token);
+  const subtasks = await api<Array<{ title: string }>>(
+    "GET",
+    `/tasks/${task!.id}/subtasks`,
+    undefined,
+    session.token
+  );
   expect(subtasks.map((s) => s.title)).toEqual(["Interview parents"]);
 });
 
 test("moves a task's time block with it to another day, and clears it for the backlog", async () => {
   const session = await register();
   const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
-  const task = await api<{ id: string }>("POST", "/tasks", { title: "Plan the week", scheduledDate: today }, session.token);
-  await api("POST", "/time-blocks", { taskId: task.id, title: "Plan the week", date: today, startTime: "09:00", endTime: "10:00" }, session.token);
+  const task = await api<{ id: string }>(
+    "POST",
+    "/tasks",
+    { title: "Plan the week", scheduledDate: today },
+    session.token
+  );
+  await api(
+    "POST",
+    "/time-blocks",
+    {
+      taskId: task.id,
+      title: "Plan the week",
+      date: today,
+      startTime: "09:00",
+      endTime: "10:00",
+    },
+    session.token
+  );
 
-  await api("PATCH", `/tasks/${task.id}`, { scheduledDate: tomorrow }, session.token);
+  await api(
+    "PATCH",
+    `/tasks/${task.id}`,
+    { scheduledDate: tomorrow },
+    session.token
+  );
   type Block = { taskId: string | null; date: string; startTime: string };
-  const onTomorrow = await api<Block[]>("GET", `/time-blocks?date=${tomorrow}`, undefined, session.token);
-  expect(onTomorrow.map((b) => [b.taskId, b.date])).toEqual([[task.id, tomorrow]]);
-  expect(await api<Block[]>("GET", `/time-blocks?date=${today}`, undefined, session.token)).toEqual([]);
+  const onTomorrow = await api<Block[]>(
+    "GET",
+    `/time-blocks?date=${tomorrow}`,
+    undefined,
+    session.token
+  );
+  expect(onTomorrow.map((b) => [b.taskId, b.date])).toEqual([
+    [task.id, tomorrow],
+  ]);
+  expect(
+    await api<Block[]>(
+      "GET",
+      `/time-blocks?date=${today}`,
+      undefined,
+      session.token
+    )
+  ).toEqual([]);
 
-  await api("POST", "/tasks/reorder", { date: "backlog", taskIds: [task.id] }, session.token);
-  expect(await api<Block[]>("GET", `/time-blocks?date=${tomorrow}`, undefined, session.token)).toEqual([]);
+  await api(
+    "POST",
+    "/tasks/reorder",
+    { date: "backlog", taskIds: [task.id] },
+    session.token
+  );
+  expect(
+    await api<Block[]>(
+      "GET",
+      `/time-blocks?date=${tomorrow}`,
+      undefined,
+      session.token
+    )
+  ).toEqual([]);
 });
 
-
-test("task list searches every page and expands checklists", async ({ page }) => {
+test("task list searches every page and expands checklists", async ({
+  page,
+}) => {
   const session = await register();
   for (let batch = 0; batch < 11; batch++) {
-    await Promise.all(Array.from({ length: 10 }, (_, n) => api("POST", "/tasks", { title: `List item ${batch * 10 + n}`, scheduledDate: today }, session.token)));
+    await Promise.all(
+      Array.from({ length: 10 }, (_, n) =>
+        api(
+          "POST",
+          "/tasks",
+          { title: `List item ${batch * 10 + n}`, scheduledDate: today },
+          session.token
+        )
+      )
+    );
   }
-  const task = await api<{ id: string }>("POST", "/tasks", { title: "Needle beyond first page", scheduledDate: today, position: 999 }, session.token);
-  await api("POST", `/tasks/${task.id}/subtasks`, { title: "Visible checklist item" }, session.token);
+  const task = await api<{ id: string }>(
+    "POST",
+    "/tasks",
+    { title: "Needle beyond first page", scheduledDate: today, position: 999 },
+    session.token
+  );
+  await api(
+    "POST",
+    `/tasks/${task.id}/subtasks`,
+    { title: "Visible checklist item" },
+    session.token
+  );
   await signInWithToken(page, session);
   await page.goto("/app/tasks");
-  await expect(page.getByRole("button", { name: "Load more tasks" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Load more tasks" })
+  ).toBeVisible();
   await page.getByRole("button", { name: "Load more tasks" }).click();
-  await expect(page.getByRole("button", { name: "Needle beyond first page", exact: true })).toBeVisible();
-  await page.getByRole("textbox", { name: "Search all tasks" }).fill("Needle beyond");
+  await expect(
+    page.getByRole("button", { name: "Needle beyond first page", exact: true })
+  ).toBeVisible();
+  await page
+    .getByRole("textbox", { name: "Search all tasks" })
+    .fill("Needle beyond");
   const row = page.locator(`[data-task-id="${task.id}"]`);
   await expect(row).toBeVisible();
   await row.getByRole("button", { name: "Expand subtasks" }).click();
-  await expect(row.getByText("Visible checklist item", { exact: true })).toBeVisible();
+  await expect(
+    row.getByText("Visible checklist item", { exact: true })
+  ).toBeVisible();
 });
 
 test("concurrent timer starts keep one timer and stale stops do not stop another subtask", async () => {
   const session = await register();
-  const first = await api<{ id: string }>("POST", "/tasks", { title: "First timer", scheduledDate: today }, session.token);
-  const second = await api<{ id: string }>("POST", "/tasks", { title: "Second timer", scheduledDate: today }, session.token);
-  await Promise.all([first, second].map((t) => api("POST", `/tasks/${t.id}/timer/start`, {}, session.token)));
-  const saved = await api<Array<{ timerStartedAt: string | null }>>("GET", `/tasks?date=${today}`, undefined, session.token);
+  const first = await api<{ id: string }>(
+    "POST",
+    "/tasks",
+    { title: "First timer", scheduledDate: today },
+    session.token
+  );
+  const second = await api<{ id: string }>(
+    "POST",
+    "/tasks",
+    { title: "Second timer", scheduledDate: today },
+    session.token
+  );
+  await Promise.all(
+    [first, second].map((t) =>
+      api("POST", `/tasks/${t.id}/timer/start`, {}, session.token)
+    )
+  );
+  const saved = await api<Array<{ timerStartedAt: string | null }>>(
+    "GET",
+    `/tasks?date=${today}`,
+    undefined,
+    session.token
+  );
   expect(saved.filter((t) => t.timerStartedAt)).toHaveLength(1);
-  const a = await api<{ id: string }>("POST", `/tasks/${first.id}/subtasks`, { title: "A" }, session.token);
-  const b = await api<{ id: string }>("POST", `/tasks/${first.id}/subtasks`, { title: "B" }, session.token);
-  await api("POST", `/tasks/${first.id}/subtasks/${a.id}/timer/start`, {}, session.token);
-  await api("POST", `/tasks/${first.id}/subtasks/${b.id}/timer/start`, {}, session.token);
-  await api("POST", `/tasks/${first.id}/subtasks/${a.id}/timer/stop`, {}, session.token);
-  const rows = await api<Array<{ id: string; timerStartedAt: string | null }>>("GET", `/tasks/${first.id}/subtasks`, undefined, session.token);
+  const a = await api<{ id: string }>(
+    "POST",
+    `/tasks/${first.id}/subtasks`,
+    { title: "A" },
+    session.token
+  );
+  const b = await api<{ id: string }>(
+    "POST",
+    `/tasks/${first.id}/subtasks`,
+    { title: "B" },
+    session.token
+  );
+  await api(
+    "POST",
+    `/tasks/${first.id}/subtasks/${a.id}/timer/start`,
+    {},
+    session.token
+  );
+  await api(
+    "POST",
+    `/tasks/${first.id}/subtasks/${b.id}/timer/start`,
+    {},
+    session.token
+  );
+  await api(
+    "POST",
+    `/tasks/${first.id}/subtasks/${a.id}/timer/stop`,
+    {},
+    session.token
+  );
+  const rows = await api<Array<{ id: string; timerStartedAt: string | null }>>(
+    "GET",
+    `/tasks/${first.id}/subtasks`,
+    undefined,
+    session.token
+  );
   expect(rows.find((s) => s.id === b.id)?.timerStartedAt).toBeTruthy();
   await api("POST", `/tasks/${first.id}/timer/stop`, {}, session.token);
 });
 
-test("the task modal's checkbox completes and uncompletes the open task", async ({ page }) => {
+test("the task modal's checkbox completes and uncompletes the open task", async ({
+  page,
+}) => {
   const session = await register();
   const title = `Modal complete ${Date.now()}`;
   await api("POST", "/tasks", { title, scheduledDate: today }, session.token);
@@ -259,7 +466,9 @@ test("the task modal's checkbox completes and uncompletes the open task", async 
 
   await page.locator("[data-task-id]").filter({ hasText: title }).click();
   const dialog = page.getByRole("dialog", { name: title });
-  const checkbox = dialog.getByRole("checkbox", { name: /Mark (complete|incomplete)/ });
+  const checkbox = dialog.getByRole("checkbox", {
+    name: /Mark (complete|incomplete)/,
+  });
   await expect(checkbox).toHaveAttribute("aria-checked", "false");
 
   // The modal opens from a snapshot of the task; the checkbox must follow
@@ -270,17 +479,21 @@ test("the task modal's checkbox completes and uncompletes the open task", async 
   expect((await completed).ok()).toBe(true);
   await expect(checkbox).toHaveAttribute("aria-checked", "true");
 
-  const uncompleted = page.waitForResponse((r) => /\/uncomplete$/.test(r.url()));
+  const uncompleted = page.waitForResponse((r) =>
+    /\/uncomplete$/.test(r.url())
+  );
   await checkbox.click();
   await expect(checkbox).toHaveAttribute("aria-checked", "false");
   expect((await uncompleted).ok()).toBe(true);
 
-  const task = (await api<Array<{ title: string; completedAt: string | null }>>(
-    "GET",
-    `/tasks?from=${today}&to=${today}`,
-    undefined,
-    session.token
-  )).find((t) => t.title === title);
+  const task = (
+    await api<Array<{ title: string; completedAt: string | null }>>(
+      "GET",
+      `/tasks?from=${today}&to=${today}`,
+      undefined,
+      session.token
+    )
+  ).find((t) => t.title === title);
   expect(task?.completedAt, "task is open again in the database").toBeNull();
 });
 
@@ -289,7 +502,9 @@ test("mobile board fits above compact navigation", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await signInWithToken(page, session);
   await page.goto("/app");
-  const nav = page.locator("nav").filter({ has: page.getByRole("link", { name: "More", exact: true }) });
+  const nav = page
+    .locator("nav")
+    .filter({ has: page.getByRole("link", { name: "More", exact: true }) });
   await expect(nav).toBeVisible();
   const box = await nav.boundingBox();
   expect(box!.height).toBe(56);
@@ -297,18 +512,23 @@ test("mobile board fits above compact navigation", async ({ page }) => {
   const main = await page.locator("main").boundingBox();
   expect(main!.y + main!.height).toBeLessThanOrEqual(844);
   await page.getByRole("link", { name: "Ideas", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Create your first board" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Create your first board" })
+  ).toBeVisible();
 });
 
-
-test("Today keeps its sidebar beside the calendar and sweeps an hour", async ({ page }) => {
+test("Today keeps its sidebar beside the calendar and sweeps an hour", async ({
+  page,
+}) => {
   const session = await register();
   await signInWithToken(page, session);
   await page.goto("/app");
   const column = page.locator("[data-calendar-create-column]");
   await expect(column).toBeVisible();
   const calendar = await column.boundingBox();
-  const rail = await page.getByRole("navigation", { name: "Right panel" }).boundingBox();
+  const rail = await page
+    .getByRole("navigation", { name: "Right panel" })
+    .boundingBox();
   expect(Math.abs(rail!.x - (calendar!.x + calendar!.width))).toBeLessThan(4);
   const y = Math.max(calendar!.y, 160) + 80;
   await page.mouse.move(calendar!.x + 80, y);
@@ -317,148 +537,332 @@ test("Today keeps its sidebar beside the calendar and sweeps an hour", async ({ 
   await page.mouse.up();
   const dialog = page.getByRole("dialog", { name: "Add event", exact: true });
   await expect(dialog).toBeVisible();
-  await dialog.getByRole("textbox", { name: "Event title", exact: true }).fill("Sweep review");
-  const saved = page.waitForResponse((r) => r.url().endsWith("/time-blocks") && r.request().method() === "POST");
+  await dialog
+    .getByRole("textbox", { name: "Event title", exact: true })
+    .fill("Sweep review");
+  const saved = page.waitForResponse(
+    (r) => r.url().endsWith("/time-blocks") && r.request().method() === "POST"
+  );
   await dialog.getByRole("button", { name: "Save", exact: true }).click();
   const block = (await (await saved).json()).data;
   expect(block.durationMins).toBe(60);
   expect(block.taskId).toBeNull();
 });
 
-for (const explicitDefault of [true, false]) test(`empty slots prefer ${explicitDefault ? "the chosen default" : "the primary calendar"} and retain edits after save failure`, async ({ page }) => {
-  const session = await register();
-  await page.route(`${API}/calendar/accounts`, r => r.fulfill({ json: { success: true, data: [{ id: "event-account", provider: "google", email: "owner@example.com", isActive: true }] } }));
-  await page.route(`${API}/calendars`, r => r.fulfill({ json: { success: true, data: [{ id: "event-account", provider: "google", calendars: [
-    { id: "readonly", name: "Read only", isReadOnly: true, isEnabled: true, isDefaultForEvents: true },
-    { id: "birthdays", name: "Birthdays", isReadOnly: false, isEnabled: true, isDefaultForEvents: false },
-    { id: "primary", externalId: "owner@example.com", name: "Main calendar", isReadOnly: false, isEnabled: true, isDefaultForEvents: false },
-    { id: "writable", name: "Work calendar", isReadOnly: false, isEnabled: true, isDefaultForEvents: explicitDefault },
-  ] }] } }));
-  let attempts = 0;
-  let payload: Record<string, unknown> = {};
-  await page.route(`${API}/calendar-events`, async r => {
-    payload = r.request().postDataJSON();
-    attempts++;
-    await r.fulfill(attempts === 1
-      ? { status: 503, json: { success: false, error: { code: "PROVIDER_UNAVAILABLE", message: "Calendar temporarily unavailable", statusCode: 503 } } }
-      : { json: { success: true, data: { id: "created-event", ...payload } } });
+for (const explicitDefault of [true, false])
+  test(`empty slots prefer ${explicitDefault ? "the chosen default" : "the primary calendar"} and retain edits after save failure`, async ({
+    page,
+  }) => {
+    const session = await register();
+    await page.route(`${API}/calendar/accounts`, (r) =>
+      r.fulfill({
+        json: {
+          success: true,
+          data: [
+            {
+              id: "event-account",
+              provider: "google",
+              email: "owner@example.com",
+              isActive: true,
+            },
+          ],
+        },
+      })
+    );
+    await page.route(`${API}/calendars`, (r) =>
+      r.fulfill({
+        json: {
+          success: true,
+          data: [
+            {
+              id: "event-account",
+              provider: "google",
+              calendars: [
+                {
+                  id: "readonly",
+                  name: "Read only",
+                  isReadOnly: true,
+                  isEnabled: true,
+                  isDefaultForEvents: true,
+                },
+                {
+                  id: "birthdays",
+                  name: "Birthdays",
+                  isReadOnly: false,
+                  isEnabled: true,
+                  isDefaultForEvents: false,
+                },
+                {
+                  id: "primary",
+                  externalId: "owner@example.com",
+                  name: "Main calendar",
+                  isReadOnly: false,
+                  isEnabled: true,
+                  isDefaultForEvents: false,
+                },
+                {
+                  id: "writable",
+                  name: "Work calendar",
+                  isReadOnly: false,
+                  isEnabled: true,
+                  isDefaultForEvents: explicitDefault,
+                },
+              ],
+            },
+          ],
+        },
+      })
+    );
+    let attempts = 0;
+    let payload: Record<string, unknown> = {};
+    await page.route(`${API}/calendar-events`, async (r) => {
+      payload = r.request().postDataJSON();
+      attempts++;
+      await r.fulfill(
+        attempts === 1
+          ? {
+              status: 503,
+              json: {
+                success: false,
+                error: {
+                  code: "PROVIDER_UNAVAILABLE",
+                  message: "Calendar temporarily unavailable",
+                  statusCode: 503,
+                },
+              },
+            }
+          : {
+              json: {
+                success: true,
+                data: { id: "created-event", ...payload },
+              },
+            }
+      );
+    });
+    await signInWithToken(page, session);
+    await page.goto("/app");
+    const column = page.locator("[data-calendar-create-column]");
+    await expect(column).toBeVisible();
+    const rect = (await column.boundingBox())!;
+    const y = Math.max(rect.y, 160) + 80;
+    await page.mouse.move(rect.x + 80, y);
+    await page.mouse.down();
+    await page.mouse.move(rect.x + 80, y + 64, { steps: 8 });
+    await page.mouse.up();
+    const dialog = page.getByRole("dialog", { name: "Add event", exact: true });
+    await expect(dialog.getByRole("combobox", { name: "Calendar" })).toHaveText(
+      explicitDefault ? "Work calendar" : "Main calendar"
+    );
+    await expect(dialog.getByText("Link to task (optional)")).toHaveCount(0);
+    await expect(dialog.getByRole("tab")).toHaveCount(0);
+    await dialog
+      .getByLabel("Event title", { exact: true })
+      .fill("Design review");
+    await dialog.getByRole("button", { name: "More options" }).click();
+    await dialog.getByLabel("Start", { exact: true }).fill(`${today}T14:00`);
+    await dialog.getByLabel("End", { exact: true }).fill(`${today}T13:00`);
+    await dialog.getByRole("button", { name: "Save", exact: true }).click();
+    await expect(
+      page.getByText("End time must be after start time", { exact: true })
+    ).toBeVisible();
+    expect(attempts).toBe(0);
+    await dialog.getByLabel("End", { exact: true }).fill(`${today}T15:15`);
+    await dialog.getByLabel("Location", { exact: true }).fill("Studio");
+    await dialog.getByRole("button", { name: "Save", exact: true }).click();
+    await expect(
+      page.getByText("Calendar temporarily unavailable", { exact: true })
+    ).toBeVisible();
+    await expect(dialog.getByLabel("Event title", { exact: true })).toHaveValue(
+      "Design review"
+    );
+    await dialog.getByRole("button", { name: "Save", exact: true }).click();
+    await expect(dialog).toBeHidden();
+    expect(attempts).toBe(2);
+    expect(payload).toMatchObject({
+      calendarId: explicitDefault ? "writable" : "primary",
+      title: "Design review",
+      location: "Studio",
+      startTime: `${today}T14:00:00.000Z`,
+      endTime: `${today}T15:15:00.000Z`,
+    });
   });
-  await signInWithToken(page, session);
-  await page.goto("/app");
-  const column = page.locator("[data-calendar-create-column]");
-  await expect(column).toBeVisible();
-  const rect = (await column.boundingBox())!;
-  const y = Math.max(rect.y, 160) + 80;
-  await page.mouse.move(rect.x + 80, y);
-  await page.mouse.down();
-  await page.mouse.move(rect.x + 80, y + 64, { steps: 8 });
-  await page.mouse.up();
-  const dialog = page.getByRole("dialog", { name: "Add event", exact: true });
-  await expect(dialog.getByRole("combobox", { name: "Calendar" })).toHaveText(explicitDefault ? "Work calendar" : "Main calendar");
-  await expect(dialog.getByText("Link to task (optional)")).toHaveCount(0);
-  await expect(dialog.getByRole("tab")).toHaveCount(0);
-  await dialog.getByLabel("Event title", { exact: true }).fill("Design review");
-  await dialog.getByRole("button", { name: "More options" }).click();
-  await dialog.getByLabel("Start", { exact: true }).fill(`${today}T14:00`);
-  await dialog.getByLabel("End", { exact: true }).fill(`${today}T13:00`);
-  await dialog.getByRole("button", { name: "Save", exact: true }).click();
-  await expect(page.getByText("End time must be after start time", { exact: true })).toBeVisible();
-  expect(attempts).toBe(0);
-  await dialog.getByLabel("End", { exact: true }).fill(`${today}T15:15`);
-  await dialog.getByLabel("Location", { exact: true }).fill("Studio");
-  await dialog.getByRole("button", { name: "Save", exact: true }).click();
-  await expect(page.getByText("Calendar temporarily unavailable", { exact: true })).toBeVisible();
-  await expect(dialog.getByLabel("Event title", { exact: true })).toHaveValue("Design review");
-  await dialog.getByRole("button", { name: "Save", exact: true }).click();
-  await expect(dialog).toBeHidden();
-  expect(attempts).toBe(2);
-  expect(payload).toMatchObject({ calendarId: explicitDefault ? "writable" : "primary", title: "Design review", location: "Studio", startTime: `${today}T14:00:00.000Z`, endTime: `${today}T15:15:00.000Z` });
-});
 
-test("mobile subtask titles keep readable width alongside timer controls", async ({ page }) => {
+test("mobile subtask titles keep readable width alongside timer controls", async ({
+  page,
+}) => {
   const session = await register();
-  const task = await api<{id: string}>("POST", "/tasks", { title: "Mobile layout", scheduledDate: today }, session.token);
-  const subtask = await api<{id: string}>("POST", `/tasks/${task.id}/subtasks`, { title: "Check the launch checklist" }, session.token);
+  const task = await api<{ id: string }>(
+    "POST",
+    "/tasks",
+    { title: "Mobile layout", scheduledDate: today },
+    session.token
+  );
+  const subtask = await api<{ id: string }>(
+    "POST",
+    `/tasks/${task.id}/subtasks`,
+    { title: "Check the launch checklist" },
+    session.token
+  );
   await page.setViewportSize({ width: 390, height: 844 });
   await signInWithToken(page, session);
   await page.goto("/app");
   await page.getByText("Mobile layout", { exact: true }).click();
   const row = page.locator(`[data-subtask-id="${subtask.id}"]`);
   await expect(row).toBeVisible();
-  const title = await row.getByText("Check the launch checklist", { exact: true }).boundingBox();
+  const title = await row
+    .getByText("Check the launch checklist", { exact: true })
+    .boundingBox();
   expect(title!.width).toBeGreaterThan(230);
   expect(title!.height).toBeLessThan(50);
-  await expect(row.getByRole("button", { name: "Start subtask timer" })).toBeVisible();
+  await expect(
+    row.getByRole("button", { name: "Start subtask timer" })
+  ).toBeVisible();
 });
 
 test("completion cannot leave a task or subtask timer running after concurrent starts", async () => {
   const session = await register();
   for (const completion of ["task", "task-patch", "subtask"]) {
     for (let attempt = 0; attempt < 3; attempt++) {
-      const task = await api<{id: string}>("POST", "/tasks", { title: "Concurrent completion" }, session.token);
-      const subtask = await api<{id: string}>("POST", `/tasks/${task.id}/subtasks`, { title: "Subtask" }, session.token);
-      const completePath = completion === "subtask" ? `/tasks/${task.id}/subtasks/${subtask.id}` : completion === "task-patch" ? `/tasks/${task.id}` : `/tasks/${task.id}/complete`;
-      const body = completion === "subtask" ? { completed: true } : completion === "task-patch" ? { completedAt: new Date().toISOString() } : {};
+      const task = await api<{ id: string }>(
+        "POST",
+        "/tasks",
+        { title: "Concurrent completion" },
+        session.token
+      );
+      const subtask = await api<{ id: string }>(
+        "POST",
+        `/tasks/${task.id}/subtasks`,
+        { title: "Subtask" },
+        session.token
+      );
+      const completePath =
+        completion === "subtask"
+          ? `/tasks/${task.id}/subtasks/${subtask.id}`
+          : completion === "task-patch"
+            ? `/tasks/${task.id}`
+            : `/tasks/${task.id}/complete`;
+      const body =
+        completion === "subtask"
+          ? { completed: true }
+          : completion === "task-patch"
+            ? { completedAt: new Date().toISOString() }
+            : {};
       const [start, complete] = await Promise.all([
-        fetch(`${API}/tasks/${task.id}/subtasks/${subtask.id}/timer/start`, { method: "POST", headers: { Authorization: `Bearer ${session.token}` } }),
-        fetch(`${API}${completePath}`, { method: completion === "task" ? "POST" : "PATCH", headers: { Authorization: `Bearer ${session.token}`, "Content-Type": "application/json" }, body: JSON.stringify(body) }),
+        fetch(`${API}/tasks/${task.id}/subtasks/${subtask.id}/timer/start`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${session.token}` },
+        }),
+        fetch(`${API}${completePath}`, {
+          method: completion === "task" ? "POST" : "PATCH",
+          headers: {
+            Authorization: `Bearer ${session.token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }),
       ]);
       expect([200, 400]).toContain(start.status);
       expect(complete.status).toBe(200);
-      const current = await api<{completedAt: string | null; timerStartedAt: string | null}>("GET", `/tasks/${task.id}`, undefined, session.token);
-      const subtasks = await api<Array<{completed: boolean; timerStartedAt: string | null}>>("GET", `/tasks/${task.id}/subtasks`, undefined, session.token);
+      const current = await api<{
+        completedAt: string | null;
+        timerStartedAt: string | null;
+      }>("GET", `/tasks/${task.id}`, undefined, session.token);
+      const subtasks = await api<
+        Array<{ completed: boolean; timerStartedAt: string | null }>
+      >("GET", `/tasks/${task.id}/subtasks`, undefined, session.token);
       expect(subtasks[0]!.timerStartedAt).toBeNull();
       if (completion === "subtask") expect(subtasks[0]!.completed).toBe(true);
-      else { expect(current.completedAt).toBeTruthy(); expect(current.timerStartedAt).toBeNull(); }
+      else {
+        expect(current.completedAt).toBeTruthy();
+        expect(current.timerStartedAt).toBeNull();
+      }
     }
   }
 });
 
-test("E edits planned time and W edits actual time consistently", async ({ page }) => {
+test("E edits planned time and W edits actual time consistently", async ({
+  page,
+}) => {
   const session = await register();
-  const task = await api<{id: string}>("POST", "/tasks", { title: "Shortcut consistency", scheduledDate: today, estimatedMins:30 }, session.token);
+  const task = await api<{ id: string }>(
+    "POST",
+    "/tasks",
+    { title: "Shortcut consistency", scheduledDate: today, estimatedMins: 30 },
+    session.token
+  );
   await api("PATCH", `/tasks/${task.id}`, { actualMins: 5 }, session.token);
   await signInWithToken(page, session);
   await page.goto("/app");
   const card = todayColumn(page).locator(`[data-task-id="${task.id}"]`);
   await card.hover();
   await page.keyboard.press("e");
-  await expect(page.getByRole("textbox", { name: "Planned", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("textbox", { name: "Planned", exact: true })
+  ).toBeVisible();
   await page.keyboard.press("Escape");
   await card.getByText("Shortcut consistency", { exact: true }).click();
   for (const view of ["modal", "focus", "list"]) {
-    if (view === "focus") await page.getByRole("button", { name: "Open in focus mode" }).click();
+    if (view === "focus")
+      await page.getByRole("button", { name: "Open in focus mode" }).click();
     if (view === "list") {
       await page.goto("/app/tasks");
-      await page.getByRole("button", { name: "Shortcut consistency", exact: true }).hover();
-    } else await page.getByRole("button", { name: "Start timer", exact: true }).focus();
+      await page
+        .getByRole("button", { name: "Shortcut consistency", exact: true })
+        .hover();
+    } else
+      await page
+        .getByRole("button", { name: "Start timer", exact: true })
+        .focus();
     await page.keyboard.press("e");
     const planned = page.getByRole("textbox", { name: "Planned", exact: true });
     await expect(planned).toBeVisible();
     await expect(planned).toHaveValue("0:30");
-    await expect(page.getByRole("dialog").last().getByText("E", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("dialog").last().getByText("E", { exact: true })
+    ).toBeVisible();
     await page.keyboard.press("Escape");
     if (view === "list") continue;
-    await page.getByRole("button", { name: "Start timer", exact: true }).focus();
+    await page
+      .getByRole("button", { name: "Start timer", exact: true })
+      .focus();
     await page.keyboard.press("w");
-    await expect(page.getByRole("textbox", { name: "Actual", exact: true })).toHaveValue("0:05");
-    await expect(page.getByRole("dialog").last().getByText("W", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("textbox", { name: "Actual", exact: true })
+    ).toHaveValue("0:05");
+    await expect(
+      page.getByRole("dialog").last().getByText("W", { exact: true })
+    ).toBeVisible();
     await page.keyboard.press("Escape");
-    if (view === "focus") await expect(page).toHaveURL(new RegExp(`/app/focus/${task.id}`));
+    if (view === "focus")
+      await expect(page).toHaveURL(new RegExp(`/app/focus/${task.id}`));
   }
 });
 
-
-test("task list buttons activate with the keyboard without dragging", async ({ page }) => {
+test("task list buttons activate with the keyboard without dragging", async ({
+  page,
+}) => {
   const session = await register();
-  await api("POST", "/tasks", { title: "Keyboard task", scheduledDate: today }, session.token);
+  await api(
+    "POST",
+    "/tasks",
+    { title: "Keyboard task", scheduledDate: today },
+    session.token
+  );
   await signInWithToken(page, session);
   await page.goto("/app/tasks");
-  await page.getByRole("button", { name: "Keyboard task", exact: true }).press("Enter");
-  await expect(page.getByRole("button", { name: "Open in focus mode" })).toBeVisible();
+  await page
+    .getByRole("button", { name: "Keyboard task", exact: true })
+    .press("Enter");
+  await expect(
+    page.getByRole("button", { name: "Open in focus mode" })
+  ).toBeVisible();
   await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "Edit planned time", exact: true }).press("Space");
-  await expect(page.getByRole("textbox", { name: "Planned", exact: true })).toBeVisible();
+  await page
+    .getByRole("button", { name: "Edit planned time", exact: true })
+    .press("Space");
+  await expect(
+    page.getByRole("textbox", { name: "Planned", exact: true })
+  ).toBeVisible();
 });
 
 test("mobile new task immediately focuses its title", async ({ page }) => {
@@ -473,283 +877,667 @@ test("mobile new task immediately focuses its title", async ({ page }) => {
   await page.keyboard.press("Enter");
   await expect(page.getByRole("dialog")).toBeHidden();
   await page.reload();
-  await expect(page.getByText("Type immediately on mobile", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Type immediately on mobile", { exact: true })
+  ).toBeVisible();
 });
 
-test("mobile Ideas swipes over cards without an extra navigation row", async ({ browser }) => {
+test("mobile Ideas swipes over cards without an extra navigation row", async ({
+  browser,
+}) => {
   const session = await register();
-  const board = await api<{id: string}>("POST", "/ideas/boards", { name: "Mobile navigation" }, session.token);
-  const columns = await api<Array<{id: string}>>("GET", `/ideas/columns?boardId=${board.id}`, undefined, session.token);
-  for (const name of ["Exploring", "Ready", "Later"]) columns.push(await api<{id: string}>("POST", "/ideas/columns", { boardId: board.id, name }, session.token));
-  const idea = await api<{id: string}>("POST", "/ideas", { boardId: board.id, columnId: columns[0]!.id, title: "Swipe across this card" }, session.token);
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const board = await api<{ id: string }>(
+    "POST",
+    "/ideas/boards",
+    { name: "Mobile navigation" },
+    session.token
+  );
+  const columns = await api<Array<{ id: string }>>(
+    "GET",
+    `/ideas/columns?boardId=${board.id}`,
+    undefined,
+    session.token
+  );
+  for (const name of ["Exploring", "Ready", "Later"])
+    columns.push(
+      await api<{ id: string }>(
+        "POST",
+        "/ideas/columns",
+        { boardId: board.id, name },
+        session.token
+      )
+    );
+  const idea = await api<{ id: string }>(
+    "POST",
+    "/ideas",
+    {
+      boardId: board.id,
+      columnId: columns[0]!.id,
+      title: "Swipe across this card",
+    },
+    session.token
+  );
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
+  });
   const page = await context.newPage();
   try {
     await signInWithToken(page, session);
     await page.goto("/app/ideas");
-    await expect(page.getByRole("navigation", { name: "Ideas columns" })).toHaveCount(0);
+    await expect(
+      page.getByRole("navigation", { name: "Ideas columns" })
+    ).toHaveCount(0);
     const first = page.locator(`[data-idea-column-id="${columns[0]!.id}"]`);
     await expect(first).toBeVisible();
     const initialX = (await first.boundingBox())!.x;
     const card = page.getByText("Swipe across this card", { exact: true });
     const box = (await card.boundingBox())!;
     const cdp = await context.newCDPSession(page);
-    const x = box.x + box.width * 0.7, y = box.y + box.height / 2;
-    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
+    const x = box.x + box.width * 0.7,
+      y = box.y + box.height / 2;
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ x, y }],
+    });
     for (let step = 1; step <= 10; step++) {
-      await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: x - step * 19, y }] });
+      await cdp.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [{ x: x - step * 19, y }],
+      });
       // Give each touch move a frame, like a finger crossing the card.
       await page.waitForTimeout(16);
     }
-    await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-    await expect.poll(async () => (await first.boundingBox())!.x).toBeLessThan(initialX - 100);
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    await expect
+      .poll(async () => (await first.boundingBox())!.x)
+      .toBeLessThan(initialX - 100);
     await expect(page.getByRole("dialog")).toBeHidden();
-    const unchanged = await api<{columnId: string}>("GET", `/ideas/${idea.id}`, undefined, session.token);
+    const unchanged = await api<{ columnId: string }>(
+      "GET",
+      `/ideas/${idea.id}`,
+      undefined,
+      session.token
+    );
     expect(unchanged.columnId).toBe(columns[0]!.id);
-  } finally { await context.close(); }
+  } finally {
+    await context.close();
+  }
 });
 
-test("view shortcuts and priority shortcuts work without changing typed text", async ({ page }) => {
+test("view shortcuts and priority shortcuts work without changing typed text", async ({
+  page,
+}) => {
   const session = await register();
   await signInWithToken(page, session);
   await page.goto("/app");
-  await expect(page.getByRole("radio", { name: "Today", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("radio", { name: "Today", exact: true })
+  ).toBeVisible();
   await page.keyboard.press("Shift+T");
-  await expect(page.getByRole("radio", { name: "Today", exact: true })).toHaveAttribute("aria-checked", "true");
+  await expect(
+    page.getByRole("radio", { name: "Today", exact: true })
+  ).toHaveAttribute("aria-checked", "true");
   await page.keyboard.press("Shift+B");
-  await expect(page.getByRole("radio", { name: "Board", exact: true, includeHidden: true })).toHaveAttribute("aria-checked", "true");
+  await expect(
+    page.getByRole("radio", { name: "Board", exact: true, includeHidden: true })
+  ).toHaveAttribute("aria-checked", "true");
   await todayColumn(page).getByRole("button", { name: "Add task" }).click();
   const title = page.getByRole("textbox", { name: "Task title", exact: true });
   await title.fill("Priority keyboard test");
   await title.press("Alt+Shift+1");
-  await expect(page.getByRole("button", { name: "Priority: P1 High", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Priority: P1 High", exact: true })
+  ).toBeVisible();
   await expect(title).toHaveValue("Priority keyboard test");
   await title.press("Enter");
   await expect(page.getByRole("dialog")).toBeHidden();
-  await todayColumn(page).getByText("Priority keyboard test", { exact: true }).click();
-  await page.getByRole("button", { name: "Edit task title", exact: true }).click();
+  await todayColumn(page)
+    .getByText("Priority keyboard test", { exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Edit task title", exact: true })
+    .click();
   await title.press("Alt+Shift+0");
-  await expect(page.getByRole("button", { name: "Priority: P0 Urgent", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Priority: P0 Urgent", exact: true })
+  ).toBeVisible();
   await expect(title).toHaveValue("Priority keyboard test");
   await title.press("Shift+T");
-  await expect(page.getByRole("radio", { name: "Board", exact: true, includeHidden: true })).toHaveAttribute("aria-checked", "true");
+  await expect(
+    page.getByRole("radio", { name: "Board", exact: true, includeHidden: true })
+  ).toHaveAttribute("aria-checked", "true");
   await expect(title).toHaveValue(/T/);
   await title.fill("Priority keyboard test");
-  await expect.poll(async () => {
-    const tasks = await api<Array<{title: string; priority: string}>>("GET", `/tasks?scheduledDate=${today}`, undefined, session.token);
-    return tasks.find(task => task.title === "Priority keyboard test")?.priority;
-  }).toBe("P0");
+  await expect
+    .poll(async () => {
+      const tasks = await api<Array<{ title: string; priority: string }>>(
+        "GET",
+        `/tasks?scheduledDate=${today}`,
+        undefined,
+        session.token
+      );
+      return tasks.find((task) => task.title === "Priority keyboard test")
+        ?.priority;
+    })
+    .toBe("P0");
   await title.press("Enter");
   await expect(page.getByRole("dialog")).toBeHidden();
   await page.reload();
-  await todayColumn(page).getByText("Priority keyboard test", { exact: true }).click();
-  await expect(page.getByRole("button", { name: "Priority: P0 Urgent", exact: true })).toBeVisible();
+  await todayColumn(page)
+    .getByText("Priority keyboard test", { exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Priority: P0 Urgent", exact: true })
+  ).toBeVisible();
 });
 
-test("calendar resizes a projected task into one saved block and resizes it again", async ({ page }) => {
+test("calendar resizes a projected task into one saved block and resizes it again", async ({
+  page,
+}) => {
   await page.clock.setFixedTime(new Date(`${today}T09:00:00Z`));
   const session = await register();
-  const task = await api<{id: string}>("POST", "/tasks", { title: "Resize the plan", scheduledDate: today, estimatedMins: 30 }, session.token);
+  const task = await api<{ id: string }>(
+    "POST",
+    "/tasks",
+    { title: "Resize the plan", scheduledDate: today, estimatedMins: 30 },
+    session.token
+  );
   await signInWithToken(page, session);
   await page.goto("/app");
   const preview = page.locator(`[data-projected-task="${task.id}"]`);
   await preview.scrollIntoViewIfNeeded();
   const handle = await preview.locator('[data-resize="bottom"]').boundingBox();
-  await page.mouse.move(handle!.x + handle!.width / 2, handle!.y + handle!.height / 2);
+  await page.mouse.move(
+    handle!.x + handle!.width / 2,
+    handle!.y + handle!.height / 2
+  );
   await page.mouse.down();
-  await page.mouse.move(handle!.x + handle!.width / 2, handle!.y + handle!.height / 2 + 32, { steps: 8 });
-  const created = page.waitForResponse(r => r.url().endsWith('/time-blocks') && r.request().method() === 'POST');
+  await page.mouse.move(
+    handle!.x + handle!.width / 2,
+    handle!.y + handle!.height / 2 + 32,
+    { steps: 8 }
+  );
+  const created = page.waitForResponse(
+    (r) => r.url().endsWith("/time-blocks") && r.request().method() === "POST"
+  );
   await page.mouse.up();
   const block = (await (await created).json()).data;
   expect(block.taskId).toBe(task.id);
   expect(block.durationMins).toBe(60);
-  const saved = page.locator('[data-time-block]').filter({ hasText: 'Resize the plan' });
+  const saved = page
+    .locator("[data-time-block]")
+    .filter({ hasText: "Resize the plan" });
   await expect(saved).toBeVisible();
   const bottom = await saved.locator('[data-resize="bottom"]').boundingBox();
-  await page.mouse.move(bottom!.x + bottom!.width / 2, bottom!.y + bottom!.height / 2);
+  await page.mouse.move(
+    bottom!.x + bottom!.width / 2,
+    bottom!.y + bottom!.height / 2
+  );
   await page.mouse.down();
-  await page.mouse.move(bottom!.x + bottom!.width / 2, bottom!.y + bottom!.height / 2 + 32, { steps: 8 });
+  await page.mouse.move(
+    bottom!.x + bottom!.width / 2,
+    bottom!.y + bottom!.height / 2 + 32,
+    { steps: 8 }
+  );
   await page.mouse.up();
-  await expect.poll(async () => (await api<{durationMins:number}>('GET', `/time-blocks/${block.id}`, undefined, session.token)).durationMins).toBe(90);
-  await expect(page.getByRole('dialog')).toBeHidden();
-  const all = await api<Array<{id:string}>>('GET', `/time-blocks?date=${today}`, undefined, session.token);
+  await expect
+    .poll(
+      async () =>
+        (
+          await api<{ durationMins: number }>(
+            "GET",
+            `/time-blocks/${block.id}`,
+            undefined,
+            session.token
+          )
+        ).durationMins
+    )
+    .toBe(90);
+  await expect(page.getByRole("dialog")).toBeHidden();
+  const all = await api<Array<{ id: string }>>(
+    "GET",
+    `/time-blocks?date=${today}`,
+    undefined,
+    session.token
+  );
   expect(all).toHaveLength(1);
 });
 
-test("editable calendar events resize from either edge in the sidebar", async ({ page }) => {
+test("editable calendar events resize from either edge in the sidebar", async ({
+  page,
+}) => {
   const session = await register();
-  let event = { id: "event-resize", calendarId: "calendar-resize", title: "Provider event", startTime: `${today}T14:00:00.000Z`, endTime: `${today}T15:00:00.000Z`, isAllDay: false, color: "#4285f4", responseStatus: "accepted" };
+  let event = {
+    id: "event-resize",
+    calendarId: "calendar-resize",
+    title: "Provider event",
+    startTime: `${today}T14:00:00.000Z`,
+    endTime: `${today}T15:00:00.000Z`,
+    isAllDay: false,
+    color: "#4285f4",
+    responseStatus: "accepted",
+  };
   const updates: unknown[] = [];
-  await page.route(`${API}/calendar/accounts`, r => r.fulfill({ json: { success: true, data: [{ id: 'account-resize', provider: 'google', isActive: true }] } }));
-  await page.route(`${API}/calendars`, r => r.fulfill({ json: { success: true, data: [{ id: 'account-resize', provider: 'google', calendars: [{ id: 'calendar-resize', name: 'Test calendar', isReadOnly: false, isVisible: true }] }] } }));
-  await page.route(`${API}/calendar-events?**`, r => r.fulfill({ json: { success: true, data: [event] } }));
-  await page.route(`${API}/calendar-events/event-resize`, async r => {
+  await page.route(`${API}/calendar/accounts`, (r) =>
+    r.fulfill({
+      json: {
+        success: true,
+        data: [{ id: "account-resize", provider: "google", isActive: true }],
+      },
+    })
+  );
+  await page.route(`${API}/calendars`, (r) =>
+    r.fulfill({
+      json: {
+        success: true,
+        data: [
+          {
+            id: "account-resize",
+            provider: "google",
+            calendars: [
+              {
+                id: "calendar-resize",
+                name: "Test calendar",
+                isReadOnly: false,
+                isVisible: true,
+              },
+            ],
+          },
+        ],
+      },
+    })
+  );
+  await page.route(`${API}/calendar-events?**`, (r) =>
+    r.fulfill({ json: { success: true, data: [event] } })
+  );
+  await page.route(`${API}/calendar-events/event-resize`, async (r) => {
     const patch = r.request().postDataJSON();
     updates.push(patch);
     event = { ...event, ...patch };
     await r.fulfill({ json: { success: true, data: event } });
   });
   await signInWithToken(page, session);
-  await page.goto('/app');
-  const block = page.locator('[data-external-event]').filter({ hasText: 'Provider event' });
-  for (const [edge, dy, expectedStart, expectedEnd] of [['bottom', 32, 14, 15.5], ['top', -32, 13.5, 15.5]] as const) {
+  await page.goto("/app");
+  const block = page
+    .locator("[data-external-event]")
+    .filter({ hasText: "Provider event" });
+  for (const [edge, dy, expectedStart, expectedEnd] of [
+    ["bottom", 32, 14, 15.5],
+    ["top", -32, 13.5, 15.5],
+  ] as const) {
     await block.scrollIntoViewIfNeeded();
-    const handle = (await block.locator(`[data-resize="${edge}"]`).boundingBox())!;
-    await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
+    const handle = (await block
+      .locator(`[data-resize="${edge}"]`)
+      .boundingBox())!;
+    await page.mouse.move(
+      handle.x + handle.width / 2,
+      handle.y + handle.height / 2
+    );
     await page.mouse.down();
-    await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2 + dy, { steps: 8 });
+    await page.mouse.move(
+      handle.x + handle.width / 2,
+      handle.y + handle.height / 2 + dy,
+      { steps: 8 }
+    );
     await page.mouse.up();
-    await expect.poll(() => new Date(event.startTime).getUTCHours() + new Date(event.startTime).getUTCMinutes() / 60).toBe(expectedStart);
-    await expect.poll(() => new Date(event.endTime).getUTCHours() + new Date(event.endTime).getUTCMinutes() / 60).toBe(expectedEnd);
+    await expect
+      .poll(
+        () =>
+          new Date(event.startTime).getUTCHours() +
+          new Date(event.startTime).getUTCMinutes() / 60
+      )
+      .toBe(expectedStart);
+    await expect
+      .poll(
+        () =>
+          new Date(event.endTime).getUTCHours() +
+          new Date(event.endTime).getUTCMinutes() / 60
+      )
+      .toBe(expectedEnd);
   }
   expect(updates).toHaveLength(2);
-  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByRole("dialog")).toBeHidden();
 });
 
-test("question mark toggles shortcuts and sort stays compact", async ({ page }) => {
+test("question mark toggles shortcuts and sort stays compact", async ({
+  page,
+}) => {
   const session = await register();
   await signInWithToken(page, session);
-  await page.goto('/app');
-  await expect(page.getByRole('button', {name:'Sort: Manual'})).toBeVisible();
-  await page.keyboard.press('Shift+?');
-  await expect(page.getByRole('heading', {name:'Keyboard Shortcuts'})).toBeVisible();
-  await page.keyboard.press('Shift+?');
-  await expect(page.getByRole('heading', {name:'Keyboard Shortcuts'})).toBeHidden();
-  await page.getByRole('button', {name:'Sort: Manual'}).click();
-  await page.getByRole('menuitem', {name:'Priority (P0 → P3)',exact:true}).click();
-  const sort = page.getByRole('button', {name:'Sort: Priority (P0 → P3)',exact:true});
+  await page.goto("/app");
+  await expect(
+    page.getByRole("button", { name: "Sort: Manual" })
+  ).toBeVisible();
+  await page.keyboard.press("Shift+?");
+  await expect(
+    page.getByRole("heading", { name: "Keyboard Shortcuts" })
+  ).toBeVisible();
+  await page.keyboard.press("Shift+?");
+  await expect(
+    page.getByRole("heading", { name: "Keyboard Shortcuts" })
+  ).toBeHidden();
+  await page.getByRole("button", { name: "Sort: Manual" }).click();
+  await page
+    .getByRole("menuitem", { name: "Priority (P0 → P3)", exact: true })
+    .click();
+  const sort = page.getByRole("button", {
+    name: "Sort: Priority (P0 → P3)",
+    exact: true,
+  });
   await expect(sort).toBeVisible();
   expect((await sort.boundingBox())!.width).toBeLessThanOrEqual(32);
 });
 
-test("dropping a task schedules it directly without a blank create dialog", async ({ page }) => {
+test("dropping a task schedules it directly without a blank create dialog", async ({
+  page,
+}) => {
   const session = await register();
-  const task = await api<{id:string}>('POST','/tasks',{title:'Drag this task',scheduledDate:today,estimatedMins:30},session.token);
+  const task = await api<{ id: string }>(
+    "POST",
+    "/tasks",
+    { title: "Drag this task", scheduledDate: today, estimatedMins: 30 },
+    session.token
+  );
   await signInWithToken(page, session);
-  await page.goto('/app');
+  await page.goto("/app");
   const card = page.locator(`[data-task-id="${task.id}"]`).first();
   await expect(card).toBeVisible();
   const from = (await card.boundingBox())!;
-  const grid = (await page.locator('[data-calendar-create-column]').boundingBox())!;
-  await page.mouse.move(from.x+100,from.y+25);
+  const grid = (await page
+    .locator("[data-calendar-create-column]")
+    .boundingBox())!;
+  await page.mouse.move(from.x + 100, from.y + 25);
   await page.mouse.down();
-  await page.mouse.move(from.x+110,from.y+25,{steps:3});
-  await page.mouse.move(grid.x+120,228,{steps:15});
+  await page.mouse.move(from.x + 110, from.y + 25, { steps: 3 });
+  await page.mouse.move(grid.x + 120, 228, { steps: 15 });
   await page.mouse.up();
-  await expect.poll(async()=> (await api<Array<{taskId:string}>>('GET',`/time-blocks?date=${today}`,undefined,session.token)).filter(b=>b.taskId===task.id).length).toBe(1);
-  const minutes = Math.round(((228 - grid.y) / 64 * 60) / 15) * 15;
-  const expectedTime = `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
-  const blocks = await api<Array<{taskId:string;startTime:string}>>('GET',`/time-blocks?date=${today}`,undefined,session.token);
-  expect(blocks.find(b=>b.taskId===task.id)?.startTime).toBe(expectedTime);
-  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect
+    .poll(
+      async () =>
+        (
+          await api<Array<{ taskId: string }>>(
+            "GET",
+            `/time-blocks?date=${today}`,
+            undefined,
+            session.token
+          )
+        ).filter((b) => b.taskId === task.id).length
+    )
+    .toBe(1);
+  const minutes = Math.round((((228 - grid.y) / 64) * 60) / 15) * 15;
+  const expectedTime = `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+  const blocks = await api<Array<{ taskId: string; startTime: string }>>(
+    "GET",
+    `/time-blocks?date=${today}`,
+    undefined,
+    session.token
+  );
+  expect(blocks.find((b) => b.taskId === task.id)?.startTime).toBe(
+    expectedTime
+  );
+  await expect(page.getByRole("dialog")).toBeHidden();
   await page.reload();
-  await expect(page.locator('[data-time-block]').filter({hasText:'Drag this task'})).toBeVisible();
+  await expect(
+    page.locator("[data-time-block]").filter({ hasText: "Drag this task" })
+  ).toBeVisible();
 });
 
-test("Ideas tray navigates columns and drags an idea into today's tasks", async ({ page }) => {
+test("Ideas tray navigates columns and drags an idea into today's tasks", async ({
+  page,
+}) => {
   const session = await register();
-  const board = await api<{id:string}>('POST','/ideas/boards',{name:'Planner ideas'},session.token);
-  const columns = await api<Array<{id:string}>>('GET',`/ideas/columns?boardId=${board.id}`,undefined,session.token);
-  await api<{id:string}>('POST','/ideas/columns',{boardId:board.id,name:'Ready'},session.token);
-  const idea = await api<{id:string}>('POST','/ideas',{boardId:board.id,columnId:columns[0]!.id,title:'Idea to plan',estimatedMins:25},session.token);
-  await api('POST',`/ideas/${idea.id}/subtasks`,{title:'Keep this checklist'},session.token);
+  const board = await api<{ id: string }>(
+    "POST",
+    "/ideas/boards",
+    { name: "Planner ideas" },
+    session.token
+  );
+  const columns = await api<Array<{ id: string }>>(
+    "GET",
+    `/ideas/columns?boardId=${board.id}`,
+    undefined,
+    session.token
+  );
+  await api<{ id: string }>(
+    "POST",
+    "/ideas/columns",
+    { boardId: board.id, name: "Ready" },
+    session.token
+  );
+  const idea = await api<{ id: string }>(
+    "POST",
+    "/ideas",
+    {
+      boardId: board.id,
+      columnId: columns[0]!.id,
+      title: "Idea to plan",
+      estimatedMins: 25,
+    },
+    session.token
+  );
+  await api(
+    "POST",
+    `/ideas/${idea.id}/subtasks`,
+    { title: "Keep this checklist" },
+    session.token
+  );
   await signInWithToken(page, session);
-  await page.goto('/app');
-  await page.getByRole('navigation',{name:'Right panel'}).getByRole('button',{name:'Ideas',exact:true}).click();
-  const tray = page.getByRole('region',{name:'Ideas tray'});
-  await expect(tray.getByText('Planner ideas',{exact:true})).toBeVisible();
-  await tray.getByRole('tab',{name:/Ready.*0/}).click();
-  await expect(tray.getByText('Ideas for ready go here.')).toBeVisible();
-  await tray.getByRole('tab',{name:/Ready.*0/}).press('ArrowLeft');
-  await expect(tray.getByRole('tab').first()).toHaveAttribute('aria-selected','true');
-  const source = (await tray.getByText('Idea to plan',{exact:true}).boundingBox())!;
+  await page.goto("/app");
+  await page
+    .getByRole("navigation", { name: "Right panel" })
+    .getByRole("button", { name: "Ideas", exact: true })
+    .click();
+  const tray = page.getByRole("region", { name: "Ideas tray" });
+  await expect(tray.getByText("Planner ideas", { exact: true })).toBeVisible();
+  await tray.getByRole("tab", { name: /Ready.*0/ }).click();
+  await expect(tray.getByText("Ideas for ready go here.")).toBeVisible();
+  await tray.getByRole("tab", { name: /Ready.*0/ }).press("ArrowLeft");
+  await expect(tray.getByRole("tab").first()).toHaveAttribute(
+    "aria-selected",
+    "true"
+  );
+  const source = (await tray
+    .getByText("Idea to plan", { exact: true })
+    .boundingBox())!;
   const target = (await todayColumn(page).boundingBox())!;
-  await page.mouse.move(source.x+45,source.y+8);
+  await page.mouse.move(source.x + 45, source.y + 8);
   await page.mouse.down();
-  await page.mouse.move(source.x+55,source.y+8,{steps:3});
-  await page.mouse.move(target.x+100,target.y+160,{steps:15});
+  await page.mouse.move(source.x + 55, source.y + 8, { steps: 3 });
+  await page.mouse.move(target.x + 100, target.y + 160, { steps: 15 });
   await page.mouse.up();
-  await expect(todayColumn(page).getByText('Idea to plan',{exact:true})).toBeVisible();
-  const tasks = await api<Array<{id:string;title:string;estimatedMins:number}>>('GET',`/tasks?date=${today}`,undefined,session.token);
-  const task = tasks.find(t=>t.title==='Idea to plan')!;
+  await expect(
+    todayColumn(page).getByText("Idea to plan", { exact: true })
+  ).toBeVisible();
+  const tasks = await api<
+    Array<{ id: string; title: string; estimatedMins: number }>
+  >("GET", `/tasks?date=${today}`, undefined, session.token);
+  const task = tasks.find((t) => t.title === "Idea to plan")!;
   expect(task.estimatedMins).toBe(25);
-  const subtasks = await api<Array<{title:string}>>('GET',`/tasks/${task.id}/subtasks`,undefined,session.token);
-  expect(subtasks.map(s=>s.title)).toContain('Keep this checklist');
-  await expect(tray.getByRole('link',{name:'Open task',exact:true})).toBeVisible();
-  const card = (await tray.getByText('Idea to plan',{exact:true}).boundingBox())!;
-  const tab = tray.getByRole('tab',{name:/Ready.*0/});
+  const subtasks = await api<Array<{ title: string }>>(
+    "GET",
+    `/tasks/${task.id}/subtasks`,
+    undefined,
+    session.token
+  );
+  expect(subtasks.map((s) => s.title)).toContain("Keep this checklist");
+  await expect(
+    tray.getByRole("link", { name: "Open task", exact: true })
+  ).toBeVisible();
+  const card = (await tray
+    .getByText("Idea to plan", { exact: true })
+    .boundingBox())!;
+  const tab = tray.getByRole("tab", { name: /Ready.*0/ });
   const tabBox = (await tab.boundingBox())!;
-  await page.mouse.move(card.x+30,card.y+8);
+  await page.mouse.move(card.x + 30, card.y + 8);
   await page.mouse.down();
-  await page.mouse.move(card.x+45,card.y+8,{steps:3});
-  await page.mouse.move(tabBox.x+tabBox.width/2,tabBox.y+tabBox.height/2,{steps:8});
-  await expect(tab).toHaveAttribute('aria-selected','true');
-  const drop = (await page.locator('[data-ideas-tray-drop]').boundingBox())!;
-  await page.mouse.move(drop.x+100,drop.y+150,{steps:8});
+  await page.mouse.move(card.x + 45, card.y + 8, { steps: 3 });
+  await page.mouse.move(
+    tabBox.x + tabBox.width / 2,
+    tabBox.y + tabBox.height / 2,
+    { steps: 8 }
+  );
+  await expect(tab).toHaveAttribute("aria-selected", "true");
+  const drop = (await page.locator("[data-ideas-tray-drop]").boundingBox())!;
+  await page.mouse.move(drop.x + 100, drop.y + 150, { steps: 8 });
   await page.mouse.up();
-  await expect(tray.getByText('Idea to plan',{exact:true})).toBeVisible();
+  await expect(tray.getByText("Idea to plan", { exact: true })).toBeVisible();
   await page.reload();
-  await tray.getByRole('tab',{name:/Ready.*1/}).click();
-  await expect(tray.getByText('Idea to plan',{exact:true})).toBeVisible();
+  await tray.getByRole("tab", { name: /Ready.*1/ }).click();
+  await expect(tray.getByText("Idea to plan", { exact: true })).toBeVisible();
 });
 
-test("task drops save one linked idea with its checklist and reject another user's task", async ({ page }) => {
+test("task drops save one linked idea with its checklist and reject another user's task", async ({
+  page,
+}) => {
   const session = await register();
   const other = await register();
-  const board = await api<{id:string}>('POST','/ideas/boards',{name:'Linked ideas'},session.token);
-  const columns = await api<Array<{id:string}>>('GET',`/ideas/columns?boardId=${board.id}`,undefined,session.token);
-  const task = await api<{id:string}>('POST','/tasks',{title:'Keep the existing task',scheduledDate:today,estimatedMins:45},session.token);
-  await api('POST',`/tasks/${task.id}/subtasks`,{title:'Preserve checklist'},session.token);
-  await signInWithToken(page,session);
-  await page.goto('/app');
-  await page.getByRole('navigation',{name:'Right panel'}).getByRole('button',{name:'Ideas',exact:true}).click();
-  await expect(page.getByRole('region',{name:'Ideas tray'})).toBeVisible();
-  const from = (await page.locator(`[data-task-id="${task.id}"]`).first().boundingBox())!;
-  const to = (await page.locator('[data-ideas-tray-drop]').boundingBox())!;
-  await page.mouse.move(from.x+100,from.y+25);
+  const board = await api<{ id: string }>(
+    "POST",
+    "/ideas/boards",
+    { name: "Linked ideas" },
+    session.token
+  );
+  const columns = await api<Array<{ id: string }>>(
+    "GET",
+    `/ideas/columns?boardId=${board.id}`,
+    undefined,
+    session.token
+  );
+  const task = await api<{ id: string }>(
+    "POST",
+    "/tasks",
+    {
+      title: "Keep the existing task",
+      scheduledDate: today,
+      estimatedMins: 45,
+    },
+    session.token
+  );
+  await api(
+    "POST",
+    `/tasks/${task.id}/subtasks`,
+    { title: "Preserve checklist" },
+    session.token
+  );
+  await signInWithToken(page, session);
+  await page.goto("/app");
+  await page
+    .getByRole("navigation", { name: "Right panel" })
+    .getByRole("button", { name: "Ideas", exact: true })
+    .click();
+  await expect(page.getByRole("region", { name: "Ideas tray" })).toBeVisible();
+  const from = (await page
+    .locator(`[data-task-id="${task.id}"]`)
+    .first()
+    .boundingBox())!;
+  const to = (await page.locator("[data-ideas-tray-drop]").boundingBox())!;
+  await page.mouse.move(from.x + 100, from.y + 25);
   await page.mouse.down();
-  await page.mouse.move(from.x+110,from.y+25,{steps:3});
-  await page.mouse.move(to.x+100,to.y+100,{steps:15});
+  await page.mouse.move(from.x + 110, from.y + 25, { steps: 3 });
+  await page.mouse.move(to.x + 100, to.y + 100, { steps: 15 });
   await page.mouse.up();
-  await expect(page.getByRole('region',{name:'Ideas tray'}).getByText('Keep the existing task',{exact:true})).toBeVisible();
-  const payload = {taskId:task.id,boardId:board.id,columnId:columns[0]!.id};
-  const results = await Promise.all([api<{id:string}>('POST','/ideas/from-task',payload,session.token),api<{id:string}>('POST','/ideas/from-task',payload,session.token)]);
+  await expect(
+    page
+      .getByRole("region", { name: "Ideas tray" })
+      .getByText("Keep the existing task", { exact: true })
+  ).toBeVisible();
+  const payload = {
+    taskId: task.id,
+    boardId: board.id,
+    columnId: columns[0]!.id,
+  };
+  const results = await Promise.all([
+    api<{ id: string }>("POST", "/ideas/from-task", payload, session.token),
+    api<{ id: string }>("POST", "/ideas/from-task", payload, session.token),
+  ]);
   expect(results[0]!.id).toBe(results[1]!.id);
-  const saved = await api<Array<{promotedTaskId:string}>>('GET',`/ideas?boardId=${board.id}`,undefined,session.token);
+  const saved = await api<Array<{ promotedTaskId: string }>>(
+    "GET",
+    `/ideas?boardId=${board.id}`,
+    undefined,
+    session.token
+  );
   expect(saved).toHaveLength(1);
   expect(saved[0]!.promotedTaskId).toBe(task.id);
-  const checklist = await api<Array<{title:string}>>('GET',`/ideas/${results[0]!.id}/subtasks`,undefined,session.token);
-  expect(checklist.map(i=>i.title)).toEqual(['Preserve checklist']);
-  expect((await api<{scheduledDate:string}>('GET',`/tasks/${task.id}`,undefined,session.token)).scheduledDate).toBe(today);
-  const foreignTask = await api<{id:string}>('POST','/tasks',{title:'Private task'},other.token);
-  const denied = await fetch(`${API}/ideas/from-task`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.token}`},body:JSON.stringify({...payload,taskId:foreignTask.id})});
+  const checklist = await api<Array<{ title: string }>>(
+    "GET",
+    `/ideas/${results[0]!.id}/subtasks`,
+    undefined,
+    session.token
+  );
+  expect(checklist.map((i) => i.title)).toEqual(["Preserve checklist"]);
+  expect(
+    (
+      await api<{ scheduledDate: string }>(
+        "GET",
+        `/tasks/${task.id}`,
+        undefined,
+        session.token
+      )
+    ).scheduledDate
+  ).toBe(today);
+  const foreignTask = await api<{ id: string }>(
+    "POST",
+    "/tasks",
+    { title: "Private task" },
+    other.token
+  );
+  const denied = await fetch(`${API}/ideas/from-task`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.token}`,
+    },
+    body: JSON.stringify({ ...payload, taskId: foreignTask.id }),
+  });
   expect(denied.status).toBe(404);
 });
 
-test('Ideas surfaces stay neutral across accent colors and adapt to light and dark mode', async ({ page }) => {
+test("Ideas surfaces stay neutral across accent colors and adapt to light and dark mode", async ({
+  page,
+}) => {
   const session = await register();
-  const board = await api<{id:string}>('POST','/ideas/boards',{name:'Theme validation'},session.token);
+  const board = await api<{ id: string }>(
+    "POST",
+    "/ideas/boards",
+    { name: "Theme validation" },
+    session.token
+  );
   await signInWithToken(page, session);
   const colors: string[] = [];
-  for (const mode of ['Light', 'Dark']) {
-    for (const theme of ['Ocean', 'Rose']) {
-      await page.goto('/app/settings?tab=appearance');
-      await page.getByRole('button',{name:mode,exact:true}).click();
-      await page.getByRole('button',{name:theme,exact:true}).click();
-      await expect(page.locator('html')).toHaveClass(new RegExp(`theme-${theme.toLowerCase()}`));
+  for (const mode of ["Light", "Dark"]) {
+    for (const theme of ["Ocean", "Rose"]) {
+      await page.goto("/app/settings?tab=appearance");
+      await page.getByRole("button", { name: mode, exact: true }).click();
+      await page.getByRole("button", { name: theme, exact: true }).click();
+      await expect(page.locator("html")).toHaveClass(
+        new RegExp(`theme-${theme.toLowerCase()}`)
+      );
       await page.goto(`/app/ideas?board=${board.id}`);
-      const column = page.locator('[data-idea-column-id]').first();
+      const column = page.locator("[data-idea-column-id]").first();
       await expect(column).toBeVisible();
-      const color = await column.evaluate(el => getComputedStyle(el).backgroundColor);
-      expect(color).not.toBe('rgba(0, 0, 0, 0)');
+      const color = await column.evaluate(
+        (el) => getComputedStyle(el).backgroundColor
+      );
+      expect(color).not.toBe("rgba(0, 0, 0, 0)");
       colors.push(color);
-      await page.goto('/app');
-      const tray = page.locator('[data-ideas-tray-drop]');
-      const toggle = page.getByRole('navigation',{name:'Right panel'}).getByRole('button',{name:'Ideas',exact:true});
+      await page.goto("/app");
+      const tray = page.locator("[data-ideas-tray-drop]");
+      const toggle = page
+        .getByRole("navigation", { name: "Right panel" })
+        .getByRole("button", { name: "Ideas", exact: true });
       await expect(toggle).toBeVisible();
-      if (await toggle.getAttribute('aria-pressed') !== 'true') await toggle.click();
+      if ((await toggle.getAttribute("aria-pressed")) !== "true")
+        await toggle.click();
       await expect(tray).toBeVisible();
-      await expect.poll(() => tray.evaluate(el => getComputedStyle(el).backgroundColor)).toBe(color);
+      await expect
+        .poll(() => tray.evaluate((el) => getComputedStyle(el).backgroundColor))
+        .toBe(color);
     }
   }
   expect(colors[0]).toBe(colors[1]);

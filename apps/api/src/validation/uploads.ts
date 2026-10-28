@@ -2,7 +2,7 @@
  * Validation schemas for upload routes
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Maximum file sizes in bytes
@@ -14,10 +14,10 @@ export const MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024; // 10MB
  * Allowed MIME types for avatars (images only)
  */
 export const ALLOWED_AVATAR_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
 ] as const;
 
 /**
@@ -25,21 +25,21 @@ export const ALLOWED_AVATAR_TYPES = [
  */
 export const ALLOWED_ATTACHMENT_TYPES = [
   // Images
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
   // Videos
-  'video/mp4',
-  'video/webm',
-  'video/quicktime', // .mov files
+  "video/mp4",
+  "video/webm",
+  "video/quicktime", // .mov files
   // Documents
-  'application/pdf',
-  'application/msword', // .doc
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-  'application/vnd.ms-excel', // .xls
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-  'text/plain', // .txt
+  "application/pdf",
+  "application/msword", // .doc
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+  "application/vnd.ms-excel", // .xls
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+  "text/plain", // .txt
 ] as const;
 
 /**
@@ -57,7 +57,7 @@ export type AllowedAttachmentType = (typeof ALLOWED_ATTACHMENT_TYPES)[number];
  */
 export const avatarFileSchema = z.object({
   type: z.enum(ALLOWED_AVATAR_TYPES, {
-    error: `Invalid file type. Allowed types: ${ALLOWED_AVATAR_TYPES.join(', ')}`,
+    error: `Invalid file type. Allowed types: ${ALLOWED_AVATAR_TYPES.join(", ")}`,
   }),
   size: z.number().max(MAX_AVATAR_SIZE, {
     error: `File size must be less than ${MAX_AVATAR_SIZE / (1024 * 1024)}MB`,
@@ -69,7 +69,8 @@ export const avatarFileSchema = z.object({
  */
 export const attachmentFileSchema = z.object({
   type: z.enum(ALLOWED_ATTACHMENT_TYPES, {
-    error: 'Invalid file type. Allowed types: images (jpeg, png, gif, webp), videos (mp4, webm, mov), documents (pdf, doc, docx, xls, xlsx, txt)',
+    error:
+      "Invalid file type. Allowed types: images (jpeg, png, gif, webp), videos (mp4, webm, mov), documents (pdf, doc, docx, xls, xlsx, txt)",
   }),
   size: z.number().max(MAX_ATTACHMENT_SIZE, {
     error: `File size must be less than ${MAX_ATTACHMENT_SIZE / (1024 * 1024)}MB`,
@@ -104,14 +105,11 @@ export function isAllowedAttachmentType(
  */
 export function getFileTypeCategory(
   type: string
-): 'image' | 'video' | 'document' | 'unknown' {
-  if (type.startsWith('image/')) return 'image';
-  if (type.startsWith('video/')) return 'video';
-  if (
-    type.startsWith('application/') ||
-    type.startsWith('text/')
-  ) {
-    return 'document';
+): "image" | "video" | "document" | "unknown" {
+  if (type.startsWith("image/")) return "image";
+  if (type.startsWith("video/")) return "video";
+  if (type.startsWith("application/") || type.startsWith("text/")) {
+    return "document";
   }
-  return 'unknown';
+  return "unknown";
 }

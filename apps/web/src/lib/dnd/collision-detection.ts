@@ -28,9 +28,19 @@ export const taskPriorityCollision: CollisionDetection = (args) => {
   });
   if (calendarCollisions.length > 0) return calendarCollisions;
 
-  const ideaTray = pointerWithin({ ...args, droppableContainers: droppableContainers.filter(c => c.data.current?.type === "idea-tray") });
+  const ideaTray = pointerWithin({
+    ...args,
+    droppableContainers: droppableContainers.filter(
+      (c) => c.data.current?.type === "idea-tray"
+    ),
+  });
   if (ideaTray.length) {
-    const cards = pointerWithin({ ...args, droppableContainers: droppableContainers.filter(c => c.data.current?.type === "idea") });
+    const cards = pointerWithin({
+      ...args,
+      droppableContainers: droppableContainers.filter(
+        (c) => c.data.current?.type === "idea"
+      ),
+    });
     return cards.length ? cards : ideaTray;
   }
 

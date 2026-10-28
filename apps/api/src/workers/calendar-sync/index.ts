@@ -3,16 +3,19 @@
  * Periodically syncs calendar events from connected accounts
  * Runs every 5 minutes to check for accounts needing sync
  */
-import type { Job } from 'pg-boss';
-import { getPgBoss, JOBS } from '../../lib/pgboss.js';
-import { type CalendarSyncCheckPayload, processCalendarSyncCheck } from './sync-check.js';
-import { type SyncAccountPayload, processSyncAccount } from './sync-account.js';
+import type { Job } from "pg-boss";
+import { getPgBoss, JOBS } from "../../lib/pgboss.js";
+import {
+  type CalendarSyncCheckPayload,
+  processCalendarSyncCheck,
+} from "./sync-check.js";
+import { type SyncAccountPayload, processSyncAccount } from "./sync-account.js";
 
 /**
  * Check if calendar sync is enabled via environment variable
  */
 function isCalendarSyncEnabled(): boolean {
-  return process.env.CALENDAR_SYNC_ENABLED !== 'false';
+  return process.env.CALENDAR_SYNC_ENABLED !== "false";
 }
 
 /**
@@ -20,7 +23,9 @@ function isCalendarSyncEnabled(): boolean {
  */
 export async function registerCalendarSyncWorkers(): Promise<void> {
   if (!isCalendarSyncEnabled()) {
-    console.log('[Calendar Sync Worker] Disabled via CALENDAR_SYNC_ENABLED=false');
+    console.log(
+      "[Calendar Sync Worker] Disabled via CALENDAR_SYNC_ENABLED=false"
+    );
     return;
   }
 
@@ -32,10 +37,15 @@ export async function registerCalendarSyncWorkers(): Promise<void> {
 
   // Schedule the calendar sync check to run every 5 minutes
   // singletonKey prevents duplicate schedules on server restarts
-  await boss.schedule(JOBS.CALENDAR_SYNC_CHECK, '*/5 * * * *', {}, {
-    tz: 'UTC',
-    singletonKey: 'calendar-sync-check-schedule',
-  });
+  await boss.schedule(
+    JOBS.CALENDAR_SYNC_CHECK,
+    "*/5 * * * *",
+    {},
+    {
+      tz: "UTC",
+      singletonKey: "calendar-sync-check-schedule",
+    }
+  );
 
   // Register the sync check handler
   await boss.work(
@@ -54,13 +64,13 @@ export async function registerCalendarSyncWorkers(): Promise<void> {
     { batchSize: 5 }, // Process 5 accounts concurrently
     async (jobs: Job<SyncAccountPayload>[]) => {
       // Process jobs concurrently within the batch
-      await Promise.all(jobs.map(job => processSyncAccount(job)));
+      await Promise.all(jobs.map((job) => processSyncAccount(job)));
     }
   );
 
-  console.log('[Calendar Sync Worker] Registered and scheduled');
+  console.log("[Calendar Sync Worker] Registered and scheduled");
 }
 
 // Re-export types for convenience
-export type { CalendarSyncCheckPayload } from './sync-check.js';
-export type { SyncAccountPayload } from './sync-account.js';
+export type { CalendarSyncCheckPayload } from "./sync-check.js";
+export type { SyncAccountPayload } from "./sync-account.js";

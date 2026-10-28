@@ -4,12 +4,7 @@
       "id": "open-sunsama",
       "name": "Open Sunsama",
       "tagline": "A daily planner with a kanban board of days, time blocking, focus mode and a hosted MCP server for AI agents.",
-      "categories": [
-        "planner",
-        "time-blocking",
-        "todo",
-        "focus"
-      ],
+      "categories": ["planner", "time-blocking", "todo", "focus"],
       "website": "https://opensunsama.com",
       "repo": "https://github.com/ShadowWalker2014/open-sunsama",
       "docs": "https://opensunsama.com/docs",
@@ -24,22 +19,14 @@
       },
       "lastCommit": "2026-09-25",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "web",
-        "macos",
-        "windows",
-        "linux",
-        "server"
-      ],
+      "platforms": ["web", "macos", "windows", "linux", "server"],
       "selfHost": "Docker",
       "mobile": {
         "available": false,
         "how": "Mobile-friendly web app; no native iOS or Android app"
       },
       "sync": "Real-time sync, hosted or on your own server",
-      "api": [
-        "REST"
-      ],
+      "api": ["REST"],
       "mcp": {
         "kind": "official",
         "url": "https://opensunsama.com/docs/mcp/overview",
@@ -61,11 +48,7 @@
       "id": "vikunja",
       "name": "Vikunja",
       "tagline": "A self-hosted to-do app with lists, kanban, Gantt and table views.",
-      "categories": [
-        "todo",
-        "kanban",
-        "project-management"
-      ],
+      "categories": ["todo", "kanban", "project-management"],
       "website": "https://vikunja.io",
       "repo": "https://github.com/go-vikunja/vikunja",
       "docs": "https://vikunja.io/docs/",
@@ -80,26 +63,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "Go",
-      "platforms": [
-        "web",
-        "server",
-        "macos",
-        "windows",
-        "linux",
-        "android"
-      ],
+      "platforms": ["web", "server", "macos", "windows", "linux", "android"],
       "selfHost": "Docker, binary, packages",
       "mobile": {
         "available": true,
         "how": "First-party Android app in alpha (Google Play beta); no official iOS app"
       },
       "sync": "Your own server",
-      "api": [
-        "REST",
-        "CalDAV",
-        "Webhooks",
-        "CLI"
-      ],
+      "api": ["REST", "CalDAV", "Webhooks", "CLI"],
       "mcp": {
         "kind": "official",
         "url": "https://github.com/go-vikunja/vikunja/tree/main/pkg/modules/mcp",
@@ -143,24 +114,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "web",
-        "macos",
-        "windows",
-        "linux",
-        "android",
-        "ios"
-      ],
+      "platforms": ["web", "macos", "windows", "linux", "android", "ios"],
       "selfHost": "Docker (web app, sync server)",
       "mobile": {
         "available": true,
         "how": "First-party Android (Google Play, F-Droid) and iOS (App Store) apps"
       },
       "sync": "Local by default; optional SuperSync, Dropbox or WebDAV",
-      "api": [
-        "REST",
-        "Plugins"
-      ],
+      "api": ["REST", "Plugins"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/b0x42/Super-Productivity-MCP",
@@ -183,11 +144,7 @@
       "id": "tududi",
       "name": "tududi",
       "tagline": "A self-hosted app for tasks, projects, notes and areas, with CalDAV sync and a Telegram bot.",
-      "categories": [
-        "todo",
-        "project-management",
-        "notes"
-      ],
+      "categories": ["todo", "project-management", "notes"],
       "website": "https://tududi.com",
       "repo": "https://github.com/chrisvel/tududi",
       "docs": "https://docs.tududi.com",
@@ -202,20 +159,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Docker",
       "mobile": {
         "available": true,
         "how": "Installable web app (PWA) for Android and iOS; no native app"
       },
       "sync": "Your own server; CalDAV",
-      "api": [
-        "REST",
-        "CalDAV"
-      ],
+      "api": ["REST", "CalDAV"],
       "mcp": {
         "kind": "official",
         "url": "https://github.com/chrisvel/tududi/blob/main/docs/14-mcp-integration.md",
@@ -238,9 +189,7 @@
       "id": "tasks-org",
       "name": "Tasks.org",
       "tagline": "An Android to-do app, now also on desktop, that syncs with CalDAV, Google Tasks or EteSync.",
-      "categories": [
-        "todo"
-      ],
+      "categories": ["todo"],
       "website": "https://tasks.org",
       "repo": "https://github.com/tasks/tasks",
       "docs": "https://tasks.org/docs/",
@@ -255,12 +204,7 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "Kotlin",
-      "platforms": [
-        "android",
-        "macos",
-        "windows",
-        "linux"
-      ],
+      "platforms": ["android", "macos", "windows", "linux"],
       "selfHost": null,
       "mobile": {
         "available": true,
@@ -290,10 +234,7 @@
       "id": "planify",
       "name": "Planify",
       "tagline": "A to-do app for the Linux GNOME desktop that syncs with Todoist, Nextcloud or CalDAV.",
-      "categories": [
-        "todo",
-        "planner"
-      ],
+      "categories": ["todo", "planner"],
       "website": "https://useplanify.com",
       "repo": "https://github.com/alainm23/planify",
       "docs": null,
@@ -308,18 +249,14 @@
       },
       "lastCommit": "2026-09-21",
       "primaryLanguage": "Vala",
-      "platforms": [
-        "linux"
-      ],
+      "platforms": ["linux"],
       "selfHost": null,
       "mobile": {
         "available": false,
         "how": "No mobile app"
       },
       "sync": "Local, Todoist, Nextcloud or CalDAV",
-      "api": [
-        "CLI"
-      ],
+      "api": ["CLI"],
       "mcp": {
         "kind": "none",
         "url": null,
@@ -341,9 +278,7 @@
       "id": "errands",
       "name": "Errands",
       "tagline": "A simple to-do app for the Linux GNOME desktop with sub-tasks and Nextcloud sync.",
-      "categories": [
-        "todo"
-      ],
+      "categories": ["todo"],
       "website": "https://github.com/mrvladus/Errands",
       "repo": "https://github.com/mrvladus/Errands",
       "docs": null,
@@ -358,9 +293,7 @@
       },
       "lastCommit": "2026-08-22",
       "primaryLanguage": "Python",
-      "platforms": [
-        "linux"
-      ],
+      "platforms": ["linux"],
       "selfHost": null,
       "mobile": {
         "available": false,
@@ -389,9 +322,7 @@
       "id": "endeavour",
       "name": "Endeavour",
       "tagline": "The GNOME desktop's personal to-do app, formerly called GNOME To Do.",
-      "categories": [
-        "todo"
-      ],
+      "categories": ["todo"],
       "website": "https://gitlab.gnome.org/World/Endeavour",
       "repo": "https://gitlab.gnome.org/World/Endeavour",
       "docs": null,
@@ -406,9 +337,7 @@
       },
       "lastCommit": "2026-09-19",
       "primaryLanguage": "C",
-      "platforms": [
-        "linux"
-      ],
+      "platforms": ["linux"],
       "selfHost": null,
       "mobile": {
         "available": false,
@@ -437,9 +366,7 @@
       "id": "taskwarrior",
       "name": "Taskwarrior",
       "tagline": "A command-line to-do list with tags, projects, priorities, due dates and reports.",
-      "categories": [
-        "todo"
-      ],
+      "categories": ["todo"],
       "website": "https://taskwarrior.org",
       "repo": "https://github.com/GothenburgBitFactory/taskwarrior",
       "docs": "https://taskwarrior.org/docs/",
@@ -454,20 +381,14 @@
       },
       "lastCommit": "2026-09-25",
       "primaryLanguage": "C++",
-      "platforms": [
-        "linux",
-        "macos"
-      ],
+      "platforms": ["linux", "macos"],
       "selfHost": "Optional sync server",
       "mobile": {
         "available": false,
         "how": "No official mobile app"
       },
       "sync": "Local; optional TaskChampion sync server or cloud storage (S3, GCS)",
-      "api": [
-        "CLI",
-        "Plugins"
-      ],
+      "api": ["CLI", "Plugins"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/omniwaifu/taskwarrior-mcp",
@@ -490,9 +411,7 @@
       "id": "todo-txt",
       "name": "todo.txt-cli",
       "tagline": "A shell script that keeps your to-do list in one plain text file, todo.txt.",
-      "categories": [
-        "todo"
-      ],
+      "categories": ["todo"],
       "website": "http://todotxt.org",
       "repo": "https://github.com/todotxt/todo.txt-cli",
       "docs": "https://github.com/todotxt/todo.txt-cli/wiki",
@@ -507,20 +426,14 @@
       },
       "lastCommit": "2026-09-06",
       "primaryLanguage": "Shell",
-      "platforms": [
-        "linux",
-        "macos"
-      ],
+      "platforms": ["linux", "macos"],
       "selfHost": null,
       "mobile": {
         "available": true,
         "how": "No app from this project; many third-party apps read the same todo.txt file"
       },
       "sync": "Plain text file; sync it with any file sync tool",
-      "api": [
-        "CLI",
-        "Plugins"
-      ],
+      "api": ["CLI", "Plugins"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/danielmeint/todo-txt-mcp",
@@ -542,9 +455,7 @@
       "id": "donetick",
       "name": "Donetick",
       "tagline": "A self-hosted app for shared tasks and chores, with flexible repeats and task rotation.",
-      "categories": [
-        "todo"
-      ],
+      "categories": ["todo"],
       "website": "https://donetick.com",
       "repo": "https://github.com/donetick/donetick",
       "docs": "https://docs.donetick.com",
@@ -559,20 +470,14 @@
       },
       "lastCommit": "2026-08-18",
       "primaryLanguage": "Go",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Docker, binary",
       "mobile": {
         "available": true,
         "how": "Early Android APK and an alpha iOS app on TestFlight"
       },
       "sync": "Your own server, or donetick.com",
-      "api": [
-        "REST",
-        "Webhooks"
-      ],
+      "api": ["REST", "Webhooks"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/jason1365/donetick-mcp-server",
@@ -594,9 +499,7 @@
       "id": "nextcloud-tasks",
       "name": "Nextcloud Tasks",
       "tagline": "The tasks app for Nextcloud, which stores tasks in your own server and syncs over CalDAV.",
-      "categories": [
-        "todo"
-      ],
+      "categories": ["todo"],
       "website": "https://apps.nextcloud.com/apps/tasks",
       "repo": "https://github.com/nextcloud/tasks",
       "docs": null,
@@ -611,19 +514,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "JavaScript",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Nextcloud app",
       "mobile": {
         "available": true,
         "how": "No own app; use any CalDAV app, such as Apple Reminders or Tasks.org"
       },
       "sync": "Your own Nextcloud server; CalDAV",
-      "api": [
-        "CalDAV"
-      ],
+      "api": ["CalDAV"],
       "mcp": {
         "kind": "official",
         "url": "https://github.com/nextcloud/context_agent",
@@ -645,10 +543,7 @@
       "id": "calcurse",
       "name": "calcurse",
       "tagline": "A calendar and to-do list that runs in the terminal.",
-      "categories": [
-        "calendar",
-        "todo"
-      ],
+      "categories": ["calendar", "todo"],
       "website": "https://calcurse.org",
       "repo": "https://github.com/lfos/calcurse",
       "docs": "https://calcurse.org/files/manual.html",
@@ -663,19 +558,14 @@
       },
       "lastCommit": "2026-08-05",
       "primaryLanguage": "C",
-      "platforms": [
-        "linux",
-        "macos"
-      ],
+      "platforms": ["linux", "macos"],
       "selfHost": null,
       "mobile": {
         "available": false,
         "how": "No mobile app"
       },
       "sync": "Local files; optional CalDAV sync script",
-      "api": [
-        "CLI"
-      ],
+      "api": ["CLI"],
       "mcp": {
         "kind": "none",
         "url": null,
@@ -697,11 +587,7 @@
       "id": "dayglance",
       "name": "dayGLANCE",
       "tagline": "A local-first day planner where you drag tasks onto a timeline to block out your day.",
-      "categories": [
-        "planner",
-        "time-blocking",
-        "focus"
-      ],
+      "categories": ["planner", "time-blocking", "focus"],
       "website": "https://dayglance.app",
       "repo": "https://github.com/krelltunez/dayGLANCE",
       "docs": "https://docs.dayglance.app",
@@ -754,10 +640,7 @@
       "id": "nextcloud-calendar",
       "name": "Nextcloud Calendar",
       "tagline": "The calendar app for Nextcloud, with shared calendars, invites, free/busy and appointment booking.",
-      "categories": [
-        "calendar",
-        "scheduling"
-      ],
+      "categories": ["calendar", "scheduling"],
       "website": "https://apps.nextcloud.com/apps/calendar",
       "repo": "https://github.com/nextcloud/calendar",
       "docs": "https://docs.nextcloud.com/server/latest/user_manual/en/groupware/calendar.html",
@@ -772,19 +655,14 @@
       },
       "lastCommit": "2026-09-25",
       "primaryLanguage": "JavaScript",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Nextcloud app",
       "mobile": {
         "available": true,
         "how": "No first-party calendar app; phones sync over CalDAV (DAVx⁵ on Android, built in on iOS)"
       },
       "sync": "Your own Nextcloud server (CalDAV)",
-      "api": [
-        "CalDAV"
-      ],
+      "api": ["CalDAV"],
       "mcp": {
         "kind": "official",
         "url": "https://github.com/nextcloud/context_agent",
@@ -806,9 +684,7 @@
       "id": "radicale",
       "name": "Radicale",
       "tagline": "A small CalDAV and CardDAV server that stores your calendars and contacts as plain files.",
-      "categories": [
-        "calendar-server"
-      ],
+      "categories": ["calendar-server"],
       "website": "https://radicale.org",
       "repo": "https://github.com/Kozea/Radicale",
       "docs": "https://radicale.org/v3.html",
@@ -823,20 +699,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "Python",
-      "platforms": [
-        "server"
-      ],
+      "platforms": ["server"],
       "selfHost": "Docker, pip",
       "mobile": {
         "available": true,
         "how": "No app of its own; phones sync over CalDAV/CardDAV (DAVx⁵ on Android, built in on iOS)"
       },
       "sync": "CalDAV / CardDAV to your own server",
-      "api": [
-        "CalDAV",
-        "CardDAV",
-        "Plugins"
-      ],
+      "api": ["CalDAV", "CardDAV", "Plugins"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/dominik1001/caldav-mcp",
@@ -858,9 +728,7 @@
       "id": "baikal",
       "name": "Baïkal",
       "tagline": "A lightweight CalDAV and CardDAV server in PHP, with a web admin to manage users and calendars.",
-      "categories": [
-        "calendar-server"
-      ],
+      "categories": ["calendar-server"],
       "website": "https://sabre.io/baikal/",
       "repo": "https://github.com/sabre-io/Baikal",
       "docs": "https://sabre.io/baikal/",
@@ -875,19 +743,14 @@
       },
       "lastCommit": "2026-08-13",
       "primaryLanguage": "PHP",
-      "platforms": [
-        "server"
-      ],
+      "platforms": ["server"],
       "selfHost": "PHP app",
       "mobile": {
         "available": true,
         "how": "No app of its own; phones sync over CalDAV/CardDAV (DAVx⁵ on Android, built in on iOS)"
       },
       "sync": "CalDAV / CardDAV to your own server",
-      "api": [
-        "CalDAV",
-        "CardDAV"
-      ],
+      "api": ["CalDAV", "CardDAV"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/dominik1001/caldav-mcp",
@@ -909,9 +772,7 @@
       "id": "cal-diy",
       "name": "Cal.diy (Cal.com community edition)",
       "tagline": "A self-hosted booking page tool: share a link and people pick a free time on your calendar.",
-      "categories": [
-        "scheduling"
-      ],
+      "categories": ["scheduling"],
       "website": "https://www.cal.diy/",
       "repo": "https://github.com/calcom/cal.diy",
       "docs": "https://www.cal.diy/",
@@ -926,20 +787,14 @@
       },
       "lastCommit": "2026-09-20",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Docker, Node.js",
       "mobile": {
         "available": false,
         "how": "No mobile app; the booking pages work in a phone browser"
       },
       "sync": "Your own server; connects to Google, Microsoft and CalDAV calendars",
-      "api": [
-        "REST",
-        "Webhooks"
-      ],
+      "api": ["REST", "Webhooks"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/nikolapavurdzhiev/calcom-mcp",
@@ -961,9 +816,7 @@
       "id": "fossify-calendar",
       "name": "Fossify Calendar",
       "tagline": "An ad-free Android calendar with day, week, month and year views, widgets and event reminders.",
-      "categories": [
-        "calendar"
-      ],
+      "categories": ["calendar"],
       "website": "https://www.fossify.org/apps/calendar",
       "repo": "https://github.com/FossifyOrg/Calendar",
       "docs": null,
@@ -978,9 +831,7 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "Kotlin",
-      "platforms": [
-        "android"
-      ],
+      "platforms": ["android"],
       "selfHost": null,
       "mobile": {
         "available": true,
@@ -1009,9 +860,7 @@
       "id": "etar",
       "name": "Etar",
       "tagline": "A simple Android calendar with month, week, day and agenda views, built on the old AOSP calendar.",
-      "categories": [
-        "calendar"
-      ],
+      "categories": ["calendar"],
       "website": "https://f-droid.org/packages/ws.xsoh.etar/",
       "repo": "https://github.com/Etar-Group/Etar-Calendar",
       "docs": null,
@@ -1026,9 +875,7 @@
       },
       "lastCommit": "2026-08-01",
       "primaryLanguage": "Java",
-      "platforms": [
-        "android"
-      ],
+      "platforms": ["android"],
       "selfHost": null,
       "mobile": {
         "available": true,
@@ -1058,9 +905,7 @@
       "id": "thunderbird",
       "name": "Thunderbird",
       "tagline": "A desktop email app with a built-in calendar and task list that syncs over CalDAV.",
-      "categories": [
-        "calendar"
-      ],
+      "categories": ["calendar"],
       "website": "https://www.thunderbird.net",
       "repo": "https://github.com/thunderbird/thunderbird-desktop",
       "releaseTag": {
@@ -1079,21 +924,14 @@
       },
       "lastCommit": "2026-09-25",
       "primaryLanguage": "JavaScript",
-      "platforms": [
-        "windows",
-        "macos",
-        "linux"
-      ],
+      "platforms": ["windows", "macos", "linux"],
       "selfHost": null,
       "mobile": {
         "available": false,
         "how": "Thunderbird for Android is email only; calendar is desktop only for now"
       },
       "sync": "CalDAV, Google Calendar, local",
-      "api": [
-        "CalDAV",
-        "Plugins"
-      ],
+      "api": ["CalDAV", "Plugins"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/TKasperczyk/thunderbird-mcp",
@@ -1115,9 +953,7 @@
       "id": "gnome-calendar",
       "name": "GNOME Calendar",
       "tagline": "The simple calendar app for the GNOME desktop on Linux, with month, week and agenda views.",
-      "categories": [
-        "calendar"
-      ],
+      "categories": ["calendar"],
       "website": "https://apps.gnome.org/Calendar/",
       "repo": "https://gitlab.gnome.org/GNOME/gnome-calendar",
       "docs": null,
@@ -1132,18 +968,14 @@
       },
       "lastCommit": "2026-09-20",
       "primaryLanguage": "C",
-      "platforms": [
-        "linux"
-      ],
+      "platforms": ["linux"],
       "selfHost": null,
       "mobile": {
         "available": false,
         "how": "No mobile app (desktop Linux only)"
       },
       "sync": "GNOME Online Accounts (Google, Nextcloud, Microsoft) or CalDAV",
-      "api": [
-        "CalDAV"
-      ],
+      "api": ["CalDAV"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/jamesdedon/gnome-calendar-mcp",
@@ -1165,9 +997,7 @@
       "id": "davx5",
       "name": "DAVx⁵",
       "tagline": "An Android app that syncs calendars, contacts and tasks from any CalDAV or CardDAV server.",
-      "categories": [
-        "calendar"
-      ],
+      "categories": ["calendar"],
       "website": "https://www.davx5.com",
       "repo": "https://github.com/bitfireAT/davx5-ose",
       "docs": "https://manual.davx5.com/",
@@ -1182,20 +1012,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "Kotlin",
-      "platforms": [
-        "android"
-      ],
+      "platforms": ["android"],
       "selfHost": null,
       "mobile": {
         "available": true,
         "how": "Android app (F-Droid free, Google Play paid); no iOS app"
       },
       "sync": "CalDAV / CardDAV / WebDAV to any server",
-      "api": [
-        "CalDAV",
-        "CardDAV",
-        "WebDAV"
-      ],
+      "api": ["CalDAV", "CardDAV", "WebDAV"],
       "mcp": {
         "kind": "official",
         "url": "https://github.com/bitfireAT/davmcp",
@@ -1217,9 +1041,7 @@
       "id": "proton-calendar",
       "name": "Proton Calendar",
       "tagline": "An end-to-end encrypted calendar from Proton, on the web and on Android and iOS.",
-      "categories": [
-        "calendar"
-      ],
+      "categories": ["calendar"],
       "website": "https://proton.me/calendar",
       "repo": "https://github.com/ProtonMail/WebClients",
       "releaseTag": {
@@ -1238,11 +1060,7 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "web",
-        "android",
-        "ios"
-      ],
+      "platforms": ["web", "android", "ios"],
       "selfHost": null,
       "mobile": {
         "available": true,
@@ -1271,9 +1089,7 @@
       "id": "tuta-calendar",
       "name": "Tuta Calendar",
       "tagline": "An end-to-end encrypted calendar from Tuta, on the web, desktop, Android and iOS.",
-      "categories": [
-        "calendar"
-      ],
+      "categories": ["calendar"],
       "website": "https://tuta.com/calendar",
       "repo": "https://github.com/tutao/tutanota",
       "releaseTag": {
@@ -1292,14 +1108,7 @@
       },
       "lastCommit": "2026-09-22",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "web",
-        "windows",
-        "macos",
-        "linux",
-        "android",
-        "ios"
-      ],
+      "platforms": ["web", "windows", "macos", "linux", "android", "ios"],
       "selfHost": null,
       "mobile": {
         "available": true,
@@ -1328,10 +1137,7 @@
       "id": "pomatez",
       "name": "Pomatez",
       "tagline": "A desktop Pomodoro timer with a simple task list, break rules and a strict mode.",
-      "categories": [
-        "pomodoro",
-        "focus"
-      ],
+      "categories": ["pomodoro", "focus"],
       "website": "https://zidoro.github.io/pomatez/",
       "repo": "https://github.com/zidoro/pomatez",
       "docs": null,
@@ -1346,11 +1152,7 @@
       },
       "lastCommit": "2026-05-19",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "windows",
-        "macos",
-        "linux"
-      ],
+      "platforms": ["windows", "macos", "linux"],
       "selfHost": null,
       "mobile": {
         "available": false,
@@ -1380,10 +1182,7 @@
       "id": "solanum",
       "name": "Solanum",
       "tagline": "A small Pomodoro timer for the GNOME desktop that times work laps and breaks.",
-      "categories": [
-        "pomodoro",
-        "focus"
-      ],
+      "categories": ["pomodoro", "focus"],
       "website": "https://apps.gnome.org/Solanum/",
       "repo": "https://gitlab.gnome.org/World/Solanum",
       "docs": null,
@@ -1398,9 +1197,7 @@
       },
       "lastCommit": "2026-03-24",
       "primaryLanguage": "Rust",
-      "platforms": [
-        "linux"
-      ],
+      "platforms": ["linux"],
       "selfHost": null,
       "mobile": {
         "available": false,
@@ -1429,10 +1226,7 @@
       "id": "pomotroid",
       "name": "Pomotroid",
       "tagline": "A Pomodoro timer for your desktop with session stats, themes and global shortcuts.",
-      "categories": [
-        "pomodoro",
-        "focus"
-      ],
+      "categories": ["pomodoro", "focus"],
       "website": "https://pomotroid.app",
       "repo": "https://github.com/Splode/pomotroid",
       "docs": null,
@@ -1447,11 +1241,7 @@
       },
       "lastCommit": "2026-06-19",
       "primaryLanguage": "Rust",
-      "platforms": [
-        "windows",
-        "macos",
-        "linux"
-      ],
+      "platforms": ["windows", "macos", "linux"],
       "selfHost": null,
       "mobile": {
         "available": false,
@@ -1481,9 +1271,7 @@
       "id": "stretchly",
       "name": "Stretchly",
       "tagline": "A desktop app that reminds you to take short and long breaks from your computer.",
-      "categories": [
-        "focus"
-      ],
+      "categories": ["focus"],
       "website": "https://hovancik.net/stretchly",
       "repo": "https://github.com/hovancik/stretchly",
       "docs": "https://github.com/hovancik/stretchly#readme",
@@ -1498,20 +1286,14 @@
       },
       "lastCommit": "2026-08-14",
       "primaryLanguage": "JavaScript",
-      "platforms": [
-        "windows",
-        "macos",
-        "linux"
-      ],
+      "platforms": ["windows", "macos", "linux"],
       "selfHost": null,
       "mobile": {
         "available": false,
         "how": "No mobile app"
       },
       "sync": "Local only",
-      "api": [
-        "CLI"
-      ],
+      "api": ["CLI"],
       "mcp": {
         "kind": "none",
         "url": null,
@@ -1533,9 +1315,7 @@
       "id": "kimai",
       "name": "Kimai",
       "tagline": "A web app for tracking work hours, with timesheets, reports, invoices and teams.",
-      "categories": [
-        "time-tracking"
-      ],
+      "categories": ["time-tracking"],
       "website": "https://www.kimai.org",
       "repo": "https://github.com/kimai/kimai",
       "docs": "https://www.kimai.org/documentation/",
@@ -1550,20 +1330,14 @@
       },
       "lastCommit": "2026-09-15",
       "primaryLanguage": "PHP",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Docker, PHP app",
       "mobile": {
         "available": true,
         "how": "Responsive web app; iOS and Android apps are third-party only"
       },
       "sync": "Your own server",
-      "api": [
-        "REST",
-        "Plugins"
-      ],
+      "api": ["REST", "Plugins"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/glazperle/kimai_mcp",
@@ -1586,9 +1360,7 @@
       "id": "activitywatch",
       "name": "ActivityWatch",
       "tagline": "An automatic time tracker that logs which apps and websites you use, stored on your computer.",
-      "categories": [
-        "time-tracking"
-      ],
+      "categories": ["time-tracking"],
       "website": "https://activitywatch.net",
       "repo": "https://github.com/ActivityWatch/activitywatch",
       "docs": "https://docs.activitywatch.net",
@@ -1603,21 +1375,14 @@
       },
       "lastCommit": "2026-09-19",
       "primaryLanguage": "Python",
-      "platforms": [
-        "windows",
-        "macos",
-        "linux",
-        "android"
-      ],
+      "platforms": ["windows", "macos", "linux", "android"],
       "selfHost": null,
       "mobile": {
         "available": true,
         "how": "Android app (Play Store and APK); no iOS app"
       },
       "sync": "Local only (sync between devices is in testing)",
-      "api": [
-        "REST"
-      ],
+      "api": ["REST"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/8bitgentleman/activitywatch-mcp-server",
@@ -1639,9 +1404,7 @@
       "id": "traggo",
       "name": "Traggo",
       "tagline": "A self-hosted time tracker where you tag spans of time instead of filing them under tasks.",
-      "categories": [
-        "time-tracking"
-      ],
+      "categories": ["time-tracking"],
       "website": "https://traggo.net",
       "repo": "https://github.com/traggo/server",
       "docs": "https://traggo.net",
@@ -1656,19 +1419,14 @@
       },
       "lastCommit": "2026-07-31",
       "primaryLanguage": "Go",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Docker, binary",
       "mobile": {
         "available": false,
         "how": "No mobile app; web UI only"
       },
       "sync": "Your own server",
-      "api": [
-        "GraphQL"
-      ],
+      "api": ["GraphQL"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/IlyaBizyaev/traggo-mcp",
@@ -1690,9 +1448,7 @@
       "id": "solidtime",
       "name": "solidtime",
       "tagline": "A modern time tracker for freelancers and agencies, with projects, clients and billable rates.",
-      "categories": [
-        "time-tracking"
-      ],
+      "categories": ["time-tracking"],
       "website": "https://www.solidtime.io",
       "repo": "https://github.com/solidtime-io/solidtime",
       "docs": "https://docs.solidtime.io",
@@ -1707,22 +1463,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "PHP",
-      "platforms": [
-        "web",
-        "server",
-        "macos",
-        "windows",
-        "linux"
-      ],
+      "platforms": ["web", "server", "macos", "windows", "linux"],
       "selfHost": "Docker",
       "mobile": {
         "available": false,
         "how": "No mobile app"
       },
       "sync": "Your own server or solidtime Cloud",
-      "api": [
-        "REST"
-      ],
+      "api": ["REST"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/SwamiRama/solidtime-mcp-server",
@@ -1745,9 +1493,7 @@
       "id": "timetagger",
       "name": "TimeTagger",
       "tagline": "A web-based time tracker built around an interactive timeline and #tags.",
-      "categories": [
-        "time-tracking"
-      ],
+      "categories": ["time-tracking"],
       "website": "https://timetagger.app",
       "repo": "https://github.com/almarklein/timetagger",
       "docs": "https://timetagger.readthedocs.io",
@@ -1762,20 +1508,14 @@
       },
       "lastCommit": "2026-05-17",
       "primaryLanguage": "Python",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Docker, pip (Python)",
       "mobile": {
         "available": true,
         "how": "Responsive web app; no native app"
       },
       "sync": "Your own server (or the paid timetagger.app)",
-      "api": [
-        "REST",
-        "CLI"
-      ],
+      "api": ["REST", "CLI"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/regismesquita/timetagger-mcp",
@@ -1797,10 +1537,7 @@
       "id": "joplin",
       "name": "Joplin",
       "tagline": "A Markdown note and to-do app for desktop and phone that syncs through the service you pick.",
-      "categories": [
-        "notes",
-        "todo"
-      ],
+      "categories": ["notes", "todo"],
       "website": "https://joplinapp.org",
       "repo": "https://github.com/laurent22/joplin",
       "docs": "https://joplinapp.org/help/",
@@ -1815,25 +1552,14 @@
       },
       "lastCommit": "2026-09-23",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "windows",
-        "macos",
-        "linux",
-        "ios",
-        "android",
-        "server"
-      ],
+      "platforms": ["windows", "macos", "linux", "ios", "android", "server"],
       "selfHost": "Docker (Joplin Server)",
       "mobile": {
         "available": true,
         "how": "First-party iOS and Android apps"
       },
       "sync": "Joplin Cloud, Joplin Server, Nextcloud, WebDAV, Dropbox, OneDrive, S3 or a local folder",
-      "api": [
-        "REST",
-        "Plugins",
-        "CLI"
-      ],
+      "api": ["REST", "Plugins", "CLI"],
       "mcp": {
         "kind": "official",
         "url": "https://github.com/laurent22/joplin/blob/dev/readme/apps/ai_mcp.md",
@@ -1855,9 +1581,7 @@
       "id": "trilium",
       "name": "Trilium Notes",
       "tagline": "A note app for building a large personal knowledge base as a tree, with scripting and a web server.",
-      "categories": [
-        "notes"
-      ],
+      "categories": ["notes"],
       "website": "https://triliumnotes.org",
       "repo": "https://github.com/TriliumNext/Trilium",
       "docs": "https://docs.triliumnotes.org/",
@@ -1872,22 +1596,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "web",
-        "windows",
-        "macos",
-        "linux",
-        "server"
-      ],
+      "platforms": ["web", "windows", "macos", "linux", "server"],
       "selfHost": "Docker, binary",
       "mobile": {
         "available": true,
         "how": "Mobile web view from your server; Android and iOS only via community apps (TriliumDroid, Trinote)"
       },
       "sync": "Your own server",
-      "api": [
-        "REST"
-      ],
+      "api": ["REST"],
       "mcp": {
         "kind": "official",
         "url": "https://github.com/TriliumNext/Trilium/blob/main/docs/User%20Guide/User%20Guide/AI/MCP.md",
@@ -1909,9 +1625,7 @@
       "id": "logseq",
       "name": "Logseq",
       "tagline": "An outliner for notes and daily journals, with tasks, links between pages and plugins.",
-      "categories": [
-        "notes"
-      ],
+      "categories": ["notes"],
       "website": "https://logseq.com",
       "repo": "https://github.com/logseq/logseq",
       "docs": "https://docs.logseq.com/",
@@ -1926,24 +1640,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "Clojure",
-      "platforms": [
-        "web",
-        "windows",
-        "macos",
-        "linux",
-        "ios",
-        "android"
-      ],
+      "platforms": ["web", "windows", "macos", "linux", "ios", "android"],
       "selfHost": "Docker (web app, sync server)",
       "mobile": {
         "available": true,
         "how": "First-party iOS and Android apps; the new database-version mobile app is in alpha"
       },
       "sync": "Local files; paid Logseq Sync (self-hostable for DB graphs) or any file-sync tool",
-      "api": [
-        "Plugins",
-        "CLI"
-      ],
+      "api": ["Plugins", "CLI"],
       "mcp": {
         "kind": "official",
         "url": "https://github.com/logseq/docs/blob/master/db-version.md#mcp-server",
@@ -1966,11 +1670,7 @@
       "id": "appflowy",
       "name": "AppFlowy",
       "tagline": "A workspace for docs, wikis and task boards, built as an open source Notion alternative.",
-      "categories": [
-        "notes",
-        "kanban",
-        "project-management"
-      ],
+      "categories": ["notes", "kanban", "project-management"],
       "website": "https://appflowy.com",
       "repo": "https://github.com/AppFlowy-IO/AppFlowy",
       "docs": "https://docs.appflowy.io/docs",
@@ -2023,9 +1723,7 @@
       "id": "affine",
       "name": "AFFiNE",
       "tagline": "A local-first workspace that mixes docs, whiteboards and databases in one place.",
-      "categories": [
-        "notes"
-      ],
+      "categories": ["notes"],
       "website": "https://affine.pro",
       "repo": "https://github.com/toeverything/AFFiNE",
       "docs": "https://docs.affine.pro/",
@@ -2078,9 +1776,7 @@
       "id": "anytype",
       "name": "Anytype",
       "tagline": "An encrypted, local-first app for notes, tasks and linked objects that syncs peer to peer.",
-      "categories": [
-        "notes"
-      ],
+      "categories": ["notes"],
       "website": "https://anytype.io",
       "repo": "https://github.com/anyproto/anytype-ts",
       "docs": "https://doc.anytype.io/anytype",
@@ -2095,22 +1791,14 @@
       },
       "lastCommit": "2026-09-22",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "windows",
-        "macos",
-        "linux",
-        "ios",
-        "android"
-      ],
+      "platforms": ["windows", "macos", "linux", "ios", "android"],
       "selfHost": "Docker (any-sync network)",
       "mobile": {
         "available": true,
         "how": "First-party iOS and Android apps"
       },
       "sync": "End-to-end encrypted sync via the Anytype network or your own any-sync nodes",
-      "api": [
-        "REST"
-      ],
+      "api": ["REST"],
       "mcp": {
         "kind": "official",
         "url": "https://github.com/anyproto/anytype-mcp",
@@ -2132,10 +1820,7 @@
       "id": "kanboard",
       "name": "Kanboard",
       "tagline": "A simple self-hosted kanban board for projects, with list, calendar and Gantt views.",
-      "categories": [
-        "kanban",
-        "project-management"
-      ],
+      "categories": ["kanban", "project-management"],
       "website": "https://kanboard.org",
       "repo": "https://github.com/kanboard/kanboard",
       "docs": "https://docs.kanboard.org/",
@@ -2150,21 +1835,14 @@
       },
       "lastCommit": "2026-09-11",
       "primaryLanguage": "PHP",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "PHP app, Docker",
       "mobile": {
         "available": false,
         "how": "No mobile app; use the web app in a phone browser"
       },
       "sync": "Your own server",
-      "api": [
-        "JSON-RPC",
-        "Plugins",
-        "Webhooks"
-      ],
+      "api": ["JSON-RPC", "Plugins", "Webhooks"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/bivex/kanboard-mcp",
@@ -2186,9 +1864,7 @@
       "id": "wekan",
       "name": "WeKan",
       "tagline": "A self-hosted kanban board like Trello, with swimlanes, checklists and custom fields.",
-      "categories": [
-        "kanban"
-      ],
+      "categories": ["kanban"],
       "website": "https://wekan.fi",
       "repo": "https://github.com/wekan/wekan",
       "docs": "https://github.com/wekan/wekan/tree/main/docs",
@@ -2203,23 +1879,14 @@
       },
       "lastCommit": "2026-09-25",
       "primaryLanguage": "JavaScript",
-      "platforms": [
-        "web",
-        "server",
-        "windows",
-        "macos",
-        "linux"
-      ],
+      "platforms": ["web", "server", "windows", "macos", "linux"],
       "selfHost": "Docker, Snap, Sandstorm and more",
       "mobile": {
         "available": false,
         "how": "No mobile app; use the web app in a phone browser"
       },
       "sync": "Your own server",
-      "api": [
-        "REST",
-        "Webhooks"
-      ],
+      "api": ["REST", "Webhooks"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/namar0x0309/wekan-mcp",
@@ -2241,9 +1908,7 @@
       "id": "planka",
       "name": "PLANKA",
       "tagline": "A self-hosted Trello-style kanban board with real-time updates, Markdown cards and a stopwatch.",
-      "categories": [
-        "kanban"
-      ],
+      "categories": ["kanban"],
       "website": "https://planka.app",
       "repo": "https://github.com/plankanban/planka",
       "docs": "https://docs.planka.cloud/docs/welcome/",
@@ -2258,20 +1923,14 @@
       },
       "lastCommit": "2026-09-17",
       "primaryLanguage": "JavaScript",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Docker, Helm",
       "mobile": {
         "available": false,
         "how": "No app for the free edition; phone and tablet support is a paid PLANKA Pro feature"
       },
       "sync": "Your own server",
-      "api": [
-        "REST",
-        "Webhooks"
-      ],
+      "api": ["REST", "Webhooks"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/gogogadgetbytes/planka-mcp",
@@ -2293,10 +1952,7 @@
       "id": "focalboard",
       "name": "Focalboard",
       "tagline": "A self-hosted board, table and calendar tool for tasks and projects, like a simple Trello or Notion.",
-      "categories": [
-        "kanban",
-        "project-management"
-      ],
+      "categories": ["kanban", "project-management"],
       "website": "https://github.com/mattermost-community/focalboard",
       "repo": "https://github.com/mattermost-community/focalboard",
       "releaseTag": {
@@ -2315,21 +1971,14 @@
       },
       "lastCommit": "2025-06-11",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "web",
-        "server",
-        "windows",
-        "linux"
-      ],
+      "platforms": ["web", "server", "windows", "linux"],
       "selfHost": "Binary, Docker",
       "mobile": {
         "available": false,
         "how": "No mobile app"
       },
       "sync": "Your own server; the desktop app is local only",
-      "api": [
-        "REST"
-      ],
+      "api": ["REST"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/gmjuhasz/focalboard-mcp-server",
@@ -2351,10 +2000,7 @@
       "id": "taiga",
       "name": "Taiga",
       "tagline": "A self-hosted agile project tool with Scrum backlogs, sprints, kanban boards and issues.",
-      "categories": [
-        "kanban",
-        "project-management"
-      ],
+      "categories": ["kanban", "project-management"],
       "website": "https://taiga.io",
       "repo": "https://github.com/taigaio/taiga-back",
       "docs": "https://docs.taiga.io/",
@@ -2369,21 +2015,14 @@
       },
       "lastCommit": "2026-09-23",
       "primaryLanguage": "Python",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Docker",
       "mobile": {
         "available": false,
         "how": "No official mobile app; use the web app"
       },
       "sync": "Your own server",
-      "api": [
-        "REST",
-        "Webhooks",
-        "Plugins"
-      ],
+      "api": ["REST", "Webhooks", "Plugins"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/OFFSET3/taiga-mcp",
@@ -2405,9 +2044,7 @@
       "id": "nextcloud-deck",
       "name": "Nextcloud Deck",
       "tagline": "A kanban board app for Nextcloud, for personal planning and team projects.",
-      "categories": [
-        "kanban"
-      ],
+      "categories": ["kanban"],
       "website": "https://apps.nextcloud.com/apps/deck",
       "repo": "https://github.com/nextcloud/deck",
       "docs": "https://deck.readthedocs.io/en/latest/",
@@ -2422,20 +2059,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "JavaScript",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Nextcloud app",
       "mobile": {
         "available": true,
         "how": "Community apps: Nextcloud Deck for Android (F-Droid, Google Play) and Next Deck for iOS"
       },
       "sync": "Your Nextcloud server",
-      "api": [
-        "REST",
-        "CalDAV"
-      ],
+      "api": ["REST", "CalDAV"],
       "mcp": {
         "kind": "community",
         "url": "https://github.com/cbcoutinho/nextcloud-mcp-server",
@@ -2457,10 +2088,7 @@
       "id": "plane",
       "name": "Plane",
       "tagline": "An open source project tool for issues, sprints (cycles), roadmaps and docs, like Jira or Linear.",
-      "categories": [
-        "kanban",
-        "project-management"
-      ],
+      "categories": ["kanban", "project-management"],
       "website": "https://plane.so",
       "repo": "https://github.com/makeplane/plane",
       "docs": "https://docs.plane.so/",
@@ -2475,20 +2103,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Docker, Kubernetes",
       "mobile": {
         "available": false,
         "how": "Official iOS and Android apps work only with Plane Cloud and the paid self-hosted edition, not the free Community Edition"
       },
       "sync": "Your own server",
-      "api": [
-        "REST",
-        "Webhooks"
-      ],
+      "api": ["REST", "Webhooks"],
       "mcp": {
         "kind": "official",
         "url": "https://github.com/makeplane/plane-mcp-server",
@@ -2510,9 +2132,7 @@
       "id": "tasks-md",
       "name": "Tasks.md",
       "tagline": "A self-hosted kanban board that saves every card as a Markdown file in a folder.",
-      "categories": [
-        "kanban"
-      ],
+      "categories": ["kanban"],
       "website": "https://github.com/BaldissaraMatheus/Tasks.md",
       "repo": "https://github.com/BaldissaraMatheus/Tasks.md",
       "docs": null,
@@ -2527,10 +2147,7 @@
       },
       "lastCommit": "2026-03-08",
       "primaryLanguage": "JavaScript",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Docker",
       "mobile": {
         "available": false,
@@ -2560,10 +2177,7 @@
       "id": "kaneo",
       "name": "Kaneo",
       "tagline": "A clean, self-hosted project tool with boards, lists, a calendar and Gantt charts.",
-      "categories": [
-        "kanban",
-        "project-management"
-      ],
+      "categories": ["kanban", "project-management"],
       "website": "https://kaneo.app",
       "repo": "https://github.com/usekaneo/kaneo",
       "docs": "https://kaneo.app/docs/core",
@@ -2578,20 +2192,14 @@
       },
       "lastCommit": "2026-09-25",
       "primaryLanguage": "TypeScript",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "Docker, Helm",
       "mobile": {
         "available": false,
         "how": "No mobile app"
       },
       "sync": "Your own server",
-      "api": [
-        "REST",
-        "Webhooks"
-      ],
+      "api": ["REST", "Webhooks"],
       "mcp": {
         "kind": "official",
         "url": "https://kaneo.app/docs/core/integrations/mcp",
@@ -2614,11 +2222,7 @@
       "id": "openproject",
       "name": "OpenProject",
       "tagline": "A self-hosted project management suite with boards, Gantt charts, time tracking and wikis.",
-      "categories": [
-        "kanban",
-        "project-management",
-        "time-tracking"
-      ],
+      "categories": ["kanban", "project-management", "time-tracking"],
       "website": "https://www.openproject.org",
       "repo": "https://github.com/opf/openproject",
       "docs": "https://www.openproject.org/docs/",
@@ -2633,23 +2237,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "Ruby",
-      "platforms": [
-        "web",
-        "server",
-        "ios",
-        "android"
-      ],
+      "platforms": ["web", "server", "ios", "android"],
       "selfHost": "Docker, packages, Helm",
       "mobile": {
         "available": true,
         "how": "Official iOS and Android app (beta)"
       },
       "sync": "Your own server",
-      "api": [
-        "REST",
-        "Webhooks",
-        "Plugins"
-      ],
+      "api": ["REST", "Webhooks", "Plugins"],
       "mcp": {
         "kind": "official",
         "url": "https://www.openproject.org/docs/system-admin-guide/integrations/mcp-server/",
@@ -2691,20 +2286,14 @@
       },
       "lastCommit": "2026-09-24",
       "primaryLanguage": "PHP",
-      "platforms": [
-        "web",
-        "server"
-      ],
+      "platforms": ["web", "server"],
       "selfHost": "PHP app, Docker",
       "mobile": {
         "available": false,
         "how": "No mobile app; use the web app in a phone browser"
       },
       "sync": "Your own server",
-      "api": [
-        "JSON-RPC",
-        "Plugins"
-      ],
+      "api": ["JSON-RPC", "Plugins"],
       "mcp": {
         "kind": "official",
         "url": "https://marketplace.leantime.io/product/mcp-server/",

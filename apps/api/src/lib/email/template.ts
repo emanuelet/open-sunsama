@@ -8,14 +8,14 @@
 // =============================================================================
 
 export const EMAIL_COLORS = {
-  background: '#f9fafb',
-  cardBackground: '#ffffff',
-  text: '#111827',
-  textSecondary: '#374151',
-  textMuted: '#6b7280',
-  textLight: '#9ca3af',
-  border: '#e5e7eb',
-  defaultTheme: '#3b82f6',
+  background: "#f9fafb",
+  cardBackground: "#ffffff",
+  text: "#111827",
+  textSecondary: "#374151",
+  textMuted: "#6b7280",
+  textLight: "#9ca3af",
+  border: "#e5e7eb",
+  defaultTheme: "#3b82f6",
 } as const;
 
 export const EMAIL_FONTS = {
@@ -24,9 +24,9 @@ export const EMAIL_FONTS = {
 } as const;
 
 export const EMAIL_SPACING = {
-  padding: '32px',
-  gap: '16px',
-  borderRadius: '12px',
+  padding: "32px",
+  gap: "16px",
+  borderRadius: "12px",
 } as const;
 
 // =============================================================================
@@ -38,11 +38,11 @@ export const EMAIL_SPACING = {
  */
 export function escapeHtml(text: string): string {
   const htmlEntities: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
   };
   return text.replace(/[&<>"']/g, (char) => htmlEntities[char] || char);
 }
@@ -74,7 +74,7 @@ export function generateEmailHTML(options: GenerateEmailHTMLOptions): string {
 
   const footerContent = footerText
     ? `<p style="margin: 0 0 4px 0; font-size: 13px; color: ${EMAIL_COLORS.textLight};">${escapeHtml(footerText)}</p>`
-    : '';
+    : "";
 
   return `
 <!DOCTYPE html>

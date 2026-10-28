@@ -5,14 +5,14 @@
  * supporting OAuth and CalDAV authentication methods.
  */
 
-export type CalendarProvider = 'google' | 'outlook' | 'icloud';
+export type CalendarProvider = "google" | "outlook" | "icloud";
 
 export interface CalendarAccount {
   id: string;
   userId: string;
   provider: CalendarProvider;
   email: string;
-  syncStatus: 'idle' | 'syncing' | 'error';
+  syncStatus: "idle" | "syncing" | "error";
   syncError: string | null;
   lastSyncedAt: string | null;
   isActive: boolean;
@@ -38,13 +38,13 @@ export interface Calendar {
 export interface CalendarEventAttendee {
   email: string;
   name: string | null;
-  responseStatus: 'accepted' | 'declined' | 'tentative' | 'needsAction' | null;
+  responseStatus: "accepted" | "declined" | "tentative" | "needsAction" | null;
   organizer: boolean;
   /** The connected account's own entry. */
   self: boolean;
 }
 
-export type CalendarRsvpResponse = 'accepted' | 'declined' | 'tentative';
+export type CalendarRsvpResponse = "accepted" | "declined" | "tentative";
 
 export interface CalendarEvent {
   id: string;
@@ -60,8 +60,8 @@ export interface CalendarEvent {
   timezone: string | null;
   recurrenceRule: string | null;
   recurringEventId: string | null;
-  status: 'confirmed' | 'tentative' | 'cancelled';
-  responseStatus: 'accepted' | 'declined' | 'tentative' | 'needsAction' | null;
+  status: "confirmed" | "tentative" | "cancelled";
+  responseStatus: "accepted" | "declined" | "tentative" | "needsAction" | null;
   htmlLink: string | null;
   /** Guests, or null when the event has none or the provider doesn't say. */
   attendees?: CalendarEventAttendee[] | null;

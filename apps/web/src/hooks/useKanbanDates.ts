@@ -82,11 +82,11 @@ export function useKanbanDates({
 
   // Track if initial scroll position is set (for infinite scroll logic)
   const hasInitializedRef = React.useRef(false);
-  
+
   // Mark as initialized after first render with container ready
   React.useEffect(() => {
     if (hasInitializedRef.current) return;
-    
+
     const container = containerRef.current;
     if (container && container.clientWidth > 0) {
       hasInitializedRef.current = true;
@@ -124,7 +124,10 @@ export function useKanbanDates({
       if (index >= 0 && options?.instant && containerRef.current) {
         containerRef.current.scrollLeft = index * COLUMN_WIDTH;
       } else if (index >= 0) {
-        virtualizer.scrollToIndex(index, { align: "start", behavior: "smooth" });
+        virtualizer.scrollToIndex(index, {
+          align: "start",
+          behavior: "smooth",
+        });
       } else {
         pendingDateRef.current = day;
         setCenterDate(day);
@@ -150,7 +153,10 @@ export function useKanbanDates({
   const prevCenterRef = React.useRef(centerDate);
   React.useLayoutEffect(() => {
     const container = containerRef.current;
-    const shiftDays = differenceInCalendarDays(prevCenterRef.current, centerDate);
+    const shiftDays = differenceInCalendarDays(
+      prevCenterRef.current,
+      centerDate
+    );
     prevCenterRef.current = centerDate;
     if (!container) return;
     const pending = pendingDateRef.current;
@@ -173,7 +179,7 @@ export function useKanbanDates({
     // Don't navigate before initial render completes
     // This prevents browser scroll position restoration from triggering navigation
     if (!hasInitializedRef.current) return;
-    
+
     const container = containerRef.current;
     if (!container) return;
 
@@ -193,9 +199,12 @@ export function useKanbanDates({
   // Use scroll offset to determine the actual first visible column, not the first virtual item
   const scrollOffset = virtualizer.scrollOffset ?? 0;
   const firstVisibleIndex = Math.floor(scrollOffset / COLUMN_WIDTH);
-  const containerWidth = containerRef.current?.clientWidth ?? COLUMN_WIDTH * VISIBLE_DAYS;
-  const lastVisibleIndex = Math.floor((scrollOffset + containerWidth) / COLUMN_WIDTH);
-  
+  const containerWidth =
+    containerRef.current?.clientWidth ?? COLUMN_WIDTH * VISIBLE_DAYS;
+  const lastVisibleIndex = Math.floor(
+    (scrollOffset + containerWidth) / COLUMN_WIDTH
+  );
+
   const firstVisibleDate = dates[firstVisibleIndex]?.date ?? null;
   const lastVisibleDate = dates[lastVisibleIndex]?.date ?? null;
 

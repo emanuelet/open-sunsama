@@ -44,40 +44,37 @@ export function UndoRedoProvider({ children }: { children: React.ReactNode }) {
     redoStack.current = [];
   }, []);
 
-  const run = React.useCallback(
-    async (kind: "undo" | "redo") => {
-      if (busy.current) return;
-      const from = kind === "undo" ? undoStack : redoStack;
-      const to = kind === "undo" ? redoStack : undoStack;
-      const entry = from.current.pop();
-      if (!entry) {
-        toast({
-          title: kind === "undo" ? "Nothing to undo" : "Nothing to redo",
-        });
-        return;
-      }
-      busy.current = true;
-      try {
-        await (kind === "undo" ? entry.undo() : entry.redo());
-        to.current.push(entry);
-        toast({
-          title: kind === "undo" ? "Undone" : "Redone",
-          description: entry.label,
-        });
-      } catch (err) {
-        // Put it back so the user can retry, and surface the failure.
-        from.current.push(entry);
-        toast({
-          variant: "destructive",
-          title: kind === "undo" ? "Couldn't undo" : "Couldn't redo",
-          description: err instanceof Error ? err.message : "Unknown error",
-        });
-      } finally {
-        busy.current = false;
-      }
-    },
-    []
-  );
+  const run = React.useCallback(async (kind: "undo" | "redo") => {
+    if (busy.current) return;
+    const from = kind === "undo" ? undoStack : redoStack;
+    const to = kind === "undo" ? redoStack : undoStack;
+    const entry = from.current.pop();
+    if (!entry) {
+      toast({
+        title: kind === "undo" ? "Nothing to undo" : "Nothing to redo",
+      });
+      return;
+    }
+    busy.current = true;
+    try {
+      await (kind === "undo" ? entry.undo() : entry.redo());
+      to.current.push(entry);
+      toast({
+        title: kind === "undo" ? "Undone" : "Redone",
+        description: entry.label,
+      });
+    } catch (err) {
+      // Put it back so the user can retry, and surface the failure.
+      from.current.push(entry);
+      toast({
+        variant: "destructive",
+        title: kind === "undo" ? "Couldn't undo" : "Couldn't redo",
+        description: err instanceof Error ? err.message : "Unknown error",
+      });
+    } finally {
+      busy.current = false;
+    }
+  }, []);
 
   const undo = React.useCallback(() => {
     void run("undo");

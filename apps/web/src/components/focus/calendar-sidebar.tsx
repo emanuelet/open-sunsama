@@ -54,7 +54,9 @@ export function CalendarSidebar({
             <h2 className="font-semibold">
               {format(new Date(), "EEEE, MMMM d")}
             </h2>
-            <p className="text-sm text-muted-foreground">Today&apos;s schedule</p>
+            <p className="text-sm text-muted-foreground">
+              Today&apos;s schedule
+            </p>
           </div>
 
           {/* Timeline */}

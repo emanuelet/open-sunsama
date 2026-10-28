@@ -34,7 +34,8 @@ const INSTRUCTIONS = `Open Sunsama is the user's daily planner: tasks scheduled 
 export function createOpenSunsamaMcpServer(
   client: ApiClient | ApiClientConfig
 ): McpServer {
-  const apiClient = client instanceof ApiClient ? client : new ApiClient(client);
+  const apiClient =
+    client instanceof ApiClient ? client : new ApiClient(client);
   const server = new McpServer(MCP_SERVER_INFO, { instructions: INSTRUCTIONS });
 
   registerTaskTools(server, apiClient);

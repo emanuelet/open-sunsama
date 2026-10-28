@@ -29,12 +29,36 @@ export const TOOL_GROUPS: McpToolGroup[] = [
     title: "Tasks",
     note: "Your days and your backlog.",
     tools: [
-      { name: "list_tasks", does: "List tasks for a day, a range of days or the backlog", access: "read" },
-      { name: "get_task", does: "Read one task with its notes, estimate and real time", access: "read" },
-      { name: "create_task", does: "Add a task with a date, estimate and priority", access: "write" },
-      { name: "update_task", does: "Change the title, notes, date, estimate, real time or priority", access: "write" },
-      { name: "schedule_task", does: "Move a task to another day or back to the backlog", access: "write" },
-      { name: "reorder_tasks", does: "Set the order of a day's tasks", access: "write" },
+      {
+        name: "list_tasks",
+        does: "List tasks for a day, a range of days or the backlog",
+        access: "read",
+      },
+      {
+        name: "get_task",
+        does: "Read one task with its notes, estimate and real time",
+        access: "read",
+      },
+      {
+        name: "create_task",
+        does: "Add a task with a date, estimate and priority",
+        access: "write",
+      },
+      {
+        name: "update_task",
+        does: "Change the title, notes, date, estimate, real time or priority",
+        access: "write",
+      },
+      {
+        name: "schedule_task",
+        does: "Move a task to another day or back to the backlog",
+        access: "write",
+      },
+      {
+        name: "reorder_tasks",
+        does: "Set the order of a day's tasks",
+        access: "write",
+      },
       { name: "complete_task", does: "Check a task off", access: "write" },
       { name: "uncomplete_task", does: "Reopen a done task", access: "write" },
       { name: "delete_task", does: "Delete a task", access: "delete" },
@@ -44,12 +68,32 @@ export const TOOL_GROUPS: McpToolGroup[] = [
     title: "Time blocks",
     note: "Your plan on the calendar.",
     tools: [
-      { name: "get_schedule_for_day", does: "Meetings and time blocks for one day, in one call", access: "read" },
-      { name: "list_time_blocks", does: "List blocks for a day, a range or one task", access: "read" },
+      {
+        name: "get_schedule_for_day",
+        does: "Meetings and time blocks for one day, in one call",
+        access: "read",
+      },
+      {
+        name: "list_time_blocks",
+        does: "List blocks for a day, a range or one task",
+        access: "read",
+      },
       { name: "get_time_block", does: "Read one block", access: "read" },
-      { name: "create_time_block", does: "Block time on the calendar", access: "write" },
-      { name: "update_time_block", does: "Move, resize or rename a block", access: "write" },
-      { name: "link_task_to_time_block", does: "Tie a block to its task", access: "write" },
+      {
+        name: "create_time_block",
+        does: "Block time on the calendar",
+        access: "write",
+      },
+      {
+        name: "update_time_block",
+        does: "Move, resize or rename a block",
+        access: "write",
+      },
+      {
+        name: "link_task_to_time_block",
+        does: "Tie a block to its task",
+        access: "write",
+      },
       { name: "delete_time_block", does: "Delete a block", access: "delete" },
     ],
   },
@@ -59,8 +103,16 @@ export const TOOL_GROUPS: McpToolGroup[] = [
     tools: [
       { name: "list_subtasks", does: "List a task's subtasks", access: "read" },
       { name: "create_subtask", does: "Add a step to a task", access: "write" },
-      { name: "toggle_subtask", does: "Check or uncheck a step", access: "write" },
-      { name: "update_subtask", does: "Rename or reorder a step", access: "write" },
+      {
+        name: "toggle_subtask",
+        does: "Check or uncheck a step",
+        access: "write",
+      },
+      {
+        name: "update_subtask",
+        does: "Rename or reorder a step",
+        access: "write",
+      },
       { name: "delete_subtask", does: "Delete a step", access: "delete" },
     ],
   },
@@ -79,8 +131,16 @@ export const TOOL_GROUPS: McpToolGroup[] = [
     title: "Profile",
     note: "So times land in your time zone.",
     tools: [
-      { name: "get_user_profile", does: "Read your name, time zone and settings", access: "read" },
-      { name: "update_user_profile", does: "Change your name, time zone or theme", access: "write" },
+      {
+        name: "get_user_profile",
+        does: "Read your name, time zone and settings",
+        access: "read",
+      },
+      {
+        name: "update_user_profile",
+        does: "Change your name, time zone or theme",
+        access: "write",
+      },
     ],
   },
 ];
@@ -99,7 +159,10 @@ export default defineMarketingPage({
     description:
       "Open Sunsama is an AI daily planner and MCP task manager. Paste one URL into Claude, ChatGPT or Cursor, sign in, and your agent plans tasks and time blocks.",
   },
-  breadcrumbs: [{ label: "Features", href: "/#features" }, { label: "AI and MCP" }],
+  breadcrumbs: [
+    { label: "Features", href: "/#features" },
+    { label: "AI and MCP" },
+  ],
 
   hero: {
     badge: "Feature",
@@ -113,9 +176,21 @@ export default defineMarketingPage({
       alt: "Claude plans the afternoon over MCP while tasks and time blocks appear live in Open Sunsama",
     },
     chips: [
-      { tone: "agent", title: "Claude connected", detail: "Blocked 3 tasks around your meetings" },
-      { tone: "block", title: "Deep work: Q4 roadmap", detail: "9:30 - 11:00 AM" },
-      { tone: "timer", title: "24 tools", detail: "Tasks, time blocks, meetings" },
+      {
+        tone: "agent",
+        title: "Claude connected",
+        detail: "Blocked 3 tasks around your meetings",
+      },
+      {
+        tone: "block",
+        title: "Deep work: Q4 roadmap",
+        detail: "9:30 - 11:00 AM",
+      },
+      {
+        tone: "timer",
+        title: "24 tools",
+        detail: "Tasks, time blocks, meetings",
+      },
     ],
     secondary: { video: "ai", label: "Watch the AI demo" },
   },
@@ -125,7 +200,8 @@ export default defineMarketingPage({
       kind: "answer",
       id: "answer",
       eyebrow: "The short answer",
-      heading: "An AI daily planner here means your own agent plans with your real data",
+      heading:
+        "An AI daily planner here means your own agent plans with your real data",
       body: [
         "Open Sunsama is an AI daily planner that works with Claude, ChatGPT, Cursor and any other MCP client. There is no AI of our own to learn. You connect the agent you already talk to.",
         "It is also an MCP task manager. One hosted server gives your agent 24 tools for tasks, subtasks, time blocks and your synced meetings.",
@@ -155,12 +231,21 @@ export default defineMarketingPage({
         "Move everything I didn't finish today to tomorrow.",
         "Add subtasks to the launch task: write tests, update docs, deploy to staging.",
       ],
-      tools: ["get_schedule_for_day", "list_tasks", "create_time_block", "link_task_to_time_block", "schedule_task"],
+      tools: [
+        "get_schedule_for_day",
+        "list_tasks",
+        "create_time_block",
+        "link_task_to_time_block",
+        "schedule_task",
+      ],
       links: [
         { label: "Claude setup", href: "/docs/mcp/claude" },
         { label: "ChatGPT setup", href: "/docs/mcp/chatgpt" },
         { label: "Cursor setup", href: "/docs/mcp/cursor" },
-        { label: "Plan your day with Claude", href: "/blog/plan-your-day-with-claude" },
+        {
+          label: "Plan your day with Claude",
+          href: "/blog/plan-your-day-with-claude",
+        },
       ],
     },
     {
@@ -179,7 +264,8 @@ export default defineMarketingPage({
           media: {
             shot: "consent-claude",
             alt: "Open Sunsama consent screen: Claude asks to view and edit tasks, subtasks, time blocks and your profile, and to view meetings from your connected calendars",
-            caption: "You allow Claude on Open Sunsama's page. Claude never sees your password.",
+            caption:
+              "You allow Claude on Open Sunsama's page. Claude never sees your password.",
           },
           link: { label: "Claude setup guide", href: "/docs/mcp/claude" },
         },
@@ -192,7 +278,8 @@ export default defineMarketingPage({
           media: {
             shot: "consent-chatgpt",
             alt: "Open Sunsama consent screen: ChatGPT asks to view and edit tasks, subtasks, time blocks and your profile, and to view meetings from your connected calendars",
-            caption: "The same screen for ChatGPT lists what it will be able to reach.",
+            caption:
+              "The same screen for ChatGPT lists what it will be able to reach.",
           },
           link: { label: "ChatGPT setup guide", href: "/docs/mcp/chatgpt" },
         },
@@ -205,7 +292,8 @@ export default defineMarketingPage({
           media: {
             shot: "mcp-settings",
             alt: "Open Sunsama Settings, MCP page with the connector URL, setup tabs for each AI app and the connected apps list",
-            caption: "Settings → MCP: the URL, setup steps and every connected app.",
+            caption:
+              "Settings → MCP: the URL, setup steps and every connected app.",
           },
         },
       ],
@@ -219,7 +307,10 @@ export default defineMarketingPage({
       body: TOOL_GROUPS.map(
         (group) =>
           `**${group.title}** (${group.tools.length}). ${group.note} ${group.tools
-            .map((tool) => `${tool.name}: ${tool.does.charAt(0).toLowerCase()}${tool.does.slice(1)}`)
+            .map(
+              (tool) =>
+                `${tool.name}: ${tool.does.charAt(0).toLowerCase()}${tool.does.slice(1)}`
+            )
             .join("; ")}.`
       ),
     },
@@ -299,7 +390,8 @@ export default defineMarketingPage({
       kind: "comparison",
       id: "compare",
       eyebrow: "Compare",
-      heading: "Open Sunsama gives any agent your tasks, time blocks and meetings in one server",
+      heading:
+        "Open Sunsama gives any agent your tasks, time blocks and meetings in one server",
       lead: "Sunsama, Akiflow and Todoist run official MCP servers too. Motion has only community-built ones. Here is what each lets your agent do.",
       columns: ["Open Sunsama", "Sunsama", "Motion", "Akiflow", "Todoist"],
       rows: [
@@ -343,8 +435,20 @@ export default defineMarketingPage({
             { text: "Not checked" },
           ],
         },
-        { feature: "Public REST API", cells: ["yes", "no", "yes", { mark: "no", text: "None listed" }, "yes"] },
-        { feature: "Code you can read and self-host", cells: ["yes", "no", "no", "no", "no"] },
+        {
+          feature: "Public REST API",
+          cells: [
+            "yes",
+            "no",
+            "yes",
+            { mark: "no", text: "None listed" },
+            "yes",
+          ],
+        },
+        {
+          feature: "Code you can read and self-host",
+          cells: ["yes", "no", "no", "no", "no"],
+        },
       ],
       sources:
         "Competitor facts come from each company's MCP docs, summed up in our [MCP comparison](/blog/best-task-managers-with-mcp): [Sunsama MCP](https://help.sunsama.com/docs/mcp-model-context-protocol), [Motion API](https://docs.usemotion.com/), [Akiflow MCP](https://akiflow.com/mcp) and [Todoist MCP](https://www.todoist.com/help/todoist/todoist-and-ai/connect-todoist-to-an-ai-assistant-xMSzFfHng). Checked September 2026.",
@@ -359,7 +463,10 @@ export default defineMarketingPage({
         question: "What is the best AI daily planner?",
         answer:
           "We build Open Sunsama, and we think it is the best pick for most people. It works with the AI you already use, sees your tasks and meetings together, and keeps you in control. Pick Motion if you want AI to schedule every task without asking.",
-        link: { label: "Best task managers with MCP", href: "/blog/best-task-managers-with-mcp" },
+        link: {
+          label: "Best task managers with MCP",
+          href: "/blog/best-task-managers-with-mcp",
+        },
       },
       {
         question: "What is an MCP task manager?",
@@ -376,7 +483,10 @@ export default defineMarketingPage({
         question: "Can ChatGPT plan my day?",
         answer:
           "Yes. Turn on developer mode, add the URL as a plugin and sign in. Developer mode is on paid ChatGPT plans, on the web.",
-        link: { label: "Plan your day with ChatGPT", href: "/blog/plan-your-day-with-chatgpt" },
+        link: {
+          label: "Plan your day with ChatGPT",
+          href: "/blog/plan-your-day-with-chatgpt",
+        },
       },
       {
         question: "Can the AI see or change my meetings?",
@@ -392,7 +502,10 @@ export default defineMarketingPage({
         question: "Can I use a local model or my own scripts?",
         answer:
           "Yes. Run the local MCP server with an API key for any local client, or call the public REST API from your own code.",
-        link: { label: "Local server and API keys", href: "/docs/mcp/local-server" },
+        link: {
+          label: "Local server and API keys",
+          href: "/docs/mcp/local-server",
+        },
       },
     ],
   },
@@ -462,7 +575,8 @@ export default defineMarketingPage({
     heading: "Connect your AI and plan tomorrow tonight",
     body: "Paste one URL into the agent you already use, sign in, and ask it to plan your day. Every block shows up on your calendar, where you can move it.",
     shot: "mcp-settings",
-    shotAlt: "Open Sunsama Settings, MCP page with the connector URL and the connected AI apps",
+    shotAlt:
+      "Open Sunsama Settings, MCP page with the connector URL and the connected AI apps",
   },
 
   software: {

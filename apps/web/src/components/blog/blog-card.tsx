@@ -11,7 +11,8 @@ import { BlogCover } from "./blog-cover";
  * cropping cuts words). Where the card is taller than the cover, the cover sits
  * centered on a band painted in the covers' own background color.
  */
-const COVER_BAND = "flex items-center bg-[hsl(30_60%_98.6%)] dark:bg-[hsl(228_14%_7%)]";
+const COVER_BAND =
+  "flex items-center bg-[hsl(30_60%_98.6%)] dark:bg-[hsl(228_14%_7%)]";
 
 /** "Feb 1, 2026", or "Updated Mar 3, 2026" once a post has been revised */
 export function cardDate({ date, updated }: BlogPost) {

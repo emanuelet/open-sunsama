@@ -23,15 +23,27 @@ import {
 } from "@/components/ui";
 import { WithShortcut, KeyCaps } from "@/components/ui/with-shortcut";
 import { MonthGrid } from "@/components/ui/month-grid";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { SHORTCUTS, formatShortcut } from "@/hooks/useKeyboardShortcuts";
 import { useIntegrationProviders } from "@/hooks/useIntegrations";
 
 // Extended sort option that includes direction
-export type SortOption = "position" | "priority-desc" | "priority-asc" | "createdAt-desc" | "createdAt-asc";
+export type SortOption =
+  | "position"
+  | "priority-desc"
+  | "priority-asc"
+  | "createdAt-desc"
+  | "createdAt-asc";
 
 // Map to extract base sort field and direction
-export function parseSortOption(sort: SortOption): { field: TaskSortBy; direction: "asc" | "desc" } {
+export function parseSortOption(sort: SortOption): {
+  field: TaskSortBy;
+  direction: "asc" | "desc";
+} {
   switch (sort) {
     case "priority-desc":
       return { field: "priority", direction: "desc" };
@@ -77,7 +89,13 @@ interface KanbanBoardToolbarProps {
   onSearchQueryChange: (query: string) => void;
 }
 
-const VALID_SORT_OPTIONS: SortOption[] = ["position", "priority-desc", "priority-asc", "createdAt-desc", "createdAt-asc"];
+const VALID_SORT_OPTIONS: SortOption[] = [
+  "position",
+  "priority-desc",
+  "priority-asc",
+  "createdAt-desc",
+  "createdAt-asc",
+];
 
 /**
  * Hook to manage sort preference with localStorage persistence
@@ -121,18 +139,35 @@ export function KanbanBoardToolbar({
     setGoToOpen(false);
   };
   const goToRows = [
-    { label: "Go to today", shortcut: SHORTCUTS.focusToday, action: onNavigateToday },
-    { label: "Go to next day", shortcut: SHORTCUTS.nextDay, action: onNavigateNext },
-    { label: "Go to previous day", shortcut: SHORTCUTS.previousDay, action: onNavigatePrevious },
+    {
+      label: "Go to today",
+      shortcut: SHORTCUTS.focusToday,
+      action: onNavigateToday,
+    },
+    {
+      label: "Go to next day",
+      shortcut: SHORTCUTS.nextDay,
+      action: onNavigateNext,
+    },
+    {
+      label: "Go to previous day",
+      shortcut: SHORTCUTS.previousDay,
+      action: onNavigatePrevious,
+    },
   ];
-  const currentSortLabel = SORT_OPTIONS.find((o) => o.value === sortBy)?.label ?? "Manual";
+  const currentSortLabel =
+    SORT_OPTIONS.find((o) => o.value === sortBy)?.label ?? "Manual";
 
   return (
     <div className="flex h-12 flex-shrink-0 items-center justify-between px-3 sm:px-4">
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Navigation Arrows */}
         <div className="flex items-center gap-0.5 sm:gap-1">
-          <WithShortcut label="Previous day" shortcut="previousDay" side="bottom">
+          <WithShortcut
+            label="Previous day"
+            shortcut="previousDay"
+            side="bottom"
+          >
             <Button
               variant="ghost"
               size="icon"
@@ -147,10 +182,15 @@ export function KanbanBoardToolbar({
           <Popover open={goToOpen} onOpenChange={setGoToOpen}>
             <PopoverTrigger asChild>
               <WithShortcut label="Go to date" side="bottom">
-                <Button variant="ghost" className="h-7 gap-1.5 px-2 text-[13px]">
+                <Button
+                  variant="ghost"
+                  className="h-7 gap-1.5 px-2 text-[13px]"
+                >
                   <CalendarDays className="h-4 w-4 text-muted-foreground" />
                   {/* One day at a time shows which day it is. */}
-                  {mode === "day" && firstVisibleDate && !isToday(firstVisibleDate)
+                  {mode === "day" &&
+                  firstVisibleDate &&
+                  !isToday(firstVisibleDate)
                     ? format(firstVisibleDate, "EEE, MMM d")
                     : "Today"}
                 </Button>
@@ -192,7 +232,6 @@ export function KanbanBoardToolbar({
             </Button>
           </WithShortcut>
         </div>
-
       </div>
 
       {/* Right-side actions */}
@@ -205,11 +244,26 @@ export function KanbanBoardToolbar({
         >
           {(
             [
-              { value: "day", label: "Today", icon: Square, shortcut: "todayView" },
-              { value: "board", label: "Board", icon: Columns3, shortcut: "boardView" },
+              {
+                value: "day",
+                label: "Today",
+                icon: Square,
+                shortcut: "todayView",
+              },
+              {
+                value: "board",
+                label: "Board",
+                icon: Columns3,
+                shortcut: "boardView",
+              },
             ] as const
           ).map(({ value, label, icon: Icon, shortcut }) => (
-            <WithShortcut key={value} label={label} shortcut={shortcut} side="bottom">
+            <WithShortcut
+              key={value}
+              label={label}
+              shortcut={shortcut}
+              side="bottom"
+            >
               <button
                 aria-keyshortcuts={value === "day" ? "Shift+T" : "Shift+B"}
                 type="button"
@@ -237,16 +291,18 @@ export function KanbanBoardToolbar({
           placeholder="Search tasks…"
         />
 
-        {providers.length > 0 && <Button
-          onClick={onImportTask}
-          variant="outline"
-          size="sm"
-          className="h-8 gap-1.5 px-2.5"
-          title="Import a task by pasting its link"
-        >
-          <Download className="h-4 w-4" />
-          <span className="hidden sm:inline">Import</span>
-        </Button>}
+        {providers.length > 0 && (
+          <Button
+            onClick={onImportTask}
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5 px-2.5"
+            title="Import a task by pasting its link"
+          >
+            <Download className="h-4 w-4" />
+            <span className="hidden sm:inline">Import</span>
+          </Button>
+        )}
 
         {/* Sort Dropdown */}
         <DropdownMenu>

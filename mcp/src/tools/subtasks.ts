@@ -60,7 +60,8 @@ export function registerSubtaskTools(
   apiClient: ApiClient
 ): void {
   // List subtasks for a task
-  defineTool(server,
+  defineTool(
+    server,
     "list_subtasks",
     "List all subtasks for a specific task. Subtasks are checklist items within a task that help break down work into smaller actionable steps. Returns all subtasks with their completion status, title, and position.",
     {
@@ -95,7 +96,8 @@ export function registerSubtaskTools(
   );
 
   // Create a subtask
-  defineTool(server,
+  defineTool(
+    server,
     "create_subtask",
     "Create a new subtask within a task. Subtasks are smaller actionable items that help break down a task into manageable steps. Each subtask has a title and can optionally be positioned at a specific order within the task's subtask list.",
     {
@@ -142,7 +144,8 @@ export function registerSubtaskTools(
   );
 
   // Toggle subtask completion
-  defineTool(server,
+  defineTool(
+    server,
     "toggle_subtask",
     "Toggle a subtask's completed status. If the subtask is incomplete, it will be marked as complete. If it's already complete, it will be marked as incomplete. This is useful for quickly checking off items in a checklist.",
     {
@@ -204,7 +207,8 @@ export function registerSubtaskTools(
   );
 
   // Update a subtask
-  defineTool(server,
+  defineTool(
+    server,
     "update_subtask",
     "Update a subtask's title, completion status, position, planned minutes or logged minutes. Use this to rename a subtask, set its completion status, reorder it, or plan and log time on it. At least one field must be provided.",
     {
@@ -249,7 +253,9 @@ export function registerSubtaskTools(
         .max(1440)
         .nullable()
         .optional()
-        .describe("Minutes already spent on the subtask (0–1440); null clears it"),
+        .describe(
+          "Minutes already spent on the subtask (0–1440); null clears it"
+        ),
     },
     async (input) => {
       try {
@@ -312,7 +318,8 @@ export function registerSubtaskTools(
   );
 
   // Delete a subtask
-  defineTool(server,
+  defineTool(
+    server,
     "delete_subtask",
     "Permanently delete a subtask from a task. This action cannot be undone. Use this when a subtask is no longer needed or was created by mistake.",
     {

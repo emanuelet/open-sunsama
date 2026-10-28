@@ -189,7 +189,9 @@ if (!rootElement) {
 // Crawlers without JS still receive the original tags in the HTML response.
 if (document.head.querySelector('[data-rh="true"]')) {
   document.head.querySelector("title")?.remove();
-  document.head.querySelectorAll('[data-rh="true"]').forEach((tag) => tag.remove());
+  document.head
+    .querySelectorAll('[data-rh="true"]')
+    .forEach((tag) => tag.remove());
 }
 
 // A dev hot update of this file re-runs it; reuse the root so the app isn't mounted twice

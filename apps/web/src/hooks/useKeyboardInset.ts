@@ -13,7 +13,10 @@ export interface KeyboardInset {
  * above the keys while their background runs down behind them.
  */
 export function useKeyboardInset(active = true): KeyboardInset {
-  const [state, setState] = React.useState<KeyboardInset>({ keyboard: 0, visibleHeight: 0 });
+  const [state, setState] = React.useState<KeyboardInset>({
+    keyboard: 0,
+    visibleHeight: 0,
+  });
 
   React.useEffect(() => {
     const vv = typeof window !== "undefined" ? window.visualViewport : null;
@@ -22,9 +25,15 @@ export function useKeyboardInset(active = true): KeyboardInset {
       return;
     }
     const update = () => {
-      const covered = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      const covered = Math.max(
+        0,
+        window.innerHeight - vv.height - vv.offsetTop
+      );
       // Browser chrome jitters by a pixel or two; only a real keyboard counts.
-      setState({ keyboard: covered > 60 ? Math.round(covered) : 0, visibleHeight: Math.round(vv.height) });
+      setState({
+        keyboard: covered > 60 ? Math.round(covered) : 0,
+        visibleHeight: Math.round(vv.height),
+      });
     };
     update();
     vv.addEventListener("resize", update);

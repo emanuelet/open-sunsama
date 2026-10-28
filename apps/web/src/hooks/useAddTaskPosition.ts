@@ -74,7 +74,12 @@ export function usePlaceNewTask(scheduledDate: string | null | undefined) {
   return async (newTaskId: string, position: AddTaskPosition) => {
     if (position !== "top") return;
     const otherOpenTaskIds = (existingTasks ?? [])
-      .filter((t) => !t.completedAt && t.id !== newTaskId && !t.id.startsWith("optimistic-"))
+      .filter(
+        (t) =>
+          !t.completedAt &&
+          t.id !== newTaskId &&
+          !t.id.startsWith("optimistic-")
+      )
       .sort((a, b) => a.position - b.position)
       .map((t) => t.id);
     await reorderTasks.mutateAsync({

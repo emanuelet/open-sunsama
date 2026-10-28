@@ -2,9 +2,10 @@
  * Types for Tauri mobile bridge
  */
 
-export type HapticType = 'light' | 'medium' | 'heavy' | 'selection' | 'success' | 'warning' | 'error';
+export type HapticType =
+  "light" | "medium" | "heavy" | "selection" | "success" | "warning" | "error";
 
-export type Platform = 'ios' | 'android' | 'unknown';
+export type Platform = "ios" | "android" | "unknown";
 
 export interface MobileAPI {
   isMobile: () => Promise<boolean>;

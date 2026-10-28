@@ -44,8 +44,14 @@ function IdeaSubtaskItem({
 }: IdeaSubtaskItemProps) {
   const [editing, setEditing] = React.useState(false);
   const [value, setValue] = React.useState(subtask.title);
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: subtask.id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: subtask.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -194,7 +200,10 @@ export function IdeaSubtaskList({ ideaId }: { ideaId: string }) {
       <SubtaskAddRow
         onAdd={(titles) => {
           for (const title of titles) {
-            createSubtask.mutate({ ideaId, input: { title: title.slice(0, 500) } });
+            createSubtask.mutate({
+              ideaId,
+              input: { title: title.slice(0, 500) },
+            });
           }
         }}
       />

@@ -29,9 +29,11 @@ export class ApiError extends Error {
         // Handle Zod validation errors (has issues array)
         if (body.error.issues && Array.isArray(body.error.issues)) {
           // Extract all validation messages
-          const messages = body.error.issues.map((issue: { message: string }) => issue.message);
-          message = messages.join('. ');
-          code = 'VALIDATION_ERROR';
+          const messages = body.error.issues.map(
+            (issue: { message: string }) => issue.message
+          );
+          message = messages.join(". ");
+          code = "VALIDATION_ERROR";
           details = { issues: body.error.issues };
         } else {
           // Handle standard error format

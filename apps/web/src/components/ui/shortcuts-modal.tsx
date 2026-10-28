@@ -38,7 +38,14 @@ const categoryLabels: Record<string, string> = {
   desktop: "Desktop App",
 };
 
-const categoryOrder = ["general", "desktop", "navigation", "task", "calendar", "focus"];
+const categoryOrder = [
+  "general",
+  "desktop",
+  "navigation",
+  "task",
+  "calendar",
+  "focus",
+];
 
 export function ShortcutsModal({ open, onOpenChange }: ShortcutsModalProps) {
   return (
@@ -99,4 +106,3 @@ function ShortcutRow({ shortcut }: { shortcut: ShortcutDefinition }) {
     </div>
   );
 }
-

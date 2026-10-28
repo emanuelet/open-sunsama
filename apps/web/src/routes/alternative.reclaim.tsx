@@ -8,5 +8,7 @@ import page, { extras } from "@/content/marketing/alternatives/reclaim";
  * for crawlers (scripts/prerender-marketing.ts).
  */
 export default function AlternativeReclaimPage() {
-  return <MarketingPageView page={page} slots={alternativeSlots(page, extras)} />;
+  return (
+    <MarketingPageView page={page} slots={alternativeSlots(page, extras)} />
+  );
 }

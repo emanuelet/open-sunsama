@@ -21,13 +21,24 @@ export function SectionHeading({
   className?: string;
 }) {
   return (
-    <Reveal className={cn(align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-2xl", className)}>
+    <Reveal
+      className={cn(
+        align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-2xl",
+        className
+      )}
+    >
       {eyebrow && <p className={EYEBROW}>{eyebrow}</p>}
       <h2 id={id} className={cn(H2, eyebrow && "mt-3")}>
         {heading}
       </h2>
       {lead && (
-        <p className={cn(LEAD, "mt-4", align === "center" && "mx-auto max-w-2xl")}>
+        <p
+          className={cn(
+            LEAD,
+            "mt-4",
+            align === "center" && "mx-auto max-w-2xl"
+          )}
+        >
           <RichText text={lead} />
         </p>
       )}

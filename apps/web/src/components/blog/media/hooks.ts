@@ -37,7 +37,9 @@ export function usePrefersReducedMotion() {
 /** A post referenced a media id that isn't in blog-media.json. */
 export function warnMissing(component: string, id: string) {
   if (import.meta.env.DEV) {
-    console.warn(`<${component} id="${id}"> is not in src/lib/blog-media.json; rendering nothing`);
+    console.warn(
+      `<${component} id="${id}"> is not in src/lib/blog-media.json; rendering nothing`
+    );
   }
 }
 
@@ -54,4 +56,5 @@ export const frameSize = (width: number, height: number) => ({
   maxWidth: `${Math.round((640 * width) / height)}px`,
 });
 
-export const CAPTION_CLASS = "mt-3 text-center text-[13px] leading-snug text-muted-foreground";
+export const CAPTION_CLASS =
+  "mt-3 text-center text-[13px] leading-snug text-muted-foreground";

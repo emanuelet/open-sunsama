@@ -44,7 +44,12 @@ export function DemoVideo({ id }: { id: string }) {
           >
             {/* Captions are burned into the video; the track stays off by default so they don't show twice */}
             {video.captions && (
-              <track kind="captions" src={video.captions} srcLang="en" label="English" />
+              <track
+                kind="captions"
+                src={video.captions}
+                srcLang="en"
+                label="English"
+              />
             )}
           </video>
         ) : (

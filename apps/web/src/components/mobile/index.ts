@@ -7,5 +7,8 @@ export {
   MobileViewControls,
   type MobileTasksViewMode,
 } from "./mobile-view-controls";
-export { MobileTaskCard, MobileTaskCardWithActualTime } from "./mobile-task-card";
+export {
+  MobileTaskCard,
+  MobileTaskCardWithActualTime,
+} from "./mobile-task-card";
 export { SortableMobileTaskCard } from "./sortable-mobile-task-card";

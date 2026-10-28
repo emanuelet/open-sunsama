@@ -5,7 +5,8 @@ const originalCalendarKey = process.env.CALENDAR_ENCRYPTION_KEY;
 const originalKey = process.env.ENCRYPTION_KEY;
 
 afterEach(() => {
-  if (originalCalendarKey === undefined) delete process.env.CALENDAR_ENCRYPTION_KEY;
+  if (originalCalendarKey === undefined)
+    delete process.env.CALENDAR_ENCRYPTION_KEY;
   else process.env.CALENDAR_ENCRYPTION_KEY = originalCalendarKey;
   if (originalKey === undefined) delete process.env.ENCRYPTION_KEY;
   else process.env.ENCRYPTION_KEY = originalKey;
@@ -19,6 +20,8 @@ describe("shared credential encryption", () => {
 
     process.env.ENCRYPTION_KEY = "cd".repeat(32);
     expect(decrypt(encrypted)).toBe("saved calendar credential");
-    expect(decrypt(encrypt("new integration credential"))).toBe("new integration credential");
+    expect(decrypt(encrypt("new integration credential"))).toBe(
+      "new integration credential"
+    );
   });
 });

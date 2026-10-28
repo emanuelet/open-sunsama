@@ -2,8 +2,12 @@
  * API key utilities for Open Sunsama
  */
 
-import { createHash, randomBytes } from 'crypto';
-import { API_KEY_PREFIX, LEGACY_API_KEY_PREFIX, API_KEY_LENGTH } from './constants.js';
+import { createHash, randomBytes } from "crypto";
+import {
+  API_KEY_PREFIX,
+  LEGACY_API_KEY_PREFIX,
+  API_KEY_LENGTH,
+} from "./constants.js";
 
 /**
  * Result of generating a new API key
@@ -23,13 +27,15 @@ export interface GeneratedApiKey {
  */
 export function generateApiKey(): GeneratedApiKey {
   // Generate random bytes and convert to hex
-  const randomPart = randomBytes(API_KEY_LENGTH).toString('hex').slice(0, API_KEY_LENGTH);
+  const randomPart = randomBytes(API_KEY_LENGTH)
+    .toString("hex")
+    .slice(0, API_KEY_LENGTH);
   const key = `${API_KEY_PREFIX}${randomPart}`;
   const hash = hashApiKey(key);
-  
+
   // Extract first 8 chars after prefix for identification
   const prefix = key.slice(0, API_KEY_PREFIX.length + 8);
-  
+
   return { key, hash, prefix };
 }
 
@@ -39,7 +45,7 @@ export function generateApiKey(): GeneratedApiKey {
  * @returns SHA-256 hash of the key
  */
 export function hashApiKey(key: string): string {
-  return createHash('sha256').update(key).digest('hex');
+  return createHash("sha256").update(key).digest("hex");
 }
 
 /**
@@ -69,13 +75,13 @@ export function validateApiKeyFormat(key: string): boolean {
   if (!prefix) {
     return false;
   }
-  
+
   // Must have the correct total length (prefix length is same for both)
   const expectedLength = prefix.length + API_KEY_LENGTH;
   if (key.length !== expectedLength) {
     return false;
   }
-  
+
   // The random part must be valid hex
   const randomPart = key.slice(prefix.length);
   const hexRegex = /^[a-f0-9]+$/i;
@@ -100,7 +106,7 @@ export function extractApiKeyPrefix(key: string): string {
  */
 export function maskApiKey(key: string): string {
   const prefix = extractApiKeyPrefix(key);
-  return `${prefix}${'*'.repeat(8)}`;
+  return `${prefix}${"*".repeat(8)}`;
 }
 
 /**
@@ -115,7 +121,7 @@ export function verifyApiKey(key: string, hash: string): boolean {
   if (keyHash.length !== hash.length) {
     return false;
   }
-  
+
   let result = 0;
   for (let i = 0; i < keyHash.length; i++) {
     result |= keyHash.charCodeAt(i) ^ hash.charCodeAt(i);

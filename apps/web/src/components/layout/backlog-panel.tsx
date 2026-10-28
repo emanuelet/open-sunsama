@@ -78,7 +78,9 @@ export function BacklogPanel({ className }: { className?: string }) {
       )}
     >
       {/* Drop feedback when a task is dragged over the backlog */}
-      {isOver && <div className="pointer-events-none absolute inset-0 z-10 bg-primary/5" />}
+      {isOver && (
+        <div className="pointer-events-none absolute inset-0 z-10 bg-primary/5" />
+      )}
 
       {/* Header */}
       <div className="flex h-12 flex-shrink-0 items-center justify-between px-3">

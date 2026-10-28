@@ -1,10 +1,13 @@
 # Desktop App for Open Sunsama
 
 ## Problem
+
 Users need a native desktop experience for Open Sunsama with system tray access, global hotkeys, and native notifications. The current web app works well but lacks desktop-specific conveniences that productivity apps benefit from.
 
 ## Solution
+
 Build a desktop app using **Tauri v2** that wraps the existing React web app with minimal modifications. Tauri is chosen over Electron for:
+
 - **Smaller binary size** (~10MB vs ~150MB+ for Electron)
 - **Better performance** (native WebView, lower memory footprint)
 - **Security** (Rust backend, no Node.js in production)
@@ -16,6 +19,7 @@ The desktop app will load the web app's built assets directly, ensuring 100% cod
 ## Technical Implementation
 
 ### Architecture Overview
+
 ```
 apps/desktop/
 ├── src-tauri/           # Rust backend
@@ -83,6 +87,7 @@ apps/desktop/
 **Key principle**: The desktop app builds and serves the web app's production bundle. No UI code duplication.
 
 **Desktop-aware hooks** (added to `apps/web/src/hooks/`):
+
 - `useDesktopNotifications.ts` - Sends native notifications via Tauri
 - `useGlobalShortcuts.ts` - Registers/handles shortcuts from React
 - These use dynamic imports and feature detection
@@ -134,6 +139,7 @@ apps/desktop/
 ### Build & Release
 
 **Development**:
+
 ```bash
 # Terminal 1: Start web dev server
 bun run --filter=@open-sunsama/web dev
@@ -143,6 +149,7 @@ bun run --filter=@open-sunsama/desktop dev
 ```
 
 **Production Build**:
+
 ```bash
 # Build everything
 bun run build
@@ -152,6 +159,7 @@ bun run --filter=@open-sunsama/desktop build
 ```
 
 **CI/CD** (GitHub Actions):
+
 - On tag push (`v*`), build for macOS, Windows, Linux
 - Sign macOS builds with Developer ID
 - Sign Windows builds with code signing cert
@@ -161,6 +169,7 @@ bun run --filter=@open-sunsama/desktop build
 ### Dependencies
 
 **Rust (Cargo.toml)**:
+
 ```toml
 [dependencies]
 tauri = { version = "2", features = ["tray-icon", "devtools"] }
@@ -175,6 +184,7 @@ serde_json = "1"
 ```
 
 **TypeScript (package.json)**:
+
 ```json
 {
   "dependencies": {
@@ -193,6 +203,7 @@ serde_json = "1"
 ### Configuration
 
 **tauri.conf.json** (key sections):
+
 ```json
 {
   "productName": "Open Sunsama",
@@ -201,15 +212,17 @@ serde_json = "1"
     "frontendDist": "../web/dist"
   },
   "app": {
-    "windows": [{
-      "title": "Open Sunsama",
-      "width": 1200,
-      "height": 800,
-      "minWidth": 800,
-      "minHeight": 600,
-      "decorations": true,
-      "transparent": false
-    }],
+    "windows": [
+      {
+        "title": "Open Sunsama",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 800,
+        "minHeight": 600,
+        "decorations": true,
+        "transparent": false
+      }
+    ],
     "trayIcon": {
       "iconPath": "icons/icon.png",
       "iconAsTemplate": true
@@ -218,7 +231,12 @@ serde_json = "1"
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.icns", "icons/icon.ico"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
     "macOS": {
       "minimumSystemVersion": "10.15"
     }
@@ -227,6 +245,7 @@ serde_json = "1"
 ```
 
 **turbo.json** addition:
+
 ```json
 {
   "tasks": {

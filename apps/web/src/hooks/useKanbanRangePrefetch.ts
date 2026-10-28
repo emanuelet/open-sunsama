@@ -91,9 +91,7 @@ export function useKanbanRangePrefetch(options: RangePrefetchOptions = {}) {
   const rawCenter = options.centerDate ?? null;
   const centerString = React.useMemo(() => {
     return format(rawCenter ?? new Date(), "yyyy-MM-dd");
-  }, [
-    rawCenter ? format(rawCenter, "yyyy-MM-dd") : null,
-  ]);
+  }, [rawCenter ? format(rawCenter, "yyyy-MM-dd") : null]);
 
   const bufferDays = options.bufferDays ?? PREFETCH_BUFFER_DAYS;
   const fromString = React.useMemo(() => {
@@ -117,11 +115,11 @@ export function useKanbanRangePrefetch(options: RangePrefetchOptions = {}) {
     queryFn: async (): Promise<{
       tasks: Task[];
       /**
-        * Plain record, not a Map: this query's result is persisted to
-        * localStorage, and a Map does not survive JSON round-tripping —
-        * it comes back as `{}` and every consumer that iterates it
-        * throws on the next page load.
-        */
+       * Plain record, not a Map: this query's result is persisted to
+       * localStorage, and a Map does not survive JSON round-tripping —
+       * it comes back as `{}` and every consumer that iterates it
+       * throws on the next page load.
+       */
       subtasksByTaskId: Record<string, Subtask[]>;
       truncated: boolean;
     }> => {
@@ -188,8 +186,7 @@ export function useKanbanRangePrefetch(options: RangePrefetchOptions = {}) {
     for (const t of data.tasks) {
       fingerprint += t.id;
       const u = t.updatedAt;
-      fingerprint +=
-        "@" + (u instanceof Date ? u.getTime() : String(u)) + "|";
+      fingerprint += "@" + (u instanceof Date ? u.getTime() : String(u)) + "|";
     }
     if (fingerprint === seededFingerprintRef.current) return;
     seededFingerprintRef.current = fingerprint;

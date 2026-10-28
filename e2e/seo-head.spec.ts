@@ -37,7 +37,10 @@ test("keeps one set of SEO tags after loading a pre-rendered blog post", async (
   );
   await page.goto(path);
   await expect(
-    page.getByRole("heading", { level: 1, name: /80\/20 Rule for Productivity/ })
+    page.getByRole("heading", {
+      level: 1,
+      name: /80\/20 Rule for Productivity/,
+    })
   ).toBeVisible();
   for (const selector of [
     "title",

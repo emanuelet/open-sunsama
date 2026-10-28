@@ -50,7 +50,10 @@ export function MobileDateHeader({
     <header className="sticky top-0 z-40 border-b border-border/40 bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/85">
       <div className="flex h-12 items-center gap-1 px-3">
         {leading}
-        <MobileDatePicker value={selectedDate} onChange={(d) => onSelectDate(startOfDay(d))}>
+        <MobileDatePicker
+          value={selectedDate}
+          onChange={(d) => onSelectDate(startOfDay(d))}
+        >
           <button
             type="button"
             className="flex min-w-0 items-center gap-1 rounded-lg px-1.5 py-1 text-left active:bg-muted"
@@ -79,10 +82,14 @@ export function MobileDateHeader({
           </button>
         )}
 
-        <div className="ml-auto flex shrink-0 items-center gap-1.5">{trailing}</div>
+        <div className="ml-auto flex shrink-0 items-center gap-1.5">
+          {trailing}
+        </div>
       </div>
 
-      {!hideStrip && <WeekStrip selectedDate={selectedDate} onSelectDate={onSelectDate} />}
+      {!hideStrip && (
+        <WeekStrip selectedDate={selectedDate} onSelectDate={onSelectDate} />
+      )}
       {children}
     </header>
   );
@@ -164,7 +171,8 @@ function DayPill({
   const { data: tasks } = useQuery<Task[]>({
     queryKey: taskKeys.list({ scheduledDate: dateString, limit: 200 }),
     queryFn: async () =>
-      (await getApi().tasks.list({ scheduledDate: dateString, limit: 200 })).data ?? [],
+      (await getApi().tasks.list({ scheduledDate: dateString, limit: 200 }))
+        .data ?? [],
     enabled: false,
   });
   const total = tasks?.length ?? 0;
@@ -183,7 +191,11 @@ function DayPill({
       <span
         className={cn(
           "text-[11px] font-medium uppercase tracking-wide",
-          selected ? "text-foreground" : today ? "text-primary" : "text-muted-foreground/70"
+          selected
+            ? "text-foreground"
+            : today
+              ? "text-primary"
+              : "text-muted-foreground/70"
         )}
       >
         {format(day, "EEEEE")}

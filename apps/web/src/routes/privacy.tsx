@@ -8,7 +8,7 @@ import { useSEO, SEO_CONFIGS } from "@/hooks/useSEO";
  */
 export default function PrivacyPage() {
   useSEO(SEO_CONFIGS.privacy);
-  
+
   return (
     <LegalLayout>
       <PrivacyContent />

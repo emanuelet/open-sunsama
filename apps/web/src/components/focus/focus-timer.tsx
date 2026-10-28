@@ -32,7 +32,8 @@ export interface FocusTimerRef {
 
 const label =
   "text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70";
-const value = "font-sans text-[28px] font-normal leading-9 tabular-nums tracking-normal";
+const value =
+  "font-sans text-[28px] font-normal leading-9 tabular-nums tracking-normal";
 
 /**
  * Focus mode's timer, laid out like Sunsama's: Actual and Planned side by

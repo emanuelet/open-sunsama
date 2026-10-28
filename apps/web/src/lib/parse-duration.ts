@@ -16,7 +16,9 @@ export function parseDuration(input: string): number | null {
     if (Number(m[2]) > 59) return null;
     mins = Number(m[1]) * 60 + Number(m[2]);
   } else if (
-    (m = s.match(/^(\d+(?:\.\d+)?)(?:h|hr|hrs|hour|hours)(?:(\d+)(?:m|min|mins)?)?$/))
+    (m = s.match(
+      /^(\d+(?:\.\d+)?)(?:h|hr|hrs|hour|hours)(?:(\d+)(?:m|min|mins)?)?$/
+    ))
   ) {
     if (m[2] !== undefined && Number(m[2]) > 59) return null;
     mins = Math.round(Number(m[1]) * 60) + Number(m[2] ?? 0);

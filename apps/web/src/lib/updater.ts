@@ -1,11 +1,11 @@
 /**
  * Desktop auto-update utilities
- * 
+ *
  * Uses @tauri-apps/plugin-updater to check for and install updates.
  * Only functional when running inside Tauri desktop app.
  */
 
-import { isDesktop } from './desktop';
+import { isDesktop } from "./desktop";
 
 export interface UpdateInfo {
   version: string;
@@ -26,7 +26,7 @@ export interface UpdateProgress {
 export async function getAppVersion(): Promise<string | null> {
   if (!isDesktop()) return null;
 
-  const { getVersion } = await import('@tauri-apps/api/app');
+  const { getVersion } = await import("@tauri-apps/api/app");
   return getVersion();
 }
 
@@ -37,7 +37,7 @@ export async function getAppVersion(): Promise<string | null> {
 export async function checkForUpdate(): Promise<UpdateInfo | null> {
   if (!isDesktop()) return null;
 
-  const { check } = await import('@tauri-apps/plugin-updater');
+  const { check } = await import("@tauri-apps/plugin-updater");
   const update = await check();
 
   if (!update) return null;
@@ -58,8 +58,8 @@ export async function downloadAndInstallUpdate(
 ): Promise<void> {
   if (!isDesktop()) return;
 
-  const { check } = await import('@tauri-apps/plugin-updater');
-  const { relaunch } = await import('@tauri-apps/plugin-process');
+  const { check } = await import("@tauri-apps/plugin-updater");
+  const { relaunch } = await import("@tauri-apps/plugin-process");
 
   const update = await check();
   if (!update) return;
@@ -69,16 +69,19 @@ export async function downloadAndInstallUpdate(
 
   await update.downloadAndInstall((event) => {
     switch (event.event) {
-      case 'Started':
+      case "Started":
         contentLength = event.data.contentLength ?? null;
         onProgress?.({ contentLength, downloaded: 0 });
         break;
-      case 'Progress':
+      case "Progress":
         downloaded += event.data.chunkLength;
         onProgress?.({ contentLength, downloaded });
         break;
-      case 'Finished':
-        onProgress?.({ contentLength, downloaded: contentLength ?? downloaded });
+      case "Finished":
+        onProgress?.({
+          contentLength,
+          downloaded: contentLength ?? downloaded,
+        });
         break;
     }
   });

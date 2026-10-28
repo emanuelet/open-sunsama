@@ -8,20 +8,20 @@ Read [playbook.md](playbook.md) before writing a word. It has the hard rules: po
 
 ## Quick Reference
 
-| Step | Tool | Output |
-|------|------|--------|
-| Traffic | `datafast` CLI, Google Search Console in Chrome | What is rising, what is slipping, what to update |
-| Volume | Google Keyword Planner in Chrome (Circo, Inc account) | Monthly search buckets |
-| SERP | `mcp__blink-cms-mcp__google_serp` | Top 8 per query, related searches |
-| AI answers | Real Google in Chrome | AI Overview text and the sites it cites |
-| Teardown | Browser pane | Why the top 3-5 pages rank |
-| Write | MDX in `apps/web/src/content/blog/<slug>/index.mdx` | Posts that pass the gate |
-| Readability gate | `cd apps/web && bun run scripts/check-blog-readability.ts <slug>` | PASS/FAIL per post |
-| Media | `scripts/readme-media/blog-media.mjs` on a local seeded stack | Shots, clips, narrated videos in `apps/web/public/blog-media/` |
-| Covers | `cd apps/web && node scripts/generate-blog-covers.mjs <slug>` | Light, dark and social covers from real product screenshots |
-| Open-source registry | `cd apps/web && node scripts/refresh-oss-apps.mjs` | Fresh license, stars, releases and status for every app in `oss-apps.json` (playbook section 9) |
-| QA | `node apps/web/scripts/qa-blog.mjs <slug...>` | CLS, overflow, console errors, screenshots at 375/768/1280 in light and dark |
-| Ship | PR → squash merge to `main` → Railway deploys `web` | Live pages |
+| Step                 | Tool                                                              | Output                                                                                          |
+| -------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Traffic              | `datafast` CLI, Google Search Console in Chrome                   | What is rising, what is slipping, what to update                                                |
+| Volume               | Google Keyword Planner in Chrome (Circo, Inc account)             | Monthly search buckets                                                                          |
+| SERP                 | `mcp__blink-cms-mcp__google_serp`                                 | Top 8 per query, related searches                                                               |
+| AI answers           | Real Google in Chrome                                             | AI Overview text and the sites it cites                                                         |
+| Teardown             | Browser pane                                                      | Why the top 3-5 pages rank                                                                      |
+| Write                | MDX in `apps/web/src/content/blog/<slug>/index.mdx`               | Posts that pass the gate                                                                        |
+| Readability gate     | `cd apps/web && bun run scripts/check-blog-readability.ts <slug>` | PASS/FAIL per post                                                                              |
+| Media                | `scripts/readme-media/blog-media.mjs` on a local seeded stack     | Shots, clips, narrated videos in `apps/web/public/blog-media/`                                  |
+| Covers               | `cd apps/web && node scripts/generate-blog-covers.mjs <slug>`     | Light, dark and social covers from real product screenshots                                     |
+| Open-source registry | `cd apps/web && node scripts/refresh-oss-apps.mjs`                | Fresh license, stars, releases and status for every app in `oss-apps.json` (playbook section 9) |
+| QA                   | `node apps/web/scripts/qa-blog.mjs <slug...>`                     | CLS, overflow, console errors, screenshots at 375/768/1280 in light and dark                    |
+| Ship                 | PR → squash merge to `main` → Railway deploys `web`               | Live pages                                                                                      |
 
 ---
 
@@ -37,6 +37,7 @@ datafast --json analytics referrers --website 6980f5476c3beb852cf00100 --period 
 Search Console (Chrome, logged in): `https://search.google.com/search-console/performance/search-analytics?resource_id=sc-domain%3Aopensunsama.com&metrics=CLICKS%2CIMPRESSIONS%2CCTR%2CPOSITION&time_granularity=DAY&num_of_months=3`. Set rows per page to 500, then read the table with JS (`table tbody tr` cells). Add `&breakdown=page` for pages and `&breakdown=date` for days. Compare the last 28 days to the 28 before.
 
 Look for:
+
 - **Striking distance:** queries at position 5-20 with real impressions. A better page can reach the top 3.
 - **Rising queries** we have no page for.
 - **Pages losing clicks or position**, and posts whose `updated` date is over 90 days old but still earn impressions. These are the update candidates.
@@ -46,7 +47,6 @@ Look for:
 ## 2. Pick the work
 
 Start every run with `cd apps/web && node scripts/refresh-oss-apps.mjs` so the open-source cards stay current, and commit the refreshed registry with the run.
-
 
 - **3 new posts** for the queries with the best mix of volume, intent (people choosing an app), and weak competition (Reddit, small vendor blogs, directories).
 - **1-3 updates, 5 at most**: the most important outdated posts (impressions or signups at stake, stale facts, old date on page 1).
@@ -98,6 +98,7 @@ node scripts/qa-blog.mjs <slug> <slug> ...   # needs the web dev server on :3107
 ```
 
 Pass bar for every changed page, at 375, 768 and 1280px in light and dark:
+
 - CLS below 0.1, no horizontal scroll, no console errors.
 - Media shows in the right theme; nothing broken or blank in the screenshots (open them and look).
 - `dist/blog/<slug>.html` contains the article text in `<noscript>` plus BlogPosting and FAQPage JSON-LD.

@@ -29,12 +29,26 @@ export function FaqSection({
   className?: string;
 }) {
   return (
-    <section id={id} className={cn(SECTION, className)} aria-labelledby={`${id}-heading`}>
+    <section
+      id={id}
+      className={cn(SECTION, className)}
+      aria-labelledby={`${id}-heading`}
+    >
       <JsonLd
         id={JSON_LD_IDS.faq}
-        data={faqPageJsonLd(items.map(({ question, answer }) => ({ question, answer: plainText(answer) })))}
+        data={faqPageJsonLd(
+          items.map(({ question, answer }) => ({
+            question,
+            answer: plainText(answer),
+          }))
+        )}
       />
-      <div className={cn(CONTAINER, "grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16")}>
+      <div
+        className={cn(
+          CONTAINER,
+          "grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16"
+        )}
+      >
         <Reveal className="lg:sticky lg:top-24 lg:self-start">
           <p className={EYEBROW}>{eyebrow}</p>
           <h2 id={`${id}-heading`} className={cn(H2, "mt-3")}>
@@ -50,7 +64,9 @@ export function FaqSection({
         <dl className="divide-y divide-border/70 border-y border-border/70">
           {items.map((item) => (
             <Reveal key={item.question} className="py-6 md:py-7">
-              <dt className="text-[17px] font-semibold leading-snug tracking-[-0.01em] md:text-[18px]">{item.question}</dt>
+              <dt className="text-[17px] font-semibold leading-snug tracking-[-0.01em] md:text-[18px]">
+                {item.question}
+              </dt>
               <dd className="mt-2.5 text-[15px] leading-relaxed text-muted-foreground md:text-[15.5px]">
                 <RichText text={item.answer} />
                 {item.link && (

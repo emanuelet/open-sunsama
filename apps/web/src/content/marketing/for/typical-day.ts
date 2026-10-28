@@ -27,5 +27,7 @@ export interface DayEntry {
 
 /** The entries as paragraphs for the section body (and the prerendered HTML). */
 export function dayBody(entries: DayEntry[]): string[] {
-  return entries.map((entry) => `**${entry.time}: ${entry.title}.** ${entry.body}`);
+  return entries.map(
+    (entry) => `**${entry.time}: ${entry.title}.** ${entry.body}`
+  );
 }

@@ -4,15 +4,15 @@
  */
 
 // Default notification options
-const DEFAULT_ICON = '/android-chrome-192x192.png';
-const DEFAULT_BADGE = '/favicon-32x32.png';
+const DEFAULT_ICON = "/android-chrome-192x192.png";
+const DEFAULT_BADGE = "/favicon-32x32.png";
 
 /**
  * Handle incoming push notifications
  */
-self.addEventListener('push', (event) => {
+self.addEventListener("push", (event) => {
   if (!event.data) {
-    console.warn('[SW] Push event received but no data');
+    console.warn("[SW] Push event received but no data");
     return;
   }
 
@@ -22,14 +22,14 @@ self.addEventListener('push', (event) => {
   } catch {
     // If not JSON, use text as body
     payload = {
-      title: 'Open Sunsama',
+      title: "Open Sunsama",
       body: event.data.text(),
     };
   }
 
   const {
-    title = 'Open Sunsama',
-    body = '',
+    title = "Open Sunsama",
+    body = "",
     icon = DEFAULT_ICON,
     badge = DEFAULT_BADGE,
     tag,
@@ -52,15 +52,13 @@ self.addEventListener('push', (event) => {
     renotify: !!tag,
   };
 
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
+  event.waitUntil(self.registration.showNotification(title, options));
 });
 
 /**
  * Handle notification click events
  */
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener("notificationclick", (event) => {
   const notification = event.notification;
   const action = event.action;
   const data = notification.data || {};
@@ -69,12 +67,12 @@ self.addEventListener('notificationclick', (event) => {
   notification.close();
 
   // Determine what URL to open based on action
-  let targetUrl = '/';
+  let targetUrl = "/";
 
-  if (action === 'complete' && data.taskId) {
+  if (action === "complete" && data.taskId) {
     // User clicked "Mark Complete" - open task with complete action
     targetUrl = `/?task=${data.taskId}&action=complete`;
-  } else if (action === 'snooze' && data.taskId) {
+  } else if (action === "snooze" && data.taskId) {
     // User clicked "Snooze" - open task with snooze action
     targetUrl = `/?task=${data.taskId}&action=snooze`;
   } else if (data.url) {
@@ -87,11 +85,12 @@ self.addEventListener('notificationclick', (event) => {
 
   // Open or focus the app window
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true })
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
       .then((clientList) => {
         // Check if app is already open
         for (const client of clientList) {
-          if (client.url.includes(self.location.origin) && 'focus' in client) {
+          if (client.url.includes(self.location.origin) && "focus" in client) {
             // Navigate to target URL and focus
             client.navigate(targetUrl);
             return client.focus();
@@ -108,19 +107,19 @@ self.addEventListener('notificationclick', (event) => {
 /**
  * Handle notification close events (for analytics/cleanup)
  */
-self.addEventListener('notificationclose', (event) => {
+self.addEventListener("notificationclose", (event) => {
   const notification = event.notification;
   const data = notification.data || {};
 
   // Could send analytics about dismissed notifications
-  console.log('[SW] Notification closed:', notification.tag, data);
+  console.log("[SW] Notification closed:", notification.tag, data);
 });
 
 /**
  * Service worker install event
  */
-self.addEventListener('install', () => {
-  console.log('[SW] Service worker installed');
+self.addEventListener("install", () => {
+  console.log("[SW] Service worker installed");
   // Take control immediately without waiting for reload
   self.skipWaiting();
 });
@@ -128,8 +127,8 @@ self.addEventListener('install', () => {
 /**
  * Service worker activate event
  */
-self.addEventListener('activate', (event) => {
-  console.log('[SW] Service worker activated');
+self.addEventListener("activate", (event) => {
+  console.log("[SW] Service worker activated");
   // Take control of all pages immediately
   event.waitUntil(clients.claim());
 });

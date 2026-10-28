@@ -35,28 +35,25 @@ const priorityBadgeVariants = cva(
   }
 );
 
-const priorityDotVariants = cva(
-  "rounded-full transition-colors duration-150",
-  {
-    variants: {
-      priority: {
-        P0: "bg-red-500",
-        P1: "bg-orange-500",
-        P2: "bg-blue-500",
-        P3: "bg-slate-300 dark:bg-slate-600",
-      },
-      size: {
-        sm: "h-1.5 w-1.5",
-        default: "h-2 w-2",
-        lg: "h-2.5 w-2.5",
-      },
+const priorityDotVariants = cva("rounded-full transition-colors duration-150", {
+  variants: {
+    priority: {
+      P0: "bg-red-500",
+      P1: "bg-orange-500",
+      P2: "bg-blue-500",
+      P3: "bg-slate-300 dark:bg-slate-600",
     },
-    defaultVariants: {
-      priority: "P2",
-      size: "default",
+    size: {
+      sm: "h-1.5 w-1.5",
+      default: "h-2 w-2",
+      lg: "h-2.5 w-2.5",
     },
-  }
-);
+  },
+  defaultVariants: {
+    priority: "P2",
+    size: "default",
+  },
+});
 
 /**
  * Linear/Todoist-style priority tag variants
@@ -80,7 +77,8 @@ const priorityTagVariants = cva(
 );
 
 export interface PriorityBadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof priorityBadgeVariants> {
   priority: TaskPriority;
   showLabel?: boolean;
@@ -96,10 +94,30 @@ export const PRIORITY_META: Record<
   TaskPriority,
   { description: string; key: string; flagClass: string; filled: boolean }
 > = {
-  P0: { description: "Urgent", key: "0", flagClass: "text-red-500", filled: true },
-  P1: { description: "High", key: "1", flagClass: "text-orange-500", filled: true },
-  P2: { description: "Normal", key: "2", flagClass: "text-muted-foreground", filled: false },
-  P3: { description: "Low", key: "3", flagClass: "text-muted-foreground/60", filled: true },
+  P0: {
+    description: "Urgent",
+    key: "0",
+    flagClass: "text-red-500",
+    filled: true,
+  },
+  P1: {
+    description: "High",
+    key: "1",
+    flagClass: "text-orange-500",
+    filled: true,
+  },
+  P2: {
+    description: "Normal",
+    key: "2",
+    flagClass: "text-muted-foreground",
+    filled: false,
+  },
+  P3: {
+    description: "Low",
+    key: "3",
+    flagClass: "text-muted-foreground/60",
+    filled: true,
+  },
 };
 
 /** "P1 · High" */
@@ -261,4 +279,9 @@ export function PriorityLabel({
   );
 }
 
-export { PRIORITY_LABELS, PRIORITY_SHORT_LABELS, priorityBadgeVariants, priorityTagVariants };
+export {
+  PRIORITY_LABELS,
+  PRIORITY_SHORT_LABELS,
+  priorityBadgeVariants,
+  priorityTagVariants,
+};

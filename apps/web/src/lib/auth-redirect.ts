@@ -6,13 +6,21 @@
 export function getSafeRedirect(): string | null {
   if (typeof window === "undefined") return null;
   const value = new URLSearchParams(window.location.search).get("redirect");
-  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) {
+  if (
+    !value ||
+    !value.startsWith("/") ||
+    value.startsWith("//") ||
+    value.includes("\\")
+  ) {
     return null;
   }
   return value;
 }
 
 /** `/login` or `/register` carrying the current redirect target along. */
-export function withRedirect(path: "/login" | "/register", redirect: string | null): string {
+export function withRedirect(
+  path: "/login" | "/register",
+  redirect: string | null
+): string {
   return redirect ? `${path}?redirect=${encodeURIComponent(redirect)}` : path;
 }

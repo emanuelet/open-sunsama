@@ -1,15 +1,15 @@
 /**
  * Password reset email functionality
  */
-import { escapeHtml, generateEmailHTML } from './template';
-import { getResend, getFromEmail, getFrontendUrl } from './client';
+import { escapeHtml, generateEmailHTML } from "./template";
+import { getResend, getFromEmail, getFrontendUrl } from "./client";
 import {
   createHeading,
   createParagraph,
   createButton,
   createSecondaryText,
   createMutedText,
-} from './builders';
+} from "./builders";
 
 // =============================================================================
 // CONTENT GENERATOR
@@ -21,23 +21,23 @@ import {
 export function generatePasswordResetContent(
   resetUrl: string,
   userName?: string,
-  themeColor: string = '#3b82f6'
+  themeColor: string = "#3b82f6"
 ): string {
-  const greeting = userName ? `Hi ${userName},` : 'Hi there,';
+  const greeting = userName ? `Hi ${userName},` : "Hi there,";
 
   return [
-    createHeading('Reset your password'),
+    createHeading("Reset your password"),
     createParagraph(greeting),
     createParagraph(
       "We received a request to reset your password. Click the button below to choose a new one."
     ),
-    createButton('Reset password', resetUrl, themeColor),
+    createButton("Reset password", resetUrl, themeColor),
     createSecondaryText(
       "If you didn't request this, you can safely ignore this email. Your password won't be changed."
     ),
     createMutedText(`Or copy and paste this link into your browser:`),
     `<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #6b7280; word-break: break-all;">${escapeHtml(resetUrl)}</p>`,
-  ].join('\n');
+  ].join("\n");
 }
 
 // =============================================================================
@@ -59,21 +59,21 @@ export async function sendPasswordResetEmail(
   const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
   // Default to ocean blue if no theme color provided
-  const themeColor = userThemeColor || '#3b82f6';
+  const themeColor = userThemeColor || "#3b82f6";
 
   const content = generatePasswordResetContent(resetUrl, userName, themeColor);
   const html = generateEmailHTML({
-    title: 'Reset your password',
-    preheader: 'Reset your Open Sunsama password',
+    title: "Reset your password",
+    preheader: "Reset your Open Sunsama password",
     content,
     themeColor,
-    footerText: 'This link expires in 1 hour.',
+    footerText: "This link expires in 1 hour.",
   });
 
   await resend.emails.send({
     from: fromEmail,
     to: email,
-    subject: 'Reset your password',
+    subject: "Reset your password",
     html,
   });
 }

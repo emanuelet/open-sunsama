@@ -73,7 +73,12 @@ interface KanbanCalendarPanelProps {
   className?: string;
   onBlockClick?: (block: TimeBlockType) => void;
   onEditBlock?: (block: TimeBlockType) => void;
-  onTimeSlotClick?: (date: Date, startTime: Date, endTime: Date, anchor?: CalendarCreateAnchor) => void;
+  onTimeSlotClick?: (
+    date: Date,
+    startTime: Date,
+    endTime: Date,
+    anchor?: CalendarCreateAnchor
+  ) => void;
   onViewTask?: (taskId: string) => void;
 }
 
@@ -201,14 +206,24 @@ export function KanbanCalendarPanel({
     onBlockMove: (blockId, startTime, endTime) => {
       const task = projectedDragRef.current;
       if (task && blockId === `projected:${task.id}`) {
-        createTimeBlock.mutate({ taskId: task.id, title: task.title, startTime, endTime });
+        createTimeBlock.mutate({
+          taskId: task.id,
+          title: task.title,
+          startTime,
+          endTime,
+        });
         projectedDragRef.current = null;
       } else moveTimeBlock.mutate({ id: blockId, startTime, endTime });
     },
     onBlockResize: (blockId, startTime, endTime) => {
       const task = projectedDragRef.current;
       if (task && blockId === `projected:${task.id}`) {
-        createTimeBlock.mutate({ taskId: task.id, title: task.title, startTime, endTime });
+        createTimeBlock.mutate({
+          taskId: task.id,
+          title: task.title,
+          startTime,
+          endTime,
+        });
         projectedDragRef.current = null;
       } else cascadeResizeTimeBlock.mutate({ id: blockId, startTime, endTime });
     },
@@ -221,18 +236,26 @@ export function KanbanCalendarPanel({
     (clientY: number) => {
       const rect = timelineRef.current?.getBoundingClientRect();
       const y = rect ? clientY - rect.top : 0;
-      return snapToInterval(calculateTimeFromY(Math.max(0, y), date), SNAP_INTERVAL);
+      return snapToInterval(
+        calculateTimeFromY(Math.max(0, y), date),
+        SNAP_INTERVAL
+      );
     },
     [date, timelineRef]
   );
-  const dropData: CalendarDropData = { type: "calendar", date: dateString, timeAt };
+  const dropData: CalendarDropData = {
+    type: "calendar",
+    date: dateString,
+    timeAt,
+  };
   const { setNodeRef: setDropRef, isOver: isCardOver } = useDroppable({
     id: `calendar-${dateString}`,
     data: dropData,
   });
   const setTimelineNode = React.useCallback(
     (node: HTMLDivElement | null) => {
-      (timelineRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      (timelineRef as React.MutableRefObject<HTMLDivElement | null>).current =
+        node;
       setDropRef(node);
     },
     [timelineRef, setDropRef]
@@ -246,7 +269,9 @@ export function KanbanCalendarPanel({
   const cardDragActive = React.useRef(false);
   const cardDropEndedAt = React.useRef(0);
   useDndMonitor({
-    onDragStart: () => { cardDragActive.current = true; },
+    onDragStart: () => {
+      cardDragActive.current = true;
+    },
     onDragMove(event: DragMoveEvent) {
       const task = event.active.data.current?.task as Task | undefined;
       const y = pointerY.current;
@@ -261,8 +286,16 @@ export function KanbanCalendarPanel({
         end: addMinutes(start, task.estimatedMins ?? DEFAULT_DROP_MINS),
       });
     },
-    onDragEnd: () => { cardDragActive.current = false; cardDropEndedAt.current = Date.now(); setCardPreview(null); },
-    onDragCancel: () => { cardDragActive.current = false; cardDropEndedAt.current = Date.now(); setCardPreview(null); },
+    onDragEnd: () => {
+      cardDragActive.current = false;
+      cardDropEndedAt.current = Date.now();
+      setCardPreview(null);
+    },
+    onDragCancel: () => {
+      cardDragActive.current = false;
+      cardDropEndedAt.current = Date.now();
+      setCardPreview(null);
+    },
   });
 
   const hours = React.useMemo(
@@ -309,7 +342,10 @@ export function KanbanCalendarPanel({
   const { user } = useAuth();
   const workStartHour = user?.preferences?.workStartHour ?? 9;
   const workEndHour = user?.preferences?.workEndHour ?? 17;
-  const { data: dayTasks = [] } = useTasks({ scheduledDate: dateString, limit: 200 });
+  const { data: dayTasks = [] } = useTasks({
+    scheduledDate: dateString,
+    limit: 200,
+  });
   const projected = React.useMemo(() => {
     const open = dayTasks
       .filter((t) => !t.completedAt)
@@ -318,10 +354,16 @@ export function KanbanCalendarPanel({
       dayBlocks.map((b) => b.taskId).filter((id): id is string => !!id)
     );
     const busy = [
-      ...dayBlocks.map((b) => ({ start: new Date(b.startTime), end: new Date(b.endTime) })),
+      ...dayBlocks.map((b) => ({
+        start: new Date(b.startTime),
+        end: new Date(b.endTime),
+      })),
       ...calendarEvents
         .filter((e) => !e.isAllDay && e.responseStatus !== "declined")
-        .map((e) => ({ start: new Date(e.startTime), end: new Date(e.endTime) })),
+        .map((e) => ({
+          start: new Date(e.startTime),
+          end: new Date(e.endTime),
+        })),
     ];
     const starts = projectTaskStarts({
       day: date,
@@ -455,15 +497,28 @@ export function KanbanCalendarPanel({
     startBlockResize(block, edge, e.clientY);
   };
 
-  const startProjectedDrag = (task: Task, start: Date, end: Date, e: React.MouseEvent, edge?: "top" | "bottom") => {
+  const startProjectedDrag = (
+    task: Task,
+    start: Date,
+    end: Date,
+    e: React.MouseEvent,
+    edge?: "top" | "bottom"
+  ) => {
     if (e.button !== 0) return;
     e.preventDefault();
     e.stopPropagation();
     projectedDragRef.current = task;
     const block: TimeBlockType = {
-      id: `projected:${task.id}`, taskId: task.id, userId: task.userId,
-      title: task.title, startTime: start, endTime: end,
-      color: null, notes: null, createdAt: start, updatedAt: start,
+      id: `projected:${task.id}`,
+      taskId: task.id,
+      userId: task.userId,
+      title: task.title,
+      startTime: start,
+      endTime: end,
+      color: null,
+      notes: null,
+      createdAt: start,
+      updatedAt: start,
     };
     if (edge) startBlockResize(block, edge, e.clientY);
     else startBlockDrag(block, e.clientY);
@@ -472,7 +527,8 @@ export function KanbanCalendarPanel({
   // Press and drag on empty space to sweep out a new block.
   const createDrag = useDragToCreate(
     onTimeSlotClick
-      ? ({ day, start, end, anchor }) => onTimeSlotClick(day, start, end, anchor)
+      ? ({ day, start, end, anchor }) =>
+          onTimeSlotClick(day, start, end, anchor)
       : undefined
   );
 
@@ -496,7 +552,11 @@ export function KanbanCalendarPanel({
     }
 
     // Don't trigger during drag operations
-    if (dragState || cardDragActive.current || Date.now() - cardDropEndedAt.current < 350) {
+    if (
+      dragState ||
+      cardDragActive.current ||
+      Date.now() - cardDropEndedAt.current < 350
+    ) {
       return;
     }
 
@@ -518,7 +578,10 @@ export function KanbanCalendarPanel({
     const snappedStartTime = snapToInterval(clickedTime, SNAP_INTERVAL);
     const snappedEndTime = addMinutes(snappedStartTime, 60);
 
-    onTimeSlotClick(date, snappedStartTime, snappedEndTime, { x: e.clientX, y: e.clientY });
+    onTimeSlotClick(date, snappedStartTime, snappedEndTime, {
+      x: e.clientX,
+      y: e.clientY,
+    });
   };
 
   return (
@@ -601,7 +664,9 @@ export function KanbanCalendarPanel({
             onMouseLeave={handleTimelineMouseLeave}
             onClick={handleTimeSlotClick}
             data-calendar-create-column
-            onMouseDown={(e) => { if (!cardDragActive.current) createDrag.startCreate(e, date); }}
+            onMouseDown={(e) => {
+              if (!cardDragActive.current) createDrag.startCreate(e, date);
+            }}
           >
             {/* Hour grid lines */}
             {hours.map((hour) => (
@@ -631,39 +696,56 @@ export function KanbanCalendarPanel({
                 <WorkdayEdge
                   key={hour}
                   top={(hour - TIMELINE_START_HOUR) * HOUR_HEIGHT}
-                  label={hour === workStartHour ? "Workday starts" : "Workday ends"}
+                  label={
+                    hour === workStartHour ? "Workday starts" : "Workday ends"
+                  }
                 />
               ) : null
             )}
 
             {/* Tasks without a block, where the list order projects them */}
             {projected.map(({ task, start, end }) => (
-                <button
-                  key={task.id}
-                  type="button"
-                  data-projected-task={task.id}
-                  aria-label={task.title}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!justEndedDrag) onViewTask?.(task.id);
-                  }}
-                  onMouseDown={(e) => startProjectedDrag(task, start, end, e)}
-                  title={`${task.title} · projected ${format(start, "h:mm a")}`}
-                  className="absolute left-1 right-2 z-10 overflow-hidden rounded border border-dotted border-primary/50 bg-primary/[0.04] px-1.5 text-left text-[11px] leading-4 text-primary transition-colors hover:bg-primary/[0.09]"
-                  style={{
-                    opacity: dragState?.blockId === `projected:${task.id}` ? 0.4 : 1,
-                    top: calculateYFromTime(start) + 1,
-                    height: Math.max(
-                      16,
-                      (differenceInMinutes(end, start) / 60) * HOUR_HEIGHT - 2
-                    ),
-                  }}
-                >
-                  <span data-resize="top" title="Drag to change start time" className="absolute inset-x-0 top-0 z-20 h-1 cursor-ns-resize hover:bg-primary/20" onMouseDown={(e) => startProjectedDrag(task, start, end, e, "top")} />
-                  <span className="line-clamp-2">{task.title}</span>
-                  <span data-resize="bottom" title="Drag to change end time" className="absolute inset-x-0 bottom-0 z-20 h-1 cursor-ns-resize hover:bg-primary/20" onMouseDown={(e) => startProjectedDrag(task, start, end, e, "bottom")} />
-                </button>
-              ))}
+              <button
+                key={task.id}
+                type="button"
+                data-projected-task={task.id}
+                aria-label={task.title}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!justEndedDrag) onViewTask?.(task.id);
+                }}
+                onMouseDown={(e) => startProjectedDrag(task, start, end, e)}
+                title={`${task.title} · projected ${format(start, "h:mm a")}`}
+                className="absolute left-1 right-2 z-10 overflow-hidden rounded border border-dotted border-primary/50 bg-primary/[0.04] px-1.5 text-left text-[11px] leading-4 text-primary transition-colors hover:bg-primary/[0.09]"
+                style={{
+                  opacity:
+                    dragState?.blockId === `projected:${task.id}` ? 0.4 : 1,
+                  top: calculateYFromTime(start) + 1,
+                  height: Math.max(
+                    16,
+                    (differenceInMinutes(end, start) / 60) * HOUR_HEIGHT - 2
+                  ),
+                }}
+              >
+                <span
+                  data-resize="top"
+                  title="Drag to change start time"
+                  className="absolute inset-x-0 top-0 z-20 h-1 cursor-ns-resize hover:bg-primary/20"
+                  onMouseDown={(e) =>
+                    startProjectedDrag(task, start, end, e, "top")
+                  }
+                />
+                <span className="line-clamp-2">{task.title}</span>
+                <span
+                  data-resize="bottom"
+                  title="Drag to change end time"
+                  className="absolute inset-x-0 bottom-0 z-20 h-1 cursor-ns-resize hover:bg-primary/20"
+                  onMouseDown={(e) =>
+                    startProjectedDrag(task, start, end, e, "bottom")
+                  }
+                />
+              </button>
+            ))}
 
             {/* Current time indicator - thin red line with dot */}
             {currentTimePosition !== null && (
@@ -716,7 +798,9 @@ export function KanbanCalendarPanel({
                 key={block.id}
                 block={block}
                 layout={itemLayouts.get(`block:${block.id}`) ?? DEFAULT_LAYOUT}
-                onClick={() => { if (!justEndedDrag) onBlockClick?.(block); }}
+                onClick={() => {
+                  if (!justEndedDrag) onBlockClick?.(block);
+                }}
                 onEditBlock={() => onEditBlock?.(block)}
                 onDragStart={(e) => handleBlockDragStart(block, e)}
                 onResizeStart={(e, edge) =>
@@ -819,7 +903,12 @@ function WorkdayEdge({ top, label }: { top: number; label: string }) {
     >
       <defs>
         <pattern id={id} width="8" height="6" patternUnits="userSpaceOnUse">
-          <path d="M0 5 L4 1 L8 5" fill="none" stroke="currentColor" strokeWidth="1" />
+          <path
+            d="M0 5 L4 1 L8 5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+          />
         </pattern>
       </defs>
       <rect width="100%" height="6" fill={`url(#${id})`} />

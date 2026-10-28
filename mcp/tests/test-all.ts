@@ -161,7 +161,10 @@ async function testTasks() {
       if (response.success && response.data && response.data.completedAt) {
         pass("Complete task", `Completed at: ${response.data.completedAt}`);
       } else {
-        fail("Complete task", response.error?.message || "Task not marked complete");
+        fail(
+          "Complete task",
+          response.error?.message || "Task not marked complete"
+        );
       }
     } catch (e) {
       fail("Complete task", String(e));
@@ -177,7 +180,10 @@ async function testTasks() {
       if (response.success && response.data && !response.data.completedAt) {
         pass("Uncomplete task", "Task reopened");
       } else {
-        fail("Uncomplete task", response.error?.message || "Task still completed");
+        fail(
+          "Uncomplete task",
+          response.error?.message || "Task still completed"
+        );
       }
     } catch (e) {
       fail("Uncomplete task", String(e));
@@ -239,7 +245,10 @@ async function testSubtasks() {
       createdSubtaskIds.push(response.data.id);
       pass("Create subtask with position", `ID: ${response.data.id}`);
     } else {
-      fail("Create subtask with position", response.error?.message || "Unknown error");
+      fail(
+        "Create subtask with position",
+        response.error?.message || "Unknown error"
+      );
     }
   } catch (e) {
     fail("Create subtask with position", String(e));
@@ -286,7 +295,10 @@ async function testSubtasks() {
       if (response.success && response.data) {
         pass("Update subtask title", `New title: ${response.data.title}`);
       } else {
-        fail("Update subtask title", response.error?.message || "Unknown error");
+        fail(
+          "Update subtask title",
+          response.error?.message || "Unknown error"
+        );
       }
     } catch (e) {
       fail("Update subtask title", String(e));
@@ -349,9 +361,15 @@ async function testTimeBlocks() {
       });
       if (response.success && response.data) {
         createdTimeBlockIds.push(response.data.id);
-        pass("Create linked time block", `Linked to task: ${createdTaskIds[0]}`);
+        pass(
+          "Create linked time block",
+          `Linked to task: ${createdTaskIds[0]}`
+        );
       } else {
-        fail("Create linked time block", response.error?.message || "Unknown error");
+        fail(
+          "Create linked time block",
+          response.error?.message || "Unknown error"
+        );
       }
     } catch (e) {
       fail("Create linked time block", String(e));
@@ -364,7 +382,10 @@ async function testTimeBlocks() {
     if (response.success && response.data) {
       pass("List time blocks by date", `Found ${response.data.length} blocks`);
     } else {
-      fail("List time blocks by date", response.error?.message || "Unknown error");
+      fail(
+        "List time blocks by date",
+        response.error?.message || "Unknown error"
+      );
     }
   } catch (e) {
     fail("List time blocks by date", String(e));
@@ -377,7 +398,10 @@ async function testTimeBlocks() {
       if (response.success && response.data) {
         pass("Get time block by ID", `Title: ${response.data.title}`);
       } else {
-        fail("Get time block by ID", response.error?.message || "Unknown error");
+        fail(
+          "Get time block by ID",
+          response.error?.message || "Unknown error"
+        );
       }
     } catch (e) {
       fail("Get time block by ID", String(e));
@@ -414,7 +438,10 @@ async function testTimeBlocks() {
       if (response.success && response.data && response.data.taskId) {
         pass("Link task to time block", `Linked to: ${response.data.taskId}`);
       } else {
-        fail("Link task to time block", response.error?.message || "Unknown error");
+        fail(
+          "Link task to time block",
+          response.error?.message || "Unknown error"
+        );
       }
     } catch (e) {
       fail("Link task to time block", String(e));
@@ -430,7 +457,10 @@ async function testTimeBlocks() {
       if (response.success && response.data && !response.data.taskId) {
         pass("Unlink task from time block", "Task unlinked");
       } else {
-        fail("Unlink task from time block", response.error?.message || "Unknown error");
+        fail(
+          "Unlink task from time block",
+          response.error?.message || "Unknown error"
+        );
       }
     } catch (e) {
       fail("Unlink task from time block", String(e));

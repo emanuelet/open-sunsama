@@ -15,12 +15,15 @@ interface BreadcrumbsProps {
 /** Visible trail plus BreadcrumbList JSON-LD (marketing pages use components/marketing/breadcrumbs.tsx). */
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
   return (
-    <nav aria-label="Breadcrumb" className="text-[11px] text-muted-foreground mb-4">
+    <nav
+      aria-label="Breadcrumb"
+      className="text-[11px] text-muted-foreground mb-4"
+    >
       <JsonLd id="breadcrumb-schema" data={breadcrumbListJsonLd(items)} />
       <ol className="flex items-center gap-1.5 flex-wrap">
         <li>
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="hover:text-foreground transition-colors flex items-center gap-1"
           >
             <Home className="h-3 w-3" />
@@ -31,8 +34,8 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
           <li key={index} className="flex items-center gap-1.5">
             <ChevronRight className="h-3 w-3 text-muted-foreground/50" />
             {item.href ? (
-              <Link 
-                to={item.href} 
+              <Link
+                to={item.href}
                 className="hover:text-foreground transition-colors"
               >
                 {item.label}

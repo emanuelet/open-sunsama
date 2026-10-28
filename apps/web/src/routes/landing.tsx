@@ -10,7 +10,11 @@ import { MarketingLayout } from "@/components/marketing/marketing-layout";
 import { AiSection } from "@/components/landing/ai-section";
 import { FaqSection } from "@/components/landing/faq-section";
 import { Hero } from "@/components/landing/hero";
-import { FeaturesSection, FinalCta, OpenSourceSection } from "@/components/landing/sections";
+import {
+  FeaturesSection,
+  FinalCta,
+  OpenSourceSection,
+} from "@/components/landing/sections";
 import { StorySection } from "@/components/landing/story-section";
 
 export default function LandingPage() {

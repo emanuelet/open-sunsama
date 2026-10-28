@@ -230,7 +230,9 @@ const forRemoteWorkersRoute = createRoute({
 const openSourceTaskManagerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/open-source-task-manager",
-  component: lazyRouteComponent(() => import("./routes/open-source-task-manager")),
+  component: lazyRouteComponent(
+    () => import("./routes/open-source-task-manager")
+  ),
 });
 
 // Old SEO URL, still linked from blog posts; the time-blocking feature page replaces it.
@@ -321,9 +323,7 @@ const appTasksListRoute = createRoute({
   component: lazyRouteComponent(() => import("./routes/app/tasks")),
   // `?backlog=1` opens the mobile backlog sheet on arrival (used by the
   // mobile "More → Backlog" entry).
-  validateSearch: (
-    search: Record<string, unknown>
-  ): { backlog?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { backlog?: string } => ({
     // Coerce regardless of type — TanStack parses `?backlog=1` as the number 1.
     backlog: search.backlog != null ? String(search.backlog) : undefined,
   }),

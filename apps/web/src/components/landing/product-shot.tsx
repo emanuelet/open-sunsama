@@ -6,7 +6,13 @@
 
 import { cn } from "@/lib/utils";
 
-export type ShotName = "board" | "calendar-week" | "focus" | "command-palette" | "ideas" | "task-detail";
+export type ShotName =
+  | "board"
+  | "calendar-week"
+  | "focus"
+  | "command-palette"
+  | "ideas"
+  | "task-detail";
 
 export function ThemedShot({
   name,
@@ -70,7 +76,11 @@ export function BrowserFrame({
           <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
         </div>
         <div className="mx-auto flex h-5 min-w-0 max-w-[240px] flex-1 items-center justify-center gap-1.5 rounded-md bg-background/80 px-2 text-[10.5px] text-muted-foreground ring-1 ring-border/60 dark:bg-white/4 dark:ring-white/6">
-          <svg viewBox="0 0 16 16" className="h-2.5 w-2.5 shrink-0 opacity-60" aria-hidden>
+          <svg
+            viewBox="0 0 16 16"
+            className="h-2.5 w-2.5 shrink-0 opacity-60"
+            aria-hidden
+          >
             <path
               fill="currentColor"
               d="M8 1a3.5 3.5 0 0 0-3.5 3.5V6H4a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-.5V4.5A3.5 3.5 0 0 0 8 1Zm2 5H6V4.5a2 2 0 1 1 4 0V6Z"

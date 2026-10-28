@@ -28,7 +28,7 @@ export function RemoveAccountDialog({
   isLoading: boolean;
 }) {
   if (!account) return null;
-  
+
   const config = PROVIDER_CONFIG[account.provider];
 
   return (
@@ -41,15 +41,17 @@ export function RemoveAccountDialog({
             </div>
             <div>
               <DialogTitle>Remove Calendar Account</DialogTitle>
-              <DialogDescription>This action cannot be undone</DialogDescription>
+              <DialogDescription>
+                This action cannot be undone
+              </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <p className="text-sm text-muted-foreground">
-            Are you sure you want to disconnect this calendar account? All synced
-            events will be removed from Open Sunsama.
+            Are you sure you want to disconnect this calendar account? All
+            synced events will be removed from Open Sunsama.
           </p>
 
           <div className="flex items-center gap-3 rounded-lg border bg-muted/50 p-3">
@@ -69,7 +71,11 @@ export function RemoveAccountDialog({
           >
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onConfirm} disabled={isLoading}>
+          <Button
+            variant="destructive"
+            onClick={onConfirm}
+            disabled={isLoading}
+          >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Remove Account
           </Button>

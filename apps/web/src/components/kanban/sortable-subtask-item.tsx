@@ -5,7 +5,11 @@ import { X, GripVertical, Check } from "lucide-react";
 import type { Subtask } from "@open-sunsama/types";
 import { cn } from "@/lib/utils";
 import { useHoveredTask } from "@/hooks/useKeyboardShortcuts";
-import { useSubtaskSize, useSubtaskStyles, subtaskCheckState } from "./subtask-size";
+import {
+  useSubtaskSize,
+  useSubtaskStyles,
+  subtaskCheckState,
+} from "./subtask-size";
 import { SubtaskTiming } from "./subtask-timing";
 
 // Re-export for convenience
@@ -160,7 +164,11 @@ export function SortableSubtaskItem({
         </span>
       )}
 
-      {showTiming && <div className="max-sm:col-start-2 max-sm:col-span-2 max-sm:row-start-2"><SubtaskTiming subtask={subtask} /></div>}
+      {showTiming && (
+        <div className="max-sm:col-start-2 max-sm:col-span-2 max-sm:row-start-2">
+          <SubtaskTiming subtask={subtask} />
+        </div>
+      )}
 
       <button
         type="button"

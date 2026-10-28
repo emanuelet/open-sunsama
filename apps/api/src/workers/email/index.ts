@@ -2,26 +2,26 @@
  * Email Workers
  * Handles scheduled email notifications (daily summary, task reminders, etc.)
  */
-import type { Job } from 'pg-boss';
-import { getPgBoss, JOBS } from '../../lib/pgboss.js';
-import { 
-  type DailySummaryCheckPayload, 
+import type { Job } from "pg-boss";
+import { getPgBoss, JOBS } from "../../lib/pgboss.js";
+import {
+  type DailySummaryCheckPayload,
   type SendDailySummaryPayload,
-  processDailySummaryCheck 
-} from './daily-summary.js';
-import { processSendDailySummary } from './send-summary.js';
+  processDailySummaryCheck,
+} from "./daily-summary.js";
+import { processSendDailySummary } from "./send-summary.js";
 import {
   type TaskReminderCheckPayload,
   type SendTaskReminderPayload,
   processTaskReminderCheck,
-} from './task-reminder.js';
-import { processSendTaskReminder } from './send-reminder.js';
+} from "./task-reminder.js";
+import { processSendTaskReminder } from "./send-reminder.js";
 
 /**
  * Check if email notifications are enabled via environment variable
  */
 function isEmailWorkersEnabled(): boolean {
-  return process.env.EMAIL_WORKERS_ENABLED !== 'false';
+  return process.env.EMAIL_WORKERS_ENABLED !== "false";
 }
 
 /**
@@ -29,7 +29,7 @@ function isEmailWorkersEnabled(): boolean {
  */
 export async function registerEmailWorkers(): Promise<void> {
   if (!isEmailWorkersEnabled()) {
-    console.log('[Email Workers] Disabled via EMAIL_WORKERS_ENABLED=false');
+    console.log("[Email Workers] Disabled via EMAIL_WORKERS_ENABLED=false");
     return;
   }
 
@@ -43,16 +43,26 @@ export async function registerEmailWorkers(): Promise<void> {
 
   // Schedule the daily summary check to run every minute
   // singletonKey prevents duplicate schedules on server restarts
-  await boss.schedule(JOBS.DAILY_SUMMARY_CHECK, '* * * * *', {}, {
-    tz: 'UTC',
-    singletonKey: 'daily-summary-check-schedule',
-  });
+  await boss.schedule(
+    JOBS.DAILY_SUMMARY_CHECK,
+    "* * * * *",
+    {},
+    {
+      tz: "UTC",
+      singletonKey: "daily-summary-check-schedule",
+    }
+  );
 
   // Schedule the task reminder check to run every minute
-  await boss.schedule(JOBS.TASK_REMINDER_CHECK, '* * * * *', {}, {
-    tz: 'UTC',
-    singletonKey: 'task-reminder-check-schedule',
-  });
+  await boss.schedule(
+    JOBS.TASK_REMINDER_CHECK,
+    "* * * * *",
+    {},
+    {
+      tz: "UTC",
+      singletonKey: "task-reminder-check-schedule",
+    }
+  );
 
   // Register the daily summary check handler
   await boss.work(
@@ -71,7 +81,7 @@ export async function registerEmailWorkers(): Promise<void> {
     { batchSize: 10 }, // Process 10 emails concurrently
     async (jobs: Job<SendDailySummaryPayload>[]) => {
       // Process jobs concurrently within the batch
-      await Promise.all(jobs.map(job => processSendDailySummary(job)));
+      await Promise.all(jobs.map((job) => processSendDailySummary(job)));
     }
   );
 
@@ -90,13 +100,19 @@ export async function registerEmailWorkers(): Promise<void> {
     JOBS.SEND_TASK_REMINDER,
     { batchSize: 10 }, // Process 10 reminders concurrently
     async (jobs: Job<SendTaskReminderPayload>[]) => {
-      await Promise.all(jobs.map(job => processSendTaskReminder(job)));
+      await Promise.all(jobs.map((job) => processSendTaskReminder(job)));
     }
   );
 
-  console.log('[Email Workers] Registered and scheduled');
+  console.log("[Email Workers] Registered and scheduled");
 }
 
 // Re-export types for convenience
-export type { DailySummaryCheckPayload, SendDailySummaryPayload } from './daily-summary.js';
-export type { TaskReminderCheckPayload, SendTaskReminderPayload } from './task-reminder.js';
+export type {
+  DailySummaryCheckPayload,
+  SendDailySummaryPayload,
+} from "./daily-summary.js";
+export type {
+  TaskReminderCheckPayload,
+  SendTaskReminderPayload,
+} from "./task-reminder.js";

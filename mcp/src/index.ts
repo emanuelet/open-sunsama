@@ -20,7 +20,8 @@ import { createOpenSunsamaMcpServer } from "./server.js";
 
 // Configuration from environment variables
 const API_KEY = process.env.OPENSUNSAMA_API_KEY;
-const API_URL = process.env.OPENSUNSAMA_API_URL || "https://api.opensunsama.com";
+const API_URL =
+  process.env.OPENSUNSAMA_API_URL || "https://api.opensunsama.com";
 
 // Validate required configuration
 if (!API_KEY) {

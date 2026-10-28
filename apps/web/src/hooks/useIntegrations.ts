@@ -21,8 +21,7 @@ export interface ImportTaskResult {
 }
 
 export type ImportTaskInput =
-  | string
-  | { accountId: string; externalId: string };
+  string | { accountId: string; externalId: string };
 
 /**
  * Turn a provider failure into something a person can act on. "It didn't
@@ -97,9 +96,10 @@ export function useIntegrationTasks(accountId: string | null) {
     enabled: Boolean(accountId),
     queryFn: async (): Promise<ExternalTaskSummary[]> => {
       const client = getApiClient();
-      const response = await client.get<{ success: boolean; data: ExternalTaskSummary[] }>(
-        `integrations/accounts/${accountId}/tasks`
-      );
+      const response = await client.get<{
+        success: boolean;
+        data: ExternalTaskSummary[];
+      }>(`integrations/accounts/${accountId}/tasks`);
       return response.data;
     },
   });
@@ -171,15 +171,16 @@ export function useImportTask() {
       const response = await client.post<{
         success: boolean;
         data: ImportTaskResult;
-      }>("integrations/import", typeof input === "string" ? { reference: input } : input);
+      }>(
+        "integrations/import",
+        typeof input === "string" ? { reference: input } : input
+      );
       return response.data;
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all });
       toast({
-        title: result.alreadyExisted
-          ? "Already imported"
-          : "Task imported",
+        title: result.alreadyExisted ? "Already imported" : "Task imported",
         description: result.alreadyExisted
           ? `"${result.task.title}" is already in your tasks.`
           : `"${result.task.title}" is ready to plan.`,

@@ -18,10 +18,19 @@ import {
   SectionHeading,
   StepsSection,
 } from "@/components/marketing";
-import { GiveUpSection, VerdictSection } from "@/components/alternative/compare-parts";
+import {
+  GiveUpSection,
+  VerdictSection,
+} from "@/components/alternative/compare-parts";
 import { ProductComparisonSchema } from "@/components/seo";
 import { useSEO, SEO_CONFIGS } from "@/hooks/useSEO";
-import type { ComparisonRow, MarketingFaq, MediaRow, PageHeroContent, RelatedLink } from "@/content/marketing/types";
+import type {
+  ComparisonRow,
+  MarketingFaq,
+  MediaRow,
+  PageHeroContent,
+  RelatedLink,
+} from "@/content/marketing/types";
 import { cn } from "@/lib/utils";
 
 /*
@@ -69,35 +78,55 @@ const LOOP: MediaRow[] = [
     body: [
       "Today, tomorrow and your backlog sit side by side, like in Sunsama. Drag a task to the day you will do it. Anything you don't finish rolls over to the next day on its own.",
     ],
-    media: { clip: "plan-day", alt: "Open Sunsama board with Today, Tomorrow and the backlog", caption: "Drag tasks from the backlog into Today." },
+    media: {
+      clip: "plan-day",
+      alt: "Open Sunsama board with Today, Tomorrow and the backlog",
+      caption: "Drag tasks from the backlog into Today.",
+    },
   },
   {
     title: "Time-block your real calendar",
     body: [
       "Drag a task onto the calendar to give it a time slot, then drag the edge to set how long it takes. Your Google, Outlook and iCloud events sit right next to your blocks.",
     ],
-    media: { clip: "time-block", alt: "Open Sunsama day view with time blocks next to meetings", caption: "Drop a task on the calendar and resize the block." },
+    media: {
+      clip: "time-block",
+      alt: "Open Sunsama day view with time blocks next to meetings",
+      caption: "Drop a task on the calendar and resize the block.",
+    },
   },
   {
     title: "Focus on one task and see planned vs actual",
     body: [
       "Focus mode hides everything but the task in front of you. The timer tracks how long it really took, so tomorrow's plan is more honest.",
     ],
-    media: { clip: "focus", alt: "Open Sunsama focus mode with a running timer", caption: "Start focus mode and the timer tracks actual time." },
+    media: {
+      clip: "focus",
+      alt: "Open Sunsama focus mode with a running timer",
+      caption: "Start focus mode and the timer tracks actual time.",
+    },
   },
   {
     title: "Do it all from the keyboard",
     body: [
       "Press Cmd+K to find a task, jump to a day or run a command. Most actions have a shortcut, so a full plan takes a few minutes.",
     ],
-    media: { clip: "command-palette", alt: "Open Sunsama command palette open over the board", caption: "Cmd+K finds any task or command." },
+    media: {
+      clip: "command-palette",
+      alt: "Open Sunsama command palette open over the board",
+      caption: "Cmd+K finds any task or command.",
+    },
   },
   {
     title: "Take your plan with you",
     body: [
       "Use Open Sunsama on the web, as a desktop app for Mac, Windows and Linux, or in your phone's browser. Changes sync across devices in real time, so the plan you made at your desk is in your pocket.",
     ],
-    media: { shot: "mobile-tasks", alt: "Open Sunsama task list on a phone", caption: "Your day on your phone." },
+    media: {
+      shot: "mobile-tasks",
+      alt: "Open Sunsama task list on a phone",
+      caption: "Your day on your phone.",
+    },
     link: { label: "Download the desktop app", href: "/download" },
   },
 ];
@@ -119,19 +148,31 @@ const FEATURES: Array<{ name: string; os: Cell; sunsama: Cell }> = [
   { name: "Command palette and shortcuts", os: true, sunsama: true },
   { name: "Guided planning and shutdown ritual", os: false, sunsama: true },
   { name: "Weekly planning and review", os: false, sunsama: true },
-  { name: "Built-in task integrations", os: "Via API or agent", sunsama: "About 20 tools" },
+  {
+    name: "Built-in task integrations",
+    os: "Via API or agent",
+    sunsama: "About 20 tools",
+  },
   { name: "Team workspace", os: false, sunsama: true },
   { name: "AI assistant", os: "Bring any agent", sunsama: "Sunny" },
   { name: "MCP server for AI agents", os: true, sunsama: true },
   { name: "Public REST API with API keys", os: true, sunsama: false },
   { name: "Source code you can read and change", os: true, sunsama: false },
   { name: "Self-hosting", os: "Docker", sunsama: false },
-  { name: "Apps", os: "Web, Mac, Windows, Linux, mobile web", sunsama: "Web, Mac, Windows, Linux, iOS, Android" },
+  {
+    name: "Apps",
+    os: "Web, Mac, Windows, Linux, mobile web",
+    sunsama: "Web, Mac, Windows, Linux, iOS, Android",
+  },
 ];
 
-const toCell = (value: Cell) => (value === true ? "yes" : value === false ? "no" : { text: value });
+const toCell = (value: Cell) =>
+  value === true ? "yes" : value === false ? "no" : { text: value };
 
-const FEATURE_ROWS: ComparisonRow[] = FEATURES.map((row) => ({ feature: row.name, cells: [toCell(row.os), toCell(row.sunsama)] }));
+const FEATURE_ROWS: ComparisonRow[] = FEATURES.map((row) => ({
+  feature: row.name,
+  cells: [toCell(row.os), toCell(row.sunsama)],
+}));
 
 // ---------------------------------------------------------------------------
 // What you get / what you give up
@@ -212,19 +253,28 @@ const STEPS = [
 
 function LicenseSection() {
   return (
-    <section id="license" className={cn(SECTION, "py-14 md:py-16")} aria-labelledby="license-heading">
+    <section
+      id="license"
+      className={cn(SECTION, "py-14 md:py-16")}
+      aria-labelledby="license-heading"
+    >
       <div className={cn(CONTAINER, "max-w-3xl")}>
         <Reveal className={cn(CARD, "bg-muted/30 p-6 md:p-8")}>
-          <h2 id="license-heading" className="text-[22px] font-semibold tracking-[-0.02em] md:text-[26px]">
+          <h2
+            id="license-heading"
+            className="text-[22px] font-semibold tracking-[-0.02em] md:text-[26px]"
+          >
             The license, in plain words
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            The code is public on GitHub. It uses a non-commercial license: you can read it, run it and self-host it for
-            personal use. Companies need a commercial license.
+            The code is public on GitHub. It uses a non-commercial license: you
+            can read it, run it and self-host it for personal use. Companies
+            need a commercial license.
           </p>
           <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-            Education, non-profit and other open-source projects are covered too. It is not an OSI license like MIT or GPL,
-            so we say so up front.
+            Education, non-profit and other open-source projects are covered
+            too. It is not an OSI license like MIT or GPL, so we say so up
+            front.
           </p>
           <a
             href={`${GITHUB_URL}/blob/main/LICENSE`}
@@ -287,7 +337,8 @@ const RELATED: RelatedLink[] = [
   {
     kind: "compare",
     title: "Open Sunsama vs Motion",
-    description: "Plan by hand, or with your agent, instead of an auto-scheduler.",
+    description:
+      "Plan by hand, or with your agent, instead of an auto-scheduler.",
     href: "/alternative/motion",
   },
   {
@@ -345,7 +396,8 @@ export default function AlternativeSunsamaPage() {
         comparedProducts={[
           {
             name: "Sunsama",
-            description: "Guided daily planner with time blocking, calendar sync and task integrations.",
+            description:
+              "Guided daily planner with time blocking, calendar sync and task integrations.",
             url: "https://sunsama.com",
           },
         ]}
@@ -356,7 +408,11 @@ export default function AlternativeSunsamaPage() {
       <PageHero
         hero={HERO}
         before={
-          <Breadcrumbs items={[{ label: "Alternatives" }, { label: "Sunsama" }]} path="/alternative/sunsama" className="mb-8 md:mb-10" />
+          <Breadcrumbs
+            items={[{ label: "Alternatives" }, { label: "Sunsama" }]}
+            path="/alternative/sunsama"
+            className="mb-8 md:mb-10"
+          />
         }
       />
 

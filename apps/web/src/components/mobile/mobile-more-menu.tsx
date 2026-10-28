@@ -50,14 +50,17 @@ function MenuItemComponent({ item }: MenuItemComponentProps) {
   const content = (
     <>
       <div className="flex items-center gap-3">
-        <Icon className={cn(
-          "h-5 w-5",
-          item.destructive ? "text-destructive" : "text-muted-foreground"
-        )} />
-        <span className={cn(
-          "text-[15px]",
-          item.destructive && "text-destructive"
-        )}>{item.label}</span>
+        <Icon
+          className={cn(
+            "h-5 w-5",
+            item.destructive ? "text-destructive" : "text-muted-foreground"
+          )}
+        />
+        <span
+          className={cn("text-[15px]", item.destructive && "text-destructive")}
+        >
+          {item.label}
+        </span>
       </div>
       {!item.destructive && (
         <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
@@ -144,108 +147,111 @@ export function MobileMoreMenu({ onLogout }: MobileMoreMenuProps) {
 
   // Each entry deep-links straight to its content (the settings page opens the
   // matching sheet directly on mobile — no intermediate settings list).
-  const menuSections: MenuSection[] = React.useMemo(() => [
-    {
-      title: "Work",
-      items: [
-        {
-          id: "search",
-          icon: Search,
-          label: "Search tasks, ideas, events",
-          onClick: openSearch,
-        },
-        {
-          id: "backlog",
-          icon: Inbox,
-          label: "Backlog",
-          href: "/app/tasks?backlog=1",
-        },
-        ...(showInstall
-          ? [
-              {
-                id: "install",
-                icon: Smartphone,
-                label: "Add to Home Screen",
-                onClick: () => setInstallOpen(true),
-              },
-            ]
-          : []),
-      ],
-    },
-    {
-      title: "Settings",
-      items: [
-        {
-          id: "profile",
-          icon: User,
-          label: "Profile",
-          href: "/app/settings?tab=profile",
-        },
-        {
-          id: "security",
-          icon: Lock,
-          label: "Security",
-          href: "/app/settings?tab=security",
-        },
-        {
-          id: "appearance",
-          icon: Palette,
-          label: "Appearance",
-          href: "/app/settings?tab=appearance",
-        },
-        {
-          id: "tasks",
-          icon: ListTodo,
-          label: "Task defaults",
-          href: "/app/settings?tab=tasks",
-        },
-        {
-          id: "routines",
-          icon: Repeat,
-          label: "Routines",
-          href: "/app/settings?tab=routines",
-        },
-        {
-          id: "calendars",
-          icon: CalendarDays,
-          label: "Calendars",
-          href: "/app/settings?tab=calendars",
-        },
-        {
-          id: "notifications",
-          icon: Bell,
-          label: "Notifications",
-          href: "/app/settings?tab=notifications",
-        },
-        {
-          // Settings tab id is "api" (not "api-keys") — an invalid tab silently
-          // falls back to the Profile tab.
-          id: "api",
-          icon: Key,
-          label: "API Keys",
-          href: "/app/settings?tab=api",
-        },
-        {
-          id: "mcp",
-          icon: Terminal,
-          label: "MCP",
-          href: "/app/settings?tab=mcp",
-        },
-      ],
-    },
-    {
-      title: "Account",
-      items: [
-        {
-          id: "logout",
-          icon: LogOut,
-          label: "Log out",
-          onClick: handleLogout,
-          destructive: true,
-        },
-      ],
-    },
-  ], [handleLogout, openSearch, showInstall]);
+  const menuSections: MenuSection[] = React.useMemo(
+    () => [
+      {
+        title: "Work",
+        items: [
+          {
+            id: "search",
+            icon: Search,
+            label: "Search tasks, ideas, events",
+            onClick: openSearch,
+          },
+          {
+            id: "backlog",
+            icon: Inbox,
+            label: "Backlog",
+            href: "/app/tasks?backlog=1",
+          },
+          ...(showInstall
+            ? [
+                {
+                  id: "install",
+                  icon: Smartphone,
+                  label: "Add to Home Screen",
+                  onClick: () => setInstallOpen(true),
+                },
+              ]
+            : []),
+        ],
+      },
+      {
+        title: "Settings",
+        items: [
+          {
+            id: "profile",
+            icon: User,
+            label: "Profile",
+            href: "/app/settings?tab=profile",
+          },
+          {
+            id: "security",
+            icon: Lock,
+            label: "Security",
+            href: "/app/settings?tab=security",
+          },
+          {
+            id: "appearance",
+            icon: Palette,
+            label: "Appearance",
+            href: "/app/settings?tab=appearance",
+          },
+          {
+            id: "tasks",
+            icon: ListTodo,
+            label: "Task defaults",
+            href: "/app/settings?tab=tasks",
+          },
+          {
+            id: "routines",
+            icon: Repeat,
+            label: "Routines",
+            href: "/app/settings?tab=routines",
+          },
+          {
+            id: "calendars",
+            icon: CalendarDays,
+            label: "Calendars",
+            href: "/app/settings?tab=calendars",
+          },
+          {
+            id: "notifications",
+            icon: Bell,
+            label: "Notifications",
+            href: "/app/settings?tab=notifications",
+          },
+          {
+            // Settings tab id is "api" (not "api-keys") — an invalid tab silently
+            // falls back to the Profile tab.
+            id: "api",
+            icon: Key,
+            label: "API Keys",
+            href: "/app/settings?tab=api",
+          },
+          {
+            id: "mcp",
+            icon: Terminal,
+            label: "MCP",
+            href: "/app/settings?tab=mcp",
+          },
+        ],
+      },
+      {
+        title: "Account",
+        items: [
+          {
+            id: "logout",
+            icon: LogOut,
+            label: "Log out",
+            onClick: handleLogout,
+            destructive: true,
+          },
+        ],
+      },
+    ],
+    [handleLogout, openSearch, showInstall]
+  );
 
   return (
     // Definite height so the list scrolls internally and the "More" header
@@ -260,7 +266,9 @@ export function MobileMoreMenu({ onLogout }: MobileMoreMenuProps) {
       {/* Scrollable content */}
       <div
         className="flex-1 overflow-y-auto py-4"
-        style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom, 0px))" }}
+        style={{
+          paddingBottom: "calc(80px + env(safe-area-inset-bottom, 0px))",
+        }}
       >
         {menuSections.map((section, index) => (
           <MenuSectionComponent

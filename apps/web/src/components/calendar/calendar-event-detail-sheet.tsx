@@ -374,10 +374,7 @@ export function CalendarEventDetailSheet({
       startDate = fromLocalInputValue(editState.start);
       endDate = fromLocalInputValue(editState.end);
     }
-    if (
-      Number.isNaN(startDate.getTime()) ||
-      Number.isNaN(endDate.getTime())
-    ) {
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
       toast({
         variant: "destructive",
         title: "Invalid date",
@@ -426,8 +423,7 @@ export function CalendarEventDetailSheet({
           ...(editState.isAllDay
             ? {}
             : {
-                timezone:
-                  Intl.DateTimeFormat().resolvedOptions().timeZone,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
               }),
         },
       });
@@ -488,11 +484,7 @@ export function CalendarEventDetailSheet({
               className="flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium"
               style={{ backgroundColor: hexToRgba(color, 0.1) }}
             >
-              <CalendarDays
-                className="h-3 w-3"
-                style={{ color }}
-                aria-hidden
-              />
+              <CalendarDays className="h-3 w-3" style={{ color }} aria-hidden />
               <span style={{ color: hexToRgba(color, 1) }}>{calendarName}</span>
               {rsvpStatus && (
                 <span className="ml-auto text-muted-foreground">
@@ -528,9 +520,9 @@ export function CalendarEventDetailSheet({
                         Recurring event · entire series
                       </p>
                       <p className="mt-0.5 text-amber-700/80 dark:text-amber-300/80">
-                        iCloud doesn't support per-instance edits —
-                        any change here applies to every occurrence.
-                        To edit just one, use the iCloud Calendar app.
+                        iCloud doesn't support per-instance edits — any change
+                        here applies to every occurrence. To edit just one, use
+                        the iCloud Calendar app.
                       </p>
                     </div>
                   </div>
@@ -545,8 +537,8 @@ export function CalendarEventDetailSheet({
                         Recurring event · this instance
                       </p>
                       <p className="mt-0.5 text-muted-foreground">
-                        Changes here apply to this occurrence only. To
-                        edit the whole series, use the calendar provider.
+                        Changes here apply to this occurrence only. To edit the
+                        whole series, use the calendar provider.
                       </p>
                     </div>
                   </div>
@@ -635,8 +627,8 @@ export function CalendarEventDetailSheet({
 
               {!canEdit && !isEditing && (
                 <p className="pt-2 text-[11px] text-muted-foreground/70">
-                  This calendar is read-only — events can't be edited or
-                  deleted from here.
+                  This calendar is read-only — events can't be edited or deleted
+                  from here.
                 </p>
               )}
             </div>
@@ -649,8 +641,8 @@ export function CalendarEventDetailSheet({
           <DialogHeader>
             <DialogTitle>Delete this event?</DialogTitle>
             <DialogDescription>
-              This will remove the event from your calendar provider too.
-              This action can't be undone.
+              This will remove the event from your calendar provider too. This
+              action can't be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-2">
@@ -683,7 +675,8 @@ const MEETING_URL =
   /https:\/\/(?:meet\.google\.com|[\w.-]*zoom\.us|teams\.microsoft\.com|teams\.live\.com)\/[^\s"'<>]+/i;
 
 function meetingUrlFor(event: CalendarEvent): string | null {
-  if (event.conferenceUrl && /^https?:\/\//i.test(event.conferenceUrl)) return event.conferenceUrl;
+  if (event.conferenceUrl && /^https?:\/\//i.test(event.conferenceUrl))
+    return event.conferenceUrl;
   const text = `${event.location ?? ""} ${event.description ?? ""}`;
   return text.match(MEETING_URL)?.[0] ?? null;
 }
@@ -843,9 +836,7 @@ function AttendeeList({ attendees }: { attendees: CalendarEventAttendee[] }) {
             onClick={() => setExpanded((v) => !v)}
             className="text-xs text-muted-foreground hover:text-foreground"
           >
-            {expanded
-              ? "Show fewer"
-              : `Show all ${attendees.length} guests`}
+            {expanded ? "Show fewer" : `Show all ${attendees.length} guests`}
           </button>
         )}
       </div>
@@ -908,7 +899,10 @@ function EditForm({
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="event-start" className="text-xs text-muted-foreground">
+          <Label
+            htmlFor="event-start"
+            className="text-xs text-muted-foreground"
+          >
             Starts
           </Label>
           <Input
@@ -934,7 +928,10 @@ function EditForm({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="event-location" className="text-xs text-muted-foreground">
+        <Label
+          htmlFor="event-location"
+          className="text-xs text-muted-foreground"
+        >
           Location
         </Label>
         <Input
@@ -947,7 +944,10 @@ function EditForm({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="event-description" className="text-xs text-muted-foreground">
+        <Label
+          htmlFor="event-description"
+          className="text-xs text-muted-foreground"
+        >
           Description
         </Label>
         <Textarea

@@ -72,8 +72,9 @@ interface PendingPress {
  * single-day, so it's moot here.
  */
 export function useMobileTouchDrag(options: MobileTouchDragOptions) {
-  const [dragState, setDragState] =
-    React.useState<MobileEventDragState | null>(null);
+  const [dragState, setDragState] = React.useState<MobileEventDragState | null>(
+    null
+  );
   const dragStateRef = React.useRef<MobileEventDragState | null>(null);
   React.useEffect(() => {
     dragStateRef.current = dragState;
@@ -220,11 +221,11 @@ export function useMobileTouchDrag(options: MobileTouchDragOptions) {
       const cursorOffsetWithinEvent =
         ds.startY - ds.timelineRect.top + ds.scrollTopAtStart - initialTopPx;
       const newTopPx =
-        touch.clientY - ds.timelineRect.top + scrollDelta - cursorOffsetWithinEvent;
-      const rawStart = calculateTimeFromY(
-        Math.max(0, newTopPx),
-        ds.dayDate
-      );
+        touch.clientY -
+        ds.timelineRect.top +
+        scrollDelta -
+        cursorOffsetWithinEvent;
+      const rawStart = calculateTimeFromY(Math.max(0, newTopPx), ds.dayDate);
       let snappedStart = snapToInterval(rawStart);
       // Clamp to keep the event in the day. Detect snap-rolled-to-
       // next-day and pull back to the last legal start slot.
@@ -256,16 +257,11 @@ export function useMobileTouchDrag(options: MobileTouchDragOptions) {
     const handleEnd = () => {
       const ds = dragStateRef.current;
       if (!ds) return;
-      const moved =
-        ds.previewStart.getTime() !== ds.initialStart.getTime();
+      const moved = ds.previewStart.getTime() !== ds.initialStart.getTime();
       // Only commit if the preview actually shifted (long-press hold
       // without movement is a no-op, not a drag).
       if (moved) {
-        optionsRef.current.onCommit(
-          ds.eventId,
-          ds.previewStart,
-          ds.previewEnd
-        );
+        optionsRef.current.onCommit(ds.eventId, ds.previewStart, ds.previewEnd);
         setJustEndedDrag(true);
         setTimeout(() => setJustEndedDrag(false), 0);
       }

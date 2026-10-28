@@ -37,7 +37,9 @@ interface PasswordInputProps {
   disabled: boolean;
   error?: string;
   register: ReturnType<typeof useForm<PasswordForm>>["register"];
-  registerOptions: Parameters<ReturnType<typeof useForm<PasswordForm>>["register"]>[1];
+  registerOptions: Parameters<
+    ReturnType<typeof useForm<PasswordForm>>["register"]
+  >[1];
 }
 
 function PasswordInput({
@@ -78,9 +80,7 @@ function PasswordInput({
           )}
         </Button>
       </div>
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 }
@@ -124,19 +124,21 @@ export function PasswordSettings() {
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
       });
-      
+
       toast({
         title: "Password changed",
         description: "Your password has been updated successfully.",
       });
-      
+
       reset();
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Failed to change password",
         description:
-          error instanceof Error ? error.message : "Could not change password. Please check your current password.",
+          error instanceof Error
+            ? error.message
+            : "Could not change password. Please check your current password.",
       });
     } finally {
       setIsLoading(false);
@@ -239,7 +241,8 @@ export function PasswordSettings() {
 
           <div className="flex justify-end">
             <Button type="submit" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Change Password
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Change Password
             </Button>
           </div>
         </form>

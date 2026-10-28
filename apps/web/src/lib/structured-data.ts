@@ -8,7 +8,8 @@ import { isoDuration, type VideoMedia } from "./blog-media";
 
 export const SITE_URL = "https://opensunsama.com";
 
-const absolute = (url: string) => (url.startsWith("http") ? url : `${SITE_URL}${url}`);
+const absolute = (url: string) =>
+  url.startsWith("http") ? url : `${SITE_URL}${url}`;
 
 export interface BlogPostingInput {
   title: string;
@@ -76,13 +77,17 @@ export interface BreadcrumbInput {
 }
 
 /** Home, then each crumb. The last crumb (the current page) gets `currentPath` as its URL. */
-export function breadcrumbListJsonLd(items: BreadcrumbInput[], currentPath?: string) {
+export function breadcrumbListJsonLd(
+  items: BreadcrumbInput[],
+  currentPath?: string
+) {
   const crumbs = [{ label: "Home", href: "/" }, ...items];
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: crumbs.map((item, index) => {
-      const href = item.href ?? (index === crumbs.length - 1 ? currentPath : undefined);
+      const href =
+        item.href ?? (index === crumbs.length - 1 ? currentPath : undefined);
       return {
         "@type": "ListItem",
         position: index + 1,

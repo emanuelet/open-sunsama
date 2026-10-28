@@ -1,7 +1,11 @@
 import { MarketingPageView } from "@/components/marketing";
 import { CodeTabs } from "@/components/personas/code-tabs";
 import { TypicalDay } from "@/components/personas/typical-day";
-import page, { day, endpoints, snippets } from "@/content/marketing/for/developers";
+import page, {
+  day,
+  endpoints,
+  snippets,
+} from "@/content/marketing/for/developers";
 import type { CustomSection } from "@/content/marketing/types";
 
 /**
@@ -10,7 +14,10 @@ import type { CustomSection } from "@/content/marketing/types";
  * for crawlers (scripts/prerender-marketing.ts).
  */
 
-const custom = (id: string) => page.sections.find((s): s is CustomSection => s.kind === "custom" && s.id === id)!;
+const custom = (id: string) =>
+  page.sections.find(
+    (s): s is CustomSection => s.kind === "custom" && s.id === id
+  )!;
 const build = custom("build");
 const typical = custom("typical-day");
 
@@ -45,7 +52,10 @@ export default function DevelopersPage() {
             entries={day}
             links={[
               { label: "Focus mode", href: "/features/focus-mode" },
-              { label: "Plan your day with Claude", href: "/blog/plan-your-day-with-claude" },
+              {
+                label: "Plan your day with Claude",
+                href: "/blog/plan-your-day-with-claude",
+              },
             ]}
           />
         ),

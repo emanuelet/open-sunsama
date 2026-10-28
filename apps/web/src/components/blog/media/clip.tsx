@@ -39,7 +39,8 @@ export function Clip({ id, caption }: ClipProps) {
     const video = videoRef.current;
     if (!video || !video.duration) return;
     if (video.currentTime < FADE_SECONDS) video.currentTime = FADE_SECONDS;
-    else if (video.currentTime > video.duration - FADE_SECONDS) video.currentTime = FADE_SECONDS;
+    else if (video.currentTime > video.duration - FADE_SECONDS)
+      video.currentTime = FADE_SECONDS;
   };
 
   useEffect(() => {
@@ -49,7 +50,8 @@ export function Clip({ id, caption }: ClipProps) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) video.pause();
-        else if (autoplay.current && !reducedMotion) video.play().catch(() => {});
+        else if (autoplay.current && !reducedMotion)
+          video.play().catch(() => {});
       },
       { threshold: 0.5 }
     );
@@ -113,7 +115,11 @@ export function Clip({ id, caption }: ClipProps) {
           aria-label={playing ? "Pause clip" : "Play clip"}
           className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/85 text-foreground shadow-xs ring-1 ring-border/60 backdrop-blur-sm transition-opacity hover:bg-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         >
-          {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 translate-x-px" />}
+          {playing ? (
+            <Pause className="h-3.5 w-3.5" />
+          ) : (
+            <Play className="h-3.5 w-3.5 translate-x-px" />
+          )}
         </button>
       </div>
       {caption && <figcaption className={CAPTION_CLASS}>{caption}</figcaption>}

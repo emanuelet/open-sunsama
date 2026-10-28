@@ -20,21 +20,31 @@ export function generateMcpConfig(
     args: ["-y", "@open-sunsama/mcp"],
     env: {
       OPENSUNSAMA_API_KEY: apiKey,
-      ...(apiUrl !== "https://api.opensunsama.com" && { OPENSUNSAMA_API_URL: apiUrl }),
+      ...(apiUrl !== "https://api.opensunsama.com" && {
+        OPENSUNSAMA_API_URL: apiUrl,
+      }),
     },
   };
 
   // VS Code uses different format (array of servers)
   if (client === "vscode") {
-    return JSON.stringify({
-      mcpServers: [{ name: "open-sunsama", ...baseConfig }],
-    }, null, 2);
+    return JSON.stringify(
+      {
+        mcpServers: [{ name: "open-sunsama", ...baseConfig }],
+      },
+      null,
+      2
+    );
   }
 
   // Cursor, Claude, Windsurf use object format
-  return JSON.stringify({
-    mcpServers: { "open-sunsama": baseConfig },
-  }, null, 2);
+  return JSON.stringify(
+    {
+      mcpServers: { "open-sunsama": baseConfig },
+    },
+    null,
+    2
+  );
 }
 
 /**

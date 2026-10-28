@@ -51,10 +51,7 @@ export function TaskGroup({
 
   return (
     <div
-      className={cn(
-        "mb-6 rounded-lg",
-        isOver && "bg-primary/5"
-      )}
+      className={cn("mb-6 rounded-lg", isOver && "bg-primary/5")}
       ref={setNodeRef}
     >
       {/* Group Header */}
@@ -82,12 +79,7 @@ export function TaskGroup({
 
       {/* Task List */}
       {isExpanded && (
-        <div
-          className={cn(
-            "mt-1 space-y-0.5",
-            isOver && "border-primary/50"
-          )}
-        >
+        <div className={cn("mt-1 space-y-0.5", isOver && "border-primary/50")}>
           <SortableContext
             items={taskIds}
             strategy={verticalListSortingStrategy}

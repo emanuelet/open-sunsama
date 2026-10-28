@@ -221,11 +221,21 @@ export function DayColumn({
           })),
           ...dayEvents
             .filter((e) => !e.isAllDay && e.responseStatus !== "declined")
-            .map((e) => ({ start: new Date(e.startTime), end: new Date(e.endTime) })),
+            .map((e) => ({
+              start: new Date(e.startTime),
+              end: new Date(e.endTime),
+            })),
         ],
         workStartHour,
       }),
-    [date, pendingTasks, blockStartByTaskId, timeBlocks, dayEvents, workStartHour]
+    [
+      date,
+      pendingTasks,
+      blockStartByTaskId,
+      timeBlocks,
+      dayEvents,
+      workStartHour,
+    ]
   );
 
   const totalTasks = pendingTasks.length + completedTasks.length;
@@ -307,7 +317,11 @@ export function DayColumn({
         </div>
 
         <div className="mt-2.5 flex h-8 items-center rounded-md bg-surface pr-1.5 shadow-card">
-          <AddTaskInline scheduledDate={dateString} variant="bar" showLabel={today} />
+          <AddTaskInline
+            scheduledDate={dateString}
+            variant="bar"
+            showLabel={today}
+          />
           {totalEstimatedMins > 0 && (
             <span
               className="shrink-0 rounded bg-black/[0.06] px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-muted-foreground dark:bg-black/30"

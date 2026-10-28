@@ -6,7 +6,13 @@
  */
 
 import { defineMarketingPage } from "../types";
-import { giveUpSection, LICENSE_FAQ, LICENSE_GIVE_UP, verdictSection, type AlternativeExtras } from "./shared";
+import {
+  giveUpSection,
+  LICENSE_FAQ,
+  LICENSE_GIVE_UP,
+  verdictSection,
+  type AlternativeExtras,
+} from "./shared";
 
 const verdict: AlternativeExtras["verdict"] = {
   rival: "Akiflow",
@@ -24,7 +30,10 @@ const verdict: AlternativeExtras["verdict"] = {
     "Your team plans together in Akiflow.",
   ],
   switchLink: { label: "See the daily loop", href: "#how-it-works" },
-  stayLink: { label: "Compare 7 Akiflow alternatives", href: "/blog/akiflow-alternatives" },
+  stayLink: {
+    label: "Compare 7 Akiflow alternatives",
+    href: "/blog/akiflow-alternatives",
+  },
 };
 
 const giveUps: AlternativeExtras["giveUps"] = [
@@ -79,8 +88,16 @@ export default defineMarketingPage({
       alt: "Tasks dragged from the backlog into Today on Open Sunsama's board of days",
     },
     chips: [
-      { tone: "agent", title: "Claude connected", detail: "Turned 6 Slack to-dos into tasks" },
-      { tone: "block", title: "Reply to design review", detail: "10:00 - 10:45 AM" },
+      {
+        tone: "agent",
+        title: "Claude connected",
+        detail: "Turned 6 Slack to-dos into tasks",
+      },
+      {
+        tone: "block",
+        title: "Reply to design review",
+        detail: "10:00 - 10:45 AM",
+      },
       { tone: "timer", title: "18:40 / 45:00", detail: "Focus" },
     ],
   },
@@ -90,7 +107,8 @@ export default defineMarketingPage({
       kind: "answer",
       id: "answer",
       eyebrow: "The short answer",
-      heading: "Open Sunsama is the Akiflow alternative you own and any agent can run",
+      heading:
+        "Open Sunsama is the Akiflow alternative you own and any agent can run",
       body: [
         "Open Sunsama is an open-source Akiflow alternative. Your days sit on a board, and you drag tasks onto the calendar next to your meetings. Any AI agent can plan with you over MCP.",
         "We build Open Sunsama, so we put it first — here is why, and where Akiflow fits better.",
@@ -106,7 +124,8 @@ export default defineMarketingPage({
       ],
     },
     verdictSection(verdict, {
-      heading: "Open Sunsama fits people who plan by hand; Akiflow fits people who capture from many tools",
+      heading:
+        "Open Sunsama fits people who plan by hand; Akiflow fits people who capture from many tools",
       lead: "Both apps let you drag a task onto your calendar with a few keys. The real choice is an inbox for every tool, or a planner you own.",
     }),
     {
@@ -130,7 +149,10 @@ export default defineMarketingPage({
           title: "Drag each task onto your calendar",
           body: "Drop a task into a free slot next to your meetings, then drag its edge to set the length. Google, Outlook and iCloud events share the same view.",
           clip: "time-block",
-          link: { label: "How time blocking works", href: "/features/time-blocking" },
+          link: {
+            label: "How time blocking works",
+            href: "/features/time-blocking",
+          },
         },
         {
           icon: "timer",
@@ -146,7 +168,10 @@ export default defineMarketingPage({
           title: "Do it all from the keyboard",
           body: "Press Cmd+K to find a task, jump to a day or run a command. If you liked Akiflow's speed, you keep it.",
           clip: "command-palette",
-          link: { label: "See the command palette", href: "/features/command-palette" },
+          link: {
+            label: "See the command palette",
+            href: "/features/command-palette",
+          },
         },
       ],
     },
@@ -166,27 +191,41 @@ export default defineMarketingPage({
         "Plan my day around my meetings. Put my top three tasks in focus blocks.",
         "Yesterday went off track. Move what's left into free slots today.",
       ],
-      tools: ["create_task", "get_schedule_for_day", "list_tasks", "create_time_block", "schedule_task"],
+      tools: [
+        "create_task",
+        "get_schedule_for_day",
+        "list_tasks",
+        "create_time_block",
+        "schedule_task",
+      ],
       clip: "ai-plan",
-      clipCaption: "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
+      clipCaption:
+        "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
       links: [
         { label: "Claude setup", href: "/docs/mcp/claude" },
         { label: "ChatGPT setup", href: "/docs/mcp/chatgpt" },
         { label: "Cursor setup", href: "/docs/mcp/cursor" },
-        { label: "Task managers with MCP", href: "/blog/best-task-managers-with-mcp" },
+        {
+          label: "Task managers with MCP",
+          href: "/blog/best-task-managers-with-mcp",
+        },
       ],
     },
     {
       kind: "comparison",
       id: "compare",
       eyebrow: "Feature by feature",
-      heading: "Open Sunsama matches Akiflow's planning and adds the code, the API and self-hosting",
+      heading:
+        "Open Sunsama matches Akiflow's planning and adds the code, the API and self-hosting",
       lead: "Akiflow leads on capture and phone apps. Open Sunsama leads on ownership. Here is each feature side by side.",
       columns: ["Open Sunsama", "Akiflow"],
       rows: [
         {
           feature: "How you plan",
-          cells: [{ text: "Board of days, then drag to the calendar" }, { text: "Universal inbox, then drag to the calendar" }],
+          cells: [
+            { text: "Board of days, then drag to the calendar" },
+            { text: "Universal inbox, then drag to the calendar" },
+          ],
         },
         { feature: "Time blocking on your calendar", cells: ["yes", "yes"] },
         {
@@ -250,7 +289,8 @@ export default defineMarketingPage({
         "Akiflow facts come from its [pricing page](https://akiflow.com/pricing), its [MCP page](https://akiflow.com/mcp) and its help docs. Checked September 2026.",
     },
     giveUpSection(giveUps, {
-      heading: "Leaving Akiflow costs you its inbox, its phone apps and its ritual",
+      heading:
+        "Leaving Akiflow costs you its inbox, its phone apps and its ritual",
       lead: "Akiflow is a good app. Here is what it does that Open Sunsama doesn't, so you can choose with clear eyes.",
     }),
     {
@@ -284,13 +324,19 @@ export default defineMarketingPage({
         question: "What is the best Akiflow alternative?",
         answer:
           "We build Open Sunsama, and we think it is the best pick for most people. It is an open-source daily planner with time blocking that any AI agent can run. Pick Sunsama for a calm, guided ritual, or Morgen for a task hub.",
-        link: { label: "Compare 7 Akiflow alternatives", href: "/blog/akiflow-alternatives" },
+        link: {
+          label: "Compare 7 Akiflow alternatives",
+          href: "/blog/akiflow-alternatives",
+        },
       },
       {
         question: "Is there an open-source Akiflow alternative?",
         answer:
           "Yes. Open Sunsama's code is public on GitHub, and you can self-host it with Docker for personal use. It covers the board, time blocking, focus mode and calendar sync.",
-        link: { label: "Self-hosting guide", href: "/docs/self-hosting/docker" },
+        link: {
+          label: "Self-hosting guide",
+          href: "/docs/self-hosting/docker",
+        },
       },
       {
         question: "Does Akiflow have an MCP server or an API?",
@@ -305,7 +351,8 @@ export default defineMarketingPage({
       },
       {
         question: "Does Open Sunsama work on Linux?",
-        answer: "Yes. There are desktop apps for Mac, Windows and Linux, plus the web app. Akiflow has no Linux app.",
+        answer:
+          "Yes. There are desktop apps for Mac, Windows and Linux, plus the web app. Akiflow has no Linux app.",
         link: { label: "Download", href: "/download" },
       },
       {
@@ -324,7 +371,8 @@ export default defineMarketingPage({
       {
         kind: "guide",
         title: "7 best Akiflow alternatives in 2026",
-        description: "Calm rituals, AI scheduling, task hubs and open source, compared.",
+        description:
+          "Calm rituals, AI scheduling, task hubs and open source, compared.",
         href: "/blog/akiflow-alternatives",
       },
       {
@@ -342,7 +390,8 @@ export default defineMarketingPage({
       {
         kind: "compare",
         title: "Open Sunsama vs Motion",
-        description: "Plan by hand, or with your agent, instead of an auto-scheduler.",
+        description:
+          "Plan by hand, or with your agent, instead of an auto-scheduler.",
         href: "/alternative/motion",
       },
       {

@@ -6,14 +6,18 @@ interface SuccessStateProps {
   onNavigateToLogin: () => void;
 }
 
-export function ResetPasswordSuccessState({ onNavigateToLogin }: SuccessStateProps) {
+export function ResetPasswordSuccessState({
+  onNavigateToLogin,
+}: SuccessStateProps) {
   return (
     <AuthLayout>
       <div className="flex flex-col items-center space-y-3 text-center">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
           <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
         </div>
-        <h1 className="text-lg font-semibold tracking-tight">Password reset successful</h1>
+        <h1 className="text-lg font-semibold tracking-tight">
+          Password reset successful
+        </h1>
         <p className="text-sm text-muted-foreground max-w-[280px]">
           Your password has been reset. You can now log in.
         </p>
@@ -46,7 +50,9 @@ export function ResetPasswordErrorState({
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
           <XCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
         </div>
-        <h1 className="text-lg font-semibold tracking-tight">Reset link invalid</h1>
+        <h1 className="text-lg font-semibold tracking-tight">
+          Reset link invalid
+        </h1>
         <p className="text-sm text-muted-foreground max-w-[280px]">
           {errorMessage}
         </p>

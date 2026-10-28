@@ -74,7 +74,10 @@ export function MobileUnscheduledSheet({
                 </SheetTitle>
               </div>
               {taskCount > 0 && (
-                <Badge variant="secondary" className="h-5 min-w-[20px] justify-center">
+                <Badge
+                  variant="secondary"
+                  className="h-5 min-w-[20px] justify-center"
+                >
                   {taskCount}
                 </Badge>
               )}
@@ -100,7 +103,11 @@ export function MobileUnscheduledSheet({
                 </div>
               ) : (
                 tasks.map((task) => (
-                  <TaskContextMenu key={task.id} task={task} onEdit={() => onTaskClick?.(task)}>
+                  <TaskContextMenu
+                    key={task.id}
+                    task={task}
+                    onEdit={() => onTaskClick?.(task)}
+                  >
                     <div
                       className="cursor-grab active:cursor-grabbing"
                       onMouseDown={(event) => onTaskDragStart?.(task, event)}
@@ -111,7 +118,10 @@ export function MobileUnscheduledSheet({
                         isHovered={false}
                         onToggleComplete={(e) => {
                           e.stopPropagation();
-                          completeTask.mutate({ id: task.id, completed: !task.completedAt });
+                          completeTask.mutate({
+                            id: task.id,
+                            completed: !task.completedAt,
+                          });
                         }}
                         onClick={() => {
                           onTaskClick?.(task);

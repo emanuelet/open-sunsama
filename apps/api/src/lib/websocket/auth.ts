@@ -3,7 +3,7 @@
  * Handles JWT verification for WebSocket connections
  */
 
-import { verifyToken } from '../jwt.js';
+import { verifyToken } from "../jwt.js";
 
 export interface AuthResult {
   success: boolean;
@@ -22,25 +22,25 @@ export function authenticateWebSocket(url: string): AuthResult {
   try {
     // Parse URL to extract query parameters
     // Use a dummy base URL since we only care about the path and query
-    const urlObj = new URL(url, 'http://localhost');
-    const token = urlObj.searchParams.get('token');
+    const urlObj = new URL(url, "http://localhost");
+    const token = urlObj.searchParams.get("token");
 
     if (!token) {
-      return { success: false, error: 'Token required' };
+      return { success: false, error: "Token required" };
     }
 
     // Verify the JWT token
     const { userId } = verifyToken(token);
 
     if (!userId) {
-      return { success: false, error: 'Invalid token payload' };
+      return { success: false, error: "Invalid token payload" };
     }
 
     return { success: true, userId };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Invalid token',
+      error: error instanceof Error ? error.message : "Invalid token",
     };
   }
 }

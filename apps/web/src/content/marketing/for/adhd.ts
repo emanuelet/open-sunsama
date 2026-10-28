@@ -22,7 +22,7 @@ export const day: DayEntry[] = [
     tone: "block",
     tag: "Time block",
     title: "Give the first task a real slot",
-    body: "Drop \"Reply to the landlord\" onto the calendar at 9:30. Now it has a start and an end, not just a spot on a list.",
+    body: 'Drop "Reply to the landlord" onto the calendar at 9:30. Now it has a start and an end, not just a spot on a list.',
   },
   {
     time: "9:30 AM - 10:15 AM",
@@ -42,7 +42,7 @@ export const day: DayEntry[] = [
     time: "11:30 AM",
     tone: "agent",
     tag: "Claude",
-    title: "\"Help me get back on track\"",
+    title: '"Help me get back on track"',
     body: "Ask your AI agent to look at what's left and the free time around your meetings. It suggests a smaller plan, and you say yes or change it.",
   },
   {
@@ -83,9 +83,17 @@ export default defineMarketingPage({
       alt: "Tasks dragged from the backlog into Today on the Open Sunsama board, with time estimates",
     },
     chips: [
-      { tone: "block", title: "Reply to the landlord", detail: "9:30 - 10:00 AM" },
+      {
+        tone: "block",
+        title: "Reply to the landlord",
+        detail: "9:30 - 10:00 AM",
+      },
       { tone: "timer", title: "12:40 / 30:00", detail: "Focus" },
-      { tone: "agent", title: "Claude connected", detail: "Moved 4 tasks to tomorrow" },
+      {
+        tone: "agent",
+        title: "Claude connected",
+        detail: "Moved 4 tasks to tomorrow",
+      },
     ],
     secondary: { video: "ai", label: "Watch AI plan a day" },
   },
@@ -95,7 +103,8 @@ export default defineMarketingPage({
       kind: "answer",
       id: "answer",
       eyebrow: "The short answer",
-      heading: "Open Sunsama is an ADHD planner app built around the day going wrong",
+      heading:
+        "Open Sunsama is an ADHD planner app built around the day going wrong",
       body: [
         "Open Sunsama is a daily planner that works as an ADHD planner app. It shows your tasks on a board of days and your time on a calendar, side by side.",
         "It helps with three things people with ADHD often name: planning too much, losing track of time, and falling behind. You see the hours before you commit. A timer keeps count. And unfinished tasks move to tomorrow without a fuss.",
@@ -114,7 +123,8 @@ export default defineMarketingPage({
       kind: "media-rows",
       id: "pains",
       eyebrow: "What gets in the way",
-      heading: "Each part of Open Sunsama answers something that makes planning hard",
+      heading:
+        "Each part of Open Sunsama answers something that makes planning hard",
       lead: "People with ADHD describe the same problems again and again: a wall of stuff, time that slips away, and systems that need babysitting. Here is what Open Sunsama does about each one.",
       rows: [
         {
@@ -138,7 +148,7 @@ export default defineMarketingPage({
         {
           title: "Time blocks make time something you can see",
           body: [
-            "Time blindness makes \"later\" feel like forever. A block on the calendar turns a task into a real stretch of time, with an end.",
+            'Time blindness makes "later" feel like forever. A block on the calendar turns a task into a real stretch of time, with an end.',
             "Drag a task onto the day view and stretch it to fit. Your meetings from Google Calendar, Outlook and iCloud sit right beside it.",
             "Turn on email reminders, and Open Sunsama writes to you before a block starts.",
           ],
@@ -147,7 +157,10 @@ export default defineMarketingPage({
             alt: "A task dragged onto the day calendar in Open Sunsama and resized to fit",
             caption: "Drag a task onto the calendar and stretch it to fit.",
           },
-          link: { label: "Time blocking in Open Sunsama", href: "/features/time-blocking" },
+          link: {
+            label: "Time blocking in Open Sunsama",
+            href: "/features/time-blocking",
+          },
         },
         {
           title: "Focus mode puts one task on the screen",
@@ -158,7 +171,8 @@ export default defineMarketingPage({
           media: {
             clip: "focus",
             alt: "Focus mode in Open Sunsama with one task, its subtasks and a running timer",
-            caption: "One task, its steps and a timer. Your list stays out of sight.",
+            caption:
+              "One task, its steps and a timer. Your list stays out of sight.",
           },
           link: { label: "How focus mode works", href: "/features/focus-mode" },
         },
@@ -173,7 +187,10 @@ export default defineMarketingPage({
             alt: "Checking off tasks at the end of the day in Open Sunsama",
             caption: "Check off what's done. The rest rolls to tomorrow.",
           },
-          link: { label: "Why you always feel behind", href: "/blog/why-do-i-always-feel-behind" },
+          link: {
+            label: "Why you always feel behind",
+            href: "/blog/why-do-i-always-feel-behind",
+          },
         },
       ],
     },
@@ -191,15 +208,25 @@ export default defineMarketingPage({
         "Here's my brain dump. Turn it into tasks for this week.",
         "Yesterday went off track. Help me get back on track.",
         "I only have 3 hours today. What should I drop?",
-        "Break \"do my taxes\" into small steps.",
+        'Break "do my taxes" into small steps.',
       ],
-      tools: ["list_tasks", "create_task", "create_subtask", "schedule_task", "get_schedule_for_day"],
+      tools: [
+        "list_tasks",
+        "create_task",
+        "create_subtask",
+        "schedule_task",
+        "get_schedule_for_day",
+      ],
       clip: "ai-plan",
-      clipCaption: "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
+      clipCaption:
+        "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
       links: [
         { label: "Claude setup", href: "/docs/mcp/claude" },
         { label: "ChatGPT setup", href: "/docs/mcp/chatgpt" },
-        { label: "Plan your day with Claude", href: "/blog/plan-your-day-with-claude" },
+        {
+          label: "Plan your day with Claude",
+          href: "/blog/plan-your-day-with-claude",
+        },
       ],
     },
     {
@@ -296,7 +323,10 @@ export default defineMarketingPage({
             { mark: "yes", text: "AI task input" },
           ],
         },
-        { feature: "Code you can read and self-host", cells: ["yes", "no", "no", "no"] },
+        {
+          feature: "Code you can read and self-host",
+          cells: ["yes", "no", "no", "no"],
+        },
         {
           feature: "Phone",
           cells: [
@@ -320,7 +350,10 @@ export default defineMarketingPage({
         question: "What is the best planner app for ADHD?",
         answer:
           "We build Open Sunsama, and we think it is the best pick for most people with ADHD who want to stay in charge. You see a realistic day, work one task at a time, and unfinished tasks roll over. Pick Motion if you'd rather let AI schedule every task, or Structured for a simple phone timeline.",
-        link: { label: "Productivity apps for ADHD", href: "/blog/best-productivity-apps-adhd" },
+        link: {
+          label: "Productivity apps for ADHD",
+          href: "/blog/best-productivity-apps-adhd",
+        },
       },
       {
         question: "Is Open Sunsama made for people with ADHD?",
@@ -342,7 +375,10 @@ export default defineMarketingPage({
         question: "How do I time block with ADHD?",
         answer:
           "Start small: block only your first one or two tasks, not the whole day. Leave gaps between blocks. Drag a task onto the calendar in Open Sunsama and stretch it to your best guess.",
-        link: { label: "Getting started with time blocking", href: "/blog/getting-started-with-time-blocking" },
+        link: {
+          label: "Getting started with time blocking",
+          href: "/blog/getting-started-with-time-blocking",
+        },
       },
       {
         question: "Does Open Sunsama work on my phone?",
@@ -396,7 +432,8 @@ export default defineMarketingPage({
       {
         kind: "guide",
         title: "Productivity apps for ADHD",
-        description: "Focus apps, task managers and time blocking tools compared.",
+        description:
+          "Focus apps, task managers and time blocking tools compared.",
         href: "/blog/best-productivity-apps-adhd",
       },
       {
@@ -424,7 +461,8 @@ export default defineMarketingPage({
     heading: "Plan a calm, realistic day tomorrow",
     body: "Pick three tasks, give each one a slot, and let the rest roll over. If the day goes sideways, you start again with nothing lost.",
     shot: "focus",
-    shotAlt: "Open Sunsama focus mode with one task, its subtasks and a running timer",
+    shotAlt:
+      "Open Sunsama focus mode with one task, its subtasks and a running timer",
   },
 
   software: {

@@ -1,20 +1,23 @@
 # Mobile Apps for Open Sunsama (iOS & Android)
 
 ## Problem
+
 Users need to access their tasks and time blocks on mobile devices (iPhone and Android). The current web app is responsive but lacks native mobile features like push notifications, offline support, biometric authentication, and home screen widgets. A native mobile experience is essential for a productivity app that users rely on throughout the day.
 
 ## Solution
+
 Build mobile apps using **React Native with Expo** (managed workflow) to maximize code reuse with the existing React web app while providing true native mobile capabilities.
 
 ### Why React Native + Expo over Alternatives
 
-| Approach | Code Reuse | Native Features | Maintenance | Decision |
-|----------|------------|-----------------|-------------|----------|
-| **React Native + Expo** | High (~70% logic) | Full native access | Single JS codebase | **Recommended** |
-| Capacitor (WebView) | ~95% | Limited | Easy but degraded UX | Rejected |
-| Flutter | 0% (rewrite) | Full native | Separate Dart codebase | Rejected |
+| Approach                | Code Reuse        | Native Features    | Maintenance            | Decision        |
+| ----------------------- | ----------------- | ------------------ | ---------------------- | --------------- |
+| **React Native + Expo** | High (~70% logic) | Full native access | Single JS codebase     | **Recommended** |
+| Capacitor (WebView)     | ~95%              | Limited            | Easy but degraded UX   | Rejected        |
+| Flutter                 | 0% (rewrite)      | Full native        | Separate Dart codebase | Rejected        |
 
 **Key reasons for Expo:**
+
 1. **Shares React paradigm** - Hooks, components, state management patterns transfer directly
 2. **Shares `@open-sunsama/api-client`** - Same API client, types, and React Query hooks
 3. **Shares `@open-sunsama/types`** - TypeScript types work across platforms
@@ -129,6 +132,7 @@ apps/mobile/src/                  # Mobile-specific
 ```
 
 **What's Shared (70% of logic):**
+
 - `@open-sunsama/api-client` - API calls, React Query hooks
 - `@open-sunsama/types` - All TypeScript interfaces
 - Business logic in hooks (task filtering, date calculations)
@@ -136,6 +140,7 @@ apps/mobile/src/                  # Mobile-specific
 - React Query key patterns
 
 **What's Mobile-Specific (30%):**
+
 - UI components (React Native vs React DOM)
 - Navigation (Expo Router vs TanStack Router)
 - Storage (AsyncStorage vs localStorage)
@@ -229,6 +234,7 @@ apps/mobile/
 ### Dependencies
 
 **package.json:**
+
 ```json
 {
   "name": "@open-sunsama/mobile",
@@ -275,19 +281,20 @@ apps/mobile/
 ```
 
 **metro.config.js** (for monorepo):
+
 ```javascript
-const { getDefaultConfig } = require('expo/metro-config');
-const path = require('path');
+const { getDefaultConfig } = require("expo/metro-config");
+const path = require("path");
 
 const projectRoot = __dirname;
-const workspaceRoot = path.resolve(projectRoot, '../..');
+const workspaceRoot = path.resolve(projectRoot, "../..");
 
 const config = getDefaultConfig(projectRoot);
 
 config.watchFolders = [workspaceRoot];
 config.resolver.nodeModulesPaths = [
-  path.resolve(projectRoot, 'node_modules'),
-  path.resolve(workspaceRoot, 'node_modules'),
+  path.resolve(projectRoot, "node_modules"),
+  path.resolve(workspaceRoot, "node_modules"),
 ];
 config.resolver.disableHierarchicalLookup = true;
 
@@ -295,6 +302,7 @@ module.exports = config;
 ```
 
 **app.json:**
+
 ```json
 {
   "expo": {
@@ -350,6 +358,7 @@ module.exports = config;
 ```
 
 **eas.json:**
+
 ```json
 {
   "cli": {
@@ -379,6 +388,7 @@ module.exports = config;
 ### Turborepo Integration
 
 **turbo.json** additions:
+
 ```json
 {
   "tasks": {
@@ -405,18 +415,21 @@ The production API at `https://api.opensunsama.com` needs CORS updates:
 
 ```javascript
 // apps/api/src/index.ts - update CORS
-app.use('*', cors({
-  origin: [
-    'http://localhost:3000',
-    'tauri://localhost',
-    'https://tauri.localhost',
-    // Mobile app origins (Expo development)
-    'exp://192.168.1.*:8081',
-    'exp://localhost:8081',
-    // Production mobile (no origin header needed - native apps)
-  ],
-  // ... rest unchanged
-}));
+app.use(
+  "*",
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "tauri://localhost",
+      "https://tauri.localhost",
+      // Mobile app origins (Expo development)
+      "exp://192.168.1.*:8081",
+      "exp://localhost:8081",
+      // Production mobile (no origin header needed - native apps)
+    ],
+    // ... rest unchanged
+  })
+);
 ```
 
 Note: Native mobile apps don't send Origin headers, so CORS isn't an issue in production. The API should accept requests with valid Authorization headers regardless of origin.
@@ -424,24 +437,28 @@ Note: Native mobile apps don't send Origin headers, so CORS isn't an issue in pr
 ## Features (Prioritized)
 
 ### Phase 1: MVP (Week 1-2)
+
 1. **Authentication** - Login, register, secure token storage
 2. **Task List View** - View tasks by day, mark complete
 3. **Task Creation** - Quick add task with title and date
 4. **Pull-to-Refresh** - Refresh task list
 
 ### Phase 2: Core Features (Week 3-4)
+
 5. **Task Detail Sheet** - Edit task title, description, priority
 6. **Calendar View** - View time blocks for today
 7. **Date Navigation** - Swipe between days
 8. **Push Notifications** - Task reminders
 
 ### Phase 3: Native Experience (Week 5-6)
+
 9. **Offline Support** - View cached tasks, queue mutations
 10. **Biometric Auth** - Face ID / fingerprint lock
 11. **Haptic Feedback** - Tactile response on actions
 12. **Dark Mode** - System theme support
 
 ### Phase 4: Advanced (Future)
+
 13. **Drag & Drop** - Reorder tasks (gesture-based)
 14. **Time Block Creation** - Add/edit time blocks
 15. **Subtasks** - Manage task subtasks
@@ -450,6 +467,7 @@ Note: Native mobile apps don't send Origin headers, so CORS isn't an issue in pr
 ## Build & Release Process
 
 ### Development
+
 ```bash
 # Start Expo dev server
 cd apps/mobile
@@ -463,6 +481,7 @@ bun run android
 ```
 
 ### Testing on Device
+
 ```bash
 # Build development client for internal testing
 eas build --profile development --platform ios
@@ -470,6 +489,7 @@ eas build --profile development --platform android
 ```
 
 ### Production Release
+
 ```bash
 # Build for App Store / Play Store
 eas build --profile production --platform all
@@ -480,12 +500,13 @@ eas submit --platform android
 ```
 
 ### CI/CD (GitHub Actions)
+
 ```yaml
 # .github/workflows/mobile.yml
 name: Mobile Build
 on:
   push:
-    tags: ['mobile-v*']
+    tags: ["mobile-v*"]
 
 jobs:
   build:

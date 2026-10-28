@@ -1,4 +1,8 @@
-import { TIME_EDIT_KEYS, matchesTimeEditShortcut, usePriorityShortcut } from "@/hooks/useKeyboardShortcuts";
+import {
+  TIME_EDIT_KEYS,
+  matchesTimeEditShortcut,
+  usePriorityShortcut,
+} from "@/hooks/useKeyboardShortcuts";
 import * as React from "react";
 import { createPortal } from "react-dom";
 import {
@@ -41,7 +45,10 @@ import {
 } from "@/hooks/useTasks";
 import { useHoveredTask, useIsMobile } from "@/hooks";
 import { useCreateSubtask, useUpdateSubtask } from "@/hooks/useSubtasks";
-import { useAddTaskPosition, usePlaceNewTask } from "@/hooks/useAddTaskPosition";
+import {
+  useAddTaskPosition,
+  usePlaceNewTask,
+} from "@/hooks/useAddTaskPosition";
 import { BottomSheetContent } from "@/components/ui/bottom-sheet";
 import { useTimeBlocks, useUpdateTimeBlock } from "@/hooks/useTimeBlocks";
 
@@ -190,10 +197,7 @@ export function TaskModal({
   const updateTask = useUpdateTask();
 
   // Live timer display — ticks every second when timer is active
-  const {
-    isTimerRunning,
-    liveSeconds,
-  } = useTaskTimerDisplay(
+  const { isTimerRunning, liveSeconds } = useTaskTimerDisplay(
     task ??
       ({
         timerStartedAt: null,
@@ -501,7 +505,6 @@ export function TaskModal({
     await completeTask.mutateAsync({ id: task.id, completed: !isCompleted });
   };
 
-
   const handleCreate = async () => {
     const trimmed = title.trim();
     if (!isCompose || !trimmed || isCreating) return;
@@ -581,7 +584,8 @@ export function TaskModal({
     "flex shrink-0 flex-col items-start justify-end gap-0.5 rounded-md px-2 py-1 text-left transition-colors hover:bg-accent focus:outline-hidden focus-visible:ring-1 focus-visible:ring-ring";
   const fieldLabel =
     "text-[10px] font-medium uppercase leading-3 tracking-wider text-muted-foreground/60";
-  const fieldValue = "flex items-center gap-1.5 text-sm leading-5 text-muted-foreground";
+  const fieldValue =
+    "flex items-center gap-1.5 text-sm leading-5 text-muted-foreground";
 
   const scheduled = renderTask.scheduledDate
     ? parse(renderTask.scheduledDate, "yyyy-MM-dd", new Date())
@@ -615,13 +619,19 @@ export function TaskModal({
               className={fieldButton}
             >
               <span className={fieldLabel}>Start</span>
-              <span className={cn(fieldValue, "text-foreground")}>{dateText}</span>
+              <span className={cn(fieldValue, "text-foreground")}>
+                {dateText}
+              </span>
             </DatePickerPopover>
           </span>
         </WithShortcut>
         <Popover open={priorityOpen} onOpenChange={setPriorityOpen}>
           <PopoverTrigger asChild>
-            <WithShortcut label="Priority" shortcut="editPriority" side="bottom">
+            <WithShortcut
+              label="Priority"
+              shortcut="editPriority"
+              side="bottom"
+            >
               <button
                 type="button"
                 className={fieldButton}
@@ -629,8 +639,13 @@ export function TaskModal({
               >
                 <span className={fieldValue}>
                   <PriorityIcon priority={renderTask.priority} />
-                  <span className={renderTask.priority !== "P2" ? "text-foreground" : ""}>
-                    {renderTask.priority} {PRIORITY_META[renderTask.priority].description}
+                  <span
+                    className={
+                      renderTask.priority !== "P2" ? "text-foreground" : ""
+                    }
+                  >
+                    {renderTask.priority}{" "}
+                    {PRIORITY_META[renderTask.priority].description}
                   </span>
                 </span>
               </button>
@@ -664,7 +679,11 @@ export function TaskModal({
             <DropdownMenu>
               <WithShortcut label="More actions" side="bottom">
                 <DropdownMenuTrigger asChild>
-                  <button type="button" className={iconButton} aria-label="More actions">
+                  <button
+                    type="button"
+                    className={iconButton}
+                    aria-label="More actions"
+                  >
                     <MoreHorizontal className="h-4 w-4" />
                   </button>
                 </DropdownMenuTrigger>
@@ -741,9 +760,11 @@ export function TaskModal({
     </WithShortcut>
   );
 
-  const timeValue = "font-sans text-base font-normal tabular-nums tracking-normal";
-  const actualColumn = !isCompose && (
-    isTimerRunning ? (
+  const timeValue =
+    "font-sans text-base font-normal tabular-nums tracking-normal";
+  const actualColumn =
+    !isCompose &&
+    (isTimerRunning ? (
       <div className="flex flex-col items-center gap-1">
         <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground/70">
           Actual
@@ -751,7 +772,8 @@ export function TaskModal({
         <span
           className={cn(
             timeValue,
-            renderTask.estimatedMins && liveSeconds > renderTask.estimatedMins * 60
+            renderTask.estimatedMins &&
+              liveSeconds > renderTask.estimatedMins * 60
               ? "text-amber-500"
               : "text-emerald-500"
           )}
@@ -770,8 +792,7 @@ export function TaskModal({
         placeholder="0:00"
         className={timeValue}
       />
-    )
-  );
+    ));
   const plannedColumn = (
     <TimeDropdown
       ref={plannedTimeRef}
@@ -779,7 +800,9 @@ export function TaskModal({
       onChange={handleDurationChange}
       label="Planned"
       dropdownHeader="Planned"
-      shortcutHint={isCompose ? undefined : TIME_EDIT_KEYS.planned.toUpperCase()}
+      shortcutHint={
+        isCompose ? undefined : TIME_EDIT_KEYS.planned.toUpperCase()
+      }
       placeholder="--:--"
       className={timeValue}
     />
@@ -803,7 +826,10 @@ export function TaskModal({
         // Placeholder circle keeps the title aligned with the edit layout.
         <div className="mt-1.5 h-6 w-6 shrink-0 rounded-full border-[1.5px] border-dashed border-muted-foreground/30" />
       ) : (
-        <WithShortcut label={isCompleted ? "Mark incomplete" : "Complete task"} shortcut="completeTask">
+        <WithShortcut
+          label={isCompleted ? "Mark incomplete" : "Complete task"}
+          shortcut="completeTask"
+        >
           <button
             type="button"
             role="checkbox"
@@ -872,22 +898,22 @@ export function TaskModal({
   // Subtasks line up under the title's checkbox, as in Sunsama.
   const subtasks = (
     <SubtaskSizeContext.Provider value="lg">
-    <div className={isMobile ? "pl-[22px] pr-5 pt-2" : "pl-[34px] pr-8 pt-3"}>
-      {isCompose ? (
-        <SubtaskList
-          subtasks={draftSubtasks}
-          onSubtasksChange={setDraftSubtasks}
-          addInputRef={subtaskInputRef}
-        />
-      ) : (
-        <SubtaskChecklist
-          key={renderTask.id}
-          taskId={renderTask.id}
-          addInputRef={subtaskInputRef}
-          showHeader={false}
-        />
-      )}
-    </div>
+      <div className={isMobile ? "pl-[22px] pr-5 pt-2" : "pl-[34px] pr-8 pt-3"}>
+        {isCompose ? (
+          <SubtaskList
+            subtasks={draftSubtasks}
+            onSubtasksChange={setDraftSubtasks}
+            addInputRef={subtaskInputRef}
+          />
+        ) : (
+          <SubtaskChecklist
+            key={renderTask.id}
+            taskId={renderTask.id}
+            addInputRef={subtaskInputRef}
+            showHeader={false}
+          />
+        )}
+      </div>
     </SubtaskSizeContext.Provider>
   );
 
@@ -903,7 +929,8 @@ export function TaskModal({
         notes={description}
         onChange={setDescription}
         onBlur={() => {
-          if (!isCompose && description !== (renderTask.notes || "")) handleSave();
+          if (!isCompose && description !== (renderTask.notes || ""))
+            handleSave();
         }}
         placeholder="Notes…"
         minHeight={isMobile ? "96px" : "140px"}
@@ -947,7 +974,11 @@ export function TaskModal({
         // Keep the keyboard up: don't let the tap steal focus from the title.
         onPointerDown={(e) => e.preventDefault()}
         onClick={() => setAddPosition(addPosition === "top" ? "bottom" : "top")}
-        aria-label={addPosition === "top" ? "Adding to top of the day" : "Adding to bottom of the day"}
+        aria-label={
+          addPosition === "top"
+            ? "Adding to top of the day"
+            : "Adding to bottom of the day"
+        }
         className={cn(
           "flex h-9 items-center gap-1.5 rounded-full border px-3 text-[13px] font-medium transition-colors",
           addPosition === "top"

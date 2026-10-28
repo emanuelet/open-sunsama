@@ -1,20 +1,21 @@
 /**
  * Hook for desktop app auto-updates
- * 
+ *
  * Checks for updates on mount (desktop only) and provides
  * state + actions for the update UI.
  */
 
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { isDesktop } from '@/lib/desktop';
+import { useEffect, useState, useCallback, useRef } from "react";
+import { isDesktop } from "@/lib/desktop";
 import {
   checkForUpdate,
   downloadAndInstallUpdate,
   type UpdateInfo,
   type UpdateProgress,
-} from '@/lib/updater';
+} from "@/lib/updater";
 
-export type UpdateStatus = 'idle' | 'checking' | 'available' | 'downloading' | 'installing' | 'error';
+export type UpdateStatus =
+  "idle" | "checking" | "available" | "downloading" | "installing" | "error";
 
 export interface AppUpdateState {
   status: UpdateStatus;
@@ -27,7 +28,7 @@ export interface AppUpdateState {
 }
 
 export function useAppUpdate(): AppUpdateState {
-  const [status, setStatus] = useState<UpdateStatus>('idle');
+  const [status, setStatus] = useState<UpdateStatus>("idle");
   const [update, setUpdate] = useState<UpdateInfo | null>(null);
   const [progress, setProgress] = useState<UpdateProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -37,28 +38,32 @@ export function useAppUpdate(): AppUpdateState {
   const doCheck = useCallback(async () => {
     if (!isDesktop()) return;
 
-    setStatus('checking');
+    setStatus("checking");
     setError(null);
 
     try {
       const result = await checkForUpdate();
       if (result) {
         setUpdate(result);
-        setStatus('available');
+        setStatus("available");
         setDismissed(false);
       } else {
-        setStatus('idle');
+        setStatus("idle");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err || 'Failed to check for updates'));
-      setStatus('error');
+      setError(
+        err instanceof Error
+          ? err.message
+          : String(err || "Failed to check for updates")
+      );
+      setStatus("error");
     }
   }, []);
 
   const installUpdate = useCallback(async () => {
     if (!isDesktop()) return;
 
-    setStatus('downloading');
+    setStatus("downloading");
     setProgress(null);
     setError(null);
 
@@ -67,10 +72,14 @@ export function useAppUpdate(): AppUpdateState {
         setProgress(p);
       });
       // If we get here, relaunch didn't happen (shouldn't normally reach this)
-      setStatus('installing');
+      setStatus("installing");
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err || 'Failed to install update'));
-      setStatus('error');
+      setError(
+        err instanceof Error
+          ? err.message
+          : String(err || "Failed to install update")
+      );
+      setStatus("error");
     }
   }, []);
 
@@ -89,7 +98,7 @@ export function useAppUpdate(): AppUpdateState {
   }, [doCheck]);
 
   // If dismissed, report as idle
-  const effectiveStatus = dismissed && status === 'available' ? 'idle' : status;
+  const effectiveStatus = dismissed && status === "available" ? "idle" : status;
 
   return {
     status: effectiveStatus,

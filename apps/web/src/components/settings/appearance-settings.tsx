@@ -5,14 +5,23 @@ import { COLOR_THEMES, FONT_OPTIONS, type ThemeMode } from "@/lib/themes";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui";
 
-const THEME_MODES: { id: ThemeMode; label: string; icon: React.ElementType }[] = [
-  { id: "system", label: "System", icon: Monitor },
-  { id: "light", label: "Light", icon: Sun },
-  { id: "dark", label: "Dark", icon: Moon },
-];
+const THEME_MODES: { id: ThemeMode; label: string; icon: React.ElementType }[] =
+  [
+    { id: "system", label: "System", icon: Monitor },
+    { id: "light", label: "Light", icon: Sun },
+    { id: "dark", label: "Dark", icon: Moon },
+  ];
 
 export function AppearanceSettings() {
-  const { themeMode, colorTheme, fontFamily, setThemeMode, setColorTheme, setFontFamily, resolvedTheme } = useTheme();
+  const {
+    themeMode,
+    colorTheme,
+    fontFamily,
+    setThemeMode,
+    setColorTheme,
+    setFontFamily,
+    resolvedTheme,
+  } = useTheme();
 
   return (
     <div className="space-y-8">
@@ -56,8 +65,11 @@ export function AppearanceSettings() {
         <div className="grid grid-cols-4 gap-3">
           {COLOR_THEMES.map((theme) => {
             const isActive = colorTheme === theme.id;
-            const previewColor = resolvedTheme === "dark" ? theme.preview.dark : theme.preview.light;
-            
+            const previewColor =
+              resolvedTheme === "dark"
+                ? theme.preview.dark
+                : theme.preview.light;
+
             return (
               <button
                 key={theme.id}
@@ -75,9 +87,12 @@ export function AppearanceSettings() {
                     "h-8 w-8 rounded-full transition-all",
                     isActive && "ring-2 ring-offset-2 ring-offset-background"
                   )}
-                  style={{ 
+                  style={{
                     backgroundColor: previewColor,
-                    ...(isActive && { "--tw-ring-color": previewColor } as React.CSSProperties),
+                    ...(isActive &&
+                      ({
+                        "--tw-ring-color": previewColor,
+                      } as React.CSSProperties)),
                   }}
                 >
                   {isActive && (
@@ -87,10 +102,12 @@ export function AppearanceSettings() {
                   )}
                 </div>
                 {/* Theme name */}
-                <span className={cn(
-                  "text-xs font-medium",
-                  isActive ? "text-foreground" : "text-muted-foreground"
-                )}>
+                <span
+                  className={cn(
+                    "text-xs font-medium",
+                    isActive ? "text-foreground" : "text-muted-foreground"
+                  )}
+                >
                   {theme.name}
                 </span>
               </button>
@@ -105,7 +122,7 @@ export function AppearanceSettings() {
         <div className="space-y-2">
           {FONT_OPTIONS.map((font) => {
             const isActive = fontFamily === font.id;
-            
+
             return (
               <button
                 key={font.id}
@@ -118,7 +135,7 @@ export function AppearanceSettings() {
                 )}
               >
                 <div>
-                  <p 
+                  <p
                     className="text-sm font-medium"
                     style={{ fontFamily: font.fontFamily }}
                   >
@@ -128,9 +145,7 @@ export function AppearanceSettings() {
                     {font.description}
                   </p>
                 </div>
-                {isActive && (
-                  <Check className="h-4 w-4 text-primary" />
-                )}
+                {isActive && <Check className="h-4 w-4 text-primary" />}
               </button>
             );
           })}

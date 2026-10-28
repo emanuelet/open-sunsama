@@ -22,7 +22,8 @@ const PENDING_RESET_FLAG = "open_sunsama_pending_cache_reset";
 const RECOVERY_WINDOW_MS = 60_000;
 const CACHE_KEY_PREFIX = "open_sunsama_rq_cache";
 const SESSION_KEYS = ["open_sunsama_token", "open_sunsama_user"];
-const ISSUES_URL = "https://github.com/ShadowWalker2014/open-sunsama/issues/new?template=bug.yml";
+const ISSUES_URL =
+  "https://github.com/ShadowWalker2014/open-sunsama/issues/new?template=bug.yml";
 
 function removeLocalKeys(match: (key: string) => boolean) {
   try {
@@ -79,7 +80,8 @@ function markRecovered() {
 }
 
 function describe(error: unknown): { message: string; stack: string } {
-  if (error instanceof Error) return { message: error.message, stack: error.stack ?? "" };
+  if (error instanceof Error)
+    return { message: error.message, stack: error.stack ?? "" };
   return { message: String(error), stack: "" };
 }
 
@@ -170,8 +172,9 @@ export function AppErrorScreen({ error }: { error: unknown }) {
         <div className="space-y-2">
           <h1 className="text-lg font-semibold">Open Sunsama hit an error</h1>
           <p className="text-sm text-muted-foreground">
-            Your tasks are safe on the server. Reload to try again. If it keeps happening, reset
-            local data: it clears this device's cached copy and keeps you signed in.
+            Your tasks are safe on the server. Reload to try again. If it keeps
+            happening, reset local data: it clears this device's cached copy and
+            keeps you signed in.
           </p>
         </div>
 
@@ -187,7 +190,9 @@ export function AppErrorScreen({ error }: { error: unknown }) {
               type="button"
               className={secondary}
               onClick={installUpdate}
-              disabled={updateState === "checking" || updateState === "installing"}
+              disabled={
+                updateState === "checking" || updateState === "installing"
+              }
             >
               {updateLabel[updateState]}
             </button>
@@ -198,16 +203,27 @@ export function AppErrorScreen({ error }: { error: unknown }) {
         </div>
 
         <details className="rounded-md border border-border bg-muted/40 p-3 text-xs">
-          <summary className="cursor-pointer select-none font-medium">Error details</summary>
+          <summary className="cursor-pointer select-none font-medium">
+            Error details
+          </summary>
           <pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap wrap-break-word text-muted-foreground">
             {message}
             {stack ? `\n\n${stack}` : ""}
           </pre>
           <div className="mt-3 flex gap-3">
-            <button type="button" className="underline underline-offset-2" onClick={copyDetails}>
+            <button
+              type="button"
+              className="underline underline-offset-2"
+              onClick={copyDetails}
+            >
               {copied ? "Copied" : "Copy details"}
             </button>
-            <a className="underline underline-offset-2" href={ISSUES_URL} target="_blank" rel="noreferrer">
+            <a
+              className="underline underline-offset-2"
+              href={ISSUES_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
               Report the issue
             </a>
           </div>

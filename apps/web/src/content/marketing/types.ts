@@ -183,7 +183,8 @@ export interface StepsSection extends SectionBase {
 }
 
 /** Only true numbers. `live: "github-stars"` shows the current star count. */
-export type StatItem = { value: string; label: string } | { live: "github-stars"; label: string };
+export type StatItem =
+  { value: string; label: string } | { live: "github-stars"; label: string };
 
 export interface StatsSection {
   kind: "stats";
@@ -260,7 +261,9 @@ export interface MarketingPageContent {
 }
 
 /** Identity helper so data modules get type-checked with a readable error. */
-export function defineMarketingPage(page: MarketingPageContent): MarketingPageContent {
+export function defineMarketingPage(
+  page: MarketingPageContent
+): MarketingPageContent {
   return page;
 }
 
@@ -281,7 +284,8 @@ export function parseInline(text: string): InlineToken[] {
   let last = 0;
   for (const match of text.matchAll(INLINE)) {
     const index = match.index ?? 0;
-    if (index > last) tokens.push({ type: "text", value: text.slice(last, index) });
+    if (index > last)
+      tokens.push({ type: "text", value: text.slice(last, index) });
     if (match[1] !== undefined && match[2] !== undefined) {
       tokens.push({ type: "link", label: match[1], href: match[2] });
     } else if (match[3] !== undefined) {
@@ -289,7 +293,8 @@ export function parseInline(text: string): InlineToken[] {
     }
     last = index + match[0].length;
   }
-  if (last < text.length) tokens.push({ type: "text", value: text.slice(last) });
+  if (last < text.length)
+    tokens.push({ type: "text", value: text.slice(last) });
   return tokens;
 }
 
@@ -300,4 +305,8 @@ export function plainText(text: string): string {
     .join("");
 }
 
-export const markLabel: Record<Mark, string> = { yes: "Yes", partial: "Partly", no: "No" };
+export const markLabel: Record<Mark, string> = {
+  yes: "Yes",
+  partial: "Partly",
+  no: "No",
+};

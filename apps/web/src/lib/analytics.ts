@@ -43,12 +43,16 @@ export function identifyUser(user: {
   name: string | null;
   avatarUrl: string | null;
 }): void {
-  const params: Record<string, string> = { user_id: user.id, email: user.email };
+  const params: Record<string, string> = {
+    user_id: user.id,
+    email: user.email,
+  };
   if (user.name) params.name = user.name;
   // Avatars are stored as API-relative paths; DataFast rejects anything but a
   // full http(s) URL of at most 250 characters.
   const image = getAvatarUrl(user.avatarUrl);
-  if (image && /^https?:/.test(image) && image.length <= 250) params.image = image;
+  if (image && /^https?:/.test(image) && image.length <= 250)
+    params.image = image;
   try {
     window.datafast?.("identify", params);
   } catch {

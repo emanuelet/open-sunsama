@@ -3,19 +3,22 @@
  * Handles CRUD operations for API keys
  */
 
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
-import { getDb, eq, and, apiKeys } from '@open-sunsama/database';
-import { NotFoundError, uuidSchema, generateApiKey } from '@open-sunsama/utils';
-import type { CreateApiKeyResponse } from '@open-sunsama/types';
-import { auth, type AuthVariables } from '../middleware/auth.js';
-import { createApiKeySchema, updateApiKeySchema } from '../validation/api-keys.js';
+import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
+import { getDb, eq, and, apiKeys } from "@open-sunsama/database";
+import { NotFoundError, uuidSchema, generateApiKey } from "@open-sunsama/utils";
+import type { CreateApiKeyResponse } from "@open-sunsama/types";
+import { auth, type AuthVariables } from "../middleware/auth.js";
+import {
+  createApiKeySchema,
+  updateApiKeySchema,
+} from "../validation/api-keys.js";
 
 const apiKeysRouter = new Hono<{ Variables: AuthVariables }>();
 
 // Apply JWT authentication only (API keys shouldn't be able to manage API keys)
-apiKeysRouter.use('*', auth);
+apiKeysRouter.use("*", auth);
 
 /**
  * Format API key for response (exclude sensitive hash)
@@ -39,14 +42,14 @@ function formatApiKey(key: typeof apiKeys.$inferSelect) {
  * Helper to check JWT auth and return error response if not
  */
 function requireJwtAuth(c: any): Response | null {
-  const authMethod = c.get('authMethod');
-  if (authMethod !== 'jwt') {
+  const authMethod = c.get("authMethod");
+  if (authMethod !== "jwt") {
     return c.json(
       {
         success: false,
         error: {
-          code: 'AUTHORIZATION_ERROR',
-          message: 'API keys cannot be used to manage API keys',
+          code: "AUTHORIZATION_ERROR",
+          message: "API keys cannot be used to manage API keys",
           statusCode: 403,
         },
       },
@@ -60,11 +63,11 @@ function requireJwtAuth(c: any): Response | null {
  * GET /api-keys
  * List user's API keys
  */
-apiKeysRouter.get('/', async (c) => {
+apiKeysRouter.get("/", async (c) => {
   const authError = requireJwtAuth(c);
   if (authError) return authError;
 
-  const userId = c.get('userId');
+  const userId = c.get("userId");
   const db = getDb();
 
   const keys = await db
@@ -80,12 +83,12 @@ apiKeysRouter.get('/', async (c) => {
  * POST /api-keys
  * Generate a new API key
  */
-apiKeysRouter.post('/', zValidator('json', createApiKeySchema), async (c) => {
+apiKeysRouter.post("/", zValidator("json", createApiKeySchema), async (c) => {
   const authError = requireJwtAuth(c);
   if (authError) return authError;
 
-  const userId = c.get('userId');
-  const data = c.req.valid('json');
+  const userId = c.get("userId");
+  const data = c.req.valid("json");
   const db = getDb();
 
   const { key, hash, prefix } = generateApiKey();
@@ -104,7 +107,7 @@ apiKeysRouter.post('/', zValidator('json', createApiKeySchema), async (c) => {
     .returning();
 
   if (!newApiKey) {
-    throw new Error('Failed to create API key');
+    throw new Error("Failed to create API key");
   }
 
   const response: CreateApiKeyResponse = {
@@ -116,7 +119,8 @@ apiKeysRouter.post('/', zValidator('json', createApiKeySchema), async (c) => {
     {
       success: true,
       data: response,
-      message: 'API key created successfully. Save this key - it will not be shown again.',
+      message:
+        "API key created successfully. Save this key - it will not be shown again.",
     },
     201
   );
@@ -127,14 +131,14 @@ apiKeysRouter.post('/', zValidator('json', createApiKeySchema), async (c) => {
  * Get a single API key by ID
  */
 apiKeysRouter.get(
-  '/:id',
-  zValidator('param', z.object({ id: uuidSchema })),
+  "/:id",
+  zValidator("param", z.object({ id: uuidSchema })),
   async (c) => {
     const authError = requireJwtAuth(c);
     if (authError) return authError;
 
-    const userId = c.get('userId');
-    const { id } = c.req.valid('param');
+    const userId = c.get("userId");
+    const { id } = c.req.valid("param");
     const db = getDb();
 
     const [key] = await db
@@ -144,7 +148,7 @@ apiKeysRouter.get(
       .limit(1);
 
     if (!key) {
-      throw new NotFoundError('API key', id);
+      throw new NotFoundError("API key", id);
     }
 
     return c.json({ success: true, data: formatApiKey(key) });
@@ -156,14 +160,14 @@ apiKeysRouter.get(
  * Revoke (delete) an API key
  */
 apiKeysRouter.delete(
-  '/:id',
-  zValidator('param', z.object({ id: uuidSchema })),
+  "/:id",
+  zValidator("param", z.object({ id: uuidSchema })),
   async (c) => {
     const authError = requireJwtAuth(c);
     if (authError) return authError;
 
-    const userId = c.get('userId');
-    const { id } = c.req.valid('param');
+    const userId = c.get("userId");
+    const { id } = c.req.valid("param");
     const db = getDb();
 
     const [existing] = await db
@@ -173,12 +177,14 @@ apiKeysRouter.delete(
       .limit(1);
 
     if (!existing) {
-      throw new NotFoundError('API key', id);
+      throw new NotFoundError("API key", id);
     }
 
-    await db.delete(apiKeys).where(and(eq(apiKeys.id, id), eq(apiKeys.userId, userId)));
+    await db
+      .delete(apiKeys)
+      .where(and(eq(apiKeys.id, id), eq(apiKeys.userId, userId)));
 
-    return c.json({ success: true, message: 'API key revoked successfully' });
+    return c.json({ success: true, message: "API key revoked successfully" });
   }
 );
 
@@ -187,16 +193,16 @@ apiKeysRouter.delete(
  * Update an API key (name, scopes, active status)
  */
 apiKeysRouter.patch(
-  '/:id',
-  zValidator('param', z.object({ id: uuidSchema })),
-  zValidator('json', updateApiKeySchema),
+  "/:id",
+  zValidator("param", z.object({ id: uuidSchema })),
+  zValidator("json", updateApiKeySchema),
   async (c) => {
     const authError = requireJwtAuth(c);
     if (authError) return authError;
 
-    const userId = c.get('userId');
-    const { id } = c.req.valid('param');
-    const updates = c.req.valid('json');
+    const userId = c.get("userId");
+    const { id } = c.req.valid("param");
+    const updates = c.req.valid("json");
     const db = getDb();
 
     const [existing] = await db
@@ -206,7 +212,7 @@ apiKeysRouter.patch(
       .limit(1);
 
     if (!existing) {
-      throw new NotFoundError('API key', id);
+      throw new NotFoundError("API key", id);
     }
 
     const updateData: Record<string, unknown> = { updatedAt: new Date() };
@@ -215,7 +221,9 @@ apiKeysRouter.patch(
     if (updates.scopes !== undefined) updateData.scopes = updates.scopes;
     if (updates.isActive !== undefined) updateData.isActive = updates.isActive;
     if (updates.expiresAt !== undefined) {
-      updateData.expiresAt = updates.expiresAt ? new Date(updates.expiresAt) : null;
+      updateData.expiresAt = updates.expiresAt
+        ? new Date(updates.expiresAt)
+        : null;
     }
 
     const [updatedKey] = await db

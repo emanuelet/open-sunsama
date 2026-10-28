@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { format } from 'date-fns';
-import type { TimeBlock } from '@open-sunsama/types';
-import { useThemeColors, type ThemeColors } from '@/lib/theme';
+import { View, Text, StyleSheet } from "react-native";
+import { format } from "date-fns";
+import type { TimeBlock } from "@open-sunsama/types";
+import { useThemeColors, type ThemeColors } from "@/lib/theme";
 
 interface TimeBlockCardProps {
   timeBlock: TimeBlock;
@@ -21,18 +21,25 @@ function getBlockColor(color: string | null, colors: ThemeColors): string {
 export function TimeBlockCard({ timeBlock }: TimeBlockCardProps) {
   const colors = useThemeColors();
   const styles = createStyles(colors);
-  const startTime = timeBlock.startTime instanceof Date
-    ? timeBlock.startTime
-    : new Date(timeBlock.startTime);
-  const endTime = timeBlock.endTime instanceof Date
-    ? timeBlock.endTime
-    : new Date(timeBlock.endTime);
+  const startTime =
+    timeBlock.startTime instanceof Date
+      ? timeBlock.startTime
+      : new Date(timeBlock.startTime);
+  const endTime =
+    timeBlock.endTime instanceof Date
+      ? timeBlock.endTime
+      : new Date(timeBlock.endTime);
 
   const color = getBlockColor(timeBlock.color, colors);
-  const timeLabel = `${format(startTime, 'h:mm a')} - ${format(endTime, 'h:mm a')}`;
+  const timeLabel = `${format(startTime, "h:mm a")} - ${format(endTime, "h:mm a")}`;
 
   return (
-    <View style={[styles.container, { borderLeftColor: color, backgroundColor: `${color}20` }]}>
+    <View
+      style={[
+        styles.container,
+        { borderLeftColor: color, backgroundColor: `${color}20` },
+      ]}
+    >
       <Text style={styles.title} numberOfLines={2}>
         {timeBlock.title}
       </Text>
@@ -46,28 +53,29 @@ export function TimeBlockCard({ timeBlock }: TimeBlockCardProps) {
   );
 }
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  container: {
-    flex: 1,
-    borderLeftWidth: 4,
-    borderRadius: 6,
-    padding: 8,
-    backgroundColor: colors.raised,
-    minHeight: 30,
-  },
-  title: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 2,
-  },
-  time: {
-    fontSize: 11,
-    color: colors.secondary,
-  },
-  notes: {
-    fontSize: 11,
-    color: colors.muted,
-    marginTop: 2,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      borderLeftWidth: 4,
+      borderRadius: 6,
+      padding: 8,
+      backgroundColor: colors.raised,
+      minHeight: 30,
+    },
+    title: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.text,
+      marginBottom: 2,
+    },
+    time: {
+      fontSize: 11,
+      color: colors.secondary,
+    },
+    notes: {
+      fontSize: 11,
+      color: colors.muted,
+      marginTop: 2,
+    },
+  });

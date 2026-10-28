@@ -28,7 +28,12 @@ interface LightboxProps {
 /**
  * Full-screen lightbox for previewing images and videos
  */
-export function Lightbox({ items, initialIndex = 0, open, onClose }: LightboxProps) {
+export function Lightbox({
+  items,
+  initialIndex = 0,
+  open,
+  onClose,
+}: LightboxProps) {
   const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
   const [zoom, setZoom] = React.useState(1);
   const [isDragging, setIsDragging] = React.useState(false);
@@ -158,7 +163,10 @@ export function Lightbox({ items, initialIndex = 0, open, onClose }: LightboxPro
       const touch = e.touches[0];
       if (touch && zoom > 1) {
         setIsDragging(true);
-        setDragStart({ x: touch.clientX - offset.x, y: touch.clientY - offset.y });
+        setDragStart({
+          x: touch.clientX - offset.x,
+          y: touch.clientY - offset.y,
+        });
       }
     }
   };
@@ -445,19 +453,16 @@ export function LightboxProvider({ children }: { children: React.ReactNode }) {
     index: number;
   } | null>(null);
 
-  const open = React.useCallback(
-    (items: LightboxItem[], initialIndex = 0) => {
-      const resolved = items
-        .map((item) => ({
-          ...item,
-          url: resolveUploadUrl(item.url) ?? item.url,
-        }))
-        .filter((item) => item.url);
-      if (resolved.length === 0) return;
-      setState({ items: resolved, index: initialIndex });
-    },
-    []
-  );
+  const open = React.useCallback((items: LightboxItem[], initialIndex = 0) => {
+    const resolved = items
+      .map((item) => ({
+        ...item,
+        url: resolveUploadUrl(item.url) ?? item.url,
+      }))
+      .filter((item) => item.url);
+    if (resolved.length === 0) return;
+    setState({ items: resolved, index: initialIndex });
+  }, []);
 
   const value = React.useMemo(() => ({ open }), [open]);
 

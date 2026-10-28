@@ -16,15 +16,10 @@
  * account collapse into one sync job.
  */
 
-import { Hono } from 'hono';
-import {
-  getDb,
-  eq,
-  calendars,
-  calendarAccounts,
-} from '@open-sunsama/database';
-import { getPgBoss, JOBS } from '../lib/pgboss.js';
-import type { SyncAccountPayload } from '../workers/calendar-sync/sync-account.js';
+import { Hono } from "hono";
+import { getDb, eq, calendars, calendarAccounts } from "@open-sunsama/database";
+import { getPgBoss, JOBS } from "../lib/pgboss.js";
+import type { SyncAccountPayload } from "../workers/calendar-sync/sync-account.js";
 
 const webhooksRouter = new Hono();
 
@@ -43,20 +38,20 @@ const webhooksRouter = new Hono();
  *
  * Body is empty for `sync` and `exists`; we ignore it.
  */
-webhooksRouter.post('/google/calendar', async (c) => {
-  const channelId = c.req.header('x-goog-channel-id');
-  const resourceId = c.req.header('x-goog-resource-id');
-  const resourceState = c.req.header('x-goog-resource-state');
+webhooksRouter.post("/google/calendar", async (c) => {
+  const channelId = c.req.header("x-goog-channel-id");
+  const resourceId = c.req.header("x-goog-resource-id");
+  const resourceState = c.req.header("x-goog-resource-state");
 
   if (!channelId || !resourceId || !resourceState) {
-    return c.json({ ok: false, reason: 'missing_headers' }, 400);
+    return c.json({ ok: false, reason: "missing_headers" }, 400);
   }
 
   // Google's first POST after registering a channel is `sync` and
   // doesn't represent a change — just acknowledge and bail. The
   // channel is now active.
-  if (resourceState === 'sync') {
-    return c.json({ ok: true, ignored: 'sync_handshake' }, 200);
+  if (resourceState === "sync") {
+    return c.json({ ok: true, ignored: "sync_handshake" }, 200);
   }
 
   // Look up the calendar row by the channel id we generated. If no
@@ -77,13 +72,13 @@ webhooksRouter.post('/google/calendar', async (c) => {
     .limit(1);
 
   if (!cal) {
-    return c.json({ ok: true, ignored: 'unknown_channel' }, 200);
+    return c.json({ ok: true, ignored: "unknown_channel" }, 200);
   }
 
   // Reject mismatched resourceId — defends against a leaked/guessed
   // channel id being replayed against a different calendar.
   if (cal.watchResourceId !== resourceId) {
-    return c.json({ ok: false, reason: 'resource_mismatch' }, 403);
+    return c.json({ ok: false, reason: "resource_mismatch" }, 403);
   }
 
   // Find the account so we can enqueue an account-level sync. Going
@@ -100,7 +95,7 @@ webhooksRouter.post('/google/calendar', async (c) => {
     .limit(1);
 
   if (!account) {
-    return c.json({ ok: true, ignored: 'no_account' }, 200);
+    return c.json({ ok: true, ignored: "no_account" }, 200);
   }
 
   // Enqueue with `singletonKey` per account: if a sync job is

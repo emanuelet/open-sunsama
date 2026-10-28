@@ -2,12 +2,12 @@
  * Validation schemas for auth routes
  */
 
-import { z } from 'zod';
-import { emailSchema, passwordSchema } from '@open-sunsama/utils';
+import { z } from "zod";
+import { emailSchema, passwordSchema } from "@open-sunsama/utils";
 
 const isIanaTimezone = (timezone: string): boolean => {
   try {
-    new Intl.DateTimeFormat('en-US', { timeZone: timezone }).format();
+    new Intl.DateTimeFormat("en-US", { timeZone: timezone }).format();
     return true;
   } catch {
     return false;
@@ -15,7 +15,7 @@ const isIanaTimezone = (timezone: string): boolean => {
 };
 
 export const timezoneSchema = z.string().min(1).max(50).refine(isIanaTimezone, {
-  error: 'Timezone must be a valid IANA timezone identifier',
+  error: "Timezone must be a valid IANA timezone identifier",
 });
 
 /**
@@ -32,7 +32,7 @@ export const registerSchema = z.object({
  */
 export const loginSchema = z.object({
   email: emailSchema,
-  password: z.string().min(1, { error: 'Password is required' }),
+  password: z.string().min(1, { error: "Password is required" }),
 });
 
 /**
@@ -73,7 +73,7 @@ export const updateProfileSchema = z.object({
  * Schema for changing password
  */
 export const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1, { error: 'Current password is required' }),
+  currentPassword: z.string().min(1, { error: "Current password is required" }),
   newPassword: passwordSchema,
 });
 
@@ -88,6 +88,6 @@ export const requestPasswordResetSchema = z.object({
  * Schema for resetting password with token
  */
 export const resetPasswordSchema = z.object({
-  token: z.string().min(1, { error: 'Reset token is required' }),
+  token: z.string().min(1, { error: "Reset token is required" }),
   newPassword: passwordSchema,
 });

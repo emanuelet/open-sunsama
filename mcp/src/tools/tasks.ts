@@ -88,7 +88,8 @@ export function registerTaskTools(
   // ============================================================
   // LIST TASKS
   // ============================================================
-  defineTool(server,
+  defineTool(
+    server,
     "list_tasks",
     `List tasks with optional filters. Returns tasks sorted by position by default.
 
@@ -184,7 +185,8 @@ Pagination: Use "page" and "limit" for large result sets.`,
   // ============================================================
   // GET TASK
   // ============================================================
-  defineTool(server,
+  defineTool(
+    server,
     "get_task",
     `Get detailed information about a specific task by its ID.
 
@@ -214,7 +216,8 @@ Example: { "id": "task_abc123" }`,
   // ============================================================
   // CREATE TASK
   // ============================================================
-  defineTool(server,
+  defineTool(
+    server,
     "create_task",
     `Create a new task.
 
@@ -288,7 +291,8 @@ Examples:
   // ============================================================
   // UPDATE TASK
   // ============================================================
-  defineTool(server,
+  defineTool(
+    server,
     "update_task",
     `Update an existing task. Only provide fields you want to change.
 
@@ -379,7 +383,8 @@ Examples:
   // ============================================================
   // COMPLETE TASK
   // ============================================================
-  defineTool(server,
+  defineTool(
+    server,
     "complete_task",
     `Mark a task as complete.
 
@@ -415,7 +420,8 @@ Example: { "id": "task_abc123" }`,
   // ============================================================
   // UNCOMPLETE TASK
   // ============================================================
-  defineTool(server,
+  defineTool(
+    server,
     "uncomplete_task",
     `Mark a task as incomplete (reopen a completed task).
 
@@ -451,7 +457,8 @@ Example: { "id": "task_abc123" }`,
   // ============================================================
   // DELETE TASK
   // ============================================================
-  defineTool(server,
+  defineTool(
+    server,
     "delete_task",
     `Permanently delete a task.
 
@@ -483,7 +490,8 @@ Example: { "id": "task_abc123" }`,
   // ============================================================
   // SCHEDULE TASK
   // ============================================================
-  defineTool(server,
+  defineTool(
+    server,
     "schedule_task",
     `Move a task to a specific date or to the backlog.
 
@@ -531,7 +539,8 @@ Examples:
   // ============================================================
   // REORDER TASKS
   // ============================================================
-  defineTool(server,
+  defineTool(
+    server,
     "reorder_tasks",
     `Reorder tasks within a specific date or backlog.
 

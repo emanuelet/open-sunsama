@@ -418,9 +418,9 @@ export function useUpdateTask() {
 
       const baseTask: Task | undefined =
         previousTask ??
-        (previousQueries
+        previousQueries
           .map(([, list]) => list?.find((t) => t.id === id))
-          .find((t): t is Task => t !== undefined));
+          .find((t): t is Task => t !== undefined);
 
       const nextTask: Task | null = baseTask
         ? ({ ...baseTask, ...cleanedPatch, updatedAt: new Date() } as Task)
@@ -434,8 +434,10 @@ export function useUpdateTask() {
       // caches — drop it from its source list and inject it into the
       // destination list. Otherwise just update it in place wherever it
       // currently lives.
-      const isMovingDate =
-        Object.prototype.hasOwnProperty.call(data, "scheduledDate");
+      const isMovingDate = Object.prototype.hasOwnProperty.call(
+        data,
+        "scheduledDate"
+      );
 
       if (isMovingDate && nextTask) {
         const targetDate = data.scheduledDate ?? null;
@@ -786,7 +788,10 @@ export function useCompleteTask() {
       // scheduled for a different day (e.g. tomorrow), move it to today so it
       // lands in today's Done list rather than staying on its planned day.
       const today = format(new Date(), "yyyy-MM-dd");
-      if (completedTask.scheduledDate && completedTask.scheduledDate !== today) {
+      if (
+        completedTask.scheduledDate &&
+        completedTask.scheduledDate !== today
+      ) {
         return await api.tasks.update(id, { scheduledDate: today });
       }
       return completedTask;

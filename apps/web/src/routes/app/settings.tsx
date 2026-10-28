@@ -77,7 +77,12 @@ function SettingsContent({ tab }: { tab: SettingsTab }) {
     case "profile":
       return <ProfileSettings />;
     case "security":
-      return <div className="space-y-4"><PasskeySettings /><PasswordSettings /></div>;
+      return (
+        <div className="space-y-4">
+          <PasskeySettings />
+          <PasswordSettings />
+        </div>
+      );
     case "appearance":
       return <AppearanceSettings />;
     case "tasks":

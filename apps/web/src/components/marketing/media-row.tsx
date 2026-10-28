@@ -8,7 +8,13 @@ import { SectionHeading } from "./section-heading";
 import { BODY, CONTAINER, H3, SECTION } from "./tokens";
 
 /** Text beside a real clip or screenshot. `flip` puts the media on the left (md and up). */
-export function MediaRow({ row, flip = false }: { row: MediaRowData; flip?: boolean }) {
+export function MediaRow({
+  row,
+  flip = false,
+}: {
+  row: MediaRowData;
+  flip?: boolean;
+}) {
   return (
     <div className="grid items-center gap-6 md:grid-cols-5 md:gap-12">
       <Reveal className={cn("min-w-0 md:col-span-2", flip && "md:order-2")}>
@@ -23,8 +29,14 @@ export function MediaRow({ row, flip = false }: { row: MediaRowData; flip?: bool
         {row.bullets && (
           <ul className="mt-4 space-y-2">
             {row.bullets.map((bullet) => (
-              <li key={bullet} className="flex gap-2.5 text-[14.5px] leading-relaxed text-foreground/85">
-                <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={2.5} />
+              <li
+                key={bullet}
+                className="flex gap-2.5 text-[14.5px] leading-relaxed text-foreground/85"
+              >
+                <Check
+                  className="mt-1 h-3.5 w-3.5 shrink-0 text-primary"
+                  strokeWidth={2.5}
+                />
                 <span>
                   <RichText text={bullet} />
                 </span>
@@ -42,7 +54,11 @@ export function MediaRow({ row, flip = false }: { row: MediaRowData; flip?: bool
           </SmartLink>
         )}
       </Reveal>
-      <Reveal delay={100} y={24} className={cn("min-w-0 md:col-span-3", flip && "md:order-1")}>
+      <Reveal
+        delay={100}
+        y={24}
+        className={cn("min-w-0 md:col-span-3", flip && "md:order-1")}
+      >
         <MediaBlock media={row.media} />
       </Reveal>
     </div>
@@ -66,7 +82,12 @@ export function MediaRows({
   return (
     <section id={id} className={SECTION} aria-labelledby={`${id}-heading`}>
       <div className={CONTAINER}>
-        <SectionHeading id={`${id}-heading`} eyebrow={eyebrow} heading={heading} lead={lead} />
+        <SectionHeading
+          id={`${id}-heading`}
+          eyebrow={eyebrow}
+          heading={heading}
+          lead={lead}
+        />
         <div className="mt-14 space-y-16 md:mt-16 md:space-y-24">
           {rows.map((row, i) => (
             <MediaRow key={row.title} row={row} flip={i % 2 === 1} />

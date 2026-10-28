@@ -98,10 +98,10 @@ export function ProfileSettings() {
   const onSubmit = async (data: ProfileForm) => {
     setIsLoading(true);
     try {
-        await updateUser({
-          name: data.name,
-          timezone: data.timezone,
-          timezoneManuallySet: dirtyFields.timezone === true,
+      await updateUser({
+        name: data.name,
+        timezone: data.timezone,
+        timezoneManuallySet: dirtyFields.timezone === true,
       });
       toast({
         title: "Profile updated",
@@ -140,7 +140,7 @@ export function ProfileSettings() {
               className="hidden"
               aria-label="Upload avatar"
             />
-            
+
             {/* Clickable avatar with hover overlay */}
             <button
               type="button"
@@ -151,9 +151,11 @@ export function ProfileSettings() {
             >
               <Avatar className="h-20 w-20">
                 <AvatarImage src={getAvatarUrl(user?.avatarUrl)} />
-                <AvatarFallback className="text-lg">{userInitials}</AvatarFallback>
+                <AvatarFallback className="text-lg">
+                  {userInitials}
+                </AvatarFallback>
               </Avatar>
-              
+
               {/* Hover overlay with camera icon */}
               <div
                 className={cn(
@@ -171,7 +173,7 @@ export function ProfileSettings() {
                 )}
               </div>
             </button>
-            
+
             <div>
               <Button
                 type="button"
@@ -207,7 +209,9 @@ export function ProfileSettings() {
                 disabled={isLoading}
               />
               {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 

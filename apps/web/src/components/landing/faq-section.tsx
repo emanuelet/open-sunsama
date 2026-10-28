@@ -11,7 +11,10 @@ const FAQS: MarketingFaq[] = [
     question: "Is Open Sunsama open source?",
     answer:
       "Yes. The code is public on GitHub. It uses a non-commercial license: you can read it, run it and self-host it for personal use. Companies need a commercial license.",
-    link: { label: "See the code on GitHub", href: "https://github.com/ShadowWalker2014/open-sunsama" },
+    link: {
+      label: "See the code on GitHub",
+      href: "https://github.com/ShadowWalker2014/open-sunsama",
+    },
   },
   {
     question: "Does it work with Claude and ChatGPT?",
@@ -21,7 +24,8 @@ const FAQS: MarketingFaq[] = [
   },
   {
     question: "Can I self-host it?",
-    answer: "Yes. You can run it on your own server with Docker. The self-hosting guide walks you through each step.",
+    answer:
+      "Yes. You can run it on your own server with Docker. The self-hosting guide walks you through each step.",
     link: { label: "Self-hosting guide", href: "/docs/self-hosting/docker" },
   },
   {
@@ -32,7 +36,8 @@ const FAQS: MarketingFaq[] = [
   },
   {
     question: "Does it sync with Google Calendar and Outlook?",
-    answer: "Yes. Connect Google Calendar, Outlook or iCloud. Your events show up next to your tasks and time blocks.",
+    answer:
+      "Yes. Connect Google Calendar, Outlook or iCloud. Your events show up next to your tasks and time blocks.",
     link: { label: "How calendar sync works", href: "/features/calendar-sync" },
   },
   {

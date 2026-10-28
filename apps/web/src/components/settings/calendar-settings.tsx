@@ -47,13 +47,20 @@ function WorkingHoursCard() {
   const handleStartChange = async (value: string) => {
     const hour = parseInt(value, 10);
     if (hour >= workEndHour) {
-      toast({ variant: "destructive", title: "Start time must be before end time" });
+      toast({
+        variant: "destructive",
+        title: "Start time must be before end time",
+      });
       return;
     }
     setIsSaving(true);
     await updateUser({
       preferences: {
-        ...(user?.preferences ?? { themeMode: "system" as const, colorTheme: "default", fontFamily: "geist" }),
+        ...(user?.preferences ?? {
+          themeMode: "system" as const,
+          colorTheme: "default",
+          fontFamily: "geist",
+        }),
         workStartHour: hour,
         workEndHour,
       },
@@ -65,13 +72,20 @@ function WorkingHoursCard() {
   const handleEndChange = async (value: string) => {
     const hour = parseInt(value, 10);
     if (hour <= workStartHour) {
-      toast({ variant: "destructive", title: "End time must be after start time" });
+      toast({
+        variant: "destructive",
+        title: "End time must be after start time",
+      });
       return;
     }
     setIsSaving(true);
     await updateUser({
       preferences: {
-        ...(user?.preferences ?? { themeMode: "system" as const, colorTheme: "default", fontFamily: "geist" }),
+        ...(user?.preferences ?? {
+          themeMode: "system" as const,
+          colorTheme: "default",
+          fontFamily: "geist",
+        }),
         workStartHour,
         workEndHour: hour,
       },
@@ -88,14 +102,19 @@ function WorkingHoursCard() {
           Working Hours
         </CardTitle>
         <CardDescription>
-          Set your working hours for auto-scheduling. Tasks will be scheduled within these hours when possible.
+          Set your working hours for auto-scheduling. Tasks will be scheduled
+          within these hours when possible.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex items-end gap-3">
           <div className="min-w-0 flex-1 space-y-2">
             <Label>Start time</Label>
-            <Select value={String(workStartHour)} onValueChange={handleStartChange} disabled={isSaving}>
+            <Select
+              value={String(workStartHour)}
+              onValueChange={handleStartChange}
+              disabled={isSaving}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -111,7 +130,11 @@ function WorkingHoursCard() {
           <span className="pb-2 text-muted-foreground">to</span>
           <div className="min-w-0 flex-1 space-y-2">
             <Label>End time</Label>
-            <Select value={String(workEndHour)} onValueChange={handleEndChange} disabled={isSaving}>
+            <Select
+              value={String(workEndHour)}
+              onValueChange={handleEndChange}
+              disabled={isSaving}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -137,9 +160,11 @@ function WorkingHoursCard() {
 export function CalendarSettings() {
   const [iCloudDialogOpen, setICloudDialogOpen] = React.useState(false);
   const [removeDialogOpen, setRemoveDialogOpen] = React.useState(false);
-  const [accountToRemove, setAccountToRemove] = React.useState<Parameters<typeof RemoveAccountDialog>[0]["account"]>(null);
+  const [accountToRemove, setAccountToRemove] =
+    React.useState<Parameters<typeof RemoveAccountDialog>[0]["account"]>(null);
 
-  const { data: accounts, isLoading: isLoadingAccounts } = useCalendarAccounts();
+  const { data: accounts, isLoading: isLoadingAccounts } =
+    useCalendarAccounts();
   const { data: calendars, isLoading: isLoadingCalendars } = useCalendars();
   const disconnectMutation = useDisconnectAccount();
   const syncMutation = useSyncAccount();
@@ -202,7 +227,9 @@ export function CalendarSettings() {
         <CardContent>
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-sm text-muted-foreground">Loading...</span>
+            <span className="ml-2 text-sm text-muted-foreground">
+              Loading...
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -229,7 +256,8 @@ export function CalendarSettings() {
               onClick={handleConnectGoogle}
               disabled={initiateOAuthMutation.isPending}
             >
-              {initiateOAuthMutation.isPending && initiateOAuthMutation.variables?.provider === "google" ? (
+              {initiateOAuthMutation.isPending &&
+              initiateOAuthMutation.variables?.provider === "google" ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <GoogleIcon className="mr-2 h-4 w-4" />
@@ -241,7 +269,8 @@ export function CalendarSettings() {
               onClick={handleConnectOutlook}
               disabled={initiateOAuthMutation.isPending}
             >
-              {initiateOAuthMutation.isPending && initiateOAuthMutation.variables?.provider === "outlook" ? (
+              {initiateOAuthMutation.isPending &&
+              initiateOAuthMutation.variables?.provider === "outlook" ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <OutlookIcon className="mr-2 h-4 w-4" />
@@ -271,7 +300,8 @@ export function CalendarSettings() {
                     })
                   }
                   onReconnect={
-                    account.provider === "google" && account.syncStatus === "error"
+                    account.provider === "google" &&
+                    account.syncStatus === "error"
                       ? () =>
                           initiateOAuthMutation.mutate({
                             provider: "google",
@@ -295,7 +325,9 @@ export function CalendarSettings() {
           ) : (
             <div className="rounded-lg border border-dashed p-8 text-center">
               <Plus className="mx-auto h-8 w-8 text-muted-foreground/50" />
-              <h3 className="mt-2 text-sm font-medium">No calendars connected</h3>
+              <h3 className="mt-2 text-sm font-medium">
+                No calendars connected
+              </h3>
               <p className="mt-1 text-xs text-muted-foreground">
                 Connect a calendar account to see your events alongside tasks
               </p>

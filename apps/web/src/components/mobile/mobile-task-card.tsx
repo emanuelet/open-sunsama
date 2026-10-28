@@ -42,8 +42,8 @@ interface MobileTaskCardBaseProps {
  * Base mobile task card component with shared layout and behavior.
  * Uses a render prop for the time display to support different variants.
  */
-function MobileTaskCardBase({ 
-  task, 
+function MobileTaskCardBase({
+  task,
   onTaskClick,
   renderTimeDisplay,
 }: MobileTaskCardBaseProps) {
@@ -51,22 +51,26 @@ function MobileTaskCardBase({
   const updateSubtask = useUpdateSubtask();
   const { data: subtasks } = useSubtasks(task.id);
   const [subtasksExpanded, setSubtasksExpanded] = React.useState(false);
-  
+
   const isCompleted = !!task.completedAt;
   const subtaskCount = subtasks?.length ?? 0;
-  const completedSubtaskCount = subtasks?.filter((s) => s.completed).length ?? 0;
+  const completedSubtaskCount =
+    subtasks?.filter((s) => s.completed).length ?? 0;
   const hasSubtasks = subtaskCount > 0;
-  
+
   const handleToggleComplete = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
     completeTask.mutate({ id: task.id, completed: !isCompleted });
   };
-  
+
   const handleCardClick = () => {
     onTaskClick(task);
   };
 
-  const handleSubtaskToggle = (subtaskId: string, currentCompleted: boolean) => {
+  const handleSubtaskToggle = (
+    subtaskId: string,
+    currentCompleted: boolean
+  ) => {
     updateSubtask.mutate({
       taskId: task.id,
       subtaskId,
@@ -122,7 +126,7 @@ function MobileTaskCardBase({
             {isCompleted && <Check className="h-3 w-3" strokeWidth={3} />}
           </div>
         </div>
-        
+
         {/* Title - single line, truncated */}
         <p
           className={cn(
@@ -170,7 +174,10 @@ function MobileTaskCardBase({
             </span>
           )}
           {/* Time */}
-          {renderTimeDisplay({ isCompleted, estimatedMins: task.estimatedMins })}
+          {renderTimeDisplay({
+            isCompleted,
+            estimatedMins: task.estimatedMins,
+          })}
         </div>
       </div>
 
@@ -195,7 +202,10 @@ function MobileTaskCardBase({
                 )}
               >
                 {subtask.completed && (
-                  <Check className="h-2.5 w-2.5 text-primary-foreground" strokeWidth={3} />
+                  <Check
+                    className="h-2.5 w-2.5 text-primary-foreground"
+                    strokeWidth={3}
+                  />
                 )}
               </div>
               <span
@@ -229,11 +239,9 @@ export function MobileTaskCard({ task, onTaskClick }: MobileTaskCardProps) {
       onTaskClick={onTaskClick}
       renderTimeDisplay={({ estimatedMins }) => {
         if (estimatedMins == null || estimatedMins <= 0) return null;
-        
+
         return (
-          <div
-            className="shrink-0 text-xs tabular-nums text-muted-foreground"
-          >
+          <div className="shrink-0 text-xs tabular-nums text-muted-foreground">
             {formatDuration(estimatedMins)}
           </div>
         );
@@ -251,8 +259,8 @@ interface MobileTaskCardWithActualTimeProps extends MobileTaskCardProps {
  * Mobile task card variant that shows actual time spent alongside estimate.
  * Used in the main task list when tasks have been worked on.
  */
-export function MobileTaskCardWithActualTime({ 
-  task, 
+export function MobileTaskCardWithActualTime({
+  task,
   onTaskClick,
 }: MobileTaskCardWithActualTimeProps) {
   const { isTimerRunning, displayText } = useTaskTimerDisplay(task);

@@ -150,7 +150,9 @@ export function BoardRailContent({
   // selects the board. Touch: press-and-hold, so swiping scrolls the rail.
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 8 },
+    })
   );
 
   const trimmedQuery = query.trim().toLowerCase();
@@ -229,7 +231,9 @@ export function BoardRailContent({
       <div
         className={cn(
           "min-h-0 flex-1 overflow-y-auto overflow-x-hidden",
-          collapsed ? "flex flex-col items-center gap-0.5" : "flex flex-col gap-0.5"
+          collapsed
+            ? "flex flex-col items-center gap-0.5"
+            : "flex flex-col gap-0.5"
         )}
       >
         <DndContext

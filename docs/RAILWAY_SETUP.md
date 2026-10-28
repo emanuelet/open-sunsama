@@ -15,20 +15,24 @@ This guide explains how to configure Railway for automatic GitHub deployments.
 Go to Railway Dashboard → Open Sunsama → api service → Settings:
 
 **Source**
+
 - Connect to GitHub repo: `ShadowWalker2014/open-sunsama`
 - Branch: `main`
 
 **Build**
+
 - Builder: Dockerfile
 - Dockerfile Path: `Dockerfile.api`
 - Watch Paths: `apps/api/**`, `packages/**`, `Dockerfile.api`
 
 **Deploy**
+
 - Start Command: (leave empty, uses Dockerfile CMD)
 - Health Check Path: `/`
 - Health Check Timeout: 300
 
 **Environment Variables** (Required)
+
 ```
 NODE_ENV=production
 PORT=3001
@@ -49,19 +53,23 @@ AWS_SECRET_ACCESS_KEY=<from-railway-storage>
 Go to Railway Dashboard → Open Sunsama → web service → Settings:
 
 **Source**
+
 - Connect to GitHub repo: `ShadowWalker2014/open-sunsama`
 - Branch: `main`
 
 **Build**
+
 - Builder: Dockerfile
 - Dockerfile Path: `Dockerfile.web`
 - Watch Paths: `apps/web/**`, `packages/**`, `Dockerfile.web`
 
 **Deploy**
+
 - Start Command: (leave empty, uses Dockerfile CMD)
 - Health Check Path: `/`
 
 **Environment Variables** (Required)
+
 ```
 NODE_ENV=production
 PORT=3000
@@ -72,12 +80,14 @@ VITE_WS_URL=wss://<api-domain>.up.railway.app
 ### 3. Database Setup (Postgres)
 
 If not already created:
+
 1. Click "+ New" in Railway project
 2. Select "Database" → "PostgreSQL"
 3. Copy the **internal** DATABASE_URL (ends with `.railway.internal`)
 4. Add to API service environment variables
 
 **Important:** Use the internal URL to avoid egress fees:
+
 ```
 DATABASE_URL=postgresql://postgres:<password>@postgres.railway.internal:5432/railway
 ```
@@ -85,6 +95,7 @@ DATABASE_URL=postgresql://postgres:<password>@postgres.railway.internal:5432/rai
 ### 4. Storage Setup (S3 Bucket)
 
 If not already created:
+
 1. Click "+ New" in Railway project
 2. Select "Storage"
 3. Copy the credentials and add to API service
@@ -100,10 +111,10 @@ Once configured, Railway will:
 
 ### Watch Paths Explanation
 
-| Service | Watch Paths | Triggers On |
-|---------|-------------|-------------|
-| api | `apps/api/**`, `packages/**` | API code or shared package changes |
-| web | `apps/web/**`, `packages/**` | Web code or shared package changes |
+| Service | Watch Paths                  | Triggers On                        |
+| ------- | ---------------------------- | ---------------------------------- |
+| api     | `apps/api/**`, `packages/**` | API code or shared package changes |
+| web     | `apps/web/**`, `packages/**` | Web code or shared package changes |
 
 ## Manual Deployment
 
@@ -136,16 +147,19 @@ Or add custom domains in Railway Dashboard → Service → Settings → Domains.
 ## Troubleshooting
 
 ### Build Fails
+
 1. Check build logs in Railway Dashboard
 2. Verify Dockerfile paths are correct
 3. Ensure all workspace packages are copied in Dockerfile
 
 ### Service Won't Start
+
 1. Check deploy logs for errors
 2. Verify environment variables are set
 3. Check health check endpoint returns 200
 
 ### Database Connection Fails
+
 1. Use internal URL (`.railway.internal`)
 2. Verify DATABASE_URL is set in API service
 3. Check Postgres service is running
@@ -154,8 +168,8 @@ Or add custom domains in Railway Dashboard → Service → Settings → Domains.
 
 Always use Railway internal URLs for service-to-service communication:
 
-| Service | Internal URL |
-|---------|--------------|
-| Postgres | `postgres.railway.internal:5432` |
-| API | `api.railway.internal:3001` |
-| Storage | Use Railway's injected `AWS_*` variables |
+| Service  | Internal URL                             |
+| -------- | ---------------------------------------- |
+| Postgres | `postgres.railway.internal:5432`         |
+| API      | `api.railway.internal:3001`              |
+| Storage  | Use Railway's injected `AWS_*` variables |

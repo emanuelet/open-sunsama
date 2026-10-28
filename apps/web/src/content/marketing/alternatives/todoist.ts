@@ -7,7 +7,13 @@
  */
 
 import { defineMarketingPage } from "../types";
-import { giveUpSection, LICENSE_FAQ, LICENSE_GIVE_UP, verdictSection, type AlternativeExtras } from "./shared";
+import {
+  giveUpSection,
+  LICENSE_FAQ,
+  LICENSE_GIVE_UP,
+  verdictSection,
+  type AlternativeExtras,
+} from "./shared";
 
 const verdict: AlternativeExtras["verdict"] = {
   rival: "Todoist",
@@ -25,7 +31,10 @@ const verdict: AlternativeExtras["verdict"] = {
     "You rely on Todoist's many integrations.",
   ],
   switchLink: { label: "See the daily loop", href: "#how-it-works" },
-  stayLink: { label: "Compare open-source Todoist alternatives", href: "/blog/open-source-todoist-alternatives" },
+  stayLink: {
+    label: "Compare open-source Todoist alternatives",
+    href: "/blog/open-source-todoist-alternatives",
+  },
 };
 
 const giveUps: AlternativeExtras["giveUps"] = [
@@ -35,7 +44,7 @@ const giveUps: AlternativeExtras["giveUps"] = [
   },
   {
     title: "Natural-language quick add",
-    body: "Todoist turns \"call Sam Friday 3pm\" into a dated task. In Open Sunsama you type the task and pick the day, or ask your agent to do it.",
+    body: 'Todoist turns "call Sam Friday 3pm" into a dated task. In Open Sunsama you type the task and pick the day, or ask your agent to do it.',
   },
   {
     title: "Shared projects",
@@ -76,8 +85,16 @@ export default defineMarketingPage({
       alt: "A task dragged from the list onto Open Sunsama's day calendar, then resized to fit",
     },
     chips: [
-      { tone: "agent", title: "Claude connected", detail: "Spread your brain dump over the week" },
-      { tone: "block", title: "P0: Ship onboarding fix", detail: "1:00 - 2:30 PM" },
+      {
+        tone: "agent",
+        title: "Claude connected",
+        detail: "Spread your brain dump over the week",
+      },
+      {
+        tone: "block",
+        title: "P0: Ship onboarding fix",
+        detail: "1:00 - 2:30 PM",
+      },
       { tone: "timer", title: "12:05 / 1:30", detail: "Focus" },
     ],
   },
@@ -87,7 +104,8 @@ export default defineMarketingPage({
       kind: "answer",
       id: "answer",
       eyebrow: "The short answer",
-      heading: "Open Sunsama is the Todoist alternative built around your calendar",
+      heading:
+        "Open Sunsama is the Todoist alternative built around your calendar",
       body: [
         "Open Sunsama is an open-source Todoist alternative for people who want to plan their day, not just their list. Tasks sit on a board of days. You drag them onto the calendar, then work one at a time with a focus timer.",
         "We build Open Sunsama, so we put it first — here is why, and where Todoist fits better.",
@@ -103,7 +121,8 @@ export default defineMarketingPage({
       ],
     },
     verdictSection(verdict, {
-      heading: "Open Sunsama fits people who plan their day; Todoist fits people who manage lists",
+      heading:
+        "Open Sunsama fits people who plan their day; Todoist fits people who manage lists",
       lead: "Both apps hold your tasks. The real choice is a list you check, or a day you plan hour by hour.",
     }),
     {
@@ -127,7 +146,10 @@ export default defineMarketingPage({
           title: "Give each task a time",
           body: "Drag a task onto the calendar next to your meetings, then drag its edge to set the length. Now it has a when, not just a due date.",
           clip: "time-block",
-          link: { label: "How time blocking works", href: "/features/time-blocking" },
+          link: {
+            label: "How time blocking works",
+            href: "/features/time-blocking",
+          },
         },
         {
           icon: "timer",
@@ -143,7 +165,10 @@ export default defineMarketingPage({
           title: "Find anything from the keyboard",
           body: "Press Cmd+K to find a task, jump to a day or run a command. Most actions have a shortcut.",
           clip: "command-palette",
-          link: { label: "See the command palette", href: "/features/command-palette" },
+          link: {
+            label: "See the command palette",
+            href: "/features/command-palette",
+          },
         },
       ],
     },
@@ -162,27 +187,41 @@ export default defineMarketingPage({
         "Plan today around my meetings. Put my P0 tasks first.",
         "What's left from yesterday? Move it into free slots today.",
       ],
-      tools: ["create_task", "list_tasks", "get_schedule_for_day", "create_time_block", "schedule_task"],
+      tools: [
+        "create_task",
+        "list_tasks",
+        "get_schedule_for_day",
+        "create_time_block",
+        "schedule_task",
+      ],
       clip: "ai-plan",
-      clipCaption: "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
+      clipCaption:
+        "Claude plans the afternoon over MCP. Tasks and time blocks appear live.",
       links: [
         { label: "Claude setup", href: "/docs/mcp/claude" },
         { label: "ChatGPT setup", href: "/docs/mcp/chatgpt" },
         { label: "Cursor setup", href: "/docs/mcp/cursor" },
-        { label: "Task managers with MCP", href: "/blog/best-task-managers-with-mcp" },
+        {
+          label: "Task managers with MCP",
+          href: "/blog/best-task-managers-with-mcp",
+        },
       ],
     },
     {
       kind: "comparison",
       id: "compare",
       eyebrow: "Feature by feature",
-      heading: "Open Sunsama adds a planned day to your tasks; Todoist adds sharing and apps everywhere",
+      heading:
+        "Open Sunsama adds a planned day to your tasks; Todoist adds sharing and apps everywhere",
       lead: "Todoist leads on capture, sharing and apps. Open Sunsama leads on planning your time and owning the app. Here is each feature side by side.",
       columns: ["Open Sunsama", "Todoist"],
       rows: [
         {
           feature: "How you plan",
-          cells: [{ text: "Board of days, then drag to the calendar" }, { text: "Lists and projects, with a calendar layout" }],
+          cells: [
+            { text: "Board of days, then drag to the calendar" },
+            { text: "Lists and projects, with a calendar layout" },
+          ],
         },
         {
           feature: "Time blocking on your calendar",
@@ -207,7 +246,10 @@ export default defineMarketingPage({
         },
         {
           feature: "Unfinished tasks",
-          cells: [{ text: "Roll over to the next day" }, { text: "Stay overdue until you move them" }],
+          cells: [
+            { text: "Roll over to the next day" },
+            { text: "Stay overdue until you move them" },
+          ],
         },
         {
           feature: "Natural-language quick add",
@@ -252,7 +294,8 @@ export default defineMarketingPage({
         "Todoist facts come from its [downloads page](https://www.todoist.com/downloads), its help pages on [time blocking](https://www.todoist.com/help/articles/time-blocking-in-todoist-d6Pf1uTpc) and the [calendar integration](https://www.todoist.com/help/articles/use-the-calendar-integration-rCqwLCt3G), and its [MCP server](https://github.com/Doist/todoist-mcp). Checked September 2026.",
     },
     giveUpSection(giveUps, {
-      heading: "Leaving Todoist costs you quick capture, sharing and apps everywhere",
+      heading:
+        "Leaving Todoist costs you quick capture, sharing and apps everywhere",
       lead: "Todoist is a good app. Here is what it does that Open Sunsama doesn't, so you can choose with clear eyes.",
     }),
     {
@@ -286,19 +329,28 @@ export default defineMarketingPage({
         question: "What is the best open-source Todoist alternative?",
         answer:
           "We build Open Sunsama, and we think it is the best pick overall. It plans your day on a board and a calendar, and works with any AI agent. Vikunja is the closest Todoist clone you can self-host. Super Productivity is best if you want no server at all.",
-        link: { label: "Compare 8 open-source options", href: "/blog/open-source-todoist-alternatives" },
+        link: {
+          label: "Compare 8 open-source options",
+          href: "/blog/open-source-todoist-alternatives",
+        },
       },
       {
         question: "Is there a Todoist alternative with time blocking?",
         answer:
           "Yes. In Open Sunsama you drag any task onto your calendar and resize it to set its length. Todoist also has a calendar layout on its Pro and Business plans.",
-        link: { label: "How time blocking works", href: "/features/time-blocking" },
+        link: {
+          label: "How time blocking works",
+          href: "/features/time-blocking",
+        },
       },
       {
         question: "Can I import my tasks from Todoist?",
         answer:
           "Yes, one task at a time. Connect Todoist under Settings → Integrations and paste a task link into Import. Bulk migration of projects and labels is not available.",
-        link: { label: "Migration guide", href: "/blog/todoist-to-open-sunsama-migration" },
+        link: {
+          label: "Migration guide",
+          href: "/blog/todoist-to-open-sunsama-migration",
+        },
       },
       {
         question: "Does Todoist have an MCP server?",
@@ -307,7 +359,8 @@ export default defineMarketingPage({
       },
       {
         question: "Does Open Sunsama have priorities like Todoist?",
-        answer: "Yes. Tasks have priorities from P0 to P3, where P0 is the most urgent.",
+        answer:
+          "Yes. Tasks have priorities from P0 to P3, where P0 is the most urgent.",
       },
       {
         question: "Does Open Sunsama have a phone app?",
@@ -362,7 +415,8 @@ export default defineMarketingPage({
       {
         kind: "feature",
         title: "Focus mode",
-        description: "Work one task at a time with a timer that tracks real time.",
+        description:
+          "Work one task at a time with a timer that tracks real time.",
         href: "/features/focus-mode",
       },
       {

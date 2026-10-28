@@ -1,7 +1,7 @@
 /**
  * Google Calendar helper functions and types
  */
-import type { ExternalAttendee, ExternalEvent } from './index';
+import type { ExternalAttendee, ExternalEvent } from "./index";
 
 // Google API interfaces
 export interface GoogleCalendarListItem {
@@ -69,7 +69,7 @@ export interface GoogleCalendarListResponse {
 export function getClientId(): string {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   if (!clientId) {
-    throw new Error('GOOGLE_CLIENT_ID environment variable is required');
+    throw new Error("GOOGLE_CLIENT_ID environment variable is required");
   }
   return clientId;
 }
@@ -80,7 +80,7 @@ export function getClientId(): string {
 export function getClientSecret(): string {
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   if (!clientSecret) {
-    throw new Error('GOOGLE_CLIENT_SECRET environment variable is required');
+    throw new Error("GOOGLE_CLIENT_SECRET environment variable is required");
   }
   return clientSecret;
 }
@@ -88,14 +88,16 @@ export function getClientSecret(): string {
 /**
  * Map Google event status to our status type
  */
-export function mapEventStatus(status?: string): 'confirmed' | 'tentative' | 'cancelled' {
+export function mapEventStatus(
+  status?: string
+): "confirmed" | "tentative" | "cancelled" {
   switch (status) {
-    case 'tentative':
-      return 'tentative';
-    case 'cancelled':
-      return 'cancelled';
+    case "tentative":
+      return "tentative";
+    case "cancelled":
+      return "cancelled";
     default:
-      return 'confirmed';
+      return "confirmed";
   }
 }
 
@@ -104,16 +106,16 @@ export function mapEventStatus(status?: string): 'confirmed' | 'tentative' | 'ca
  */
 export function mapResponseStatus(
   responseStatus?: string
-): 'accepted' | 'declined' | 'tentative' | 'needsAction' | null {
+): "accepted" | "declined" | "tentative" | "needsAction" | null {
   switch (responseStatus) {
-    case 'accepted':
-      return 'accepted';
-    case 'declined':
-      return 'declined';
-    case 'tentative':
-      return 'tentative';
-    case 'needsAction':
-      return 'needsAction';
+    case "accepted":
+      return "accepted";
+    case "declined":
+      return "declined";
+    case "tentative":
+      return "tentative";
+    case "needsAction":
+      return "needsAction";
     default:
       return null;
   }
@@ -132,9 +134,9 @@ export function parseGoogleEvent(event: GoogleEvent): ExternalEvent | null {
   let endTime: Date;
 
   if (isAllDay) {
-    startTime = new Date(event.start.date + 'T00:00:00Z');
+    startTime = new Date(event.start.date + "T00:00:00Z");
     endTime = event.end?.date
-      ? new Date(event.end.date + 'T00:00:00Z')
+      ? new Date(event.end.date + "T00:00:00Z")
       : new Date(startTime.getTime() + 24 * 60 * 60 * 1000);
   } else {
     startTime = new Date(event.start.dateTime!);
@@ -149,11 +151,13 @@ export function parseGoogleEvent(event: GoogleEvent): ExternalEvent | null {
     : null;
 
   const recurrenceRule =
-    event.recurrence?.find((r) => r.startsWith('RRULE:'))?.replace('RRULE:', '') ?? null;
+    event.recurrence
+      ?.find((r) => r.startsWith("RRULE:"))
+      ?.replace("RRULE:", "") ?? null;
 
   return {
     externalId: event.id,
-    title: event.summary || '(No title)',
+    title: event.summary || "(No title)",
     description: event.description ?? null,
     location: event.location ?? null,
     startTime,
@@ -169,7 +173,7 @@ export function parseGoogleEvent(event: GoogleEvent): ExternalEvent | null {
     attendees: parseGoogleAttendees(event.attendees),
     conferenceUrl:
       event.conferenceData?.entryPoints?.find(
-        (e) => e.entryPointType === 'video' && e.uri
+        (e) => e.entryPointType === "video" && e.uri
       )?.uri ??
       event.hangoutLink ??
       null,

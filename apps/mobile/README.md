@@ -20,16 +20,19 @@ cargo install tauri-cli
 1. **Install Xcode** from the App Store
 
 2. **Set Xcode as active developer directory:**
+
    ```bash
    sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
    ```
 
 3. **Accept Xcode license:**
+
    ```bash
    sudo xcodebuild -license accept
    ```
 
 4. **Add iOS Rust targets:**
+
    ```bash
    rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
    ```
@@ -56,6 +59,7 @@ cargo install tauri-cli
 1. **Install Android Studio** from https://developer.android.com/studio
 
 2. **Set environment variables** (add to `~/.zshrc` or `~/.bashrc`):
+
    ```bash
    export ANDROID_HOME="$HOME/Library/Android/sdk"
    export NDK_HOME="$ANDROID_HOME/ndk/$(ls -1 $ANDROID_HOME/ndk | sort -V | tail -n 1)"
@@ -63,6 +67,7 @@ cargo install tauri-cli
    ```
 
 3. **Add Android Rust targets:**
+
    ```bash
    rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
    ```
@@ -99,11 +104,13 @@ bun run tauri android dev "Pixel_7_API_34"
 If the Tauri CLI hangs, you can build manually:
 
 1. **Start the web dev server:**
+
    ```bash
    cd ../web && bun run dev
    ```
 
 2. **Open Xcode project:**
+
    ```bash
    open src-tauri/gen/apple/open-sunsama-mobile.xcodeproj
    ```
@@ -165,16 +172,16 @@ Key settings:
 ```json
 {
   "build": {
-    "devUrl": "http://localhost:3000",      // Dev server URL
-    "frontendDist": "../../web/dist"        // Production build path
+    "devUrl": "http://localhost:3000", // Dev server URL
+    "frontendDist": "../../web/dist" // Production build path
   },
   "bundle": {
     "iOS": {
-      "developmentTeam": "YOUR_TEAM_ID",    // Apple Team ID
+      "developmentTeam": "YOUR_TEAM_ID", // Apple Team ID
       "minimumSystemVersion": "14.0"
     },
     "android": {
-      "minSdkVersion": 24                   // Android 7.0+
+      "minSdkVersion": 24 // Android 7.0+
     }
   }
 }
@@ -184,13 +191,13 @@ Key settings:
 
 The app includes these native capabilities via Tauri plugins:
 
-| Feature | Plugin | Usage |
-|---------|--------|-------|
-| Haptic Feedback | `tauri-plugin-haptics` | `triggerHaptic('light')` |
+| Feature            | Plugin                      | Usage                             |
+| ------------------ | --------------------------- | --------------------------------- |
+| Haptic Feedback    | `tauri-plugin-haptics`      | `triggerHaptic('light')`          |
 | Push Notifications | `tauri-plugin-notification` | `requestNotificationPermission()` |
-| Secure Storage | `tauri-plugin-store` | Persistent key-value storage |
-| Deep Links | `tauri-plugin-deep-link` | `opensunsama://task/{id}` |
-| Biometric Auth | `tauri-plugin-biometric` | Face ID / Touch ID / Fingerprint |
+| Secure Storage     | `tauri-plugin-store`        | Persistent key-value storage      |
+| Deep Links         | `tauri-plugin-deep-link`    | `opensunsama://task/{id}`         |
+| Biometric Auth     | `tauri-plugin-biometric`    | Face ID / Touch ID / Fingerprint  |
 
 ## Troubleshooting
 
@@ -208,6 +215,7 @@ The Xcode build script needs access to `bun` and `cargo`. The project is configu
 ### White/Blank Screen on Simulator
 
 1. **Check web server is running:**
+
    ```bash
    curl http://localhost:3000
    ```
@@ -222,6 +230,7 @@ The Xcode build script needs access to `bun` and `cargo`. The project is configu
 ### "Blocking waiting for file lock on iOS"
 
 A previous build is stuck. Kill it:
+
 ```bash
 pkill -f "tauri\|xcodebuild\|cargo"
 rm -rf src-tauri/target/aarch64-apple-ios-sim/debug/incremental
@@ -230,6 +239,7 @@ rm -rf src-tauri/target/aarch64-apple-ios-sim/debug/incremental
 ### Missing Team ID
 
 Get your Apple Team ID:
+
 1. Open Xcode → Settings → Accounts
 2. Select your Apple ID
 3. Team ID is shown next to your team name (10-character code like `DQVMM49PG9`)

@@ -6,7 +6,13 @@
  */
 
 import { defineMarketingPage } from "../types";
-import { giveUpSection, LICENSE_FAQ, LICENSE_GIVE_UP, verdictSection, type AlternativeExtras } from "./shared";
+import {
+  giveUpSection,
+  LICENSE_FAQ,
+  LICENSE_GIVE_UP,
+  verdictSection,
+  type AlternativeExtras,
+} from "./shared";
 
 const verdict: AlternativeExtras["verdict"] = {
   rival: "Motion",
@@ -23,7 +29,10 @@ const verdict: AlternativeExtras["verdict"] = {
     "You plan from your phone and want native apps for iOS and Android.",
   ],
   switchLink: { label: "See how AI planning works", href: "#ai" },
-  stayLink: { label: "Compare 8 Motion alternatives", href: "/blog/motion-alternatives" },
+  stayLink: {
+    label: "Compare 8 Motion alternatives",
+    href: "/blog/motion-alternatives",
+  },
 };
 
 const giveUps: AlternativeExtras["giveUps"] = [
@@ -74,7 +83,11 @@ export default defineMarketingPage({
       alt: "A task dragged onto Open Sunsama's day calendar next to meetings, then resized to fit",
     },
     chips: [
-      { tone: "agent", title: "Claude connected", detail: "Added 3 blocks around your meetings" },
+      {
+        tone: "agent",
+        title: "Claude connected",
+        detail: "Added 3 blocks around your meetings",
+      },
       { tone: "block", title: "Write launch notes", detail: "2:00 - 3:30 PM" },
       { tone: "timer", title: "41:12 / 1:30", detail: "Focus" },
     ],
@@ -85,7 +98,8 @@ export default defineMarketingPage({
       kind: "answer",
       id: "answer",
       eyebrow: "The short answer",
-      heading: "Open Sunsama is the Motion alternative where you, or your agent, place every block",
+      heading:
+        "Open Sunsama is the Motion alternative where you, or your agent, place every block",
       body: [
         "Open Sunsama is an open-source Motion alternative for people who want AI help without a black box. You drag tasks onto your calendar. Or you ask your AI agent to plan, and every block it makes shows up where you can see it.",
         "We build Open Sunsama, so we put it first — here is why, and where Motion fits better.",
@@ -101,7 +115,8 @@ export default defineMarketingPage({
       ],
     },
     verdictSection(verdict, {
-      heading: "Open Sunsama fits people who want control; Motion fits people who want autopilot",
+      heading:
+        "Open Sunsama fits people who want control; Motion fits people who want autopilot",
       lead: "Both apps put your tasks on your calendar. The real choice is who decides where they go.",
     }),
     {
@@ -125,7 +140,10 @@ export default defineMarketingPage({
           title: "Drop each task where you want it",
           body: "Drag a task into a free slot next to your meetings, then drag its edge to set the length. The block stays there until you move it.",
           clip: "time-block",
-          link: { label: "How time blocking works", href: "/features/time-blocking" },
+          link: {
+            label: "How time blocking works",
+            href: "/features/time-blocking",
+          },
         },
         {
           icon: "timer",
@@ -141,7 +159,10 @@ export default defineMarketingPage({
           title: "Fix the plan from the keyboard",
           body: "A meeting ran long? Press Cmd+K to find a task or jump to a day, and move it in seconds.",
           clip: "command-palette",
-          link: { label: "See the command palette", href: "/features/command-palette" },
+          link: {
+            label: "See the command palette",
+            href: "/features/command-palette",
+          },
         },
       ],
     },
@@ -152,7 +173,7 @@ export default defineMarketingPage({
       heading: "Your AI agent plans on request, and you see every block",
       lead: "Paste one URL into Claude, ChatGPT, Cursor or any MCP client, then sign in. Ask it to plan, and it creates tasks and time blocks around your meetings.",
       body: [
-        "That is the middle path many Motion users ask for. The AI does the planning, and nothing moves until you ask. Set rules in plain words, like \"no deep work after 4pm\".",
+        'That is the middle path many Motion users ask for. The AI does the planning, and nothing moves until you ask. Set rules in plain words, like "no deep work after 4pm".',
         "Motion has a public REST API, but we found only community-built MCP servers for it. Open Sunsama runs a hosted MCP server with 24 tools. Your agent can read your calendar events but can't change them.",
       ],
       prompts: [
@@ -160,9 +181,16 @@ export default defineMarketingPage({
         "A meeting ran long. Move what's left into free slots today and tomorrow.",
         "Block two hours for the launch notes before Friday.",
       ],
-      tools: ["get_schedule_for_day", "list_tasks", "create_time_block", "update_time_block", "link_task_to_time_block"],
+      tools: [
+        "get_schedule_for_day",
+        "list_tasks",
+        "create_time_block",
+        "update_time_block",
+        "link_task_to_time_block",
+      ],
       clip: "ai-plan",
-      clipCaption: "Claude plans the afternoon over MCP. Every block it makes is one you can drag, resize or delete.",
+      clipCaption:
+        "Claude plans the afternoon over MCP. Every block it makes is one you can drag, resize or delete.",
       links: [
         { label: "Claude setup", href: "/docs/mcp/claude" },
         { label: "ChatGPT setup", href: "/docs/mcp/chatgpt" },
@@ -174,13 +202,17 @@ export default defineMarketingPage({
       kind: "comparison",
       id: "compare",
       eyebrow: "Feature by feature",
-      heading: "Open Sunsama trades Motion's autopilot for control, the code and any agent",
+      heading:
+        "Open Sunsama trades Motion's autopilot for control, the code and any agent",
       lead: "Motion leads on automation, projects and phone apps. Open Sunsama leads on control and ownership. Here is each feature side by side.",
       columns: ["Open Sunsama", "Motion"],
       rows: [
         {
           feature: "How blocks get made",
-          cells: [{ text: "You drag them, or your agent does" }, { text: "AI schedules them for you" }],
+          cells: [
+            { text: "You drag them, or your agent does" },
+            { text: "AI schedules them for you" },
+          ],
         },
         {
           feature: "Auto-scheduling",
@@ -201,7 +233,10 @@ export default defineMarketingPage({
             { mark: "yes", text: "Google, Outlook, iCloud" },
           ],
         },
-        { feature: "Board of days and a backlog", cells: ["yes", { text: "Task lists and projects" }] },
+        {
+          feature: "Board of days and a backlog",
+          cells: ["yes", { text: "Task lists and projects" }],
+        },
         { feature: "Projects and team workloads", cells: ["no", "yes"] },
         {
           feature: "AI agents over MCP",
@@ -231,7 +266,8 @@ export default defineMarketingPage({
         "Motion facts come from its [pricing page](https://www.usemotion.com/pricing), [API docs](https://docs.usemotion.com/) and [calendar help](https://www.usemotion.com/help/time-management/all-things-calendars). We looked for an official MCP server and found only community-built ones. Checked September 2026.",
     },
     giveUpSection(giveUps, {
-      heading: "Leaving Motion costs you its auto-scheduler, team projects and phone apps",
+      heading:
+        "Leaving Motion costs you its auto-scheduler, team projects and phone apps",
       lead: "Motion is a good app. Here is what it does that Open Sunsama doesn't, so you can choose with clear eyes.",
     }),
     {
@@ -265,13 +301,19 @@ export default defineMarketingPage({
         question: "What is the best Motion alternative?",
         answer:
           "We build Open Sunsama, and we think it is the best pick for most people. You or your own AI agent plan the day, in an open-source planner you can self-host. If you want auto-scheduling, pick FlowSavvy for one person or Reclaim for teams.",
-        link: { label: "Compare 8 Motion alternatives", href: "/blog/motion-alternatives" },
+        link: {
+          label: "Compare 8 Motion alternatives",
+          href: "/blog/motion-alternatives",
+        },
       },
       {
         question: "Is there an open-source Motion alternative?",
         answer:
           "Yes. Open Sunsama's code is public on GitHub, and you can self-host it with Docker for personal use. It has time blocking, focus mode, calendar sync and a hosted MCP server.",
-        link: { label: "Self-hosting guide", href: "/docs/self-hosting/docker" },
+        link: {
+          label: "Self-hosting guide",
+          href: "/docs/self-hosting/docker",
+        },
       },
       {
         question: "Does Open Sunsama auto-schedule my tasks?",
@@ -288,7 +330,10 @@ export default defineMarketingPage({
         question: "Can AI plan my day without auto-scheduling?",
         answer:
           "Yes. Connect Claude or ChatGPT to a planner with an MCP server and ask it to plan your day. In Open Sunsama, the agent creates tasks and time blocks you can see and change.",
-        link: { label: "Time blocking with AI", href: "/blog/time-blocking-with-ai" },
+        link: {
+          label: "Time blocking with AI",
+          href: "/blog/time-blocking-with-ai",
+        },
       },
       {
         question: "Can I import my tasks from Motion?",

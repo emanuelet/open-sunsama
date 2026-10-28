@@ -10,7 +10,13 @@ const LINK =
  * Renders content-module text with its inline markup ([label](href), **bold**).
  * scripts/prerender-marketing.ts renders the same tokens to HTML.
  */
-export function RichText({ text, linkClassName }: { text: string; linkClassName?: string }) {
+export function RichText({
+  text,
+  linkClassName,
+}: {
+  text: string;
+  linkClassName?: string;
+}) {
   return (
     <>
       {parseInline(text).map((token, i) => {
@@ -24,7 +30,13 @@ export function RichText({ text, linkClassName }: { text: string; linkClassName?
         if (token.type === "link") {
           const external = /^https?:/.test(token.href);
           return external ? (
-            <a key={i} href={token.href} target="_blank" rel={externalRel(token.href)} className={cn(LINK, linkClassName)}>
+            <a
+              key={i}
+              href={token.href}
+              target="_blank"
+              rel={externalRel(token.href)}
+              className={cn(LINK, linkClassName)}
+            >
               {token.label}
             </a>
           ) : (
@@ -51,13 +63,22 @@ export function SmartLink({
 }) {
   if (/^https?:/.test(href)) {
     return (
-      <a href={href} target="_blank" rel={externalRel(href)} className={className}>
+      <a
+        href={href}
+        target="_blank"
+        rel={externalRel(href)}
+        className={className}
+      >
         {children}
       </a>
     );
   }
   return (
-    <Link to={href} search={href === "/blog" ? {} : undefined} className={className}>
+    <Link
+      to={href}
+      search={href === "/blog" ? {} : undefined}
+      className={className}
+    >
       {children}
     </Link>
   );
@@ -68,6 +89,7 @@ export function SmartLink({
  * evidence behind our comparisons. Other outbound links are nofollow.
  */
 export function externalRel(href: string): string {
-  const codeHost = /^https?:\/\/(www\.)?(github\.com|gitlab\.com|codeberg\.org)\//.test(href);
+  const codeHost =
+    /^https?:\/\/(www\.)?(github\.com|gitlab\.com|codeberg\.org)\//.test(href);
   return codeHost ? "noopener noreferrer" : "nofollow noopener noreferrer";
 }

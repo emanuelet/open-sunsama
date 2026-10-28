@@ -2,28 +2,37 @@
  * CalDAV routes for Open Sunsama API
  * Handles iCloud calendar connections via CalDAV
  */
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import { getDb, eq, and, calendarAccounts, calendars } from '@open-sunsama/database';
-import { ValidationError } from '@open-sunsama/utils';
-import { auth, type AuthVariables } from '../middleware/auth.js';
-import { encrypt } from '../services/encryption.js';
-import { validateCalDavCredentials, listCalDavCalendars } from '../services/calendar-providers/icloud.js';
-import { caldavConnectSchema } from '../validation/calendar.js';
+import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import {
+  getDb,
+  eq,
+  and,
+  calendarAccounts,
+  calendars,
+} from "@open-sunsama/database";
+import { ValidationError } from "@open-sunsama/utils";
+import { auth, type AuthVariables } from "../middleware/auth.js";
+import { encrypt } from "../services/encryption.js";
+import {
+  validateCalDavCredentials,
+  listCalDavCalendars,
+} from "../services/calendar-providers/icloud.js";
+import { caldavConnectSchema } from "../validation/calendar.js";
 
 const calendarCaldavRouter = new Hono<{ Variables: AuthVariables }>();
-calendarCaldavRouter.use('*', auth);
+calendarCaldavRouter.use("*", auth);
 
 /**
  * POST /calendar/caldav/connect
  * Connect an iCloud calendar account via CalDAV
  */
 calendarCaldavRouter.post(
-  '/connect',
-  zValidator('json', caldavConnectSchema),
+  "/connect",
+  zValidator("json", caldavConnectSchema),
   async (c) => {
-    const userId = c.get('userId');
-    const { email, appPassword, caldavUrl } = c.req.valid('json');
+    const userId = c.get("userId");
+    const { email, appPassword, caldavUrl } = c.req.valid("json");
 
     // Validate credentials first
     const validation = await validateCalDavCredentials({
@@ -33,9 +42,12 @@ calendarCaldavRouter.post(
     });
 
     if (!validation.valid) {
-      throw new ValidationError(validation.error || 'Invalid CalDAV credentials', {
-        credentials: [validation.error || 'Invalid CalDAV credentials'],
-      });
+      throw new ValidationError(
+        validation.error || "Invalid CalDAV credentials",
+        {
+          credentials: [validation.error || "Invalid CalDAV credentials"],
+        }
+      );
     }
 
     const db = getDb();
@@ -47,7 +59,7 @@ calendarCaldavRouter.post(
       .where(
         and(
           eq(calendarAccounts.userId, userId),
-          eq(calendarAccounts.provider, 'icloud'),
+          eq(calendarAccounts.provider, "icloud"),
           eq(calendarAccounts.email, email)
         )
       )
@@ -63,7 +75,7 @@ calendarCaldavRouter.post(
           caldavPasswordEncrypted: encrypt(appPassword),
           caldavUrl: caldavUrl || null,
           syncError: null,
-          syncStatus: 'idle',
+          syncStatus: "idle",
           isActive: true,
           updatedAt: new Date(),
         })
@@ -77,7 +89,7 @@ calendarCaldavRouter.post(
         .insert(calendarAccounts)
         .values({
           userId,
-          provider: 'icloud',
+          provider: "icloud",
           providerAccountId: email, // Use email as provider account ID for iCloud
           email,
           caldavPasswordEncrypted: encrypt(appPassword),
@@ -121,16 +133,14 @@ calendarCaldavRouter.post(
           .where(eq(calendars.id, existingCalendar.id));
       } else {
         // Create new calendar
-        await db
-          .insert(calendars)
-          .values({
-            accountId,
-            userId,
-            externalId: extCal.externalId,
-            name: extCal.name,
-            color: extCal.color,
-            isReadOnly: extCal.isReadOnly,
-          });
+        await db.insert(calendars).values({
+          accountId,
+          userId,
+          externalId: extCal.externalId,
+          name: extCal.name,
+          color: extCal.color,
+          isReadOnly: extCal.isReadOnly,
+        });
       }
     }
 
@@ -142,19 +152,22 @@ calendarCaldavRouter.post(
       .limit(1);
 
     // Format response (exclude sensitive fields)
-    return c.json({
-      success: true,
-      data: {
-        id: account!.id,
-        provider: account!.provider,
-        email: account!.email,
-        syncStatus: account!.syncStatus,
-        lastSyncedAt: account!.lastSyncedAt,
-        isActive: account!.isActive,
-        createdAt: account!.createdAt,
-        calendarsCount: externalCalendars.length,
+    return c.json(
+      {
+        success: true,
+        data: {
+          id: account!.id,
+          provider: account!.provider,
+          email: account!.email,
+          syncStatus: account!.syncStatus,
+          lastSyncedAt: account!.lastSyncedAt,
+          isActive: account!.isActive,
+          createdAt: account!.createdAt,
+          calendarsCount: externalCalendars.length,
+        },
       },
-    }, 201);
+      201
+    );
   }
 );
 

@@ -1,12 +1,6 @@
 import * as React from "react";
 import { format } from "date-fns";
-import {
-  Repeat,
-  Square,
-  Trash2,
-  MoreHorizontal,
-  Search,
-} from "lucide-react";
+import { Repeat, Square, Trash2, MoreHorizontal, Search } from "lucide-react";
 import {
   Button,
   Input,

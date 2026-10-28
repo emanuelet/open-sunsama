@@ -72,10 +72,7 @@ export function layoutOverlappingItems(
   const flushCluster = () => {
     if (cluster.length === 0) return;
     const placements = packCluster(cluster);
-    const columnCount = Math.max(
-      1,
-      ...placements.map((p) => p.lane + 1)
-    );
+    const columnCount = Math.max(1, ...placements.map((p) => p.lane + 1));
     for (const p of placements) {
       result.set(p.id, { lane: p.lane, columnCount });
     }
@@ -101,9 +98,7 @@ export function layoutOverlappingItems(
  * placed in the lowest-index lane whose tail (last placed item's end)
  * is ≤ the new item's start.
  */
-function packCluster(
-  items: LayoutItem[]
-): Array<{ id: string; lane: number }> {
+function packCluster(items: LayoutItem[]): Array<{ id: string; lane: number }> {
   // laneEnds[i] = the end-time of the latest item assigned to lane i.
   const laneEnds: number[] = [];
   const placements: Array<{ id: string; lane: number }> = [];

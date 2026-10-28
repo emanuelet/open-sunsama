@@ -20,7 +20,10 @@ interface PrioritySelectorProps {
 /**
  * Priority selector with label for task forms.
  */
-export function PrioritySelector({ priority, onChange }: PrioritySelectorProps) {
+export function PrioritySelector({
+  priority,
+  onChange,
+}: PrioritySelectorProps) {
   return (
     <div className="space-y-1.5">
       <Label className="text-xs font-medium text-muted-foreground">
@@ -59,7 +62,10 @@ interface InlinePrioritySelectorProps {
  * Compact inline priority selector for headers and property bars.
  * Minimal design — no chevron, subtle hover state.
  */
-export function InlinePrioritySelector({ priority, onChange }: InlinePrioritySelectorProps) {
+export function InlinePrioritySelector({
+  priority,
+  onChange,
+}: InlinePrioritySelectorProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

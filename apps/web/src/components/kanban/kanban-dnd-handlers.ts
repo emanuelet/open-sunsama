@@ -9,7 +9,10 @@ interface DndHandlersOptions {
   setActiveTask: (task: Task | null) => void;
   setOverId: (id: string | null) => void;
   moveTask: {
-    mutateAsync: (params: { id: string; targetDate: string | null }) => Promise<unknown>;
+    mutateAsync: (params: {
+      id: string;
+      targetDate: string | null;
+    }) => Promise<unknown>;
   };
 }
 
@@ -26,7 +29,7 @@ export function createDndHandlers(options: DndHandlersOptions) {
 
   const handleDragOver = (event: DragOverEvent) => {
     const { over } = event;
-    setOverId(over?.id as string ?? null);
+    setOverId((over?.id as string) ?? null);
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -42,7 +45,7 @@ export function createDndHandlers(options: DndHandlersOptions) {
     // Check if dropped on a day column
     if (overId.startsWith("day-")) {
       const targetDate = overId.replace("day-", "");
-      
+
       // Only move if the date is different
       if (targetDate !== task.scheduledDate) {
         await moveTask.mutateAsync({
@@ -53,7 +56,7 @@ export function createDndHandlers(options: DndHandlersOptions) {
     } else if (over.data.current?.type === "task") {
       // Dropped on another task - reorder within the same day
       const overTask = over.data.current.task as Task;
-      
+
       if (task.scheduledDate === overTask.scheduledDate) {
         // Same day reorder - handled by SortableContext
         // We need to call reorder API here

@@ -1,5 +1,12 @@
 import * as React from "react";
-import { Download, Monitor, Apple, Cpu, ExternalLink, CheckCircle2 } from "lucide-react";
+import {
+  Download,
+  Monitor,
+  Apple,
+  Cpu,
+  ExternalLink,
+  CheckCircle2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -14,9 +21,24 @@ interface PlatformInfo {
 }
 
 const PLATFORMS: PlatformInfo[] = [
-  { key: "macos-arm64", name: "macOS (Apple Silicon)", icon: Apple, description: "M1/M2/M3/M4" },
-  { key: "macos-x64", name: "macOS (Intel)", icon: Apple, description: "Intel Macs" },
-  { key: "windows", name: "Windows", icon: Monitor, description: "Windows 10+" },
+  {
+    key: "macos-arm64",
+    name: "macOS (Apple Silicon)",
+    icon: Apple,
+    description: "M1/M2/M3/M4",
+  },
+  {
+    key: "macos-x64",
+    name: "macOS (Intel)",
+    icon: Apple,
+    description: "Intel Macs",
+  },
+  {
+    key: "windows",
+    name: "Windows",
+    icon: Monitor,
+    description: "Windows 10+",
+  },
   { key: "linux", name: "Linux", icon: Cpu, description: "AppImage" },
 ];
 
@@ -40,21 +62,26 @@ function detectPlatform(): PlatformKey {
   const userAgent = navigator.userAgent.toLowerCase();
   const platform = navigator.platform?.toLowerCase() || "";
 
-  if (platform.includes("win") || userAgent.includes("windows")) return "windows";
+  if (platform.includes("win") || userAgent.includes("windows"))
+    return "windows";
   if (platform.includes("linux") || userAgent.includes("linux")) return "linux";
-  if (platform.includes("mac") || userAgent.includes("macintosh")) return "macos-arm64";
+  if (platform.includes("mac") || userAgent.includes("macintosh"))
+    return "macos-arm64";
   return "macos-arm64";
 }
 
 export function DesktopSettings() {
-  const [releases, setReleases] = React.useState<Record<PlatformKey, Release | undefined>>({
+  const [releases, setReleases] = React.useState<
+    Record<PlatformKey, Release | undefined>
+  >({
     windows: undefined,
     "macos-arm64": undefined,
     "macos-x64": undefined,
     linux: undefined,
   });
   const [isLoading, setIsLoading] = React.useState(true);
-  const [detectedPlatform, setDetectedPlatform] = React.useState<PlatformKey>("macos-arm64");
+  const [detectedPlatform, setDetectedPlatform] =
+    React.useState<PlatformKey>("macos-arm64");
 
   React.useEffect(() => {
     setDetectedPlatform(detectPlatform());
@@ -95,7 +122,10 @@ export function DesktopSettings() {
           { title: "Native Notifications", desc: "Never miss a reminder" },
           { title: "Offline Support", desc: "Work without internet" },
         ].map((feature) => (
-          <div key={feature.title} className="flex items-start gap-2 p-3 rounded-lg bg-muted/30 border border-border/40">
+          <div
+            key={feature.title}
+            className="flex items-start gap-2 p-3 rounded-lg bg-muted/30 border border-border/40"
+          >
             <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
             <div>
               <p className="text-sm font-medium">{feature.title}</p>
@@ -114,7 +144,9 @@ export function DesktopSettings() {
             <div>
               <p className="text-sm font-medium">Recommended for your system</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {PLATFORMS.find(p => p.key === detectedPlatform)?.name} • v{detectedRelease.version} • {formatFileSize(detectedRelease.fileSize)}
+                {PLATFORMS.find((p) => p.key === detectedPlatform)?.name} • v
+                {detectedRelease.version} •{" "}
+                {formatFileSize(detectedRelease.fileSize)}
               </p>
             </div>
             <Button asChild>
@@ -141,14 +173,20 @@ export function DesktopSettings() {
                 key={platform.key}
                 className={cn(
                   "flex items-center justify-between p-3 rounded-lg border transition-colors",
-                  isDetected ? "border-primary/30 bg-primary/5" : "border-border/40"
+                  isDetected
+                    ? "border-primary/30 bg-primary/5"
+                    : "border-border/40"
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <div className={cn(
-                    "flex h-9 w-9 items-center justify-center rounded-lg",
-                    isDetected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                  )}>
+                  <div
+                    className={cn(
+                      "flex h-9 w-9 items-center justify-center rounded-lg",
+                      isDetected
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground"
+                    )}
+                  >
                     <Icon className="h-4 w-4" />
                   </div>
                   <div>
@@ -162,7 +200,11 @@ export function DesktopSettings() {
                 {isLoading ? (
                   <Skeleton className="h-8 w-20" />
                 ) : release ? (
-                  <Button variant={isDetected ? "default" : "outline"} size="sm" asChild>
+                  <Button
+                    variant={isDetected ? "default" : "outline"}
+                    size="sm"
+                    asChild
+                  >
                     <a href={release.downloadUrl} download>
                       <Download className="h-3.5 w-3.5" />
                       Download
@@ -181,9 +223,9 @@ export function DesktopSettings() {
 
       {/* View all releases link */}
       <div className="pt-2">
-        <a 
-          href="/download" 
-          target="_blank" 
+        <a
+          href="/download"
+          target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
         >

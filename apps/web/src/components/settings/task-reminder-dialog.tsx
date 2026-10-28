@@ -25,7 +25,10 @@ interface TaskReminderDialogProps {
   onOpenChange: (open: boolean) => void;
   taskRemindersEnabled: boolean;
   reminderTiming: number;
-  onSave: (taskRemindersEnabled: boolean, reminderTiming: number) => Promise<void>;
+  onSave: (
+    taskRemindersEnabled: boolean,
+    reminderTiming: number
+  ) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -59,7 +62,8 @@ export function TaskReminderDialog({
     }
   };
 
-  const hasChanges = enabled !== taskRemindersEnabled || timing !== reminderTiming;
+  const hasChanges =
+    enabled !== taskRemindersEnabled || timing !== reminderTiming;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -67,14 +71,17 @@ export function TaskReminderDialog({
         <DialogHeader>
           <DialogTitle>Task Reminders</DialogTitle>
           <DialogDescription>
-            Configure when you want to be reminded about upcoming scheduled tasks.
+            Configure when you want to be reminded about upcoming scheduled
+            tasks.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="task-reminders-enabled">Enable Task Reminders</Label>
+              <Label htmlFor="task-reminders-enabled">
+                Enable Task Reminders
+              </Label>
               <p className="text-sm text-muted-foreground">
                 Receive notifications before scheduled tasks
               </p>
@@ -100,7 +107,10 @@ export function TaskReminderDialog({
                 </SelectTrigger>
                 <SelectContent>
                   {REMINDER_TIMING_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value.toString()}>
+                    <SelectItem
+                      key={option.value}
+                      value={option.value.toString()}
+                    >
                       {option.label}
                     </SelectItem>
                   ))}

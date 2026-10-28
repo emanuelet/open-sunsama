@@ -19,11 +19,13 @@ Fix bugs by adding proper error handling and `useDroppable` to the sidebar, then
 #### 1.1 Tasks List Page (`apps/web/src/routes/app/tasks.tsx`)
 
 **Current code (line 44):**
+
 ```typescript
 const { data: tasks = [], isLoading } = useSearchTasks({...});
 ```
 
 **Fix:**
+
 - Destructure `isError, error` from the hook
 - Add error UI between loading and empty states
 
@@ -48,11 +50,13 @@ const { data: tasks = [], isLoading, isError, error } = useSearchTasks({...});
 #### 1.2 Day Column (`apps/web/src/components/kanban/day-column.tsx`)
 
 **Current code (line 42):**
+
 ```typescript
 const { data: tasks, isLoading } = useTasks({ scheduledDate: dateString });
 ```
 
 **Fix:**
+
 ```typescript
 const { data: tasks, isLoading, isError } = useTasks({ scheduledDate: dateString });
 
@@ -93,11 +97,13 @@ queryClient.getQueryCache().config.onError = (error) => {
 **Current state:** Has `SortableContext` for reordering within backlog, but no `useDroppable` for receiving drops from other columns.
 
 **Add imports:**
+
 ```typescript
 import { useDroppable } from "@dnd-kit/core";
 ```
 
 **Add hook in Sidebar component (after `useTasks` call, around line 36):**
+
 ```typescript
 const { setNodeRef: setDroppableRef, isOver } = useDroppable({
   id: "backlog",
@@ -109,6 +115,7 @@ const { setNodeRef: setDroppableRef, isOver } = useDroppable({
 ```
 
 **Merge refs in the aside element (line 87):**
+
 ```typescript
 <aside
   ref={setDroppableRef}
@@ -123,6 +130,7 @@ const { setNodeRef: setDroppableRef, isOver } = useDroppable({
 #### 2.2 Update `findTargetColumnDate` (`apps/web/src/lib/dnd/tasks-dnd-context.tsx`)
 
 **Current code (lines 69-82):**
+
 ```typescript
 const findTargetColumnDate = React.useCallback(
   (overId: string | number | undefined): string | null => {
@@ -142,6 +150,7 @@ const findTargetColumnDate = React.useCallback(
 ```
 
 **Fix - Add backlog recognition:**
+
 ```typescript
 const findTargetColumnDate = React.useCallback(
   (overId: string | number | undefined): string | null | "backlog" => {
@@ -168,6 +177,7 @@ const findTargetColumnDate = React.useCallback(
 #### 2.3 Update `handleDragEnd` (`apps/web/src/lib/dnd/tasks-dnd-context.tsx`)
 
 **Current code (lines 134-145):**
+
 ```typescript
 if (targetDate) {
   // Moving to a different column/date
@@ -182,6 +192,7 @@ if (targetDate) {
 ```
 
 **Fix - Handle backlog drops (unschedule task):**
+
 ```typescript
 if (targetDate) {
   // Handle backlog - unschedule the task
@@ -211,6 +222,7 @@ if (targetDate) {
 ### 3. UI Design Updates - Sunsama-Style Polish
 
 Reference image shows:
+
 - Very dark background (#0f0f10)
 - Subtle gray borders
 - Task cards with: scheduled time, title, duration badge, project tag (#AI Software style)
@@ -220,15 +232,16 @@ Reference image shows:
 #### 3.1 Color Variable Tweaks (`apps/web/src/index.css`)
 
 **Update dark theme (lines 29-49):**
+
 ```css
 .dark {
-  --background: 0 0% 6%;           /* #0f0f0f - very dark */
-  --foreground: 0 0% 95%;          /* off-white text */
-  --card: 0 0% 8%;                 /* slightly lighter for cards */
+  --background: 0 0% 6%; /* #0f0f0f - very dark */
+  --foreground: 0 0% 95%; /* off-white text */
+  --card: 0 0% 8%; /* slightly lighter for cards */
   --card-foreground: 0 0% 95%;
   --popover: 0 0% 10%;
   --popover-foreground: 0 0% 95%;
-  --primary: 142 71% 45%;          /* green for progress/primary actions */
+  --primary: 142 71% 45%; /* green for progress/primary actions */
   --primary-foreground: 0 0% 100%;
   --secondary: 0 0% 12%;
   --secondary-foreground: 0 0% 95%;
@@ -238,7 +251,7 @@ Reference image shows:
   --accent-foreground: 0 0% 95%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 95%;
-  --border: 0 0% 18%;              /* subtle borders */
+  --border: 0 0% 18%; /* subtle borders */
   --input: 0 0% 15%;
   --ring: 142 71% 45%;
 }
@@ -249,6 +262,7 @@ Reference image shows:
 The component already supports `scheduledTime`, `tag`, and `tagColor` props but these aren't being passed. The display is already implemented.
 
 **Update task-card.tsx to pass project/tag data when available:**
+
 ```typescript
 // In SortableTaskCard and TaskCard components:
 <TaskCardContent
@@ -267,10 +281,12 @@ Note: This requires backend support for project/tag fields on tasks. If not avai
 Already has Sunsama-style header with large day name and date below (lines 151-175). Progress bar for today is implemented.
 
 **Minor polish:**
+
 - Reduce opacity on past days (already done with `pastDay && "opacity-60"`)
 - Add total time display (already implemented with `formatDuration`)
 
 **Optional enhancement - add task count badge:**
+
 ```typescript
 // In header section, after getDayLabel():
 <div className="flex items-center gap-2">
@@ -288,13 +304,15 @@ Already has Sunsama-style header with large day name and date below (lines 151-1
 #### 3.4 Sidebar Navigation Redesign (`apps/web/src/components/layout/sidebar.tsx`)
 
 Current sidebar is just "Backlog" section. Sunsama has full navigation:
+
 - Home, Today, Focus
 - Daily Rituals section
-- Weekly Rituals section  
+- Weekly Rituals section
 - Backlog
 - Folders
 
 **This is a larger enhancement.** For now, focus on:
+
 1. Adding visual drop feedback (covered in 2.1)
 2. Keeping backlog functional
 
@@ -304,14 +322,14 @@ Full navigation redesign should be a separate PRD.
 
 ## Files to Modify
 
-| File | Changes |
-|------|---------|
-| `apps/web/src/routes/app/tasks.tsx` | Add error state handling |
-| `apps/web/src/components/kanban/day-column.tsx` | Add error state handling |
-| `apps/web/src/main.tsx` | Optional: Add global error callback |
-| `apps/web/src/components/layout/sidebar.tsx` | Add `useDroppable` for backlog |
-| `apps/web/src/lib/dnd/tasks-dnd-context.tsx` | Handle backlog in drag-end |
-| `apps/web/src/index.css` | Update dark theme colors |
+| File                                            | Changes                             |
+| ----------------------------------------------- | ----------------------------------- |
+| `apps/web/src/routes/app/tasks.tsx`             | Add error state handling            |
+| `apps/web/src/components/kanban/day-column.tsx` | Add error state handling            |
+| `apps/web/src/main.tsx`                         | Optional: Add global error callback |
+| `apps/web/src/components/layout/sidebar.tsx`    | Add `useDroppable` for backlog      |
+| `apps/web/src/lib/dnd/tasks-dnd-context.tsx`    | Handle backlog in drag-end          |
+| `apps/web/src/index.css`                        | Update dark theme colors            |
 
 ---
 

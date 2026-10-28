@@ -1,8 +1,8 @@
 /**
  * Utility functions and constants for the rollover worker
  */
-import { formatInTimeZone } from 'date-fns-tz';
-import { subDays, addDays } from 'date-fns';
+import { formatInTimeZone } from "date-fns-tz";
+import { subDays, addDays } from "date-fns";
 
 // Constants
 export const BATCH_SIZE = 100; // Users per batch
@@ -24,11 +24,11 @@ export interface UserBatchRolloverPayload {
  */
 function getTimezoneOffsetMinutes(date: Date, timezone: string): number {
   // Format the offset as +HH:mm or -HH:mm
-  const offsetStr = formatInTimeZone(date, timezone, 'xxx'); // e.g., "+05:30" or "-08:00"
+  const offsetStr = formatInTimeZone(date, timezone, "xxx"); // e.g., "+05:30" or "-08:00"
   const match = offsetStr.match(/([+-])(\d{2}):(\d{2})/);
   if (!match || !match[1] || !match[2] || !match[3]) return 0;
-  
-  const sign = match[1] === '+' ? 1 : -1;
+
+  const sign = match[1] === "+" ? 1 : -1;
   const hours = parseInt(match[2], 10);
   const minutes = parseInt(match[3], 10);
   return sign * (hours * 60 + minutes);

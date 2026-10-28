@@ -2,12 +2,19 @@ import * as React from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react";
-import { AuthLayout, AuthHeader, AuthFooter } from "@/components/layout/auth-layout";
+import {
+  AuthLayout,
+  AuthHeader,
+  AuthFooter,
+} from "@/components/layout/auth-layout";
 import { Button, Input, Label } from "@/components/ui";
 import { toast } from "@/hooks/use-toast";
 import { getApi } from "@/lib/api";
 import { PasswordRequirementsList } from "./password-requirements";
-import { ResetPasswordSuccessState, ResetPasswordErrorState } from "./reset-password-states";
+import {
+  ResetPasswordSuccessState,
+  ResetPasswordErrorState,
+} from "./reset-password-states";
 
 interface ResetPasswordForm {
   newPassword: string;
@@ -18,11 +25,13 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: "/reset-password" });
   const token = (search as { token?: string })?.token || "";
-  
+
   const [isLoading, setIsLoading] = React.useState(false);
   const [showNewPassword, setShowNewPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-  const [resetStatus, setResetStatus] = React.useState<"form" | "success" | "error">("form");
+  const [resetStatus, setResetStatus] = React.useState<
+    "form" | "success" | "error"
+  >("form");
   const [errorMessage, setErrorMessage] = React.useState("");
 
   const {
@@ -43,7 +52,9 @@ export default function ResetPasswordPage() {
   React.useEffect(() => {
     if (!token) {
       setResetStatus("error");
-      setErrorMessage("Invalid or missing reset token. Please request a new password reset link.");
+      setErrorMessage(
+        "Invalid or missing reset token. Please request a new password reset link."
+      );
     }
   }, [token]);
 
@@ -199,7 +210,11 @@ export default function ResetPasswordPage() {
           )}
         </div>
 
-        <Button type="submit" disabled={isLoading} className="w-full h-9 text-[13px]">
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="w-full h-9 text-[13px]"
+        >
           {isLoading && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
           Reset Password
         </Button>

@@ -20,7 +20,8 @@ export function detectInstallPlatform(
   const ua = userAgent;
   // iPadOS reports a Mac user agent; touch support gives it away.
   const isIOS =
-    /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && maxTouchPoints > 1);
+    /iPhone|iPad|iPod/i.test(ua) ||
+    (/Macintosh/i.test(ua) && maxTouchPoints > 1);
   if (isIOS) {
     if (/CriOS/i.test(ua)) return "ios-chrome";
     if (/FxiOS|EdgiOS|OPiOS/i.test(ua)) return "ios-other";
@@ -37,15 +38,22 @@ export function detectInstallPlatform(
 
 export function currentInstallPlatform(): InstallPlatform {
   if (typeof navigator === "undefined") return "desktop";
-  return detectInstallPlatform(navigator.userAgent, navigator.maxTouchPoints ?? 0);
+  return detectInstallPlatform(
+    navigator.userAgent,
+    navigator.maxTouchPoints ?? 0
+  );
 }
 
 /** True when opened from the Home Screen (or inside the desktop app). */
 export function isRunningInstalled(): boolean {
   if (typeof window === "undefined") return false;
   if ("__TAURI__" in window) return true;
-  const iosStandalone = (navigator as Navigator & { standalone?: boolean }).standalone === true;
-  return iosStandalone || window.matchMedia?.("(display-mode: standalone)").matches === true;
+  const iosStandalone =
+    (navigator as Navigator & { standalone?: boolean }).standalone === true;
+  return (
+    iosStandalone ||
+    window.matchMedia?.("(display-mode: standalone)").matches === true
+  );
 }
 
 // --- Chrome / Edge / Samsung one-tap install -------------------------------

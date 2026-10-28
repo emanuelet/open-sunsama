@@ -2,7 +2,11 @@ import * as React from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { Loader2, ArrowLeft, Mail, CheckCircle2 } from "lucide-react";
-import { AuthLayout, AuthHeader, AuthFooter } from "@/components/layout/auth-layout";
+import {
+  AuthLayout,
+  AuthHeader,
+  AuthFooter,
+} from "@/components/layout/auth-layout";
 import { Button, Input, Label } from "@/components/ui";
 import { getApi } from "@/lib/api";
 
@@ -45,9 +49,12 @@ export default function ForgotPasswordPage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
             <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
           </div>
-          <h1 className="text-lg font-semibold tracking-tight">Check your email</h1>
+          <h1 className="text-lg font-semibold tracking-tight">
+            Check your email
+          </h1>
           <p className="text-sm text-muted-foreground max-w-[300px]">
-            If an account exists for <strong>{submittedEmail}</strong>, we've sent a password reset link.
+            If an account exists for <strong>{submittedEmail}</strong>, we've
+            sent a password reset link.
           </p>
           <p className="text-xs text-muted-foreground">
             Didn't receive the email? Check your spam folder or try again.
@@ -112,7 +119,11 @@ export default function ForgotPasswordPage() {
           )}
         </div>
 
-        <Button type="submit" disabled={isLoading} className="w-full h-9 text-[13px]">
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="w-full h-9 text-[13px]"
+        >
           {isLoading && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
           Send Reset Link
         </Button>

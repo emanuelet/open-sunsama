@@ -30,49 +30,59 @@ export function SoftwareApplicationSchema({
     const script = document.createElement("script");
     script.type = "application/ld+json";
     script.id = "software-schema";
-    
+
     const schemaData: any = {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": name,
-      "description": description,
-      "applicationCategory": applicationCategory,
-      "operatingSystem": operatingSystem,
-      "url": url,
-      "downloadUrl": "https://opensunsama.com/download",
-      "offers": price
-        ? { "@type": "Offer", "price": price, "priceCurrency": priceCurrency }
+      name: name,
+      description: description,
+      applicationCategory: applicationCategory,
+      operatingSystem: operatingSystem,
+      url: url,
+      downloadUrl: "https://opensunsama.com/download",
+      offers: price
+        ? { "@type": "Offer", price: price, priceCurrency: priceCurrency }
         : undefined,
-      "author": {
+      author: {
         "@type": "Organization",
-        "name": "Open Sunsama",
-        "url": "https://opensunsama.com"
-      }
+        name: "Open Sunsama",
+        url: "https://opensunsama.com",
+      },
     };
-    
+
     if (aggregateRating) {
       schemaData.aggregateRating = {
         "@type": "AggregateRating",
-        "ratingValue": aggregateRating.ratingValue,
-        "ratingCount": aggregateRating.ratingCount
+        ratingValue: aggregateRating.ratingValue,
+        ratingCount: aggregateRating.ratingCount,
       };
     }
-    
+
     if (featureList && featureList.length > 0) {
       schemaData.featureList = featureList;
     }
-    
+
     script.textContent = JSON.stringify(schemaData);
-    
+
     const existing = document.getElementById("software-schema");
     if (existing) existing.remove();
-    
+
     document.head.appendChild(script);
-    
+
     return () => {
       script.remove();
     };
-  }, [name, description, applicationCategory, operatingSystem, price, priceCurrency, aggregateRating, featureList, url]);
-  
+  }, [
+    name,
+    description,
+    applicationCategory,
+    operatingSystem,
+    price,
+    priceCurrency,
+    aggregateRating,
+    featureList,
+    url,
+  ]);
+
   return null;
 }

@@ -50,7 +50,9 @@ export const persister: Persister | undefined = (() => {
  * Predicate passed to PersistQueryClientProvider to filter what gets written
  * to disk. Mutations + sensitive queries stay in memory only.
  */
-export function shouldPersistQueryFn(opts: { queryKey: readonly unknown[] }): boolean {
+export function shouldPersistQueryFn(opts: {
+  queryKey: readonly unknown[];
+}): boolean {
   return shouldPersistQuery(opts.queryKey);
 }
 

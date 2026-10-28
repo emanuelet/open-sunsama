@@ -105,7 +105,8 @@ export function registerTimeBlockTools(
   apiClient: ApiClient
 ): void {
   // List time blocks with optional filters
-  defineTool(server,
+  defineTool(
+    server,
     "list_time_blocks",
     `List time blocks from your calendar with optional filters.
 
@@ -179,7 +180,9 @@ start/end times, duration, description, color, and any linked task info.`,
         const blocks = response.data || [];
 
         if (blocks.length === 0) {
-          return successResponse("No time blocks found matching your criteria.");
+          return successResponse(
+            "No time blocks found matching your criteria."
+          );
         }
 
         let result = blocks.map((b) => formatTimeBlock(b)).join("\n\n---\n\n");
@@ -198,7 +201,8 @@ start/end times, duration, description, color, and any linked task info.`,
   );
 
   // Get a specific time block by ID
-  defineTool(server,
+  defineTool(
+    server,
     "get_time_block",
     `Get detailed information about a specific time block by its ID.
 
@@ -233,7 +237,8 @@ duration in minutes, description, color, and linked task details if any.`,
   );
 
   // Create a new time block
-  defineTool(server,
+  defineTool(
+    server,
     "create_time_block",
     `Create a new time block to schedule focused work time on your calendar.
 
@@ -357,7 +362,8 @@ You can optionally link it to an existing task to track what you'll work on.`,
   );
 
   // Update an existing time block
-  defineTool(server,
+  defineTool(
+    server,
     "update_time_block",
     `Update an existing time block's details.
 
@@ -481,7 +487,8 @@ To clear optional fields (description, color, taskId), pass null explicitly.`,
   );
 
   // Delete a time block
-  defineTool(server,
+  defineTool(
+    server,
     "delete_time_block",
     `Delete a time block from your calendar.
 
@@ -517,7 +524,8 @@ Any linked task will NOT be deleted, only the link will be removed.`,
   );
 
   // Link or unlink a task to a time block
-  defineTool(server,
+  defineTool(
+    server,
     "link_task_to_time_block",
     `Link a task to a time block, or unlink a task from a time block.
 
@@ -568,7 +576,8 @@ To unlink a task, pass null as the taskId.`,
   );
 
   // Get schedule for a specific day (convenience tool)
-  defineTool(server,
+  defineTool(
+    server,
     "get_schedule_for_day",
     `Get the user's whole day in one call: calendar events (meetings from their connected Google, Outlook and iCloud calendars) and time blocks planned in Open Sunsama, each in its own section.
 
@@ -620,8 +629,12 @@ with the time block tools. Times are in the user's timezone.`,
           const tz = events.meta.timezone;
           const eventLines = formatEventsForDay(events.events, input.date, tz);
           lines.push(`Schedule for ${input.date} (times in ${tz})`, "");
-          lines.push("CALENDAR EVENTS (from connected calendars; busy, read-only)");
-          lines.push(...(eventLines.length ? eventLines : ["No calendar events."]));
+          lines.push(
+            "CALENDAR EVENTS (from connected calendars; busy, read-only)"
+          );
+          lines.push(
+            ...(eventLines.length ? eventLines : ["No calendar events."])
+          );
         } else {
           lines.push(`Schedule for ${input.date}`, "");
           lines.push("CALENDAR EVENTS");

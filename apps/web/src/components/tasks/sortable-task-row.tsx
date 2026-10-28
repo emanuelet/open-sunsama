@@ -22,22 +22,16 @@ export function SortableTaskRow({
   onSelect,
   onComplete,
 }: SortableTaskRowProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    isDragging,
-    isOver,
-    active,
-  } = useSortable({
-    id: task.id,
-    data: {
-      type: "task",
-      task,
-      columnId: task.scheduledDate || "backlog",
-      originalIndex,
-    },
-  });
+  const { attributes, listeners, setNodeRef, isDragging, isOver, active } =
+    useSortable({
+      id: task.id,
+      data: {
+        type: "task",
+        task,
+        columnId: task.scheduledDate || "backlog",
+        originalIndex,
+      },
+    });
 
   const style: React.CSSProperties = {
     // Don't apply transforms to non-dragging items — items stay in place
@@ -81,11 +75,7 @@ export function SortableTaskRow({
       {showDropIndicatorAbove && (
         <div className="absolute -top-0.5 left-0 right-0 h-0.5 rounded-full bg-primary z-10 shadow-[0_0_4px_rgba(var(--primary),0.5)]" />
       )}
-      <TaskRow
-        task={task}
-        onSelect={onSelect}
-        onComplete={onComplete}
-      />
+      <TaskRow task={task} onSelect={onSelect} onComplete={onComplete} />
       {showDropIndicatorBelow && (
         <div className="absolute -bottom-0.5 left-0 right-0 h-0.5 rounded-full bg-primary z-10 shadow-[0_0_4px_rgba(var(--primary),0.5)]" />
       )}

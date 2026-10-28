@@ -210,11 +210,7 @@ export function TaskDetailPanel({
           {showDeleteConfirm ? (
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Delete?</span>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleDelete}
-              >
+              <Button variant="destructive" size="sm" onClick={handleDelete}>
                 Yes
               </Button>
               <Button

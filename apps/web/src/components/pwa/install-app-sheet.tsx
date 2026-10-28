@@ -25,8 +25,15 @@ interface InstallAppSheetProps {
  * Where the browser supports it (Chrome on Android), one button installs.
  */
 export function InstallAppSheet({ open, onOpenChange }: InstallAppSheetProps) {
-  const guide = React.useMemo(() => installGuideFor(currentInstallPlatform()), []);
-  const canInstall = React.useSyncExternalStore(subscribeInstallPrompt, canPromptInstall, () => false);
+  const guide = React.useMemo(
+    () => installGuideFor(currentInstallPlatform()),
+    []
+  );
+  const canInstall = React.useSyncExternalStore(
+    subscribeInstallPrompt,
+    canPromptInstall,
+    () => false
+  );
   const [phase, setPhase] = React.useState<DemoPhase>(0);
   const [paused, setPaused] = React.useState(false);
 
@@ -94,7 +101,9 @@ export function InstallAppSheet({ open, onOpenChange }: InstallAppSheetProps) {
                     {i + 1}
                   </span>
                   <span className="min-w-0">
-                    <span className="block text-[15px] font-medium leading-snug">{step.text}</span>
+                    <span className="block text-[15px] font-medium leading-snug">
+                      {step.text}
+                    </span>
                     {step.detail && (
                       <span className="mt-0.5 block text-[13px] leading-snug text-muted-foreground">
                         {step.detail}

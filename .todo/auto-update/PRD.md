@@ -31,6 +31,7 @@ signature: text('signature'), // Ed25519 .sig file content, nullable
 ```
 
 Update the Zod schemas:
+
 - `insertReleaseSchema` — add `signature: z.string().optional()`
 - No migration needed if using `db:push`; otherwise generate a migration with `db:generate`
 
@@ -44,14 +45,15 @@ GET /releases/update/:target/:current_version
 
 **Target mapping** — Tauri sends platform identifiers that differ from our DB values:
 
-| Tauri `target`      | DB `platform`  |
-|---------------------|----------------|
-| `darwin-aarch64`    | `macos-arm64`  |
-| `darwin-x86_64`     | `macos-x64`    |
-| `linux-x86_64`      | `linux`        |
-| `windows-x86_64`    | `windows`      |
+| Tauri `target`   | DB `platform` |
+| ---------------- | ------------- |
+| `darwin-aarch64` | `macos-arm64` |
+| `darwin-x86_64`  | `macos-x64`   |
+| `linux-x86_64`   | `linux`       |
+| `windows-x86_64` | `windows`     |
 
 **Logic:**
+
 1. Map the Tauri `:target` to our platform name. Return 400 if unknown.
 2. Query the latest release for that platform (ordered by `createdAt DESC`).
 3. Compare `latest.version` with `:current_version` using semver. If equal or older → return **204 No Content** (Tauri expects 204 for "no update", not 404).
@@ -77,7 +79,10 @@ GET /releases/update/:target/:current_version
 
 ```ts
 export const TAURI_TARGETS = [
-  'darwin-aarch64', 'darwin-x86_64', 'linux-x86_64', 'windows-x86_64'
+  "darwin-aarch64",
+  "darwin-x86_64",
+  "linux-x86_64",
+  "windows-x86_64",
 ] as const;
 
 export const updateCheckParamSchema = z.object({
@@ -94,16 +99,16 @@ Add `createUpdaterArtifacts` to the `bundle` section and configure the updater p
 {
   "bundle": {
     // ...existing config...
-    "createUpdaterArtifacts": "v2Compatible"
+    "createUpdaterArtifacts": "v2Compatible",
   },
   "plugins": {
     "updater": {
       "pubkey": "<PUBLIC_KEY_FROM_STEP_1>",
       "endpoints": [
-        "https://api.opensunsama.com/releases/update/{{target}}/{{current_version}}"
-      ]
-    }
-  }
+        "https://api.opensunsama.com/releases/update/{{target}}/{{current_version}}",
+      ],
+    },
+  },
 }
 ```
 
@@ -154,12 +159,14 @@ Add to `dependencies`:
 Create update-related files following the existing desktop integration pattern in `lib/desktop.ts` and `hooks/useDesktop.ts`:
 
 **`apps/web/src/lib/updater.ts`** — Low-level updater functions:
+
 - `checkForUpdate()` — calls `check()` from `@tauri-apps/plugin-updater`; returns update info or `null`
 - `downloadAndInstallUpdate(update, onProgress)` — calls `update.downloadAndInstall()` with progress callback
 - `relaunchApp()` — calls `relaunch()` from `@tauri-apps/plugin-process`
 - All functions guard on `isDesktop()` and return gracefully in browser
 
 **`apps/web/src/hooks/useAppUpdate.ts`** — React hook:
+
 - On mount (if desktop), calls `checkForUpdate()` silently
 - Optionally re-checks on an interval (e.g. every 30 minutes)
 - Exposes state: `{ updateAvailable, version, downloading, progress, error, install, dismiss }`
@@ -167,6 +174,7 @@ Create update-related files following the existing desktop integration pattern i
 - `dismiss()` hides the banner (stores dismissed version in localStorage to avoid nagging)
 
 **`apps/web/src/components/app-update-banner.tsx`** — UI component:
+
 - Renders only when `updateAvailable` is true and not dismissed
 - Sticky banner at top of viewport (above header) or toast notification
 - Shows: "Update available: v{version}" with "Update Now" and "Later" buttons
@@ -249,20 +257,20 @@ Update the "Register release with API" step to include the signature:
 
 ## Files to Modify
 
-| # | File | Change |
-|---|------|--------|
-| 1 | `packages/database/src/schema/releases.ts` | Add `signature` column + update Zod schemas |
-| 2 | `apps/api/src/routes/releases.ts` | Add `GET /releases/update/:target/:current_version` endpoint; update `POST /releases` to accept `signature` |
-| 3 | `apps/api/src/validation/releases.ts` | Add `signature` to `createReleaseSchema`; add `updateCheckParamSchema` |
-| 4 | `apps/desktop/src-tauri/tauri.conf.json` | Add `createUpdaterArtifacts` + `plugins.updater` config |
-| 5 | `apps/desktop/src-tauri/Cargo.toml` | Add `tauri-plugin-updater` + `tauri-plugin-process` |
-| 6 | `apps/desktop/src-tauri/src/lib.rs` | Register updater + process plugins |
-| 7 | `apps/desktop/src-tauri/capabilities/default.json` | Add `updater:default` + `process:allow-restart` permissions |
-| 8 | `apps/web/package.json` | Add `@tauri-apps/plugin-updater` + `@tauri-apps/plugin-process` |
-| 9 | `apps/web/src/lib/updater.ts` | **New** — updater utility functions |
-| 10 | `apps/web/src/hooks/useAppUpdate.ts` | **New** — React hook for update state |
-| 11 | `apps/web/src/components/app-update-banner.tsx` | **New** — update notification UI |
-| 12 | `.github/workflows/desktop-release.yml` | Add signing key env, find `.sig` files, pass signature to API |
+| #   | File                                               | Change                                                                                                      |
+| --- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| 1   | `packages/database/src/schema/releases.ts`         | Add `signature` column + update Zod schemas                                                                 |
+| 2   | `apps/api/src/routes/releases.ts`                  | Add `GET /releases/update/:target/:current_version` endpoint; update `POST /releases` to accept `signature` |
+| 3   | `apps/api/src/validation/releases.ts`              | Add `signature` to `createReleaseSchema`; add `updateCheckParamSchema`                                      |
+| 4   | `apps/desktop/src-tauri/tauri.conf.json`           | Add `createUpdaterArtifacts` + `plugins.updater` config                                                     |
+| 5   | `apps/desktop/src-tauri/Cargo.toml`                | Add `tauri-plugin-updater` + `tauri-plugin-process`                                                         |
+| 6   | `apps/desktop/src-tauri/src/lib.rs`                | Register updater + process plugins                                                                          |
+| 7   | `apps/desktop/src-tauri/capabilities/default.json` | Add `updater:default` + `process:allow-restart` permissions                                                 |
+| 8   | `apps/web/package.json`                            | Add `@tauri-apps/plugin-updater` + `@tauri-apps/plugin-process`                                             |
+| 9   | `apps/web/src/lib/updater.ts`                      | **New** — updater utility functions                                                                         |
+| 10  | `apps/web/src/hooks/useAppUpdate.ts`               | **New** — React hook for update state                                                                       |
+| 11  | `apps/web/src/components/app-update-banner.tsx`    | **New** — update notification UI                                                                            |
+| 12  | `.github/workflows/desktop-release.yml`            | Add signing key env, find `.sig` files, pass signature to API                                               |
 
 ## Flow
 

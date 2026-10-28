@@ -37,17 +37,25 @@ import {
   readBlogPosts,
   renderBody,
 } from "./blog-content";
-import { escapeAttr, formatDate, type PageMeta, readTemplate, writePage } from "./prerender-html";
+import {
+  escapeAttr,
+  formatDate,
+  type PageMeta,
+  readTemplate,
+  writePage,
+} from "./prerender-html";
 
 /** Mirrors BlogArticleMeta + the article body + BlogFaqs in blog-layout.tsx */
 async function renderArticle({ slug, source, frontmatter: post }: BlogSource) {
   const { html: body, videosUsed, oss } = await renderBody(source);
-  const updated = post.updated && post.updated !== post.date ? post.updated : null;
+  const updated =
+    post.updated && post.updated !== post.date ? post.updated : null;
 
   const byline = [
     escapeAttr(post.author),
     `<time datetime="${escapeAttr(post.date)}">${formatDate(post.date)}</time>`,
-    updated && `Updated <time datetime="${escapeAttr(updated)}">${formatDate(updated)}</time>`,
+    updated &&
+      `Updated <time datetime="${escapeAttr(updated)}">${formatDate(updated)}</time>`,
     post.readingTime && `${post.readingTime} min read`,
   ].filter(Boolean);
 
@@ -69,7 +77,9 @@ async function renderArticle({ slug, source, frontmatter: post }: BlogSource) {
     `<h1>${escapeAttr(post.title)}</h1>`,
     `<p>${escapeAttr(post.description)}</p>`,
     `<p>${byline.join(" · ")}</p>`,
-    post.image ? `<img src="${escapeAttr(post.image)}" alt="${escapeAttr(post.title)}">` : "",
+    post.image
+      ? `<img src="${escapeAttr(post.image)}" alt="${escapeAttr(post.title)}">`
+      : "",
     body,
     faqs,
     "</article>",
@@ -93,7 +103,11 @@ async function renderArticle({ slug, source, frontmatter: post }: BlogSource) {
   }
   // Same id as <OssListProvider> (components/blog/media/oss-list.tsx), so the client replaces it
   const apps = itemListApps(oss.cards, oss.tables);
-  if (apps.length) jsonLd["oss-itemlist-schema"] = ossItemListJsonLd(apps, { name: post.title, slug });
+  if (apps.length)
+    jsonLd["oss-itemlist-schema"] = ossItemListJsonLd(apps, {
+      name: post.title,
+      slug,
+    });
 
   return { noscript, jsonLd };
 }
@@ -144,7 +158,9 @@ async function main() {
 
   for (const page of pages) writePage(template, page);
 
-  console.log(`Pre-rendered ${pages.length} blog pages (meta tags, JSON-LD, article HTML)`);
+  console.log(
+    `Pre-rendered ${pages.length} blog pages (meta tags, JSON-LD, article HTML)`
+  );
 }
 
 await main();

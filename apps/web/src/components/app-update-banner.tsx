@@ -1,19 +1,19 @@
 /**
  * App update banner - shown when a new desktop version is available
- * 
+ *
  * Minimal banner at the top of the app with update info,
  * download progress, and install/dismiss actions.
  */
 
-import { Download, X, RefreshCw, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui';
-import { useAppUpdate } from '@/hooks/useAppUpdate';
-import { cn } from '@/lib/utils';
+import { Download, X, RefreshCw, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui";
+import { useAppUpdate } from "@/hooks/useAppUpdate";
+import { cn } from "@/lib/utils";
 
 export function AppUpdateBanner() {
   const { status, update, progress, installUpdate, dismiss } = useAppUpdate();
 
-  if (status === 'idle' || status === 'checking' || status === 'error') {
+  if (status === "idle" || status === "checking" || status === "error") {
     return null;
   }
 
@@ -24,7 +24,7 @@ export function AppUpdateBanner() {
 
   return (
     <div className="relative flex items-center justify-center gap-3 bg-primary px-4 py-1.5 text-primary-foreground text-xs">
-      {status === 'available' && (
+      {status === "available" && (
         <>
           <RefreshCw className="h-3 w-3 shrink-0" />
           <span className="truncate">
@@ -48,21 +48,21 @@ export function AppUpdateBanner() {
         </>
       )}
 
-      {(status === 'downloading' || status === 'installing') && (
+      {(status === "downloading" || status === "installing") && (
         <>
           <Loader2 className="h-3 w-3 shrink-0 animate-spin" />
           <span className="truncate">
-            {status === 'installing'
-              ? 'Installing update...'
+            {status === "installing"
+              ? "Installing update..."
               : progressPercent !== null
                 ? `Downloading update... ${progressPercent}%`
-                : 'Downloading update...'}
+                : "Downloading update..."}
           </span>
           {progressPercent !== null && (
             <div className="h-1 w-24 rounded-full bg-primary-foreground/20 overflow-hidden">
               <div
                 className={cn(
-                  'h-full rounded-full bg-primary-foreground transition-all duration-300'
+                  "h-full rounded-full bg-primary-foreground transition-all duration-300"
                 )}
                 style={{ width: `${progressPercent}%` }}
               />

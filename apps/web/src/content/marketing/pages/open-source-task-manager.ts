@@ -27,7 +27,10 @@ export const openSource = {
   language: "TypeScript",
 
   heroChips: {
-    terminal: { command: "docker compose up -d --build", detail: "Web app on :3000 · API on :3001" },
+    terminal: {
+      command: "docker compose up -d --build",
+      detail: "Web app on :3000 · API on :3001",
+    },
     agent: { title: "Claude connected", detail: "Moved 3 tasks to Friday" },
   },
 
@@ -47,7 +50,11 @@ export const openSource = {
       {
         id: "update",
         label: "Update",
-        lines: ["$ git pull", "$ docker compose up -d --build", "# The API applies new migrations when it starts"],
+        lines: [
+          "$ git pull",
+          "$ docker compose up -d --build",
+          "# The API applies new migrations when it starts",
+        ],
       },
       {
         id: "backup",
@@ -62,9 +69,21 @@ export const openSource = {
     ],
     services: [
       { name: "web", port: ":3000", detail: "The web app you plan in" },
-      { name: "api", port: ":3001", detail: "REST API, MCP server and live sync" },
-      { name: "postgres", port: "localhost only", detail: "PostgreSQL 16 holds your data" },
-      { name: "redis", port: "localhost only", detail: "Relays live updates to open tabs" },
+      {
+        name: "api",
+        port: ":3001",
+        detail: "REST API, MCP server and live sync",
+      },
+      {
+        name: "postgres",
+        port: "localhost only",
+        detail: "PostgreSQL 16 holds your data",
+      },
+      {
+        name: "redis",
+        port: "localhost only",
+        detail: "Relays live updates to open tabs",
+      },
     ],
     needs: ["Docker 20.10+", "Compose 2.24+", "2 GB of RAM"],
     note: "The ready-made desktop apps connect to the hosted service. On your own server, use the web app, or build the desktop app with your API address.",
@@ -79,7 +98,15 @@ export const openSource = {
       { method: "GET", path: "/time-blocks?date=2026-09-24" },
       { method: "POST", path: "/time-blocks" },
     ],
-    scopes: ["tasks:read", "tasks:write", "time-blocks:read", "time-blocks:write", "calendar:read", "user:read", "user:write"],
+    scopes: [
+      "tasks:read",
+      "tasks:write",
+      "time-blocks:read",
+      "time-blocks:write",
+      "calendar:read",
+      "user:read",
+      "user:write",
+    ],
     prompts: [
       "Plan my afternoon around my meetings.",
       "Move what I didn't finish today to tomorrow.",
@@ -103,7 +130,13 @@ export const openSource = {
   },
 
   license: {
-    allowed: ["Personal use", "Education", "Non-profit groups", "Non-commercial open-source projects", "Evaluation and testing"],
+    allowed: [
+      "Personal use",
+      "Education",
+      "Non-profit groups",
+      "Non-commercial open-source projects",
+      "Evaluation and testing",
+    ],
     needsLicense: [
       "For-profit companies using it in production",
       "Products or services sold for profit",
@@ -113,15 +146,31 @@ export const openSource = {
 
   /** Where the comparison's facts come from. Repos are followed links; sites are nofollow. */
   sources: [
-    { name: "Vikunja", repo: "https://github.com/go-vikunja/vikunja", site: "https://vikunja.io" },
+    {
+      name: "Vikunja",
+      repo: "https://github.com/go-vikunja/vikunja",
+      site: "https://vikunja.io",
+    },
     {
       name: "Super Productivity",
       repo: "https://github.com/super-productivity/super-productivity",
       site: "https://super-productivity.com",
     },
-    { name: "Tududi", repo: "https://github.com/chrisvel/tududi", site: "https://tududi.com" },
-    { name: "Kanboard", repo: "https://github.com/kanboard/kanboard", site: "https://kanboard.org" },
-    { name: "Planka", repo: "https://github.com/plankanban/planka", site: "https://planka.app" },
+    {
+      name: "Tududi",
+      repo: "https://github.com/chrisvel/tududi",
+      site: "https://tududi.com",
+    },
+    {
+      name: "Kanboard",
+      repo: "https://github.com/kanboard/kanboard",
+      site: "https://kanboard.org",
+    },
+    {
+      name: "Planka",
+      repo: "https://github.com/plankanban/planka",
+      site: "https://planka.app",
+    },
   ],
   checked: "September 24, 2026",
 };
@@ -155,7 +204,8 @@ export default defineMarketingPage({
       kind: "answer",
       id: "answer",
       eyebrow: "The short answer",
-      heading: "Open Sunsama is an open-source task manager you can plan with, self-host and script",
+      heading:
+        "Open Sunsama is an open-source task manager you can plan with, self-host and script",
       body: [
         "Open Sunsama is an open-source task manager and daily planner. Your tasks live on a board of days. Drag one onto the calendar to block time for it, right next to your Google, Outlook or iCloud meetings.",
         "The code is public on [GitHub](https://github.com/ShadowWalker2014/open-sunsama). Run it on your own server with [Docker](/docs/self-hosting/docker), or use the hosted app. Either way you get a REST API and an MCP server, so Claude, ChatGPT or any AI agent can plan with you.",
@@ -191,7 +241,10 @@ export default defineMarketingPage({
           title: "Drop each task onto the calendar",
           body: "Drag a task next to your meetings, then drag its edge to set how long it takes. You see what fits before the day starts.",
           clip: "time-block",
-          link: { label: "How time blocking works", href: "/features/time-blocking" },
+          link: {
+            label: "How time blocking works",
+            href: "/features/time-blocking",
+          },
         },
         {
           icon: "timer",
@@ -207,7 +260,10 @@ export default defineMarketingPage({
           title: "Find anything with Cmd+K",
           body: "Search any task, jump to any day or run a command without the mouse. Most actions have a shortcut.",
           clip: "command-palette",
-          link: { label: "See the command palette", href: "/features/command-palette" },
+          link: {
+            label: "See the command palette",
+            href: "/features/command-palette",
+          },
         },
         {
           icon: "check",
@@ -268,7 +324,14 @@ export default defineMarketingPage({
       eyebrow: "Compare",
       heading: "Open Sunsama plans your day next to your real meetings",
       lead: "Vikunja, Super Productivity, Tududi, Kanboard and Planka are good projects. Here is where each one fits, so you can choose with clear eyes.",
-      columns: ["Open Sunsama", "Vikunja", "Super Productivity", "Tududi", "Kanboard", "Planka"],
+      columns: [
+        "Open Sunsama",
+        "Vikunja",
+        "Super Productivity",
+        "Tududi",
+        "Kanboard",
+        "Planka",
+      ],
       rows: [
         {
           feature: "License",
@@ -393,13 +456,19 @@ export default defineMarketingPage({
         question: "What is the best open-source task manager?",
         answer:
           "We build Open Sunsama, and we think it is the best pick if you want to plan your day: a board of days, time blocking and any AI agent. Pick Vikunja for a Todoist-style list, Super Productivity if you want no server, and Kanboard or Planka for plain kanban.",
-        link: { label: "Compare open-source productivity apps", href: "/blog/best-open-source-productivity-apps" },
+        link: {
+          label: "Compare open-source productivity apps",
+          href: "/blog/best-open-source-productivity-apps",
+        },
       },
       {
         question: "Is Open Sunsama really open source?",
         answer:
           "The code is public on GitHub. It uses a non-commercial license: you can read it, run it and self-host it for personal use. Companies need a commercial license.",
-        link: { label: "Read the LICENSE file", href: "https://github.com/ShadowWalker2014/open-sunsama/blob/main/LICENSE" },
+        link: {
+          label: "Read the LICENSE file",
+          href: "https://github.com/ShadowWalker2014/open-sunsama/blob/main/LICENSE",
+        },
       },
       {
         question: "What do I need to self-host Open Sunsama?",
@@ -434,7 +503,10 @@ export default defineMarketingPage({
         question: "How do I update a self-hosted install?",
         answer:
           "Run git pull, then docker compose up -d --build. The API applies any new database migrations when it starts, so there is no manual step.",
-        link: { label: "Updating and backups", href: "/docs/self-hosting/docker" },
+        link: {
+          label: "Updating and backups",
+          href: "/docs/self-hosting/docker",
+        },
       },
     ],
   },
@@ -446,7 +518,8 @@ export default defineMarketingPage({
       {
         kind: "guide",
         title: "Best open-source productivity apps",
-        description: "Planners, tasks, notes and calendars, with license and MCP compared.",
+        description:
+          "Planners, tasks, notes and calendars, with license and MCP compared.",
         href: "/blog/best-open-source-productivity-apps",
       },
       {

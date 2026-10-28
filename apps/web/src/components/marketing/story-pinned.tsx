@@ -39,12 +39,19 @@ const STEP_VH = 85;
 function StepCopy({ step, active }: { step: PinnedStep; active: boolean }) {
   const Icon = step.icon;
   return (
-    <div className={cn("transition-[opacity,transform] duration-500 lg:max-w-[400px]", active ? "opacity-100" : "lg:opacity-30")}>
+    <div
+      className={cn(
+        "transition-[opacity,transform] duration-500 lg:max-w-[400px]",
+        active ? "opacity-100" : "lg:opacity-30"
+      )}
+    >
       <div className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">
         {Icon && <Icon className="h-3.5 w-3.5" />}
         {step.eyebrow}
       </div>
-      <h3 className="mt-3 text-[26px] font-semibold leading-tight tracking-tight md:text-[32px]">{step.title}</h3>
+      <h3 className="mt-3 text-[26px] font-semibold leading-tight tracking-tight md:text-[32px]">
+        {step.title}
+      </h3>
       <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground md:text-[16px]">
         <RichText text={step.body} />
       </p>
@@ -82,16 +89,31 @@ export function StoryPinned({
   const [active, setActive] = React.useState(0);
   const containerRef = useScrollProgress<HTMLDivElement>("sticky", {
     onProgress: (p) => {
-      const next = Math.min(steps.length - 1, Math.floor(p * steps.length * 0.999));
+      const next = Math.min(
+        steps.length - 1,
+        Math.floor(p * steps.length * 0.999)
+      );
       setActive((current) => (current === next ? current : next));
     },
   });
   const headingId = id ? `${id}-heading` : undefined;
 
   return (
-    <section id={id} className={cn(SECTION, className)} aria-labelledby={header ? undefined : headingId}>
+    <section
+      id={id}
+      className={cn(SECTION, className)}
+      aria-labelledby={header ? undefined : headingId}
+    >
       <div className={CONTAINER}>
-        {header ?? (heading && <SectionHeading id={headingId} eyebrow={eyebrow} heading={heading} lead={lead} />)}
+        {header ??
+          (heading && (
+            <SectionHeading
+              id={headingId}
+              eyebrow={eyebrow}
+              heading={heading}
+              lead={lead}
+            />
+          ))}
 
         {/* Desktop: pinned frame + scrolling copy. */}
         <div
@@ -101,7 +123,11 @@ export function StoryPinned({
         >
           <div className="relative">
             {steps.map((step, i) => (
-              <div key={step.key} className="flex items-center" style={{ height: `${STEP_VH}vh` }}>
+              <div
+                key={step.key}
+                className="flex items-center"
+                style={{ height: `${STEP_VH}vh` }}
+              >
                 <StepCopy step={step} active={i === active} />
               </div>
             ))}
@@ -129,7 +155,12 @@ export function StoryPinned({
                         aria-hidden={i !== active}
                       >
                         {step.clip ? (
-                          <ClipPlayer id={step.clip} label={step.title} active={i === active} poster={step.still} />
+                          <ClipPlayer
+                            id={step.clip}
+                            label={step.title}
+                            active={i === active}
+                            poster={step.still}
+                          />
                         ) : (
                           step.still
                         )}
@@ -144,7 +175,11 @@ export function StoryPinned({
                       key={step.key}
                       className={cn(
                         "w-1.5 rounded-full transition-all duration-500",
-                        i === active ? "h-6 bg-primary" : i < active ? "h-1.5 bg-primary/40" : "h-1.5 bg-border"
+                        i === active
+                          ? "h-6 bg-primary"
+                          : i < active
+                            ? "h-1.5 bg-primary/40"
+                            : "h-1.5 bg-border"
                       )}
                     />
                   ))}
@@ -163,7 +198,9 @@ export function StoryPinned({
                 <Clip id={step.clip} />
               ) : (
                 <BrowserFrame>
-                  <div className="relative aspect-16/10 w-full overflow-hidden">{step.still}</div>
+                  <div className="relative aspect-16/10 w-full overflow-hidden">
+                    {step.still}
+                  </div>
                 </BrowserFrame>
               )}
             </Reveal>

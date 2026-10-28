@@ -21,9 +21,14 @@ describe("task-provider registry", () => {
       async verifyCredentials(credentials) {
         return { providerAccountId: "123", label: "Example", credentials };
       },
-      parseReference: (input) => input.startsWith("example:") ? input.slice(8) : null,
-      async fetchTask() { throw new Error("Not needed for registry test"); },
-      async listTasks() { return []; },
+      parseReference: (input) =>
+        input.startsWith("example:") ? input.slice(8) : null,
+      async fetchTask() {
+        throw new Error("Not needed for registry test");
+      },
+      async listTasks() {
+        return [];
+      },
     };
 
     registerTaskProvider(provider);

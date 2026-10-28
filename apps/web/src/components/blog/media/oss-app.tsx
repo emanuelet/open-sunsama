@@ -95,7 +95,9 @@ export function OssApp({ id, rank, bestFor }: OssAppProps) {
             <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
               <p className="oss-name">{app.name}</p>
               {app.status !== "active" && (
-                <span className={`oss-pill ${isInactive(app) ? "oss-pill-warn" : ""}`}>
+                <span
+                  className={`oss-pill ${isInactive(app) ? "oss-pill-warn" : ""}`}
+                >
                   {STATUS_LABELS[app.status]}
                 </span>
               )}
@@ -111,7 +113,10 @@ export function OssApp({ id, rank, bestFor }: OssAppProps) {
         )}
         {app.caveat && (
           <p className="oss-caveat">
-            <TriangleAlert aria-hidden className="mt-[3px] h-3.5 w-3.5 shrink-0" />
+            <TriangleAlert
+              aria-hidden
+              className="mt-[3px] h-3.5 w-3.5 shrink-0"
+            />
             <span>{app.caveat}</span>
           </p>
         )}
@@ -119,15 +124,26 @@ export function OssApp({ id, rank, bestFor }: OssAppProps) {
 
       {shot.light && (
         <figure className="mt-5 px-5 md:px-6">
-          <div className={FRAME_CLASS} style={shotSize(shot.width, shot.height)}>
-            <img {...img} src={shot.light} className={`block h-auto w-full${shot.dark ? " dark:hidden" : ""}`} />
-            {shot.dark && <img {...img} src={shot.dark} className="hidden h-auto w-full dark:block" />}
+          <div
+            className={FRAME_CLASS}
+            style={shotSize(shot.width, shot.height)}
+          >
+            <img
+              {...img}
+              src={shot.light}
+              className={`block h-auto w-full${shot.dark ? " dark:hidden" : ""}`}
+            />
+            {shot.dark && (
+              <img
+                {...img}
+                src={shot.dark}
+                className="hidden h-auto w-full dark:block"
+              />
+            )}
           </div>
           <figcaption className="oss-credit">
             {shot.sourceUrl ? (
-              <a {...outboundLink(shot.sourceUrl)}>
-                {shot.source}
-              </a>
+              <a {...outboundLink(shot.sourceUrl)}>{shot.source}</a>
             ) : (
               shot.source
             )}
@@ -153,7 +169,9 @@ export function OssApp({ id, rank, bestFor }: OssAppProps) {
           {app.latestRelease ? (
             <>
               <span className="break-all">{app.latestRelease.version}</span>
-              <span className="oss-sub">{monthYear(app.latestRelease.date)}</span>
+              <span className="oss-sub">
+                {monthYear(app.latestRelease.date)}
+              </span>
             </>
           ) : (
             "No tagged releases"
@@ -169,7 +187,10 @@ export function OssApp({ id, rank, bestFor }: OssAppProps) {
       </dl>
 
       <div className="oss-links">
-        <a {...outboundLink(app.repo, true)} className="oss-btn oss-btn-primary">
+        <a
+          {...outboundLink(app.repo, true)}
+          className="oss-btn oss-btn-primary"
+        >
           <Code2 aria-hidden className="h-4 w-4" />
           Source code
         </a>

@@ -9,7 +9,13 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Play, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FloatingChip } from "@/components/landing/hero";
-import { HeadlineReveal, introStyle, useIntro, useReducedMotion, useScrollProgress } from "@/components/landing/motion";
+import {
+  HeadlineReveal,
+  introStyle,
+  useIntro,
+  useReducedMotion,
+  useScrollProgress,
+} from "@/components/landing/motion";
 import { BrowserFrame } from "@/components/landing/product-shot";
 import { getVideo, VideoLightbox } from "@/components/landing/video-lightbox";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
@@ -41,9 +47,16 @@ export function OpenSourceHero({ page }: { page: MarketingPageContent }) {
   const chips = openSource.heroChips;
 
   return (
-    <section className="relative pb-20 pt-8 md:pb-28 md:pt-12" aria-labelledby="page-title">
+    <section
+      className="relative pb-20 pt-8 md:pb-28 md:pt-12"
+      aria-labelledby="page-title"
+    >
       <div className="container mx-auto max-w-6xl px-4">
-        <Breadcrumbs items={page.breadcrumbs} path={page.path} className="mb-8 md:mb-10" />
+        <Breadcrumbs
+          items={page.breadcrumbs}
+          path={page.path}
+          className="mb-8 md:mb-10"
+        />
         <div className="text-center">
           <div style={introStyle(ready, 0, reduced)}>
             <p className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 py-1 pl-1 pr-3 text-[12px] font-medium text-muted-foreground shadow-xs backdrop-blur-sm">
@@ -60,7 +73,11 @@ export function OpenSourceHero({ page }: { page: MarketingPageContent }) {
             id="page-title"
             className="mx-auto mt-6 max-w-5xl text-balance text-[36px] font-semibold leading-[1.04] tracking-[-0.035em] sm:text-[52px] md:text-[60px] lg:text-[64px]"
           >
-            <HeadlineReveal lines={headlineLines(hero.title, hero.accent)} ready={ready} reduced={reduced} />
+            <HeadlineReveal
+              lines={headlineLines(hero.title, hero.accent)}
+              ready={ready}
+              reduced={reduced}
+            />
           </h1>
 
           <p
@@ -70,8 +87,15 @@ export function OpenSourceHero({ page }: { page: MarketingPageContent }) {
             <RichText text={hero.answer} />
           </p>
 
-          <div className="mt-8 flex flex-col items-center justify-center gap-2.5 sm:flex-row" style={introStyle(ready, 600, reduced)}>
-            <Button size="lg" className={cn(PRIMARY_CTA, "w-full sm:w-auto")} asChild>
+          <div
+            className="mt-8 flex flex-col items-center justify-center gap-2.5 sm:flex-row"
+            style={introStyle(ready, 600, reduced)}
+          >
+            <Button
+              size="lg"
+              className={cn(PRIMARY_CTA, "w-full sm:w-auto")}
+              asChild
+            >
               <Link to="/register">
                 Get started
                 <ArrowRight className="h-4 w-4" />
@@ -86,9 +110,13 @@ export function OpenSourceHero({ page }: { page: MarketingPageContent }) {
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                   <Play className="h-3.5 w-3.5 translate-x-px fill-current" />
                 </span>
-                {hero.secondary && "label" in hero.secondary ? hero.secondary.label : "Watch the 1-minute tour"}
+                {hero.secondary && "label" in hero.secondary
+                  ? hero.secondary.label
+                  : "Watch the 1-minute tour"}
                 {video && (
-                  <span className="font-jetbrains text-[12px] tabular-nums text-muted-foreground">{clockDuration(video.duration)}</span>
+                  <span className="font-jetbrains text-[12px] tabular-nums text-muted-foreground">
+                    {clockDuration(video.duration)}
+                  </span>
                 )}
               </Button>
             </VideoLightbox>
@@ -106,7 +134,8 @@ export function OpenSourceHero({ page }: { page: MarketingPageContent }) {
             reduced
               ? undefined
               : {
-                  transition: "opacity 1000ms cubic-bezier(0.2,0.8,0.2,1), transform 1200ms cubic-bezier(0.2,0.8,0.2,1)",
+                  transition:
+                    "opacity 1000ms cubic-bezier(0.2,0.8,0.2,1), transform 1200ms cubic-bezier(0.2,0.8,0.2,1)",
                   transitionDelay: "480ms",
                   opacity: ready ? 1 : 0,
                   transform: ready ? "none" : "translateY(40px)",
@@ -125,33 +154,63 @@ export function OpenSourceHero({ page }: { page: MarketingPageContent }) {
                     }
               }
             >
-              <div className={cn(SUNRISE_GLOW, "-inset-x-16 -top-16 bottom-[20%]")} />
+              <div
+                className={cn(SUNRISE_GLOW, "-inset-x-16 -top-16 bottom-[20%]")}
+              />
               <BrowserFrame className="relative" url="tasks.your-domain.com">
                 <div className="relative aspect-16/10 w-full overflow-hidden">
-                  {"clip" in hero.media && <ClipPlayer id={hero.media.clip} label={hero.media.alt} priority controls />}
+                  {"clip" in hero.media && (
+                    <ClipPlayer
+                      id={hero.media.clip}
+                      label={hero.media.alt}
+                      priority
+                      controls
+                    />
+                  )}
                 </div>
               </BrowserFrame>
 
-              <FloatingChip className="-left-10 top-[16%]" depth={34} visible={ready} delay={1150} reduced={reduced}>
+              <FloatingChip
+                className="-left-10 top-[16%]"
+                depth={34}
+                visible={ready}
+                delay={1150}
+                reduced={reduced}
+              >
                 <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[hsl(228_14%_9%)] font-jetbrains text-[11px] font-bold text-[hsl(24_95%_60%)] dark:bg-white/10">
                   $
                 </span>
                 <span className="leading-tight">
-                  <span className="block font-jetbrains text-[12px] font-semibold text-foreground">{chips.terminal.command}</span>
+                  <span className="block font-jetbrains text-[12px] font-semibold text-foreground">
+                    {chips.terminal.command}
+                  </span>
                   <span className="mt-0.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+                    <span
+                      className="h-1.5 w-1.5 rounded-full bg-emerald-500"
+                      aria-hidden
+                    />
                     {chips.terminal.detail}
                   </span>
                 </span>
               </FloatingChip>
 
-              <FloatingChip className="-right-8 bottom-[16%]" depth={-24} visible={ready} delay={1350} reduced={reduced}>
+              <FloatingChip
+                className="-right-8 bottom-[16%]"
+                depth={-24}
+                visible={ready}
+                delay={1350}
+                reduced={reduced}
+              >
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-primary">
                   <Sparkles className="h-3.5 w-3.5" />
                 </span>
                 <span className="leading-tight">
-                  <span className="block text-[12px] font-semibold text-foreground">{chips.agent.title}</span>
-                  <span className="block text-[11px] text-muted-foreground">{chips.agent.detail}</span>
+                  <span className="block text-[12px] font-semibold text-foreground">
+                    {chips.agent.title}
+                  </span>
+                  <span className="block text-[11px] text-muted-foreground">
+                    {chips.agent.detail}
+                  </span>
                 </span>
               </FloatingChip>
             </div>

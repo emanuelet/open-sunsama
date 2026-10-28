@@ -1,14 +1,14 @@
 import * as React from "react";
 import { addMinutes, startOfDay } from "date-fns";
-import {
-  HOUR_HEIGHT,
-  SNAP_INTERVAL,
-} from "@/hooks/useCalendarDnd";
+import { HOUR_HEIGHT, SNAP_INTERVAL } from "@/hooks/useCalendarDnd";
 
 /** Pixels the pointer must travel before a press becomes a drag. */
 const DRAG_THRESHOLD_PX = 4;
 
-export interface CalendarCreateAnchor { x: number; y: number }
+export interface CalendarCreateAnchor {
+  x: number;
+  y: number;
+}
 
 export interface CreateRange {
   anchor: CalendarCreateAnchor;
@@ -44,22 +44,42 @@ export function useDragToCreate(
     if (!press) return null;
     const y = clientY - press.column.getBoundingClientRect().top;
     const lastMinute = addMinutes(startOfDay(press.day), 1439);
-    const minutes = Math.round(Math.max(0, Math.min(24 * HOUR_HEIGHT, y)) / HOUR_HEIGHT * 60 / SNAP_INTERVAL) * SNAP_INTERVAL;
+    const minutes =
+      Math.round(
+        ((Math.max(0, Math.min(24 * HOUR_HEIGHT, y)) / HOUR_HEIGHT) * 60) /
+          SNAP_INTERVAL
+      ) * SNAP_INTERVAL;
     const snapped = addMinutes(startOfDay(press.day), minutes);
     const here = snapped > lastMinute ? lastMinute : snapped;
     const start = here < press.anchor ? here : press.anchor;
     let end = here < press.anchor ? press.anchor : here;
     if (end.getTime() - start.getTime() < SNAP_INTERVAL * 60_000) {
-      end = new Date(Math.min(addMinutes(start, SNAP_INTERVAL).getTime(), lastMinute.getTime()));
+      end = new Date(
+        Math.min(
+          addMinutes(start, SNAP_INTERVAL).getTime(),
+          lastMinute.getTime()
+        )
+      );
     }
-    return { day: press.day, start, end, anchor: { x: press.column.getBoundingClientRect().right, y: Math.min(press.startY, clientY) } };
+    return {
+      day: press.day,
+      start,
+      end,
+      anchor: {
+        x: press.column.getBoundingClientRect().right,
+        y: Math.min(press.startY, clientY),
+      },
+    };
   }, []);
 
   React.useEffect(() => {
     const onMove = (e: MouseEvent) => {
       const press = pressRef.current;
       if (!press) return;
-      if (!press.dragging && Math.abs(e.clientY - press.startY) < DRAG_THRESHOLD_PX) {
+      if (
+        !press.dragging &&
+        Math.abs(e.clientY - press.startY) < DRAG_THRESHOLD_PX
+      ) {
         return;
       }
       press.dragging = true;
@@ -105,7 +125,9 @@ export function useDragToCreate(
       const target = e.target as HTMLElement;
       if (
         !e.currentTarget.contains(target) ||
-        target.closest("button, a, input, textarea, select, [role=button], [data-time-block]") ||
+        target.closest(
+          "button, a, input, textarea, select, [role=button], [data-time-block]"
+        ) ||
         target.closest("[data-external-event]") ||
         target.closest("[data-all-day-event], [data-projected-task]")
       ) {
@@ -118,7 +140,14 @@ export function useDragToCreate(
         day,
         column,
         startY: e.clientY,
-        anchor: addMinutes(startOfDay(day), Math.min(1424, Math.round(Math.max(0, y) / HOUR_HEIGHT * 60 / SNAP_INTERVAL) * SNAP_INTERVAL)),
+        anchor: addMinutes(
+          startOfDay(day),
+          Math.min(
+            1424,
+            Math.round(((Math.max(0, y) / HOUR_HEIGHT) * 60) / SNAP_INTERVAL) *
+              SNAP_INTERVAL
+          )
+        ),
         dragging: false,
       };
     },

@@ -1,0 +1,38 @@
+# Local development dependencies only. Run the API and web app with Bun:
+#   docker compose -f docker-compose.dev.yml up -d
+#   DATABASE_URL=postgresql://opensunsama:opensunsama@localhost:5431/opensunsama \
+#   REDIS_URL=redis://localhost:6379 bun run dev
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-opensunsama}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-opensunsama}
+      POSTGRES_DB: ${POSTGRES_DB:-opensunsama}
+    ports:
+      - "127.0.0.1:5431:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-opensunsama}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:

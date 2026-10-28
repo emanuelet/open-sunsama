@@ -20,6 +20,8 @@ import type {
   PromoteIdeaInput,
   IdeaFilterInput,
   IdeaSubtask,
+  KarakeepConnection,
+  KarakeepBookmark,
   CreateIdeaSubtaskInput,
   UpdateIdeaSubtaskInput,
 } from "@open-sunsama/types";
@@ -120,6 +122,25 @@ export interface IdeasApi {
     input?: PromoteIdeaInput,
     options?: RequestOptions
   ): Promise<{ idea: Idea; task: Task }>;
+  karakeep: {
+    getConnection(options?: RequestOptions): Promise<KarakeepConnection | null>;
+    connect(
+      input: { baseUrl: string; apiKey: string },
+      options?: RequestOptions
+    ): Promise<KarakeepConnection>;
+    disconnect(options?: RequestOptions): Promise<void>;
+    send(id: string, options?: RequestOptions): Promise<Idea>;
+    search(
+      id: string,
+      query: string,
+      options?: RequestOptions
+    ): Promise<KarakeepBookmark[]>;
+    link(
+      id: string,
+      bookmarkId: string,
+      options?: RequestOptions
+    ): Promise<Idea>;
+  };
 }
 
 /**
@@ -311,6 +332,55 @@ export function createIdeasApi(client: OpenSunsamaClient): IdeasApi {
         ApiResponseWrapper<{ idea: Idea; task: Task }>
       >(`ideas/${id}/promote`, input ?? {}, options);
       return res.data;
+    },
+
+    karakeep: {
+      async getConnection(options) {
+        const res = await client.get<
+          ApiResponseWrapper<KarakeepConnection | null>
+        >("ideas/karakeep/connection", options);
+        return res.data;
+      },
+      async connect(input, options) {
+        const res = await client.put<ApiResponseWrapper<KarakeepConnection>>(
+          "ideas/karakeep/connection",
+          input,
+          options
+        );
+        return res.data;
+      },
+      async disconnect(options) {
+        await client.delete<ApiResponseWrapper<void>>(
+          "ideas/karakeep/connection",
+          options
+        );
+      },
+      async send(id, options) {
+        const res = await client.post<ApiResponseWrapper<Idea>>(
+          `ideas/${id}/karakeep/send`,
+          {},
+          options
+        );
+        return res.data;
+      },
+      async search(id, query, options) {
+        const res = await client.get<ApiResponseWrapper<KarakeepBookmark[]>>(
+          `ideas/${id}/karakeep/search`,
+          {
+            ...options,
+            searchParams: { ...options?.searchParams, query },
+          }
+        );
+        return res.data ?? [];
+      },
+      async link(id, bookmarkId, options) {
+        const res = await client.post<ApiResponseWrapper<Idea>>(
+          `ideas/${id}/karakeep/link`,
+          { bookmarkId },
+          options
+        );
+        return res.data;
+      },
     },
 
     subtasks: {

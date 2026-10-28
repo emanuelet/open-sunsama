@@ -4,8 +4,6 @@
  * @module @open-sunsama/types/idea
  */
 
-import type { TaskPriority } from "./task";
-
 /** A board groups one kind of idea (e.g. "Movies to watch"). */
 export interface IdeaBoard {
   /** Unique identifier (UUID) */
@@ -43,10 +41,10 @@ export interface Idea {
   columnId: string;
   title: string;
   notes: string | null;
-  /** Rough time estimate in minutes; null when unset. */
-  estimatedMins: number | null;
-  /** P0–P3, same scale as tasks. */
-  priority: TaskPriority;
+  url: string | null;
+  tags: string[];
+  source: string | null;
+  karakeepBookmarkId: string | null;
   position: number;
   /** Set when the card is checked off (e.g. "watched"/"done"). */
   completedAt: Date | null;
@@ -91,16 +89,18 @@ export interface CreateIdeaInput {
   columnId: string;
   title: string;
   notes?: string | null;
-  estimatedMins?: number | null;
-  priority?: TaskPriority;
+  url?: string | null;
+  tags?: string[];
+  source?: string | null;
   position?: number;
 }
 
 export interface UpdateIdeaInput {
   title?: string;
   notes?: string | null;
-  estimatedMins?: number | null;
-  priority?: TaskPriority;
+  url?: string | null;
+  tags?: string[];
+  source?: string | null;
   columnId?: string;
   position?: number;
   /** Pass a Date to mark done, or null to clear. */
@@ -137,6 +137,19 @@ export interface IdeaFilterInput {
   boardId?: string;
   columnId?: string;
   completed?: boolean;
+}
+
+export interface KarakeepConnection {
+  baseUrl: string;
+  connected: boolean;
+}
+
+export interface KarakeepBookmark {
+  id: string;
+  title: string | null;
+  url: string | null;
+  note: string | null;
+  tags: string[];
 }
 
 // ───────────────────────── idea subtasks ─────────────────────────

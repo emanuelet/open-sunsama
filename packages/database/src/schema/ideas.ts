@@ -11,7 +11,7 @@ import { relations } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 import { users } from "./users";
-import { tasks, TASK_PRIORITIES } from "./tasks";
+import { tasks } from "./tasks";
 
 /**
  * Ideas feature — a Trello-style "someday" space.
@@ -80,10 +80,14 @@ export const ideas = pgTable(
       .references(() => ideaColumns.id, { onDelete: "cascade" }),
     title: varchar("title", { length: 500 }).notNull(),
     notes: text("notes"),
-    /** rough time estimate in minutes; mirrors tasks.estimatedMins */
-    estimatedMins: integer("estimated_mins"),
-    /** P0–P3, same scale as tasks.priority */
-    priority: varchar("priority", { length: 2 }).notNull().default("P2"),
+    /** The source link an idea represents, independent of planner tasks. */
+    url: varchar("url", { length: 2048 }),
+    /** User-maintained categorization for an idea. */
+    tags: text("tags").array().notNull().default([]),
+    /** Optional provenance such as an import or capture source. */
+    source: varchar("source", { length: 120 }),
+    /** Bookmark selected or created in the owner's Karakeep instance. */
+    karakeepBookmarkId: varchar("karakeep_bookmark_id", { length: 255 }),
     position: integer("position").notNull().default(0),
     /** set when the user checks the card off (e.g. "watched"/"done") */
     completedAt: timestamp("completed_at"),
@@ -162,8 +166,6 @@ export const updateIdeaColumnSchema = insertIdeaColumnSchema
 export const insertIdeaSchema = createInsertSchema(ideas, {
   title: z.string().min(1, { error: "Title is required" }).max(500),
   notes: z.string().optional().nullable(),
-  estimatedMins: z.number().int().positive().optional().nullable(),
-  priority: z.enum(TASK_PRIORITIES).optional(),
   position: z.number().int().nonnegative().optional(),
 });
 export const selectIdeaSchema = createSelectSchema(ideas);

@@ -57,6 +57,7 @@ function TaskSourceChip({
   const refreshMutation = useRefreshLinkedTask();
 
   const label =
+    link.remoteMeta?.title ||
     link.remoteMeta?.containerName ||
     (link.kind === "pull_request" ? "Pull request" : config.name);
 
@@ -75,6 +76,12 @@ function TaskSourceChip({
     <>
       {link.kind === "pull_request" ? (
         <GitPullRequest className="h-3 w-3 shrink-0" />
+      ) : link.remoteMeta?.faviconUrl ? (
+        <img
+          src={link.remoteMeta.faviconUrl}
+          alt=""
+          className="h-3 w-3 shrink-0 rounded-sm"
+        />
       ) : (
         <ProviderIcon className="h-3 w-3 shrink-0" />
       )}

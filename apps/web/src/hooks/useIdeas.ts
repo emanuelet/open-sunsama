@@ -18,6 +18,7 @@ import type {
   ReorderIdeaColumnsInput,
   ReorderIdeaBoardsInput,
   PromoteIdeaInput,
+  KarakeepConnection,
 } from "@open-sunsama/types";
 import { getApi } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
@@ -62,6 +63,88 @@ export function useIdeas(boardId: string | undefined) {
       return await api.ideas.list({ boardId });
     },
     enabled: isAuthenticated && !!boardId,
+  });
+}
+
+const karakeepConnectionKey = ["ideas", "karakeep", "connection"] as const;
+
+export function useKarakeepConnection() {
+  const { isAuthenticated } = useAuth();
+  return useQuery({
+    queryKey: karakeepConnectionKey,
+    queryFn: () => getApi().ideas.karakeep.getConnection(),
+    enabled: isAuthenticated,
+  });
+}
+
+export function useConnectKarakeep() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { baseUrl: string; apiKey: string }) =>
+      getApi().ideas.karakeep.connect(input),
+    onSuccess: (connection: KarakeepConnection) => {
+      queryClient.setQueryData(karakeepConnectionKey, connection);
+      toast({ title: "Karakeep connected" });
+    },
+    onError: (error) =>
+      toast({
+        variant: "destructive",
+        title: "Could not connect Karakeep",
+        description: error instanceof Error ? error.message : "Unknown error",
+      }),
+  });
+}
+
+function replaceCachedIdea(
+  queryClient: ReturnType<typeof useQueryClient>,
+  boardId: string | undefined,
+  idea: Idea
+) {
+  if (!boardId) return;
+  queryClient.setQueryData<Idea[]>(ideaKeys.byBoard(boardId), (old) =>
+    (old ?? []).map((item) => (item.id === idea.id ? idea : item))
+  );
+}
+
+export function useSendIdeaToKarakeep(boardId: string | undefined) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => getApi().ideas.karakeep.send(id),
+    onSuccess: (idea) => {
+      replaceCachedIdea(queryClient, boardId, idea);
+      toast({ title: "Sent to Karakeep" });
+    },
+    onError: (error) =>
+      toast({
+        variant: "destructive",
+        title: "Could not send to Karakeep",
+        description: error instanceof Error ? error.message : "Unknown error",
+      }),
+  });
+}
+
+export function useSearchKarakeep() {
+  return useMutation({
+    mutationFn: ({ id, query }: { id: string; query: string }) =>
+      getApi().ideas.karakeep.search(id, query),
+  });
+}
+
+export function useLinkIdeaToKarakeep(boardId: string | undefined) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, bookmarkId }: { id: string; bookmarkId: string }) =>
+      getApi().ideas.karakeep.link(id, bookmarkId),
+    onSuccess: (idea) => {
+      replaceCachedIdea(queryClient, boardId, idea);
+      toast({ title: "Karakeep bookmark linked" });
+    },
+    onError: (error) =>
+      toast({
+        variant: "destructive",
+        title: "Could not link Karakeep bookmark",
+        description: error instanceof Error ? error.message : "Unknown error",
+      }),
   });
 }
 
@@ -359,8 +442,10 @@ export function useCreateIdea(boardId: string | undefined) {
         columnId: input.columnId,
         title: input.title,
         notes: input.notes ?? null,
-        estimatedMins: input.estimatedMins ?? null,
-        priority: input.priority ?? "P2",
+        url: input.url ?? null,
+        tags: input.tags ?? [],
+        source: input.source ?? null,
+        karakeepBookmarkId: null,
         position: Number.MAX_SAFE_INTEGER,
         completedAt: null,
         promotedTaskId: null,
@@ -545,7 +630,9 @@ export function useReorderIdeas(boardId: string | undefined) {
       });
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: boardId ? ideaKeys.byBoard(boardId) : ideaKeys.lists() });
+      queryClient.invalidateQueries({
+        queryKey: boardId ? ideaKeys.byBoard(boardId) : ideaKeys.lists(),
+      });
     },
   });
 }
@@ -566,8 +653,10 @@ export function usePromoteIdea(_boardId: string | undefined) {
     onSuccess: (result) => {
       if (result.idea.boardId) {
         // Reflect the new promotedTaskId on the card.
-        queryClient.setQueryData<Idea[]>(ideaKeys.byBoard(result.idea.boardId), (old) =>
-          (old ?? []).map((i) => (i.id === result.idea.id ? result.idea : i))
+        queryClient.setQueryData<Idea[]>(
+          ideaKeys.byBoard(result.idea.boardId),
+          (old) =>
+            (old ?? []).map((i) => (i.id === result.idea.id ? result.idea : i))
         );
       }
       // The promote created a real task — refresh task lists.
@@ -599,11 +688,23 @@ export function usePromoteIdea(_boardId: string | undefined) {
 export function useSaveTaskAsIdea() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {taskId:string; boardId:string; columnId:string}) => getApi().ideas.fromTask(input),
+    mutationFn: async (input: {
+      taskId: string;
+      boardId: string;
+      columnId: string;
+    }) => getApi().ideas.fromTask(input),
     onSuccess: () => {
-      void queryClient.invalidateQueries({queryKey:ideaKeys.all});
-      toast({title:"Saved to Ideas",description:"The idea links to your existing task."});
+      void queryClient.invalidateQueries({ queryKey: ideaKeys.all });
+      toast({
+        title: "Saved to Ideas",
+        description: "The idea links to your existing task.",
+      });
     },
-    onError: (error) => toast({variant:"destructive",title:"Could not save idea",description:error.message}),
+    onError: (error) =>
+      toast({
+        variant: "destructive",
+        title: "Could not save idea",
+        description: error.message,
+      }),
   });
 }

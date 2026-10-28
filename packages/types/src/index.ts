@@ -194,6 +194,8 @@ export type {
   ReorderIdeaBoardsInput,
   PromoteIdeaInput,
   IdeaFilterInput,
+  KarakeepConnection,
+  KarakeepBookmark,
   IdeaSubtask,
   CreateIdeaSubtaskInput,
   UpdateIdeaSubtaskInput,

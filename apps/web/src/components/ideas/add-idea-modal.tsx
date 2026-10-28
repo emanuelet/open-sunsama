@@ -13,7 +13,7 @@ interface AddIdeaModalProps {
 
 /**
  * Add an idea with the same quick composer as tasks: one line for the
- * title, Tab for subtasks, chips for planned time and priority.
+ * title and Tab for subtasks.
  */
 export function AddIdeaModal({
   open,
@@ -46,13 +46,14 @@ export function AddIdeaModal({
                   boardId,
                   columnId,
                   title: values.title,
-                  estimatedMins: values.estimatedMins ?? undefined,
-                  priority: values.priority,
                 })
                 .then(async (idea) => {
                   // One at a time, so they keep the order they were typed in.
                   for (const title of values.subtasks) {
-                    await createSubtask.mutateAsync({ ideaId: idea.id, input: { title } });
+                    await createSubtask.mutateAsync({
+                      ideaId: idea.id,
+                      input: { title },
+                    });
                   }
                 })
                 .catch(() => {

@@ -1,25 +1,25 @@
 import * as React from "react";
-import { Check, Clock, ChevronDown } from "lucide-react";
-import type { Idea, TaskPriority } from "@open-sunsama/types";
+import { Check, Link2, Search, Send } from "lucide-react";
+import type { Idea, KarakeepBookmark } from "@open-sunsama/types";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   Label,
   Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  Input,
 } from "@/components/ui";
-import { PriorityIcon, PRIORITY_LABELS } from "@/components/ui/priority-badge";
 import { RichTextEditor } from "@/components/ui/rich-text-editor.lazy";
-import { cn, TIME_PRESETS, formatTimeDisplayCompact } from "@/lib/utils";
-import { useUpdateIdea } from "@/hooks/useIdeas";
+import { cn } from "@/lib/utils";
+import {
+  useConnectKarakeep,
+  useKarakeepConnection,
+  useLinkIdeaToKarakeep,
+  useSearchKarakeep,
+  useSendIdeaToKarakeep,
+  useUpdateIdea,
+} from "@/hooks/useIdeas";
 import { IdeaSubtaskList } from "./idea-subtask-list";
-
-const PRIORITIES: TaskPriority[] = ["P0", "P1", "P2", "P3"];
 
 interface IdeaEditDialogProps {
   boardId: string;
@@ -41,12 +41,29 @@ export function IdeaEditDialog({
 }: IdeaEditDialogProps) {
   const [title, setTitle] = React.useState(idea.title);
   const [notes, setNotes] = React.useState(idea.notes ?? "");
+  const [url, setUrl] = React.useState(idea.url ?? "");
+  const [tags, setTags] = React.useState(idea.tags.join(", "));
+  const [source, setSource] = React.useState(idea.source ?? "");
+  const [baseUrl, setBaseUrl] = React.useState("");
+  const [apiKey, setApiKey] = React.useState("");
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [results, setResults] = React.useState<KarakeepBookmark[]>([]);
   const updateIdea = useUpdateIdea(boardId);
+  const connection = useKarakeepConnection();
+  const connect = useConnectKarakeep();
+  const send = useSendIdeaToKarakeep(boardId);
+  const search = useSearchKarakeep();
+  const link = useLinkIdeaToKarakeep(boardId);
 
   React.useEffect(() => {
     if (open) {
       setTitle(idea.title);
       setNotes(idea.notes ?? "");
+      setUrl(idea.url ?? "");
+      setTags(idea.tags.join(", "));
+      setSource(idea.source ?? "");
+      setSearchQuery("");
+      setResults([]);
     }
   }, [open, idea]);
 
@@ -63,6 +80,27 @@ export function IdeaEditDialog({
     }
   };
 
+  const saveIdeaProperties = async () => {
+    const nextTags = tags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+    if (
+      url.trim() === (idea.url ?? "") &&
+      source.trim() === (idea.source ?? "") &&
+      nextTags.join("\u0000") === idea.tags.join("\u0000")
+    )
+      return;
+    await updateIdea.mutateAsync({
+      id: idea.id,
+      input: {
+        url: url.trim() || null,
+        source: source.trim() || null,
+        tags: nextTags,
+      },
+    });
+  };
+
   const handleOpenChange = (next: boolean) => {
     if (!next) {
       // Persist notes on close.
@@ -73,16 +111,9 @@ export function IdeaEditDialog({
           input: { notes: cleaned || null },
         });
       }
+      void saveIdeaProperties();
     }
     onOpenChange(next);
-  };
-
-  const setPriority = (priority: TaskPriority) => {
-    updateIdea.mutate({ id: idea.id, input: { priority } });
-  };
-
-  const setEstimate = (mins: number | null) => {
-    updateIdea.mutate({ id: idea.id, input: { estimatedMins: mins } });
   };
 
   const toggleComplete = () => {
@@ -90,6 +121,18 @@ export function IdeaEditDialog({
       id: idea.id,
       input: { completedAt: isCompleted ? null : new Date() },
     });
+  };
+
+  const searchKarakeep = async () => {
+    const query = searchQuery.trim();
+    if (!query) return;
+    const found = await search.mutateAsync({ id: idea.id, query });
+    setResults(found);
+  };
+
+  const sendToKarakeep = async () => {
+    await saveIdeaProperties();
+    await send.mutateAsync(idea.id);
   };
 
   return (
@@ -132,80 +175,6 @@ export function IdeaEditDialog({
           />
         </div>
 
-        {/* Property bar: priority + estimate (saved immediately) */}
-        <div className="flex items-center gap-2 border-t border-border/40 px-5 py-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 gap-1.5 px-2.5 text-sm font-normal"
-              >
-                <PriorityIcon priority={idea.priority} />
-                <span>{PRIORITY_LABELS[idea.priority]}</span>
-                <ChevronDown className="h-3 w-3 opacity-50" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-32">
-              {PRIORITIES.map((p) => (
-                <DropdownMenuItem
-                  key={p}
-                  onClick={() => setPriority(p)}
-                  className={cn("gap-2 text-sm", idea.priority === p && "bg-accent")}
-                >
-                  <PriorityIcon priority={p} />
-                  <span>{PRIORITY_LABELS[p]}</span>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className={cn(
-                  "h-8 gap-1.5 px-2.5 text-sm font-normal",
-                  idea.estimatedMins == null && "text-muted-foreground"
-                )}
-              >
-                <Clock className="h-3.5 w-3.5" />
-                <span>
-                  {formatTimeDisplayCompact(idea.estimatedMins) || "Estimate"}
-                </span>
-                <ChevronDown className="h-3 w-3 opacity-50" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-32">
-              {TIME_PRESETS.map((preset) => (
-                <DropdownMenuItem
-                  key={preset.value}
-                  onClick={() => setEstimate(parseInt(preset.value, 10))}
-                  className={cn(
-                    "text-sm",
-                    idea.estimatedMins === parseInt(preset.value, 10) &&
-                      "bg-accent"
-                  )}
-                >
-                  {preset.label}
-                </DropdownMenuItem>
-              ))}
-              {idea.estimatedMins != null && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => setEstimate(null)}
-                    className="text-sm text-muted-foreground"
-                  >
-                    Clear
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
         {/* Body: subtasks + notes */}
         <div className="max-h-[60vh] space-y-4 overflow-y-auto border-t border-border/40 px-5 py-4">
           <div className="space-y-1.5">
@@ -214,6 +183,62 @@ export function IdeaEditDialog({
             </Label>
             <IdeaSubtaskList ideaId={idea.id} />
           </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Link
+            </Label>
+            <Input
+              value={url}
+              onChange={(event) => setUrl(event.target.value)}
+              placeholder="https://example.com"
+              type="url"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Tags
+              </Label>
+              <Input
+                value={tags}
+                onChange={(event) => setTags(event.target.value)}
+                placeholder="research, design"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Source
+              </Label>
+              <Input
+                value={source}
+                onChange={(event) => setSource(event.target.value)}
+                placeholder="Where it came from"
+              />
+            </div>
+          </div>
+
+          <KarakeepPanel
+            idea={idea}
+            connection={connection.data}
+            baseUrl={baseUrl}
+            apiKey={apiKey}
+            searchQuery={searchQuery}
+            results={results}
+            connecting={connect.isPending}
+            sending={send.isPending}
+            searching={search.isPending}
+            linking={link.isPending}
+            canSend={Boolean(url.trim())}
+            onBaseUrlChange={setBaseUrl}
+            onApiKeyChange={setApiKey}
+            onSearchChange={setSearchQuery}
+            onConnect={() => connect.mutate({ baseUrl, apiKey })}
+            onSend={sendToKarakeep}
+            onSearch={searchKarakeep}
+            onLink={(bookmarkId) => link.mutate({ id: idea.id, bookmarkId })}
+          />
 
           <div className="space-y-1.5">
             <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -229,5 +254,135 @@ export function IdeaEditDialog({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function KarakeepPanel({
+  idea,
+  connection,
+  baseUrl,
+  apiKey,
+  searchQuery,
+  results,
+  connecting,
+  sending,
+  searching,
+  linking,
+  canSend,
+  onBaseUrlChange,
+  onApiKeyChange,
+  onSearchChange,
+  onConnect,
+  onSend,
+  onSearch,
+  onLink,
+}: {
+  idea: Idea;
+  connection: { baseUrl: string; connected: boolean } | null | undefined;
+  baseUrl: string;
+  apiKey: string;
+  searchQuery: string;
+  results: KarakeepBookmark[];
+  connecting: boolean;
+  sending: boolean;
+  searching: boolean;
+  linking: boolean;
+  canSend: boolean;
+  onBaseUrlChange: (value: string) => void;
+  onApiKeyChange: (value: string) => void;
+  onSearchChange: (value: string) => void;
+  onConnect: () => void;
+  onSend: () => void;
+  onSearch: () => void;
+  onLink: (bookmarkId: string) => void;
+}) {
+  if (!connection) {
+    return (
+      <div className="space-y-2 rounded-md border border-border/60 p-3">
+        <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Karakeep
+        </Label>
+        <Input
+          value={baseUrl}
+          onChange={(event) => onBaseUrlChange(event.target.value)}
+          placeholder="https://karakeep.example.com"
+          type="url"
+        />
+        <Input
+          value={apiKey}
+          onChange={(event) => onApiKeyChange(event.target.value)}
+          placeholder="API key"
+          type="password"
+        />
+        <Button
+          size="sm"
+          onClick={onConnect}
+          disabled={!baseUrl || !apiKey || connecting}
+        >
+          Connect Karakeep
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2 rounded-md border border-border/60 p-3">
+      <div className="flex items-center justify-between gap-2">
+        <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Karakeep
+        </Label>
+        {idea.karakeepBookmarkId ? (
+          <span className="text-xs text-muted-foreground">Linked</span>
+        ) : null}
+      </div>
+      <Button
+        size="sm"
+        variant="outline"
+        className="gap-1.5"
+        onClick={onSend}
+        disabled={!canSend || sending}
+      >
+        <Send className="h-3.5 w-3.5" /> Send to Karakeep
+      </Button>
+      <div className="flex gap-2">
+        <Input
+          value={searchQuery}
+          onChange={(event) => onSearchChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              onSearch();
+            }
+          }}
+          placeholder="Search bookmarks and notes"
+        />
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={onSearch}
+          disabled={!searchQuery.trim() || searching}
+          aria-label="Search Karakeep"
+        >
+          <Search className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+      {results.map((bookmark) => (
+        <button
+          key={bookmark.id}
+          type="button"
+          className="flex w-full items-center justify-between gap-3 rounded px-1 py-1 text-left text-xs hover:bg-accent"
+          onClick={() => onLink(bookmark.id)}
+          disabled={linking}
+        >
+          <span className="min-w-0 truncate">
+            {bookmark.title ||
+              bookmark.url ||
+              bookmark.note ||
+              "Untitled bookmark"}
+          </span>
+          <Link2 className="h-3.5 w-3.5 shrink-0" />
+        </button>
+      ))}
+    </div>
   );
 }

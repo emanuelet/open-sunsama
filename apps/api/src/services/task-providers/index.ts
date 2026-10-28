@@ -63,28 +63,30 @@ export interface VerifiedAccount {
   label: string;
   /**
    * The credential object to encrypt and store. Providers return this so
-    * they can validate or enrich what the user typed without the route
-    * layer knowing the credential shape.
+   * they can validate or enrich what the user typed without the route
+   * layer knowing the credential shape.
    */
   credentials: unknown;
 }
 
-export interface TaskProvider {
+export interface IntegrationProvider {
   readonly id: string;
   readonly displayName: string;
   /** Where to find the credential the connect dialog asks for. */
   readonly docsUrl: string;
   readonly credentialFields: CredentialField[];
   readonly credentialSchema: z.ZodTypeAny;
-  /** Shown as the import dialog's placeholder. */
-  readonly referenceExample: string;
-
   /**
    * Prove the credential works and identify the account behind it.
    * Called from the connect route so a bad token fails loudly at connect
    * time rather than at the user's first import.
    */
   verifyCredentials(credentials: unknown): Promise<VerifiedAccount>;
+}
+
+export interface TaskProvider extends IntegrationProvider {
+  /** Shown as the import dialog's placeholder. */
+  readonly referenceExample: string;
 
   /**
    * Pull a task id out of whatever the user pasted — a full URL, a share
@@ -106,12 +108,43 @@ export interface TaskProvider {
  * so adding a provider does not require changing shared schemas.
  */
 const PROVIDERS = new Map<string, TaskProvider>();
+const INTEGRATION_PROVIDERS = new Map<string, IntegrationProvider>();
+
+export function registerIntegrationProvider(
+  provider: IntegrationProvider
+): void {
+  if (
+    !provider.id ||
+    provider.id.length > 32 ||
+    INTEGRATION_PROVIDERS.has(provider.id)
+  ) {
+    throw new Error(
+      `Invalid or duplicate integration provider: ${provider.id}`
+    );
+  }
+  INTEGRATION_PROVIDERS.set(provider.id, provider);
+}
 
 export function registerTaskProvider(provider: TaskProvider): void {
   if (!provider.id || provider.id.length > 32 || PROVIDERS.has(provider.id)) {
     throw new Error(`Invalid or duplicate task provider: ${provider.id}`);
   }
   PROVIDERS.set(provider.id, provider);
+  registerIntegrationProvider(provider);
+}
+
+export function getIntegrationProvider(id: string): IntegrationProvider {
+  const provider = INTEGRATION_PROVIDERS.get(id);
+  if (!provider) throw new NotFoundError(`Integration provider ${id}`);
+  return provider;
+}
+
+export function hasIntegrationProvider(id: string): boolean {
+  return INTEGRATION_PROVIDERS.has(id);
+}
+
+export function listIntegrationProviders(): IntegrationProvider[] {
+  return [...INTEGRATION_PROVIDERS.values()];
 }
 
 export function getTaskProvider(id: string): TaskProvider {
@@ -131,5 +164,7 @@ export function listTaskProviders(): TaskProvider[] {
 }
 
 import { TodoistProvider } from "./todoist.js";
+import { KarakeepProvider } from "./karakeep.js";
 
 registerTaskProvider(new TodoistProvider());
+registerIntegrationProvider(new KarakeepProvider());

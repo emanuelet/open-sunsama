@@ -5,12 +5,30 @@
 import { z } from "zod";
 import { uuidSchema, dateSchema } from "@open-sunsama/utils";
 
-const prioritySchema = z.enum(["P0", "P1", "P2", "P3"]);
-const estimatedMinsSchema = z.number().int().positive().max(1440);
-const orderedIdsSchema = z.array(uuidSchema).min(1).refine(
-  (ids) => new Set(ids).size === ids.length,
-  "IDs must be unique"
-);
+const httpUrlSchema = z
+  .string()
+  .max(2048)
+  .url()
+  .refine((value) => {
+    const url = new URL(value);
+    return (
+      (url.protocol === "https:" || url.protocol === "http:") &&
+      !url.username &&
+      !url.password
+    );
+  }, "Use an http(s) URL without embedded credentials");
+const ideaTagsSchema = z
+  .array(z.string().trim().min(1).max(64))
+  .max(20)
+  .refine(
+    (tags) =>
+      new Set(tags.map((tag) => tag.toLowerCase())).size === tags.length,
+    "Tags must be unique"
+  );
+const orderedIdsSchema = z
+  .array(uuidSchema)
+  .min(1)
+  .refine((ids) => new Set(ids).size === ids.length, "IDs must be unique");
 
 // lucide icon name — letters/digits only (e.g. "Film", "Rocket")
 const iconSchema = z
@@ -64,16 +82,18 @@ export const createIdeaSchema = z.object({
   columnId: uuidSchema,
   title: z.string().min(1, { error: "Title is required" }).max(500),
   notes: z.string().max(5000).optional().nullable(),
-  estimatedMins: estimatedMinsSchema.optional().nullable(),
-  priority: prioritySchema.optional(),
+  url: httpUrlSchema.optional().nullable(),
+  tags: ideaTagsSchema.optional(),
+  source: z.string().trim().min(1).max(120).optional().nullable(),
   position: z.number().int().nonnegative().optional(),
 });
 
 export const updateIdeaSchema = z.object({
   title: z.string().min(1).max(500).optional(),
   notes: z.string().max(5000).optional().nullable(),
-  estimatedMins: estimatedMinsSchema.optional().nullable(),
-  priority: prioritySchema.optional(),
+  url: httpUrlSchema.optional().nullable(),
+  tags: ideaTagsSchema.optional(),
+  source: z.string().trim().min(1).max(120).optional().nullable(),
   columnId: uuidSchema.optional(),
   position: z.number().int().nonnegative().optional(),
   completedAt: z.iso.datetime().optional().nullable(),
@@ -92,6 +112,22 @@ export const reorderIdeasSchema = z.object({
 
 export const promoteIdeaSchema = z.object({
   scheduledDate: dateSchema.optional().nullable(),
+});
+
+export const karakeepConnectionSchema = z.object({
+  baseUrl: httpUrlSchema.refine(
+    (value) => new URL(value).pathname === "/",
+    "Use the Karakeep server URL without a path"
+  ),
+  apiKey: z.string().trim().min(1).max(2048),
+});
+
+export const karakeepSearchSchema = z.object({
+  query: z.string().trim().min(1).max(500),
+});
+
+export const karakeepLinkSchema = z.object({
+  bookmarkId: z.string().trim().min(1).max(255),
 });
 
 // ───────────────────────── idea subtasks ─────────────────────────

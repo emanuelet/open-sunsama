@@ -32,9 +32,11 @@ import {
   updateIntegrationAccountSchema,
 } from "../validation/integrations.js";
 import {
+  getIntegrationProvider,
   getTaskProvider,
+  hasIntegrationProvider,
   hasTaskProvider,
-  listTaskProviders,
+  listIntegrationProviders,
   ProviderCredentialError,
   ProviderRateLimitError,
   ProviderTaskNotFoundError,
@@ -45,6 +47,7 @@ import {
   resolveReference,
 } from "../services/task-import.js";
 import { decrypt, encrypt } from "../services/encryption.js";
+import { fetchLinkPreview } from "../services/link-preview.js";
 import { publishEvent } from "../lib/websocket/index.js";
 import type { IntegrationAccount } from "@open-sunsama/database/schema";
 
@@ -86,12 +89,13 @@ integrationsRouter.get(
   (c) => {
     return c.json({
       success: true,
-      data: listTaskProviders().map((provider) => ({
+      data: listIntegrationProviders().map((provider) => ({
         id: provider.id,
         displayName: provider.displayName,
         docsUrl: provider.docsUrl,
         credentialFields: provider.credentialFields,
-        referenceExample: provider.referenceExample,
+        referenceExample:
+          "referenceExample" in provider ? provider.referenceExample : null,
       })),
     });
   }
@@ -134,7 +138,12 @@ integrationsRouter.get(
     const [account] = await db
       .select()
       .from(integrationAccounts)
-      .where(and(eq(integrationAccounts.id, id), eq(integrationAccounts.userId, userId)))
+      .where(
+        and(
+          eq(integrationAccounts.id, id),
+          eq(integrationAccounts.userId, userId)
+        )
+      )
       .limit(1);
 
     if (!account) throw new NotFoundError("Integration account not found");
@@ -166,7 +175,10 @@ integrationsRouter.get(
       const mapped = providerErrorResponse(error);
       if (mapped) {
         return c.json(
-          { success: false, error: { code: mapped.code, message: mapped.message } },
+          {
+            success: false,
+            error: { code: mapped.code, message: mapped.message },
+          },
           mapped.status
         );
       }
@@ -192,7 +204,7 @@ integrationsRouter.post(
     const { provider: providerId, credentials } = c.req.valid("json");
     const db = getDb();
 
-    if (!hasTaskProvider(providerId)) {
+    if (!hasIntegrationProvider(providerId)) {
       return c.json(
         {
           success: false,
@@ -205,7 +217,7 @@ integrationsRouter.post(
       );
     }
 
-    const provider = getTaskProvider(providerId);
+    const provider = getIntegrationProvider(providerId);
 
     const parsed = provider.credentialSchema.safeParse(credentials);
     if (!parsed.success) {
@@ -228,7 +240,10 @@ integrationsRouter.post(
       const mapped = providerErrorResponse(error);
       if (mapped) {
         return c.json(
-          { success: false, error: { code: mapped.code, message: mapped.message } },
+          {
+            success: false,
+            error: { code: mapped.code, message: mapped.message },
+          },
           mapped.status
         );
       }
@@ -383,21 +398,26 @@ integrationsRouter.post(
   async (c) => {
     const userId = c.get("userId");
     const input = c.req.valid("json");
-    const resolved = "reference" in input
-      ? await resolveReference(userId, input.reference)
-      : await (async () => {
-          const db = getDb();
-          const [account] = await db.select().from(integrationAccounts).where(
-            and(
-              eq(integrationAccounts.id, input.accountId),
-              eq(integrationAccounts.userId, userId),
-              eq(integrationAccounts.isActive, true)
-            )
-          ).limit(1);
-          return account && hasTaskProvider(account.provider)
-            ? { account, externalId: input.externalId }
-            : null;
-        })();
+    const resolved =
+      "reference" in input
+        ? await resolveReference(userId, input.reference)
+        : await (async () => {
+            const db = getDb();
+            const [account] = await db
+              .select()
+              .from(integrationAccounts)
+              .where(
+                and(
+                  eq(integrationAccounts.id, input.accountId),
+                  eq(integrationAccounts.userId, userId),
+                  eq(integrationAccounts.isActive, true)
+                )
+              )
+              .limit(1);
+            return account && hasTaskProvider(account.provider)
+              ? { account, externalId: input.externalId }
+              : null;
+          })();
     if (!resolved) {
       return c.json(
         {
@@ -441,7 +461,10 @@ integrationsRouter.post(
       const mapped = providerErrorResponse(error);
       if (mapped) {
         return c.json(
-          { success: false, error: { code: mapped.code, message: mapped.message } },
+          {
+            success: false,
+            error: { code: mapped.code, message: mapped.message },
+          },
           mapped.status
         );
       }
@@ -470,7 +493,10 @@ integrationsRouter.post(
       const mapped = providerErrorResponse(error);
       if (mapped) {
         return c.json(
-          { success: false, error: { code: mapped.code, message: mapped.message } },
+          {
+            success: false,
+            error: { code: mapped.code, message: mapped.message },
+          },
           mapped.status
         );
       }
@@ -532,6 +558,8 @@ integrationsRouter.post(
       throw new NotFoundError("Task not found");
     }
 
+    const preview = await fetchLinkPreview(body.externalUrl);
+
     const [link] = await db
       .insert(taskExternalLinks)
       .values({
@@ -544,7 +572,16 @@ integrationsRouter.post(
         kind: body.kind,
         role: "reference",
         status: "active",
-        remoteMeta: body.label ? { containerName: body.label } : null,
+        remoteMeta:
+          body.label || preview
+            ? {
+                ...(body.label ? { containerName: body.label } : {}),
+                ...(preview?.title ? { title: preview.title } : {}),
+                ...(preview?.faviconUrl
+                  ? { faviconUrl: preview.faviconUrl }
+                  : {}),
+              }
+            : null,
       })
       .returning();
 

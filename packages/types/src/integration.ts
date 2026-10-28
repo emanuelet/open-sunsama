@@ -5,7 +5,7 @@
 export interface IntegrationCredentialField {
   key: string;
   label: string;
-  type: 'password' | 'text';
+  type: "password" | "text";
   placeholder?: string;
   help?: string;
 }
@@ -15,8 +15,8 @@ export interface IntegrationProviderInfo {
   displayName: string;
   docsUrl: string;
   credentialFields: IntegrationCredentialField[];
-  /** Example reference, shown as the import dialog's placeholder. */
-  referenceExample: string;
+  /** Example reference, shown as the import dialog's placeholder when this provider imports tasks. */
+  referenceExample: string | null;
 }
 
 export interface IntegrationAccount {
@@ -37,7 +37,7 @@ export interface IntegrationAccount {
 export interface ExternalTaskSummary {
   externalId: string;
   title: string;
-  priority: 'P0' | 'P1' | 'P2' | 'P3' | null;
+  priority: "P0" | "P1" | "P2" | "P3" | null;
   isCompleted: boolean;
   statusName: string | null;
   dueDate: string | null;
@@ -50,11 +50,13 @@ export interface ExternalTaskSummary {
 /** Providers may expose object kinds beyond the initial task/issue/PR set. */
 export type ExternalLinkKind = string;
 
-export type ExternalLinkRole = 'source' | 'reference';
-export type ExternalLinkStatus = 'active' | 'orphaned';
+export type ExternalLinkRole = "source" | "reference";
+export type ExternalLinkStatus = "active" | "orphaned";
 
 export interface ExternalLinkMeta {
   containerName?: string | null;
+  title?: string | null;
+  faviconUrl?: string | null;
   statusName?: string | null;
   dueDate?: string | null;
 }

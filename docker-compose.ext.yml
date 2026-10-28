@@ -23,12 +23,13 @@ services:
       - path: .env
         required: false
     environment:
-      # When empty, docker-start.sh builds this from the POSTGRES_* settings.
-      DATABASE_URL: ${DATABASE_URL:-}
+      # Keep the root DATABASE_URL available for local development. Docker
+      # uses its own override, or docker-start.sh builds the internal URL.
+      DATABASE_URL: ${COMPOSE_DATABASE_URL:-}
       POSTGRES_USER: ${POSTGRES_USER:-opensunsama}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-opensunsama}
       POSTGRES_DB: ${POSTGRES_DB:-opensunsama}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      REDIS_URL: ${COMPOSE_REDIS_URL:-redis://redis:6379}
       MIGRATE_ON_START: "true"
       PORT: ${PORT:-3001}
       # Public URLs: OAuth redirects, email links, CORS and the MCP connector use them

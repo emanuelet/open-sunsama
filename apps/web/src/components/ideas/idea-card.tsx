@@ -1,6 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { DurationPicker } from "@/components/ui/duration-picker";
-import { PriorityMenu } from "@/components/kanban/priority-menu";
 import * as React from "react";
 import { SubtaskChecklistPreview } from "@/components/kanban/task-card-content";
 import { useIdeaSubtasks, useUpdateIdeaSubtask } from "@/hooks/useIdeaSubtasks";
@@ -17,8 +15,8 @@ import {
   Columns3,
   Trash2,
 } from "lucide-react";
-import type { Idea, IdeaColumn, TaskPriority } from "@open-sunsama/types";
-import { cn, formatDuration } from "@/lib/utils";
+import type { Idea, IdeaColumn } from "@open-sunsama/types";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -37,27 +35,9 @@ import {
   ContextMenuSubTrigger,
   ContextMenuSubContent,
 } from "@/components/ui";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { HtmlContent } from "@/components/ui/html-content";
 import { useDeleteIdea, usePromoteIdea, useUpdateIdea } from "@/hooks/useIdeas";
 import { IdeaEditDialog } from "./idea-edit-dialog";
-
-/** Priority swatch styles — identical to the kanban task card. */
-const PRIORITY_STYLES: Record<TaskPriority, string> = {
-  P0: "bg-red-500/15 text-red-600 dark:text-red-400",
-  P1: "bg-orange-500/15 text-orange-600 dark:text-orange-400",
-  P2: "bg-blue-500/10 text-blue-500 dark:text-blue-400",
-  P3: "bg-slate-400/10 text-slate-400 dark:text-slate-500",
-};
-
-
-
-/** Duration presets in minutes — same grid as the kanban task card. */
-
 
 interface IdeaCardProps {
   idea: Idea;
@@ -189,8 +169,6 @@ export function IdeaCard({
 }: IdeaCardProps) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [editOpen, setEditOpen] = React.useState(false);
-  const [priorityOpen, setPriorityOpen] = React.useState(false);
-  const [durationOpen, setDurationOpen] = React.useState(false);
 
   const updateIdea = useUpdateIdea(boardId);
   const deleteIdea = useDeleteIdea(boardId);
@@ -222,16 +200,14 @@ export function IdeaCard({
   let showDropBelow = false;
   if (showIndicator) {
     const activeColumn = sortable.active?.data?.current?.columnId as
-      | string
-      | undefined;
+      string | undefined;
     if (activeColumn !== idea.columnId) {
       // Cross-column drop inserts before the hovered card.
       showDropAbove = true;
     } else {
       const activeIndex =
         (sortable.active?.data?.current?.sortable?.index as
-          | number
-          | undefined) ?? -1;
+          number | undefined) ?? -1;
       showDropAbove = activeIndex > sortable.index;
       showDropBelow = activeIndex < sortable.index && activeIndex !== -1;
     }
@@ -243,16 +219,6 @@ export function IdeaCard({
       id: idea.id,
       input: { completedAt: isCompleted ? null : new Date() },
     });
-  };
-
-  const setPriority = (priority: TaskPriority) => {
-    updateIdea.mutate({ id: idea.id, input: { priority } });
-    setPriorityOpen(false);
-  };
-
-  const setEstimate = (estimatedMins: number | null) => {
-    updateIdea.mutate({ id: idea.id, input: { estimatedMins } });
-    setDurationOpen(false);
   };
 
   const handleClick = () => {
@@ -353,77 +319,17 @@ export function IdeaCard({
         />
       )}
 
-      {/* Meta row: estimate + priority (inline editable) + subtasks + planner.
-          Shown for completed cards too — checking a card off shouldn't hide
-          what it was scoped at. */}
-      <div
-        className="flex flex-wrap items-center gap-1.5 pl-6"
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        {/* Estimated time — only shown when set (same as the task card);
-              click it to change or clear. Set it from the editor / Add idea. */}
-        {idea.estimatedMins != null && (
-          <Popover open={durationOpen} onOpenChange={setDurationOpen}>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                aria-label="Estimated time"
-                onClick={(e) => e.stopPropagation()}
-                className={cn(
-                  "shrink-0 rounded bg-muted/50 px-1.5 py-0.5",
-                  "text-[11px] tabular-nums text-muted-foreground",
-                  "transition-colors hover:bg-muted"
-                )}
-              >
-                {formatDuration(idea.estimatedMins)}
-              </button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto p-1"
-              align="start"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <DurationPicker value={idea.estimatedMins} onChange={setEstimate} onClose={() => setDurationOpen(false)} />
-            </PopoverContent>
-          </Popover>
-        )}
-
-        {/* Priority — click to change */}
-        <Popover open={priorityOpen} onOpenChange={setPriorityOpen}>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              aria-label="Priority"
-              onClick={(e) => e.stopPropagation()}
-              className={cn(
-                "shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold transition-all duration-150",
-                // Normal is the default, so it only shows on hover.
-                idea.priority === "P2" &&
-                  "opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100",
-                "hover:ring-1 hover:ring-primary/30",
-                "focus:outline-hidden focus:ring-1 focus:ring-primary/50",
-                PRIORITY_STYLES[idea.priority]
-              )}
-            >
-              {idea.priority}
-            </button>
-          </PopoverTrigger>
-          <PopoverContent
-            className="w-auto p-1"
-            align="start"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <PriorityMenu value={idea.priority} onChange={setPriority} />
-          </PopoverContent>
-        </Popover>
-
-        {inPlanner && (
-          <Link to="/app/focus/$taskId" params={{ taskId: idea.promotedTaskId! }} onClick={(e) => e.stopPropagation()} className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 hover:underline dark:text-emerald-400">
-            <Check className="h-3 w-3" strokeWidth={2.5} />
-            Open task
-          </Link>
-        )}
-      </div>
+      {inPlanner && (
+        <Link
+          to="/app/focus/$taskId"
+          params={{ taskId: idea.promotedTaskId! }}
+          onClick={(e) => e.stopPropagation()}
+          className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 hover:underline dark:text-emerald-400"
+        >
+          <Check className="h-3 w-3" strokeWidth={2.5} />
+          Open task
+        </Link>
+      )}
 
       {/* Subtasks right on the card, tickable, as on task cards */}
       {subtaskTotal > 0 && <IdeaSubtaskPreview ideaId={idea.id} />}
@@ -498,7 +404,11 @@ function IdeaSubtaskPreview({ ideaId }: { ideaId: string }) {
         onToggleSubtask={(id) => {
           const current = subtasks.find((s) => s.id === id);
           if (!current) return;
-          update.mutate({ ideaId, subtaskId: id, input: { completed: !current.completed } });
+          update.mutate({
+            ideaId,
+            subtaskId: id,
+            input: { completed: !current.completed },
+          });
         }}
       />
     </div>

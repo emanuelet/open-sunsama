@@ -45,12 +45,11 @@ export function IntegrationsSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Plug className="h-5 w-5" />
-            Task sources
+            Integrations
           </CardTitle>
           <CardDescription>
-            Connect a tool, then pull individual tasks in with{" "}
-            <span className="font-medium">Import</span> on the Tasks or Board
-            page. Nothing syncs automatically and nothing is written back.
+            Connect task sources to import work, or Karakeep to save and link
+            Ideas.
           </CardDescription>
         </CardHeader>
 
@@ -73,7 +72,9 @@ export function IntegrationsSettings() {
             </div>
           ) : (
             <p className="py-2 text-sm text-muted-foreground">
-              {providers.length ? "No task sources connected yet." : "No task sources available yet."}
+              {providers.length
+                ? "No integrations connected yet."
+                : "No integrations available yet."}
             </p>
           )}
 

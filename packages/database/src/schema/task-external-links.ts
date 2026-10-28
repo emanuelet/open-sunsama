@@ -47,6 +47,10 @@ export type ExternalLinkStatus = (typeof EXTERNAL_LINK_STATUSES)[number];
 export interface ExternalLinkMeta {
   /** External project or repository, rendered on the card's source chip. */
   containerName?: string | null;
+  /** Best-effort title captured from a manually attached web page. */
+  title?: string | null;
+  /** Best-effort favicon URL captured from a manually attached web page. */
+  faviconUrl?: string | null;
   /** Remote status label, e.g. "in progress". */
   statusName?: string | null;
   /** Remote due date, ISO date string. Display only — never sets scheduledDate. */

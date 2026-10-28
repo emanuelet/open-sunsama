@@ -19,10 +19,15 @@ import {
   ideaColumns,
   ideas,
   ideaSubtasks,
+  integrationAccounts,
   subtasks,
   tasks,
 } from "@open-sunsama/database";
-import { NotFoundError, ValidationError, uuidSchema } from "@open-sunsama/utils";
+import {
+  NotFoundError,
+  ValidationError,
+  uuidSchema,
+} from "@open-sunsama/utils";
 import { auth, requireScopes, type AuthVariables } from "../middleware/auth.js";
 import {
   createIdeaBoardSchema,
@@ -36,8 +41,19 @@ import {
   ideaFilterSchema,
   reorderIdeasSchema,
   promoteIdeaSchema,
+  karakeepConnectionSchema,
+  karakeepSearchSchema,
+  karakeepLinkSchema,
 } from "../validation/ideas.js";
 import { publishEvent } from "../lib/websocket/index.js";
+import { decrypt, encrypt } from "../services/encryption.js";
+import {
+  KarakeepError,
+  createKarakeepBookmark,
+  getKarakeepBookmark,
+  searchKarakeepBookmarks,
+  verifyKarakeepConnection,
+} from "../services/karakeep.js";
 
 const ideasRouter = new Hono<{ Variables: AuthVariables }>();
 ideasRouter.use("*", auth);
@@ -69,11 +85,158 @@ async function assertColumnOwned(userId: string, columnId: string) {
   return column;
 }
 
-function assertCompleteOrder(requested: string[], existing: string[], label: string) {
-  if (requested.length !== existing.length || existing.some((id) => !requested.includes(id))) {
+function assertCompleteOrder(
+  requested: string[],
+  existing: string[],
+  label: string
+) {
+  if (
+    requested.length !== existing.length ||
+    existing.some((id) => !requested.includes(id))
+  ) {
     throw new ValidationError(`Supply every ${label} ID exactly once`);
   }
 }
+
+async function getKarakeepConnection(userId: string) {
+  const [connection] = await getDb()
+    .select()
+    .from(integrationAccounts)
+    .where(
+      and(
+        eq(integrationAccounts.userId, userId),
+        eq(integrationAccounts.provider, "karakeep"),
+        eq(integrationAccounts.isActive, true)
+      )
+    )
+    .limit(1);
+  if (!connection) throw new NotFoundError("Karakeep connection");
+  const credentials = JSON.parse(decrypt(connection.credentialsEncrypted)) as {
+    baseUrl: string;
+    apiKey: string;
+  };
+  return {
+    baseUrl: credentials.baseUrl,
+    apiKey: credentials.apiKey,
+  };
+}
+
+function karakeepErrorResponse(
+  c: { json: (data: unknown, status?: 422 | 502) => Response },
+  error: unknown
+) {
+  if (error instanceof KarakeepError) {
+    return c.json(
+      {
+        success: false,
+        error: { code: "KARAKEEP_ERROR", message: error.message },
+      },
+      error.status
+    );
+  }
+  throw error;
+}
+
+function publicKarakeepBookmark(
+  bookmark: Awaited<ReturnType<typeof getKarakeepBookmark>>
+) {
+  return {
+    id: bookmark.id,
+    title: bookmark.title,
+    url:
+      bookmark.content.type === "link" ? (bookmark.content.url ?? null) : null,
+    note: bookmark.note,
+    tags: bookmark.tags.map((tag) => tag.name),
+  };
+}
+
+ideasRouter.get("/karakeep/connection", READ, async (c) => {
+  const [connection] = await getDb()
+    .select({ credentialsEncrypted: integrationAccounts.credentialsEncrypted })
+    .from(integrationAccounts)
+    .where(
+      and(
+        eq(integrationAccounts.userId, c.get("userId")),
+        eq(integrationAccounts.provider, "karakeep")
+      )
+    )
+    .limit(1);
+  return c.json({
+    success: true,
+    data: connection
+      ? {
+          baseUrl: (
+            JSON.parse(decrypt(connection.credentialsEncrypted)) as {
+              baseUrl: string;
+            }
+          ).baseUrl,
+          connected: true,
+        }
+      : null,
+  });
+});
+
+ideasRouter.put(
+  "/karakeep/connection",
+  WRITE,
+  zValidator("json", karakeepConnectionSchema),
+  async (c) => {
+    const userId = c.get("userId");
+    const { baseUrl, apiKey } = c.req.valid("json");
+    const normalizedBaseUrl = new URL(baseUrl).origin;
+    try {
+      await verifyKarakeepConnection(normalizedBaseUrl, apiKey);
+    } catch (error) {
+      return karakeepErrorResponse(c, error);
+    }
+    const db = getDb();
+    const [existing] = await db
+      .select()
+      .from(integrationAccounts)
+      .where(
+        and(
+          eq(integrationAccounts.userId, userId),
+          eq(integrationAccounts.provider, "karakeep")
+        )
+      )
+      .limit(1);
+    const values = {
+      providerAccountId: normalizedBaseUrl,
+      label: new URL(normalizedBaseUrl).host,
+      credentialsEncrypted: encrypt(
+        JSON.stringify({ baseUrl: normalizedBaseUrl, apiKey })
+      ),
+      isActive: true,
+      updatedAt: new Date(),
+    };
+    if (existing) {
+      await db
+        .update(integrationAccounts)
+        .set(values)
+        .where(eq(integrationAccounts.id, existing.id));
+    } else {
+      await db
+        .insert(integrationAccounts)
+        .values({ userId, provider: "karakeep", ...values });
+    }
+    return c.json({
+      success: true,
+      data: { baseUrl: normalizedBaseUrl, connected: true },
+    });
+  }
+);
+
+ideasRouter.delete("/karakeep/connection", WRITE, async (c) => {
+  await getDb()
+    .delete(integrationAccounts)
+    .where(
+      and(
+        eq(integrationAccounts.userId, c.get("userId")),
+        eq(integrationAccounts.provider, "karakeep")
+      )
+    );
+  return c.json({ success: true, data: undefined });
+});
 
 // ═══════════════════════════ BOARDS ═══════════════════════════
 
@@ -128,7 +291,10 @@ ideasRouter.post(
 
     publishEvent(userId, "idea-board:created", { boardId: board.id });
 
-    return c.json({ success: true, data: { ...board, columns: [column] } }, 201);
+    return c.json(
+      { success: true, data: { ...board, columns: [column] } },
+      201
+    );
   }
 );
 
@@ -142,8 +308,15 @@ ideasRouter.post(
     const { boardIds } = c.req.valid("json");
     const db = getDb();
 
-    const owned = await db.select({ id: ideaBoards.id }).from(ideaBoards).where(eq(ideaBoards.userId, userId));
-    assertCompleteOrder(boardIds, owned.map((board) => board.id), "board");
+    const owned = await db
+      .select({ id: ideaBoards.id })
+      .from(ideaBoards)
+      .where(eq(ideaBoards.userId, userId));
+    assertCompleteOrder(
+      boardIds,
+      owned.map((board) => board.id),
+      "board"
+    );
 
     await Promise.all(
       boardIds.map((id, index) =>
@@ -284,18 +457,24 @@ ideasRouter.post(
     await assertBoardOwned(userId, boardId);
     const db = getDb();
 
-    const owned = await db.select({ id: ideaColumns.id }).from(ideaColumns)
-      .where(and(eq(ideaColumns.userId, userId), eq(ideaColumns.boardId, boardId)));
-    assertCompleteOrder(columnIds, owned.map((column) => column.id), "column on this board");
+    const owned = await db
+      .select({ id: ideaColumns.id })
+      .from(ideaColumns)
+      .where(
+        and(eq(ideaColumns.userId, userId), eq(ideaColumns.boardId, boardId))
+      );
+    assertCompleteOrder(
+      columnIds,
+      owned.map((column) => column.id),
+      "column on this board"
+    );
 
     await Promise.all(
       columnIds.map((id, index) =>
         db
           .update(ideaColumns)
           .set({ position: index, updatedAt: new Date() })
-          .where(
-            and(eq(ideaColumns.id, id), eq(ideaColumns.userId, userId))
-          )
+          .where(and(eq(ideaColumns.id, id), eq(ideaColumns.userId, userId)))
       )
     );
 
@@ -369,55 +548,50 @@ ideasRouter.delete(
 // ═══════════════════════════ IDEAS ═══════════════════════════
 
 /** GET /ideas?boardId=&columnId=&completed= - list idea cards */
-ideasRouter.get(
-  "/",
-  READ,
-  zValidator("query", ideaFilterSchema),
-  async (c) => {
-    const userId = c.get("userId");
-    const filters = c.req.valid("query");
-    const db = getDb();
+ideasRouter.get("/", READ, zValidator("query", ideaFilterSchema), async (c) => {
+  const userId = c.get("userId");
+  const filters = c.req.valid("query");
+  const db = getDb();
 
-    const conditions = [eq(ideas.userId, userId)];
-    if (filters.boardId) conditions.push(eq(ideas.boardId, filters.boardId));
-    if (filters.columnId) conditions.push(eq(ideas.columnId, filters.columnId));
-    if (filters.completed === "true")
-      conditions.push(isNotNull(ideas.completedAt));
-    else if (filters.completed === "false")
-      conditions.push(isNull(ideas.completedAt));
+  const conditions = [eq(ideas.userId, userId)];
+  if (filters.boardId) conditions.push(eq(ideas.boardId, filters.boardId));
+  if (filters.columnId) conditions.push(eq(ideas.columnId, filters.columnId));
+  if (filters.completed === "true")
+    conditions.push(isNotNull(ideas.completedAt));
+  else if (filters.completed === "false")
+    conditions.push(isNull(ideas.completedAt));
 
-    const rows = await db
-      .select()
-      .from(ideas)
-      .where(and(...conditions))
-      .orderBy(asc(ideas.position), asc(ideas.createdAt));
+  const rows = await db
+    .select()
+    .from(ideas)
+    .where(and(...conditions))
+    .orderBy(asc(ideas.position), asc(ideas.createdAt));
 
-    // Attach subtask totals for the card badge (single grouped query).
-    if (rows.length === 0) return c.json({ success: true, data: rows });
-    const counts = await db
-      .select({
-        ideaId: ideaSubtasks.ideaId,
-        total: sql<number>`count(*)::int`,
-        done: sql<number>`count(*) filter (where ${ideaSubtasks.completed})::int`,
-      })
-      .from(ideaSubtasks)
-      .where(
-        inArray(
-          ideaSubtasks.ideaId,
-          rows.map((r) => r.id)
-        )
+  // Attach subtask totals for the card badge (single grouped query).
+  if (rows.length === 0) return c.json({ success: true, data: rows });
+  const counts = await db
+    .select({
+      ideaId: ideaSubtasks.ideaId,
+      total: sql<number>`count(*)::int`,
+      done: sql<number>`count(*) filter (where ${ideaSubtasks.completed})::int`,
+    })
+    .from(ideaSubtasks)
+    .where(
+      inArray(
+        ideaSubtasks.ideaId,
+        rows.map((r) => r.id)
       )
-      .groupBy(ideaSubtasks.ideaId);
-    const byId = new Map(counts.map((c2) => [c2.ideaId, c2]));
-    const data = rows.map((r) => ({
-      ...r,
-      subtaskCount: byId.get(r.id)?.total ?? 0,
-      subtaskDoneCount: byId.get(r.id)?.done ?? 0,
-    }));
+    )
+    .groupBy(ideaSubtasks.ideaId);
+  const byId = new Map(counts.map((c2) => [c2.ideaId, c2]));
+  const data = rows.map((r) => ({
+    ...r,
+    subtaskCount: byId.get(r.id)?.total ?? 0,
+    subtaskDoneCount: byId.get(r.id)?.done ?? 0,
+  }));
 
-    return c.json({ success: true, data });
-  }
-);
+  return c.json({ success: true, data });
+});
 
 /** Save a task as a linked idea without removing its schedule or timer. */
 ideasRouter.post(
@@ -473,8 +647,6 @@ ideasRouter.post(
           columnId,
           title: task.title,
           notes: task.notes,
-          priority: task.priority,
-          estimatedMins: task.estimatedMins,
           promotedTaskId: taskId,
           position: (maxPos?.max ?? -1) + 1,
         })
@@ -486,16 +658,14 @@ ideasRouter.post(
         .where(eq(subtasks.taskId, taskId))
         .orderBy(asc(subtasks.position));
       if (checklist.length)
-        await tx
-          .insert(ideaSubtasks)
-          .values(
-            checklist.map((item, position) => ({
-              ideaId: created.id,
-              title: item.title,
-              completed: item.completed,
-              position,
-            }))
-          );
+        await tx.insert(ideaSubtasks).values(
+          checklist.map((item, position) => ({
+            ideaId: created.id,
+            title: item.title,
+            completed: item.completed,
+            position,
+          }))
+        );
       return created;
     });
     publishEvent(userId, "idea:updated", { ideaId: idea.id });
@@ -538,8 +708,9 @@ ideasRouter.post(
         columnId: data.columnId,
         title: data.title,
         notes: data.notes ?? null,
-        estimatedMins: data.estimatedMins ?? null,
-        priority: data.priority ?? "P2",
+        url: data.url ?? null,
+        tags: data.tags ?? [],
+        source: data.source ?? null,
         position,
       })
       .returning();
@@ -565,13 +736,20 @@ ideasRouter.post(
     const targetColumn = await assertColumnOwned(userId, columnId);
     const db = getDb();
 
-    const owned = await db.select({ id: ideas.id }).from(ideas)
+    const owned = await db
+      .select({ id: ideas.id })
+      .from(ideas)
       .where(and(eq(ideas.userId, userId), inArray(ideas.id, ideaIds)));
-    if (owned.length !== ideaIds.length) throw new ValidationError("Every idea must belong to you");
-    const destination = await db.select({ id: ideas.id }).from(ideas)
+    if (owned.length !== ideaIds.length)
+      throw new ValidationError("Every idea must belong to you");
+    const destination = await db
+      .select({ id: ideas.id })
+      .from(ideas)
       .where(and(eq(ideas.userId, userId), eq(ideas.columnId, columnId)));
     if (destination.some((idea) => !ideaIds.includes(idea.id))) {
-      throw new ValidationError("Supply every idea already in the destination column");
+      throw new ValidationError(
+        "Supply every idea already in the destination column"
+      );
     }
 
     await Promise.all(
@@ -613,78 +791,83 @@ ideasRouter.post(
     const db = getDb();
 
     const promotion = await db.transaction(async (tx) => {
-    const [idea] = await tx
-      .select()
-      .from(ideas)
-      .where(and(eq(ideas.id, id), eq(ideas.userId, userId)))
-      .limit(1).for("update");
-    if (!idea) throw new NotFoundError("Idea", id);
+      const [idea] = await tx
+        .select()
+        .from(ideas)
+        .where(and(eq(ideas.id, id), eq(ideas.userId, userId)))
+        .limit(1)
+        .for("update");
+      if (!idea) throw new NotFoundError("Idea", id);
 
-    if (idea.promotedTaskId) {
-      const [existing] = await tx.select().from(tasks).where(and(eq(tasks.id, idea.promotedTaskId), eq(tasks.userId, userId)));
-      if (existing) return { idea, task: existing, created: false };
-    }
+      if (idea.promotedTaskId) {
+        const [existing] = await tx
+          .select()
+          .from(tasks)
+          .where(
+            and(eq(tasks.id, idea.promotedTaskId), eq(tasks.userId, userId))
+          );
+        if (existing) return { idea, task: existing, created: false };
+      }
 
-    const targetDate = scheduledDate ?? null;
+      const targetDate = scheduledDate ?? null;
 
-    // Append to the end of the destination (backlog or a given day).
-    const [maxPos] = await tx
-      .select({ max: sql<number>`COALESCE(MAX(${tasks.position}), -1)` })
-      .from(tasks)
-      .where(
-        and(
-          eq(tasks.userId, userId),
-          targetDate
-            ? eq(tasks.scheduledDate, targetDate)
-            : isNull(tasks.scheduledDate)
-        )
-      );
-    const position = (maxPos?.max ?? -1) + 1;
+      // Append to the end of the destination (backlog or a given day).
+      const [maxPos] = await tx
+        .select({ max: sql<number>`COALESCE(MAX(${tasks.position}), -1)` })
+        .from(tasks)
+        .where(
+          and(
+            eq(tasks.userId, userId),
+            targetDate
+              ? eq(tasks.scheduledDate, targetDate)
+              : isNull(tasks.scheduledDate)
+          )
+        );
+      const position = (maxPos?.max ?? -1) + 1;
 
-    const [task] = await tx
-      .insert(tasks)
-      .values({
-        userId,
-        title: idea.title,
-        notes: idea.notes ?? null,
-        scheduledDate: targetDate,
-        estimatedMins: idea.estimatedMins,
-        priority: idea.priority,
-        position,
-      })
-      .returning();
-    if (!task) throw new Error("Failed to create task from idea");
-
-    // The idea's checklist comes along, in order and with its ticks.
-    const checklist = await tx
-      .select()
-      .from(ideaSubtasks)
-      .where(eq(ideaSubtasks.ideaId, id))
-      .orderBy(asc(ideaSubtasks.position), asc(ideaSubtasks.createdAt));
-    if (checklist.length > 0) {
-      await tx.insert(subtasks).values(
-        checklist.map((item, position) => ({
-          taskId: task.id,
-          title: item.title,
-          completed: item.completed,
+      const [task] = await tx
+        .insert(tasks)
+        .values({
+          userId,
+          title: idea.title,
+          notes: idea.notes ?? null,
+          scheduledDate: targetDate,
           position,
-        }))
-      );
-    }
+        })
+        .returning();
+      if (!task) throw new Error("Failed to create task from idea");
 
-    const [updatedIdea] = await tx
-      .update(ideas)
-      .set({ promotedTaskId: task.id, updatedAt: new Date() })
-      .where(and(eq(ideas.id, id), eq(ideas.userId, userId)))
-      .returning();
+      // The idea's checklist comes along, in order and with its ticks.
+      const checklist = await tx
+        .select()
+        .from(ideaSubtasks)
+        .where(eq(ideaSubtasks.ideaId, id))
+        .orderBy(asc(ideaSubtasks.position), asc(ideaSubtasks.createdAt));
+      if (checklist.length > 0) {
+        await tx.insert(subtasks).values(
+          checklist.map((item, position) => ({
+            taskId: task.id,
+            title: item.title,
+            completed: item.completed,
+            position,
+          }))
+        );
+      }
+
+      const [updatedIdea] = await tx
+        .update(ideas)
+        .set({ promotedTaskId: task.id, updatedAt: new Date() })
+        .where(and(eq(ideas.id, id), eq(ideas.userId, userId)))
+        .returning();
 
       return { idea: updatedIdea!, task, created: true };
     });
     const { idea, task } = promotion;
-    if (promotion.created) publishEvent(userId, "task:created", {
-      taskId: task.id,
-      scheduledDate: task.scheduledDate,
-    });
+    if (promotion.created)
+      publishEvent(userId, "task:created", {
+        taskId: task.id,
+        scheduledDate: task.scheduledDate,
+      });
     publishEvent(userId, "idea:updated", {
       ideaId: id,
       boardId: idea.boardId,
@@ -698,15 +881,150 @@ ideasRouter.post(
   }
 );
 
+/** Send an idea's URL to the owner's Karakeep instance and remember the bookmark. */
+ideasRouter.post(
+  "/:id/karakeep/send",
+  WRITE,
+  zValidator("param", z.object({ id: uuidSchema })),
+  async (c) => {
+    const userId = c.get("userId");
+    const { id } = c.req.valid("param");
+    const db = getDb();
+    const [idea] = await db
+      .select()
+      .from(ideas)
+      .where(and(eq(ideas.id, id), eq(ideas.userId, userId)))
+      .limit(1);
+    if (!idea) throw new NotFoundError("Idea", id);
+    if (!idea.url)
+      throw new ValidationError(
+        "Add an Idea URL before sending it to Karakeep"
+      );
+
+    try {
+      const connection = await getKarakeepConnection(userId);
+      const bookmark = await createKarakeepBookmark(
+        connection.baseUrl,
+        connection.apiKey,
+        {
+          title: idea.title,
+          url: idea.url,
+          notes: idea.notes,
+          tags: idea.tags,
+        }
+      );
+      const [updated] = await db
+        .update(ideas)
+        .set({ karakeepBookmarkId: bookmark.id, updatedAt: new Date() })
+        .where(and(eq(ideas.id, id), eq(ideas.userId, userId)))
+        .returning();
+      publishEvent(userId, "idea:updated", {
+        ideaId: id,
+        boardId: idea.boardId,
+        columnId: idea.columnId,
+      });
+      return c.json({ success: true, data: updated });
+    } catch (error) {
+      return karakeepErrorResponse(c, error);
+    }
+  }
+);
+
+/** Search only the authenticated user's Karakeep instance for a link target. */
+ideasRouter.get(
+  "/:id/karakeep/search",
+  READ,
+  zValidator("param", z.object({ id: uuidSchema })),
+  zValidator("query", karakeepSearchSchema),
+  async (c) => {
+    const userId = c.get("userId");
+    const { id } = c.req.valid("param");
+    const [idea] = await getDb()
+      .select({ id: ideas.id })
+      .from(ideas)
+      .where(and(eq(ideas.id, id), eq(ideas.userId, userId)))
+      .limit(1);
+    if (!idea) throw new NotFoundError("Idea", id);
+    try {
+      const connection = await getKarakeepConnection(userId);
+      const bookmarks = await searchKarakeepBookmarks(
+        connection.baseUrl,
+        connection.apiKey,
+        c.req.valid("query").query
+      );
+      return c.json({
+        success: true,
+        data: bookmarks.map(publicKarakeepBookmark),
+      });
+    } catch (error) {
+      return karakeepErrorResponse(c, error);
+    }
+  }
+);
+
+/** Link an existing bookmark after reading it through the owner's credentials. */
+ideasRouter.post(
+  "/:id/karakeep/link",
+  WRITE,
+  zValidator("param", z.object({ id: uuidSchema })),
+  zValidator("json", karakeepLinkSchema),
+  async (c) => {
+    const userId = c.get("userId");
+    const { id } = c.req.valid("param");
+    const { bookmarkId } = c.req.valid("json");
+    const db = getDb();
+    const [idea] = await db
+      .select()
+      .from(ideas)
+      .where(and(eq(ideas.id, id), eq(ideas.userId, userId)))
+      .limit(1);
+    if (!idea) throw new NotFoundError("Idea", id);
+    try {
+      const connection = await getKarakeepConnection(userId);
+      // A successful read proves this bookmark belongs to the configured account.
+      await getKarakeepBookmark(
+        connection.baseUrl,
+        connection.apiKey,
+        bookmarkId
+      );
+      const [updated] = await db
+        .update(ideas)
+        .set({ karakeepBookmarkId: bookmarkId, updatedAt: new Date() })
+        .where(and(eq(ideas.id, id), eq(ideas.userId, userId)))
+        .returning();
+      publishEvent(userId, "idea:updated", {
+        ideaId: id,
+        boardId: idea.boardId,
+        columnId: idea.columnId,
+      });
+      return c.json({ success: true, data: updated });
+    } catch (error) {
+      return karakeepErrorResponse(c, error);
+    }
+  }
+);
+
 /** Read one card without downloading its whole board. */
-ideasRouter.get("/:id", READ, zValidator("param", z.object({ id: uuidSchema })), async (c) => {
-  const { id } = c.req.valid("param");
-  const db = getDb();
-  const [idea] = await db.select().from(ideas).where(and(eq(ideas.id, id), eq(ideas.userId, c.get("userId"))));
-  if (!idea) throw new NotFoundError("Idea", id);
-  const checklist = await db.select().from(ideaSubtasks).where(eq(ideaSubtasks.ideaId, id)).orderBy(asc(ideaSubtasks.position), asc(ideaSubtasks.createdAt));
-  return c.json({ success: true, data: { ...idea, subtasks: checklist } });
-});
+ideasRouter.get(
+  "/:id",
+  READ,
+  zValidator("param", z.object({ id: uuidSchema })),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    const db = getDb();
+    const [idea] = await db
+      .select()
+      .from(ideas)
+      .where(and(eq(ideas.id, id), eq(ideas.userId, c.get("userId"))));
+    if (!idea) throw new NotFoundError("Idea", id);
+    const checklist = await db
+      .select()
+      .from(ideaSubtasks)
+      .where(eq(ideaSubtasks.ideaId, id))
+      .orderBy(asc(ideaSubtasks.position), asc(ideaSubtasks.createdAt));
+    return c.json({ success: true, data: { ...idea, subtasks: checklist } });
+  }
+);
 
 /** PATCH /ideas/:id - update an idea card */
 ideasRouter.patch(
@@ -730,9 +1048,9 @@ ideasRouter.patch(
     const updateData: Record<string, unknown> = { updatedAt: new Date() };
     if (updates.title !== undefined) updateData.title = updates.title;
     if (updates.notes !== undefined) updateData.notes = updates.notes;
-    if (updates.estimatedMins !== undefined)
-      updateData.estimatedMins = updates.estimatedMins;
-    if (updates.priority !== undefined) updateData.priority = updates.priority;
+    if (updates.url !== undefined) updateData.url = updates.url;
+    if (updates.tags !== undefined) updateData.tags = updates.tags;
+    if (updates.source !== undefined) updateData.source = updates.source;
     if (updates.position !== undefined) updateData.position = updates.position;
     if (updates.completedAt !== undefined)
       updateData.completedAt = updates.completedAt
@@ -778,7 +1096,9 @@ ideasRouter.delete(
       .limit(1);
     if (!existing) throw new NotFoundError("Idea", id);
 
-    await db.delete(ideas).where(and(eq(ideas.id, id), eq(ideas.userId, userId)));
+    await db
+      .delete(ideas)
+      .where(and(eq(ideas.id, id), eq(ideas.userId, userId)));
 
     publishEvent(userId, "idea:deleted", {
       ideaId: id,

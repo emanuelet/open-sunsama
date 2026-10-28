@@ -56,7 +56,11 @@ import { createAuthApi, type AuthApi } from "./auth.js";
 export { createAuthApi, type AuthApi };
 
 // Tasks API
-import { createTasksApi, type TasksApi, type TasksListResponse } from "./tasks.js";
+import {
+  createTasksApi,
+  type TasksApi,
+  type TasksListResponse,
+} from "./tasks.js";
 export { createTasksApi, type TasksApi, type TasksListResponse };
 
 // Subtasks API
@@ -72,7 +76,10 @@ import { createApiKeysApi, type ApiKeysApi } from "./api-keys.js";
 export { createApiKeysApi, type ApiKeysApi };
 
 // Notifications API
-import { createNotificationsApi, type NotificationsApi } from "./notifications.js";
+import {
+  createNotificationsApi,
+  type NotificationsApi,
+} from "./notifications.js";
 export { createNotificationsApi, type NotificationsApi };
 
 // Ideas API
@@ -159,6 +166,8 @@ export type {
   ReorderIdeaBoardsInput,
   PromoteIdeaInput,
   IdeaFilterInput,
+  KarakeepConnection,
+  KarakeepBookmark,
 } from "@open-sunsama/types";
 export { REMINDER_TIMING_OPTIONS } from "@open-sunsama/types";
 

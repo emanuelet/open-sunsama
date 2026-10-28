@@ -8,7 +8,7 @@
 
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Github, Menu } from "lucide-react";
+import { ArrowRight, Code2, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -168,7 +168,7 @@ function MobileMenu() {
             rel="noopener noreferrer"
             className={cn(item, "flex items-center gap-2")}
           >
-            <Github className="h-4 w-4" />
+            <Code2 className="h-4 w-4" />
             GitHub
           </a>
         </nav>
@@ -268,7 +268,7 @@ export function SiteHeader({
             rel="noopener noreferrer"
             className="hidden h-8 items-center gap-1.5 rounded-md border border-border/70 bg-background/60 px-2.5 text-[12px] font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring sm:flex"
           >
-            <Github className="h-3.5 w-3.5" />
+            <Code2 className="h-3.5 w-3.5" />
             Star
             {stars !== null && (
               <span className="rounded bg-muted px-1.5 py-px text-[11px] tabular-nums text-foreground">

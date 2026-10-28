@@ -5,8 +5,9 @@
  * entry here plus its backend implementation.
  */
 import type * as React from "react";
-import { Bookmark, Plug } from "lucide-react";
+import { Plug } from "lucide-react";
 import { TodoistIcon } from "@/components/ui/todoist-icon";
+import { KarakeepIcon } from "@/components/ui/karakeep-icon";
 
 export interface IntegrationProviderConfig {
   name: string;
@@ -30,7 +31,7 @@ export const INTEGRATION_PROVIDER_CONFIG: Record<
   },
   karakeep: {
     name: "Karakeep",
-    icon: Bookmark,
+    icon: KarakeepIcon,
     chipColor: "#6366F1",
     blurb:
       "Send ideas to your self-hosted Karakeep instance and link existing bookmarks.",

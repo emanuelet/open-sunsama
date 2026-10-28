@@ -1,4 +1,4 @@
-import { Twitter, Linkedin, Link2, Check } from "lucide-react";
+import { BriefcaseBusiness, Check, Link2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useState, useCallback } from "react";
@@ -85,7 +85,7 @@ export function ShareButtons({
         title="Share on Twitter/X"
         aria-label="Share on Twitter/X"
       >
-        <Twitter className="h-3.5 w-3.5" />
+        <Send className="h-3.5 w-3.5" />
       </Button>
 
       <Button
@@ -96,7 +96,7 @@ export function ShareButtons({
         title="Share on LinkedIn"
         aria-label="Share on LinkedIn"
       >
-        <Linkedin className="h-3.5 w-3.5" />
+        <BriefcaseBusiness className="h-3.5 w-3.5" />
       </Button>
 
       <Button

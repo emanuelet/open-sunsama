@@ -12,14 +12,14 @@ import {
 import { RichTextEditor } from "@/components/ui/rich-text-editor.lazy";
 import { cn } from "@/lib/utils";
 import {
-  useConnectKarakeep,
-  useKarakeepConnection,
   useLinkIdeaToKarakeep,
   useSearchKarakeep,
   useSendIdeaToKarakeep,
   useUpdateIdea,
 } from "@/hooks/useIdeas";
 import { IdeaSubtaskList } from "./idea-subtask-list";
+import { useIntegrationAccounts } from "@/hooks/useIntegrations";
+import { KarakeepIcon } from "@/components/ui/karakeep-icon";
 
 interface IdeaEditDialogProps {
   boardId: string;
@@ -44,13 +44,11 @@ export function IdeaEditDialog({
   const [url, setUrl] = React.useState(idea.url ?? "");
   const [tags, setTags] = React.useState(idea.tags.join(", "));
   const [source, setSource] = React.useState(idea.source ?? "");
-  const [baseUrl, setBaseUrl] = React.useState("");
-  const [apiKey, setApiKey] = React.useState("");
   const [searchQuery, setSearchQuery] = React.useState("");
   const [results, setResults] = React.useState<KarakeepBookmark[]>([]);
   const updateIdea = useUpdateIdea(boardId);
-  const connection = useKarakeepConnection();
-  const connect = useConnectKarakeep();
+  const { data: accounts = [] } = useIntegrationAccounts();
+  const karakeepConnected = accounts.some((account) => account.provider === "karakeep" && account.isActive);
   const send = useSendIdeaToKarakeep(boardId);
   const search = useSearchKarakeep();
   const link = useLinkIdeaToKarakeep(boardId);
@@ -65,7 +63,7 @@ export function IdeaEditDialog({
       setSearchQuery("");
       setResults([]);
     }
-  }, [open, idea]);
+  }, [open, idea.id]);
 
   const isCompleted = !!idea.completedAt;
 
@@ -131,7 +129,17 @@ export function IdeaEditDialog({
   };
 
   const sendToKarakeep = async () => {
-    await saveIdeaProperties();
+    const cleanedNotes = notes.replace(/<[^>]*>/g, "").trim().length ? notes : null;
+    await updateIdea.mutateAsync({
+      id: idea.id,
+      input: {
+        title: title.trim() || idea.title,
+        notes: cleanedNotes,
+        url: url.trim() || null,
+        tags: tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+        source: source.trim() || null,
+      },
+    });
     await send.mutateAsync(idea.id);
   };
 
@@ -175,8 +183,14 @@ export function IdeaEditDialog({
           />
         </div>
 
-        {/* Body: subtasks + notes */}
+        {/* Body: description and properties */}
         <div className="max-h-[60vh] space-y-4 overflow-y-auto border-t border-border/40 px-5 py-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Description
+            </Label>
+            <RichTextEditor value={notes} onChange={setNotes} placeholder="Add details..." minHeight="120px" />
+          </div>
           <div className="space-y-1.5">
             <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Subtasks
@@ -219,38 +233,19 @@ export function IdeaEditDialog({
             </div>
           </div>
 
-          <KarakeepPanel
+          {karakeepConnected && <KarakeepPanel
             idea={idea}
-            connection={connection.data}
-            baseUrl={baseUrl}
-            apiKey={apiKey}
             searchQuery={searchQuery}
             results={results}
-            connecting={connect.isPending}
             sending={send.isPending}
             searching={search.isPending}
             linking={link.isPending}
             canSend={Boolean(url.trim())}
-            onBaseUrlChange={setBaseUrl}
-            onApiKeyChange={setApiKey}
             onSearchChange={setSearchQuery}
-            onConnect={() => connect.mutate({ baseUrl, apiKey })}
             onSend={sendToKarakeep}
             onSearch={searchKarakeep}
             onLink={(bookmarkId) => link.mutate({ id: idea.id, bookmarkId })}
-          />
-
-          <div className="space-y-1.5">
-            <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Notes
-            </Label>
-            <RichTextEditor
-              value={notes}
-              onChange={setNotes}
-              placeholder="Add details..."
-              minHeight="120px"
-            />
-          </div>
+          />}
         </div>
       </DialogContent>
     </Dialog>
@@ -259,77 +254,34 @@ export function IdeaEditDialog({
 
 function KarakeepPanel({
   idea,
-  connection,
-  baseUrl,
-  apiKey,
   searchQuery,
   results,
-  connecting,
   sending,
   searching,
   linking,
   canSend,
-  onBaseUrlChange,
-  onApiKeyChange,
   onSearchChange,
-  onConnect,
   onSend,
   onSearch,
   onLink,
 }: {
   idea: Idea;
-  connection: { baseUrl: string; connected: boolean } | null | undefined;
-  baseUrl: string;
-  apiKey: string;
   searchQuery: string;
   results: KarakeepBookmark[];
-  connecting: boolean;
   sending: boolean;
   searching: boolean;
   linking: boolean;
   canSend: boolean;
-  onBaseUrlChange: (value: string) => void;
-  onApiKeyChange: (value: string) => void;
   onSearchChange: (value: string) => void;
-  onConnect: () => void;
   onSend: () => void;
   onSearch: () => void;
   onLink: (bookmarkId: string) => void;
 }) {
-  if (!connection) {
-    return (
-      <div className="space-y-2 rounded-md border border-border/60 p-3">
-        <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Karakeep
-        </Label>
-        <Input
-          value={baseUrl}
-          onChange={(event) => onBaseUrlChange(event.target.value)}
-          placeholder="https://karakeep.example.com"
-          type="url"
-        />
-        <Input
-          value={apiKey}
-          onChange={(event) => onApiKeyChange(event.target.value)}
-          placeholder="API key"
-          type="password"
-        />
-        <Button
-          size="sm"
-          onClick={onConnect}
-          disabled={!baseUrl || !apiKey || connecting}
-        >
-          Connect Karakeep
-        </Button>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-2 rounded-md border border-border/60 p-3">
       <div className="flex items-center justify-between gap-2">
-        <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Karakeep
+        <Label className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <KarakeepIcon className="h-4 w-4" /> Karakeep
         </Label>
         {idea.karakeepBookmarkId ? (
           <span className="text-xs text-muted-foreground">Linked</span>
@@ -340,9 +292,9 @@ function KarakeepPanel({
         variant="outline"
         className="gap-1.5"
         onClick={onSend}
-        disabled={!canSend || sending}
+        disabled={!canSend || sending || !!idea.karakeepBookmarkId}
       >
-        <Send className="h-3.5 w-3.5" /> Send to Karakeep
+        <Send className="h-3.5 w-3.5" /> {idea.karakeepBookmarkId ? "Saved to Karakeep" : "Save to Karakeep"}
       </Button>
       <div className="flex gap-2">
         <Input

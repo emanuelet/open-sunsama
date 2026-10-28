@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Command, Github } from "lucide-react";
+import { Code2, Command } from "lucide-react";
 import { GITHUB_URL } from "./site-header";
 
 const FOOTER_COLUMNS: Array<{ title: string; links: Array<[string, string]> }> =
@@ -74,7 +74,7 @@ export function SiteFooter() {
             rel="noopener noreferrer"
             className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground"
           >
-            <Github className="h-4 w-4" />
+            <Code2 className="h-4 w-4" />
             GitHub
           </a>
         </div>

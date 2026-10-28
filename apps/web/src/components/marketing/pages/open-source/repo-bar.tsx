@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { Github, Scale, Star, Tag } from "lucide-react";
+import { Code2, Scale, Star, Tag } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useGitHubStars } from "@/components/marketing/site-header";
 import { openSource } from "@/content/marketing/pages/open-source-task-manager";
@@ -119,7 +119,7 @@ export function RepoBar({ className }: { className?: string }) {
         className="flex min-w-0 items-center gap-3 border-b border-border/60 px-4 py-3 transition-colors hover:bg-muted/50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring dark:border-white/[0.07] sm:border-b-0 sm:border-r"
       >
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-background">
-          <Github className="h-4 w-4" />
+          <Code2 className="h-4 w-4" />
         </span>
         <span className="min-w-0">
           <span className="block truncate font-jetbrains text-[13px] text-muted-foreground">

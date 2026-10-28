@@ -4,7 +4,7 @@ import {
   Download,
   Monitor,
   Apple,
-  Github,
+  Code2,
   ExternalLink,
   Cpu,
   Zap,
@@ -498,7 +498,7 @@ export default function DownloadPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Github className="h-3.5 w-3.5" />
+              <Code2 className="h-3.5 w-3.5" />
               View on GitHub
             </a>
           </Button>

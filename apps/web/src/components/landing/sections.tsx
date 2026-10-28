@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   Download,
-  Github,
+  Code2,
   Hourglass,
   ListChecks,
   Monitor,
@@ -179,7 +179,7 @@ export function OpenSourceSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <Github className="h-4 w-4" />
+                    <Code2 className="h-4 w-4" />
                     Star on GitHub
                   </a>
                 </Button>

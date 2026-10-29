@@ -40,6 +40,15 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
+        name="ideas"
+        options={{
+          title: "Ideas",
+          tabBarIcon: ({ color, size }) => (
+            <Lucide name="lightbulb" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: "Settings",

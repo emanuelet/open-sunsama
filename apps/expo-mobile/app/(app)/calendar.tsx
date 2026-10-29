@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { format, addDays, subDays } from "date-fns";
 import { Lucide } from "@react-native-vector-icons/lucide";
 import { useTimeBlocks } from "@/hooks/useTimeBlocks";
 import { Timeline } from "@/components/Timeline";
+import { CreateTaskModal } from "@/components/CreateTaskModal";
 import { useThemeColors, type ThemeColors } from "@/lib/theme";
 
 /**
@@ -14,6 +15,7 @@ export default function CalendarScreen() {
   const colors = useThemeColors();
   const styles = createStyles(colors);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [creating, setCreating] = useState(false);
 
   const dateString = format(selectedDate, "yyyy-MM-dd");
   const {
@@ -81,6 +83,12 @@ export default function CalendarScreen() {
         onRefresh={refetch}
         isToday={isToday}
       />
+      <TouchableOpacity style={styles.fab} onPress={() => setCreating(true)} accessibilityRole="button" accessibilityLabel="Create calendar task">
+        <Lucide name="plus" size={24} color="#fff" />
+      </TouchableOpacity>
+      <Modal visible={creating} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setCreating(false)}>
+        {creating && <CreateTaskModal calendar defaultDate={dateString} onClose={() => setCreating(false)} />}
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -88,6 +96,7 @@ export default function CalendarScreen() {
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
+    fab: { position: "absolute", bottom: 24, right: 20, width: 56, height: 56, borderRadius: 28, backgroundColor: colors.accentFill, alignItems: "center", justifyContent: "center", elevation: 5 },
     dateNav: {
       flexDirection: "row",
       alignItems: "center",

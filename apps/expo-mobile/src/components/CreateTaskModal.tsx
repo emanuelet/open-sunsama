@@ -12,14 +12,17 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import type { TaskPriority } from "@open-sunsama/types";
-import { useCreateTask } from "@/hooks/useTasks";
+import type { Task, TaskPriority } from "@open-sunsama/types";
+import { useCreateTask, useUpdateTask } from "@/hooks/useTasks";
+import { useCreateTimeBlock } from "@/hooks/useTimeBlocks";
 import { PrioritySelector } from "./PrioritySelector";
 import { useThemeColors, type ThemeColors } from "@/lib/theme";
 
 interface CreateTaskModalProps {
   onClose: () => void;
   defaultDate?: string;
+  task?: Task;
+  calendar?: boolean;
 }
 
 /**
@@ -28,15 +31,23 @@ interface CreateTaskModalProps {
 export function CreateTaskModal({
   onClose,
   defaultDate,
+  task,
+  calendar = false,
 }: CreateTaskModalProps) {
   const colors = useThemeColors();
   const styles = createStyles(colors);
-  const [title, setTitle] = useState("");
-  const [notes, setNotes] = useState("");
-  const [priority, setPriority] = useState<TaskPriority>("P2");
-  const [estimatedMins, setEstimatedMins] = useState("");
+  const [title, setTitle] = useState(task?.title ?? "");
+  const [notes, setNotes] = useState(task?.notes ?? "");
+  const [priority, setPriority] = useState<TaskPriority>(task?.priority ?? "P2");
+  const [estimatedMins, setEstimatedMins] = useState(task?.estimatedMins?.toString() ?? "");
+  const [scheduledDate, setScheduledDate] = useState(task?.scheduledDate ?? defaultDate ?? "");
+  const [startTime, setStartTime] = useState("09:00");
+  const [createdTask, setCreatedTask] = useState<Task | null>(null);
 
   const createTask = useCreateTask();
+  const updateTask = useUpdateTask();
+  const createBlock = useCreateTimeBlock();
+  const pending = createTask.isPending || updateTask.isPending || createBlock.isPending;
 
   const handleCreate = async () => {
     if (!title.trim()) {
@@ -44,19 +55,44 @@ export function CreateTaskModal({
       return;
     }
 
+    const minutes = estimatedMins ? Number(estimatedMins) : null;
+    if (minutes !== null && (!Number.isInteger(minutes) || minutes < 1 || minutes > 1440)) {
+      Alert.alert("Invalid estimate", "Enter a number of minutes between 1 and 1440.");
+      return;
+    }
+    if (scheduledDate && !/^\d{4}-\d{2}-\d{2}$/.test(scheduledDate)) {
+      Alert.alert("Invalid date", "Enter a date as YYYY-MM-DD, or leave it blank for the backlog.");
+      return;
+    }
+    if (calendar && !/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(startTime)) {
+      Alert.alert("Invalid time", "Enter a time in 24-hour HH:MM format.");
+      return;
+    }
+    let taskCreated = !!createdTask;
     try {
-      await createTask.mutateAsync({
+      const input = {
         title: title.trim(),
-        notes: notes.trim() || undefined,
+        notes: notes.trim() || null,
         priority,
-        scheduledDate: defaultDate,
-        estimatedMins: estimatedMins ? parseInt(estimatedMins, 10) : undefined,
-      });
+        scheduledDate: scheduledDate || null,
+        estimatedMins: minutes,
+      };
+      if (task) {
+        await updateTask.mutateAsync({ id: task.id, data: input });
+      } else {
+        const created = createdTask ?? await createTask.mutateAsync({ ...input, notes: input.notes ?? undefined, scheduledDate: input.scheduledDate ?? undefined, estimatedMins: input.estimatedMins ?? undefined });
+        if (calendar && defaultDate) {
+          taskCreated = true;
+          setCreatedTask(created);
+          const start = new Date(`${defaultDate}T${startTime}:00`);
+          await createBlock.mutateAsync({ taskId: created.id, title: created.title, startTime: start.toISOString(), endTime: new Date(start.getTime() + (minutes ?? 60) * 60000).toISOString() });
+        }
+      }
       onClose();
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to create task";
-      Alert.alert("Error", message);
+      Alert.alert("Error", taskCreated ? `Task was created, but the time block failed. Retry or cancel. ${message}` : message);
     }
   };
 
@@ -71,16 +107,16 @@ export function CreateTaskModal({
           <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
             <Text style={styles.cancelText}>Cancel</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>New Task</Text>
+          <Text style={styles.headerTitle}>{task ? "Edit Task" : "New Task"}</Text>
           <TouchableOpacity
             onPress={handleCreate}
             style={[
               styles.saveButton,
               !title.trim() && styles.saveButtonDisabled,
             ]}
-            disabled={createTask.isPending || !title.trim()}
+            disabled={pending || !title.trim()}
           >
-            {createTask.isPending ? (
+            {pending ? (
               <ActivityIndicator size="small" color={colors.accent} />
             ) : (
               <Text
@@ -89,7 +125,7 @@ export function CreateTaskModal({
                   !title.trim() && styles.saveTextDisabled,
                 ]}
               >
-                Create
+                {task ? "Save" : "Create"}
               </Text>
             )}
           </TouchableOpacity>
@@ -107,7 +143,7 @@ export function CreateTaskModal({
               onChangeText={setTitle}
               autoFocus
               multiline
-              maxLength={200}
+              maxLength={500}
             />
           </View>
 
@@ -121,7 +157,6 @@ export function CreateTaskModal({
               value={notes}
               onChangeText={setNotes}
               multiline
-              maxLength={1000}
             />
           </View>
 
@@ -144,6 +179,14 @@ export function CreateTaskModal({
               maxLength={4}
             />
           </View>
+          {!calendar && <View style={styles.inputGroup}>
+            <Text style={styles.label}>Scheduled date (YYYY-MM-DD)</Text>
+            <TextInput style={styles.input} value={scheduledDate} onChangeText={setScheduledDate} placeholder="Backlog" placeholderTextColor={colors.muted} />
+          </View>}
+          {calendar && <View style={styles.inputGroup}>
+            <Text style={styles.label}>Start time (HH:MM)</Text>
+            <TextInput style={styles.input} value={startTime} onChangeText={setStartTime} placeholder="09:00" placeholderTextColor={colors.muted} />
+          </View>}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

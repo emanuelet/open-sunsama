@@ -25,6 +25,7 @@ export default function TasksScreen() {
   const styles = createStyles(colors);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const dateString = format(selectedDate, "yyyy-MM-dd");
   const {
@@ -51,7 +52,7 @@ export default function TasksScreen() {
   const isToday = format(new Date(), "yyyy-MM-dd") === dateString;
 
   const renderTask = useCallback(
-    ({ item }: { item: Task }) => <TaskCard task={item} />,
+    ({ item }: { item: Task }) => <TaskCard task={item} onPress={() => setEditingTask(item)} />,
     []
   );
 
@@ -159,10 +160,14 @@ export default function TasksScreen() {
         presentationStyle="pageSheet"
         onRequestClose={handleCloseCreateModal}
       >
-        <CreateTaskModal
+        {isCreateModalVisible && <CreateTaskModal
+          key="create"
           onClose={handleCloseCreateModal}
           defaultDate={dateString}
-        />
+        />}
+      </Modal>
+      <Modal visible={!!editingTask} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setEditingTask(null)}>
+        {editingTask && <CreateTaskModal task={editingTask} onClose={() => setEditingTask(null)} />}
       </Modal>
     </SafeAreaView>
   );

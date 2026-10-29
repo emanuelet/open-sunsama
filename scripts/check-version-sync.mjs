@@ -9,12 +9,14 @@ const versionFiles = [
   "apps/web/package.json",
   "apps/desktop/package.json",
   "apps/desktop/src-tauri/tauri.conf.json",
+  "apps/expo-mobile/package.json",
+  "apps/expo-mobile/app.json",
 ];
 
 const versions = versionFiles.map((relativePath) => {
   const filePath = path.join(root, relativePath);
   const document = JSON.parse(fs.readFileSync(filePath, "utf8"));
-  return { filePath: relativePath, version: document.version };
+  return { filePath: relativePath, version: document.expo?.version ?? document.version };
 });
 
 const expectedVersion = versions[0].version;

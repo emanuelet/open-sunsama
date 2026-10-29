@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -5,11 +6,14 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
+  TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/lib/auth";
 import { useThemeColors, type ThemeColors } from "@/lib/theme";
 import Constants from "expo-constants";
+import { ApiEndpointSettings } from "@/components/ApiEndpointSettings";
 
 /**
  * Settings screen
@@ -17,7 +21,37 @@ import Constants from "expo-constants";
 export default function SettingsScreen() {
   const colors = useThemeColors();
   const styles = createStyles(colors);
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
+  const [name, setName] = useState(user?.name ?? "");
+  const [timezone, setTimezone] = useState(user?.timezone ?? "");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setName(user?.name ?? "");
+    setTimezone(user?.timezone ?? "");
+  }, [user?.name, user?.timezone]);
+
+  const saveProfile = async () => {
+    const zone = timezone.trim();
+    try {
+      new Intl.DateTimeFormat("en", { timeZone: zone });
+    } catch {
+      Alert.alert("Invalid timezone", "Enter a valid IANA timezone, such as Europe/Rome.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await updateUser({
+        name: name.trim() || null,
+        ...(zone !== user?.timezone ? { timezone: zone, timezoneManuallySet: true } : {}),
+      });
+      Alert.alert("Saved", "Your account settings have been updated.");
+    } catch (error) {
+      Alert.alert("Could not save", error instanceof Error ? error.message : "Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert("Sign Out", "Are you sure you want to sign out?", [
@@ -51,13 +85,23 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Preferences</Text>
           <View style={styles.menuCard}>
-            <TouchableOpacity style={styles.menuItem}>
+            <View style={styles.field}>
+              <Text style={styles.menuItemText}>Display name</Text>
+              <TextInput accessibilityLabel="Display name" style={styles.input} value={name} onChangeText={setName} placeholder="Your name" placeholderTextColor={colors.muted} />
+            </View>
+            <View style={styles.field}>
               <Text style={styles.menuItemText}>Timezone</Text>
-              <Text style={styles.menuItemValue}>
-                {user?.timezone || "Not set"}
-              </Text>
+              <TextInput accessibilityLabel="Timezone" style={styles.input} value={timezone} onChangeText={setTimezone} autoCapitalize="none" placeholder="Europe/Rome" placeholderTextColor={colors.muted} />
+            </View>
+            <TouchableOpacity style={styles.saveButton} onPress={saveProfile} disabled={saving}>
+              {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveText}>Save settings</Text>}
             </TouchableOpacity>
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Server</Text>
+          <View style={[styles.menuCard, { padding: 16 }]}><ApiEndpointSettings /></View>
         </View>
 
         {/* About Section */}
@@ -168,6 +212,10 @@ const createStyles = (colors: ThemeColors) =>
       fontSize: 16,
       color: colors.text,
     },
+    field: { paddingHorizontal: 16, paddingTop: 16, gap: 8 },
+    input: { borderWidth: 1, borderColor: colors.inputBorder, borderRadius: 8, padding: 12, color: colors.text, fontSize: 16 },
+    saveButton: { margin: 16, padding: 12, borderRadius: 8, alignItems: "center", backgroundColor: colors.accentFill },
+    saveText: { color: "#fff", fontSize: 16, fontWeight: "600" },
     menuItemValue: {
       fontSize: 16,
       color: colors.secondary,

@@ -16,6 +16,7 @@ import type { Task, TaskPriority } from "@open-sunsama/types";
 import { useCreateTask, useUpdateTask } from "@/hooks/useTasks";
 import { useCreateTimeBlock } from "@/hooks/useTimeBlocks";
 import { PrioritySelector } from "./PrioritySelector";
+import { TaskChecklist } from "./TaskChecklist";
 import { useThemeColors, type ThemeColors } from "@/lib/theme";
 
 interface CreateTaskModalProps {
@@ -146,6 +147,8 @@ export function CreateTaskModal({
               maxLength={500}
             />
           </View>
+
+          {task && <TaskChecklist taskId={task.id} />}
 
           {/* Notes */}
           <View style={styles.inputGroup}>

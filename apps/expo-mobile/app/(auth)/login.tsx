@@ -9,11 +9,13 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 import { useAuth } from "@/lib/auth";
 import { useThemeColors, type ThemeColors } from "@/lib/theme";
+import { ApiEndpointSettings } from "@/components/ApiEndpointSettings";
 
 /**
  * Login screen
@@ -25,8 +27,11 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showServer, setShowServer] = useState(false);
+  const [serverSaving, setServerSaving] = useState(false);
 
   const handleLogin = async () => {
+    if (serverSaving) return;
     if (!email.trim() || !password.trim()) {
       Alert.alert("Error", "Please enter both email and password");
       return;
@@ -49,7 +54,7 @@ export default function LoginScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
       >
-        <View style={styles.content}>
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Open Sunsama</Text>
@@ -92,7 +97,7 @@ export default function LoginScreen() {
             <TouchableOpacity
               style={[styles.button, isLoading && styles.buttonDisabled]}
               onPress={handleLogin}
-              disabled={isLoading}
+              disabled={isLoading || serverSaving}
             >
               {isLoading ? (
                 <ActivityIndicator color="#fff" />
@@ -111,7 +116,9 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </Link>
           </View>
-        </View>
+          <TouchableOpacity onPress={() => setShowServer((open) => !open)} disabled={isLoading} style={{ alignSelf: "center", marginTop: 16 }}><Text style={styles.linkText}>{showServer ? "Hide server settings" : "Configure API server"}</Text></TouchableOpacity>
+          {showServer && <View style={{ marginTop: 12 }}><ApiEndpointSettings disabled={isLoading} onSavingChange={setServerSaving} /></View>}
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -127,7 +134,7 @@ const createStyles = (colors: ThemeColors) =>
       flex: 1,
     },
     content: {
-      flex: 1,
+      flexGrow: 1,
       paddingHorizontal: 24,
       justifyContent: "center",
     },

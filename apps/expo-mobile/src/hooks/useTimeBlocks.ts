@@ -107,6 +107,10 @@ export function useUpdateTimeBlock() {
         timeBlockKeys.detail(updatedTimeBlock.id),
         updatedTimeBlock
       );
+      queryClient.setQueriesData<TimeBlock[]>(
+        { queryKey: timeBlockKeys.lists() },
+        (blocks) => blocks?.map((block) => block.id === updatedTimeBlock.id ? updatedTimeBlock : block)
+      );
 
       // Invalidate lists to ensure consistency
       queryClient.invalidateQueries({ queryKey: timeBlockKeys.lists() });

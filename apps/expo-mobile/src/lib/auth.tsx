@@ -16,6 +16,9 @@ import {
   removeToken,
   initializeApi,
   onTokenRefreshed,
+  getApiUrl,
+  setApiUrl,
+  normalizeApiUrl,
 } from "./api";
 import { getDeviceTimezone } from "./timezone";
 
@@ -31,6 +34,8 @@ interface AuthContextValue extends AuthState {
   register: (data: CreateUserInput) => Promise<void>;
   logout: () => void;
   updateUser: (data: UpdateUserInput) => Promise<void>;
+  apiUrl: string;
+  changeApiUrl: (url: string) => Promise<void>;
 }
 
 const AuthContext = React.createContext<AuthContextValue | null>(null);
@@ -39,11 +44,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const [token, setTokenState] = React.useState<string | null>(null);
   const [initialized, setInitialized] = React.useState(false);
+  const [apiUrl, setApiUrlState] = React.useState(getApiUrl);
 
   // Initialize auth on mount
   React.useEffect(() => {
     (async () => {
       await initializeApi();
+      setApiUrlState(getApiUrl());
       const storedToken = await getToken();
       if (storedToken) {
         setTokenState(storedToken);
@@ -184,6 +191,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [updateUserMutation]
   );
 
+  const changeApiUrl = React.useCallback(async (value: string) => {
+    const next = normalizeApiUrl(value);
+    if (next === getApiUrl()) return;
+    // Stop observers before switching and discard the previous server's cache.
+    clearAuthToken();
+    setTokenState(null);
+    queryClient.clear();
+    timezoneSyncAttempted.current = false;
+    await setApiUrl(next);
+    setApiUrlState(next);
+  }, [queryClient]);
+
   const isLoading = !initialized || (!!token && isUserLoading);
 
   const value = React.useMemo<AuthContextValue>(
@@ -196,8 +215,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       register,
       logout,
       updateUser,
+      apiUrl,
+      changeApiUrl,
     }),
-    [user, token, isLoading, login, register, logout, updateUser]
+    [user, token, isLoading, login, register, logout, updateUser, apiUrl, changeApiUrl]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -19,7 +19,7 @@
     },
     "apps/api": {
       "name": "@open-sunsama/api",
-      "version": "1.2.6",
+      "version": "1.3.0",
       "dependencies": {
         "@aws-sdk/client-s3": "^3.1154.0",
         "@aws-sdk/s3-request-presigner": "^3.1154.0",
@@ -62,7 +62,7 @@
     },
     "apps/desktop": {
       "name": "@open-sunsama/desktop",
-      "version": "1.2.6",
+      "version": "1.3.0",
       "dependencies": {
         "@tauri-apps/api": "catalog:",
         "@tauri-apps/plugin-autostart": "^2.7.0",
@@ -77,7 +77,7 @@
     },
     "apps/expo-mobile": {
       "name": "@open-sunsama/expo-mobile",
-      "version": "1.2.6",
+      "version": "1.3.0",
       "dependencies": {
         "@open-sunsama/api-client": "workspace:*",
         "@open-sunsama/types": "workspace:*",
@@ -108,11 +108,12 @@
         "@babel/core": "^7.29.7",
         "@types/react": "~19.3.0",
         "typescript": "~6.0.3",
+        "vitest": "catalog:",
       },
     },
     "apps/mobile": {
       "name": "@open-sunsama/mobile",
-      "version": "1.2.6",
+      "version": "1.3.0",
       "dependencies": {
         "@tauri-apps/api": "catalog:",
         "@tauri-apps/plugin-biometric": "^2.4.1",
@@ -128,7 +129,7 @@
     },
     "apps/web": {
       "name": "@open-sunsama/web",
-      "version": "1.2.6",
+      "version": "1.3.0",
       "dependencies": {
         "@datafast/ai-crawl": "^1.0.9",
         "@dnd-kit/core": "^6.3.1",

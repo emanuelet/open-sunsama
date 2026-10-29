@@ -1,6 +1,6 @@
 {
   "name": "@open-sunsama/expo-mobile",
-  "version": "1.2.6",
+  "version": "1.3.0",
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
@@ -13,6 +13,7 @@
     "submit:android": "eas submit --platform android",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "clean": "rm -rf node_modules .turbo .expo"
   },
   "dependencies": {
@@ -44,7 +45,8 @@
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@types/react": "~19.3.0",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "vitest": "catalog:"
   },
   "bun": {
     "overrides": {

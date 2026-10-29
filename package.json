@@ -1,7 +1,7 @@
 {
   "name": "open-sunsama",
   "description": "Open-source, AI agent friendly Sunsama alternative with direct API access",
-  "version": "1.2.6",
+  "version": "1.3.0",
   "private": true,
   "license": "SEE LICENSE IN LICENSE",
   "overrides": {
@@ -81,7 +81,7 @@
     "db:studio": "turbo run db:studio --filter=@open-sunsama/database",
     "release": "node scripts/release.mjs",
     "version:check": "node scripts/check-version-sync.mjs",
-    "version:sync": "node -e \"const v=require('./package.json').version; const fs=require('fs'); ['apps/api/package.json','apps/web/package.json','apps/desktop/package.json','apps/desktop/src-tauri/tauri.conf.json','apps/mobile/package.json','apps/mobile/src-tauri/tauri.conf.json','apps/expo-mobile/package.json'].forEach(f=>{const j=JSON.parse(fs.readFileSync(f));j.version=v;fs.writeFileSync(f,JSON.stringify(j,null,2)+'\\n');console.log('✓',f,'→',v)});\""
+    "version:sync": "node -e \"const v=require('./package.json').version; const fs=require('fs'); ['apps/api/package.json','apps/web/package.json','apps/desktop/package.json','apps/desktop/src-tauri/tauri.conf.json','apps/mobile/package.json','apps/mobile/src-tauri/tauri.conf.json','apps/expo-mobile/package.json','apps/expo-mobile/app.json'].forEach(f=>{const j=JSON.parse(fs.readFileSync(f));if(f.endsWith('/app.json'))j.expo.version=v;else j.version=v;fs.writeFileSync(f,JSON.stringify(j,null,2)+'\\n');console.log('✓',f,'→',v)});\""
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.1",

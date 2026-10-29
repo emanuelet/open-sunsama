@@ -6,10 +6,38 @@ import {
 import * as SecureStore from "expo-secure-store";
 
 // API URL from environment or default to production
-const API_URL =
+export const DEFAULT_API_URL =
   process.env.EXPO_PUBLIC_API_URL || "https://api.opensunsama.com";
 
 const AUTH_TOKEN_KEY = "open_sunsama_token";
+const API_URL_KEY = "open_sunsama_api_url";
+let apiUrl = DEFAULT_API_URL;
+let apiGeneration = 0;
+
+export function normalizeApiUrl(value: string): string {
+  let url: URL;
+  try { url = new URL(value.trim()); } catch { throw new Error("Enter a valid API URL."); }
+  if (!(["http:", "https:"].includes(url.protocol)) || url.username || url.password || url.search || url.hash) {
+    throw new Error("Use an HTTP or HTTPS URL without credentials, query, or fragment.");
+  }
+  return url.toString().replace(/\/+$/, "");
+}
+
+export function getApiUrl(): string { return apiUrl; }
+
+export async function setApiUrl(value: string): Promise<string> {
+  const next = normalizeApiUrl(value);
+  if (next === apiUrl) return next;
+  // Invalidate old clients and refreshes before changing the endpoint.
+  apiGeneration++;
+  currentToken = undefined;
+  // A refresh already writing credentials must finish before they are removed.
+  if (refreshPromise) await refreshPromise;
+  await removeToken();
+  await SecureStore.setItemAsync(API_URL_KEY, next);
+  apiUrl = next;
+  return next;
+}
 
 /**
  * Get stored auth token from SecureStore
@@ -74,14 +102,16 @@ export function onTokenRefreshed(listener: TokenListener): () => void {
 let refreshPromise: Promise<string | null> | null = null;
 
 async function performRefresh(): Promise<string | null> {
+  const generation = apiGeneration;
+  const endpoint = apiUrl;
   const existing = currentToken ?? (await getToken());
-  if (!existing) return null;
+  if (!existing || generation !== apiGeneration) return null;
   try {
-    const refreshClient = createApi({ baseUrl: API_URL, token: existing });
+    const refreshClient = createApi({ baseUrl: endpoint, token: existing });
     const result = await refreshClient.auth.refreshToken();
     // If logout cleared the session while this refresh was in flight, don't
     // resurrect it. clearAuthToken() sets currentToken to undefined.
-    if (currentToken === undefined) return null;
+    if (currentToken === undefined || generation !== apiGeneration) return null;
     currentToken = result.token;
     await setToken(result.token);
     for (const listener of tokenListeners) {
@@ -103,9 +133,10 @@ async function performRefresh(): Promise<string | null> {
  */
 export function refreshAuthToken(): Promise<string | null> {
   if (!refreshPromise) {
-    refreshPromise = performRefresh().finally(() => {
-      refreshPromise = null;
+    const pending = performRefresh().finally(() => {
+      if (refreshPromise === pending) refreshPromise = null;
     });
+    refreshPromise = pending;
   }
   return refreshPromise;
 }
@@ -114,11 +145,11 @@ export function refreshAuthToken(): Promise<string | null> {
  * Get the API client configured with current token
  */
 export function getApi() {
+  const generation = apiGeneration;
   return createApi({
-    baseUrl: API_URL,
-    token: currentToken,
-    getToken: () => currentToken,
-    onUnauthorized: refreshAuthToken,
+    baseUrl: apiUrl,
+    getToken: () => generation === apiGeneration ? currentToken : undefined,
+    onUnauthorized: () => generation === apiGeneration ? refreshAuthToken() : Promise.resolve(null),
   });
 }
 
@@ -126,11 +157,11 @@ export function getApi() {
  * Get the low-level API client
  */
 export function getApiClient(): OpenSunsamaClient {
+  const generation = apiGeneration;
   return createOpenSunsamaClient({
-    baseUrl: API_URL,
-    token: currentToken,
-    getToken: () => currentToken,
-    onUnauthorized: refreshAuthToken,
+    baseUrl: apiUrl,
+    getToken: () => generation === apiGeneration ? currentToken : undefined,
+    onUnauthorized: () => generation === apiGeneration ? refreshAuthToken() : Promise.resolve(null),
   });
 }
 
@@ -139,10 +170,15 @@ export function getApiClient(): OpenSunsamaClient {
  * Call this on app startup
  */
 export async function initializeApi(): Promise<void> {
+  const savedUrl = await SecureStore.getItemAsync(API_URL_KEY);
+  if (savedUrl) {
+    try { apiUrl = normalizeApiUrl(savedUrl); } catch {
+      apiUrl = DEFAULT_API_URL;
+      await removeToken();
+    }
+  }
   const token = await getToken();
   if (token) {
     currentToken = token;
   }
 }
-
-export { API_URL };

@@ -1,12 +1,15 @@
 import { useState, useCallback } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { format, addDays, subDays } from "date-fns";
 import { Lucide } from "@react-native-vector-icons/lucide";
-import { useTimeBlocks } from "@/hooks/useTimeBlocks";
+import { useTimeBlocks, useUpdateTimeBlock } from "@/hooks/useTimeBlocks";
 import { Timeline } from "@/components/Timeline";
 import { CreateTaskModal } from "@/components/CreateTaskModal";
 import { useThemeColors, type ThemeColors } from "@/lib/theme";
+import { useQuery } from "@tanstack/react-query";
+import { getApiClient } from "@/lib/api";
+import type { CalendarEvent } from "@open-sunsama/types";
 
 /**
  * Calendar screen - shows time blocks for the selected date
@@ -16,6 +19,7 @@ export default function CalendarScreen() {
   const styles = createStyles(colors);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [creating, setCreating] = useState(false);
+  const updateBlock = useUpdateTimeBlock();
 
   const dateString = format(selectedDate, "yyyy-MM-dd");
   const {
@@ -25,6 +29,10 @@ export default function CalendarScreen() {
     isRefetching,
   } = useTimeBlocks({
     date: dateString,
+  });
+  const events = useQuery({
+    queryKey: ["calendar-events", dateString],
+    queryFn: async () => (await getApiClient().get<{ data: CalendarEvent[] }>("calendar-events", { searchParams: { date: dateString } })).data,
   });
 
   const goToPreviousDay = useCallback(() => {
@@ -75,13 +83,27 @@ export default function CalendarScreen() {
         </TouchableOpacity>
       </View>
 
+      {events.isError && <Text style={{ color: colors.danger, paddingHorizontal: 16 }}>Could not load synced calendar events. Pull to retry.</Text>}
+      {!!events.data?.some((event) => event.isAllDay && event.status !== "cancelled") && <View style={{ padding: 12, backgroundColor: colors.surface, gap: 4 }}>
+        <Text style={{ color: colors.secondary, fontSize: 12 }}>All day</Text>
+        {events.data.filter((event) => event.isAllDay && event.status !== "cancelled").map((event) => <Text key={event.id} style={{ color: colors.text }}>{event.title}</Text>)}
+      </View>}
       {/* Timeline */}
       <Timeline
         timeBlocks={timeBlocks}
+        events={events.data ?? []}
+        selectedDate={selectedDate}
         isLoading={isLoading}
-        isRefetching={isRefetching}
-        onRefresh={refetch}
+        isRefetching={isRefetching || events.isRefetching}
+        onRefresh={() => { void refetch(); void events.refetch(); }}
         isToday={isToday}
+        onMoveBlock={async (block, startTime, endTime) => {
+          try {
+            await updateBlock.mutateAsync({ id: block.id, data: { startTime: startTime.toISOString(), endTime: endTime.toISOString() } });
+          } catch (error) {
+            Alert.alert("Could not move time block", error instanceof Error ? error.message : "Please try again.");
+          }
+        }}
       />
       <TouchableOpacity style={styles.fab} onPress={() => setCreating(true)} accessibilityRole="button" accessibilityLabel="Create calendar task">
         <Lucide name="plus" size={24} color="#fff" />

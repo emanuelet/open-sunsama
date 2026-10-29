@@ -1,10 +1,16 @@
 import * as React from "react";
-import { ListTodo, Calendar, Lightbulb, MoreHorizontal } from "lucide-react";
+import {
+  ListTodo,
+  Calendar,
+  Lightbulb,
+  MoreHorizontal,
+  Target,
+} from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
-  href: "/app" | "/app/calendar" | "/app/ideas" | "/app/more";
+  href: "/app" | "/app/calendar" | "/app/ideas" | "/app/more" | "/app/goals";
   icon: React.ReactNode;
   label: string;
   matchExact?: boolean;
@@ -26,6 +32,11 @@ const navItems: NavItem[] = [
     href: "/app/ideas",
     icon: <Lightbulb className="h-[21px] w-[21px]" strokeWidth={1.65} />,
     label: "Ideas",
+  },
+  {
+    href: "/app/goals",
+    icon: <Target className="h-[21px] w-[21px]" strokeWidth={1.65} />,
+    label: "Goals",
   },
   {
     href: "/app/more",

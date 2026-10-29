@@ -92,6 +92,9 @@ import {
 } from "@/hooks/useTaskTimerToggle";
 import { useTaskTimerDisplay } from "./task-time-badge";
 import { renderInlineMarkdown } from "@/components/ui/inline-markdown";
+import { GoalPicker } from "./goal-picker";
+import { useQueryClient } from "@tanstack/react-query";
+import { goalKeys } from "@/lib/query-keys";
 
 // ============================================
 // TaskModal Component
@@ -105,7 +108,7 @@ interface TaskModalProps {
    * Opens the modal as a composer for a new task (with `task` null): the same
    * layout as editing, but fields stay local until "Add task" creates it.
    */
-  createDefaults?: { scheduledDate?: string | null };
+  createDefaults?: { scheduledDate?: string | null; goalId?: string | null };
 }
 
 export function TaskModal({
@@ -115,6 +118,7 @@ export function TaskModal({
   createDefaults,
 }: TaskModalProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isMobile = useIsMobile();
 
   // The prop is a snapshot from when the modal opened and only names the task.
@@ -147,6 +151,7 @@ export function TaskModal({
   // Composer-only state: everything a new task carries before it exists.
   const [draftPriority, setDraftPriority] = React.useState<TaskPriority>("P2");
   const [draftDate, setDraftDate] = React.useState<string | null>(null);
+  const [draftGoalId, setDraftGoalId] = React.useState<string | null>(null);
   const [draftSubtasks, setDraftSubtasks] = React.useState<DraftSubtask[]>([]);
   const { addPosition, setAddPosition } = useAddTaskPosition();
   const placeNewTask = usePlaceNewTask(draftDate);
@@ -161,6 +166,7 @@ export function TaskModal({
     setPlannedMins(null);
     setDraftPriority("P2");
     setDraftDate(createDefaults?.scheduledDate ?? null);
+    setDraftGoalId(createDefaults?.goalId ?? null);
     setDraftSubtasks([]);
   }, [open, isCompose]);
 
@@ -516,6 +522,7 @@ export function TaskModal({
         scheduledDate: draftDate ?? undefined,
         estimatedMins: plannedMins ?? undefined,
         priority: draftPriority,
+        goalId: draftGoalId,
       });
       // In order, so the checklist keeps the order it was typed in.
       for (const [position, st] of draftSubtasks.entries()) {
@@ -532,6 +539,7 @@ export function TaskModal({
         }
       }
       await placeNewTask(newTask.id, addPosition);
+      void queryClient.invalidateQueries({ queryKey: goalKeys.tasks() });
       onOpenChange(false);
     } finally {
       setIsCreating(false);
@@ -950,6 +958,18 @@ export function TaskModal({
         )}
         {titleRow}
         {isMobile && <div className="px-5 pt-3">{times}</div>}
+        <div className={isMobile ? "px-5 pt-3" : "pl-[60px] pr-8 pt-3"}>
+          <GoalPicker
+            value={isCompose ? draftGoalId : (renderTask.goalId ?? null)}
+            disabled={!isCompose && updateTask.isPending}
+            onChange={(goalId) => {
+              if (isCompose) setDraftGoalId(goalId);
+              else if (task)
+                updateTask.mutate({ id: task.id, data: { goalId } });
+            }}
+            onNavigate={() => onOpenChange(false)}
+          />
+        </div>
         {!isCompose && !!renderTask.externalLinks?.length && (
           <div className={isMobile ? "px-5 pt-3" : "px-8 pt-3"}>
             <TaskSourceChips links={renderTask.externalLinks} showRefresh />

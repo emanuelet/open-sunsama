@@ -3,7 +3,11 @@
  * @module @open-sunsama/api-client/client
  */
 
-import ky, { isHTTPError, type KyInstance, type Options as KyOptions } from "ky";
+import ky, {
+  isHTTPError,
+  type KyInstance,
+  type Options as KyOptions,
+} from "ky";
 import { ApiError } from "./errors.js";
 
 /**
@@ -151,16 +155,15 @@ export function createApiClient(config: ApiClientConfig): KyInstance {
           // all) with the new token. The retryCount
           // guard limits this to a single refresh attempt so a token that is
           // still rejected can't spin in a loop.
-          if (
-            response.status === 401 &&
-            onUnauthorized &&
-            retryCount === 0
-          ) {
+          if (response.status === 401 && onUnauthorized && retryCount === 0) {
             const newToken = await onUnauthorized();
             if (newToken) {
               const headers = new Headers(request.headers);
               headers.set("Authorization", `Bearer ${newToken}`);
-              return ky.retry({ request: new Request(request, { headers }), delay: 0 });
+              return ky.retry({
+                request: new Request(request, { headers }),
+                delay: 0,
+              });
             }
           }
 
@@ -173,9 +176,14 @@ export function createApiClient(config: ApiClientConfig): KyInstance {
       beforeError: [
         async ({ error }) => {
           // Transform ky errors into ApiError
-          const response = isHTTPError(error) ? error.response : undefined;
-          if (response) {
-            const apiError = await ApiError.fromResponse(response);
+          if (isHTTPError(error)) {
+            // Ky v2 consumes the response body before beforeError and exposes
+            // the parsed payload on error.data. Reading response.json() again
+            // would discard the server's message, code, and validation issues.
+            const apiError = await ApiError.fromResponse(
+              error.response,
+              error.data
+            );
             if (onError) {
               await onError(apiError);
             }

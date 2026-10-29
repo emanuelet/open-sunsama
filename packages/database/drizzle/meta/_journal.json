@@ -57,6 +57,13 @@
       "when": 1793107336731,
       "tag": "0007_silly_songbird",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793192296829,
+      "tag": "0008_flat_hobgoblin",
+      "breakpoints": true
     }
   ]
 }

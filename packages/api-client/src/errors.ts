@@ -16,16 +16,20 @@ export class ApiError extends Error {
   }
 
   /**
-   * Create an ApiError from a response
+   * Create an ApiError from a response, or an already-parsed HTTP error body.
    */
-  static async fromResponse(response: Response): Promise<ApiError> {
+  static async fromResponse(
+    response: Response,
+    parsedBody?: unknown
+  ): Promise<ApiError> {
     let message = `Request failed with status ${response.status}`;
     let code: string | undefined;
     let details: Record<string, unknown> | undefined;
 
     try {
-      const body = await response.json();
-      if (body.error) {
+      const body =
+        parsedBody === undefined ? await response.json() : parsedBody;
+      if (body?.error) {
         // Handle Zod validation errors (has issues array)
         if (body.error.issues && Array.isArray(body.error.issues)) {
           // Extract all validation messages

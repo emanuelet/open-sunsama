@@ -1316,7 +1316,7 @@ test("Ideas tray navigates columns and drags an idea into today's tasks", async 
       boardId: board.id,
       columnId: columns[0]!.id,
       title: "Idea to plan",
-      estimatedMins: 25,
+      notes: "Try this when there is room in the day.",
     },
     session.token
   );
@@ -1354,10 +1354,19 @@ test("Ideas tray navigates columns and drags an idea into today's tasks", async 
     todayColumn(page).getByText("Idea to plan", { exact: true })
   ).toBeVisible();
   const tasks = await api<
-    Array<{ id: string; title: string; estimatedMins: number }>
+    Array<{
+      id: string;
+      title: string;
+      notes: string | null;
+      estimatedMins: number | null;
+      priority: string;
+    }>
   >("GET", `/tasks?date=${today}`, undefined, session.token);
   const task = tasks.find((t) => t.title === "Idea to plan")!;
-  expect(task.estimatedMins).toBe(25);
+  // Ideas carry context and checklists; planning metadata is chosen on the task.
+  expect(task.notes).toBe("Try this when there is room in the day.");
+  expect(task.estimatedMins).toBeNull();
+  expect(task.priority).toBe("P2");
   const subtasks = await api<Array<{ title: string }>>(
     "GET",
     `/tasks/${task.id}/subtasks`,

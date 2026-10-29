@@ -17,6 +17,7 @@ import {
   ideaBoardKeys,
   ideaKeys,
   ideaSubtaskKeys,
+  goalKeys,
 } from "@/lib/query-keys";
 
 /**
@@ -141,12 +142,20 @@ function handleWebSocketEvent(
   batcher: InvalidationBatcher
 ): void {
   switch (event.type) {
+    case "goal:created":
+    case "goal:updated":
+    case "goal:archived":
+    case "goal:restored":
+    case "goal:reordered":
+      batcher.schedule(goalKeys.all);
+      break;
     case "task:created":
     case "task:updated":
     case "task:deleted":
     case "task:completed":
     case "task:reordered":
       batcher.schedule(taskKeys.lists());
+      batcher.schedule(goalKeys.tasks());
       // The kanban range prefetch lives outside lists(); refresh it too.
       batcher.schedule(taskKeys.rangeAll());
       batcher.schedule(["tasks", "search", "infinite"]);
@@ -245,6 +254,7 @@ function handleWebSocketEvent(
 
     case "connected":
       queryClient.invalidateQueries({ queryKey: timerKeys.active() });
+      queryClient.invalidateQueries({ queryKey: goalKeys.all });
       break;
 
     case "calendar:synced":

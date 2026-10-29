@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "f5e115c7-0350-445a-9b51-41b7a9123852"
+      }
+    },
+    "android": {
+      "package": "com.etonello.opensunsama"
+    }
+  }
+}

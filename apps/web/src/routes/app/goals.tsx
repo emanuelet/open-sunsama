@@ -30,6 +30,7 @@ import {
 import { useUpdateTask } from "@/hooks/useTasks";
 import { useQueryClient } from "@tanstack/react-query";
 import { goalKeys } from "@/lib/query-keys";
+import { GoalHierarchy } from "@/components/goals/goal-hierarchy";
 
 const field =
   "w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring";
@@ -325,7 +326,11 @@ function LinkTasks({
 }
 
 export default function GoalsPage() {
-  const { goal: goalId, archived = false } = useSearch({ from: "/app/goals" });
+  const {
+    goal: goalId,
+    archived = false,
+    view,
+  } = useSearch({ from: "/app/goals" });
   const navigate = useNavigate();
   const activeQuery = useGoals();
   const archiveQuery = useGoals(true);
@@ -373,11 +378,13 @@ export default function GoalsPage() {
   const goRoot = () =>
     void navigate({
       to: "/app/goals",
-      search: { archived: archived || undefined },
+      search: { archived: archived || undefined, view },
     });
   return (
     <div className="h-full overflow-y-auto bg-canvas px-4 py-5 sm:px-6">
-      <div className="mx-auto max-w-2xl space-y-5 pb-20">
+      <div
+        className={`mx-auto space-y-5 pb-20 ${!goalId && view ? "max-w-6xl" : "max-w-2xl"}`}
+      >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <nav
             aria-label="Breadcrumb"
@@ -385,7 +392,7 @@ export default function GoalsPage() {
           >
             <Link
               to="/app/goals"
-              search={{ archived: viewingArchived || undefined }}
+              search={{ archived: viewingArchived || undefined, view }}
               className="hover:text-foreground"
             >
               {viewingArchived ? "Archived goals" : "Goals"}
@@ -415,7 +422,7 @@ export default function GoalsPage() {
           {!goal && (
             <Link
               to="/app/goals"
-              search={{ archived: archived ? undefined : true }}
+              search={{ archived: archived ? undefined : true, view }}
               className="text-[13px] text-muted-foreground hover:text-foreground"
             >
               {archived ? "Active goals" : "Archived goals"}
@@ -696,11 +703,54 @@ export default function GoalsPage() {
           </>
         ) : (
           <>
-            <h1 className="text-lg font-semibold">
-              {archived ? "Archived goals" : "Goals"}
-            </h1>
-            {!archived && <QuickAdd parentId={null} />}
-            <GoalCards goals={siblings} parentId={null} archived={archived} />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h1 className="text-lg font-semibold">
+                {archived ? "Archived goals" : "Goals"}
+              </h1>
+              <div
+                className="inline-flex w-fit rounded-md bg-muted p-0.5"
+                aria-label="Goals view"
+              >
+                <button
+                  type="button"
+                  aria-pressed={!view}
+                  onClick={() =>
+                    void navigate({
+                      to: "/app/goals",
+                      search: { archived: archived || undefined },
+                    })
+                  }
+                  className={`rounded px-3 py-1 text-[13px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${!view ? "bg-card shadow-card" : "text-muted-foreground"}`}
+                >
+                  List
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={!!view}
+                  onClick={() =>
+                    void navigate({
+                      to: "/app/goals",
+                      search: {
+                        archived: archived || undefined,
+                        view: "hierarchy",
+                      },
+                    })
+                  }
+                  className={`rounded px-3 py-1 text-[13px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${view ? "bg-card shadow-card" : "text-muted-foreground"}`}
+                >
+                  Hierarchy
+                </button>
+              </div>
+            </div>
+            {!archived && !view && <QuickAdd parentId={null} />}
+            {view ? (
+              <GoalHierarchy
+                goals={archived ? archivedGoals : active}
+                archived={archived}
+              />
+            ) : (
+              <GoalCards goals={siblings} parentId={null} archived={archived} />
+            )}
             {siblings.length === 0 && (
               <p className="text-sm text-muted-foreground">
                 {archived

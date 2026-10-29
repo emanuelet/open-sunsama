@@ -373,9 +373,10 @@ const appGoalsRoute = createRoute({
   component: lazyRouteComponent(() => import("./routes/app/goals")),
   validateSearch: (
     search: Record<string, unknown>
-  ): { goal?: string; archived?: boolean } => ({
+  ): { goal?: string; archived?: boolean; view?: "hierarchy" } => ({
     goal: typeof search.goal === "string" ? search.goal : undefined,
     archived: search.archived === true ? true : undefined,
+    view: search.view === "hierarchy" ? "hierarchy" : undefined,
   }),
 });
 

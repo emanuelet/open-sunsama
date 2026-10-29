@@ -142,7 +142,9 @@ Everything below is outside the initial scope. These are options to revisit when
 
 ### 9. Broader navigation and planner visibility
 
-**Deferred:** Descendant task views, cross-goal summaries, full-tree/map views, and richer planner-level goal summaries. A compact board-card goal label was left for prototype validation rather than accepted as a requirement.
+**Implemented follow-up:** An optional Hierarchy view now visualizes the goal tree with connected goal cards, per-branch and global expand/collapse controls, and navigation into focused goal details. The selected view is represented in the URL and supports both active and archived goals. The existing List view remains the default, and goal detail still shows immediate children only. This advances the previously deferred full-tree visualization following the user's explicit request.
+
+**Still deferred:** Descendant task views, cross-goal summaries, richer planner-level goal summaries, and more advanced map interactions. A compact board-card goal label was left for prototype validation rather than accepted as a requirement.
 
 **Potential value:** Help locate work across goals or reconnect with context without opening task details.
 

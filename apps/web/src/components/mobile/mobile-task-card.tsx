@@ -6,6 +6,7 @@ import { useCompleteTask } from "@/hooks/useTasks";
 import { useSubtasks, useUpdateSubtask } from "@/hooks/useSubtasks";
 import { useTaskTimerDisplay } from "@/components/kanban/task-time-badge";
 import { renderInlineMarkdown } from "@/components/ui/inline-markdown";
+import { PRIORITY_CARD_BACKGROUND } from "@/components/kanban/priority-card-styles";
 
 const PRIORITY_CHECKBOX_BORDER: Record<TaskPriority, string> = {
   P0: "border-red-500",
@@ -79,7 +80,7 @@ function MobileTaskCardBase({
   };
 
   return (
-    <div className="border-b border-border/30">
+    <div className={cn("border-b border-border/30", PRIORITY_CARD_BACKGROUND[task.priority])}>
       {/* Main row */}
       <div
         className={cn(

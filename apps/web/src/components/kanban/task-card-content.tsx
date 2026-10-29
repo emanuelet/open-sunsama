@@ -21,6 +21,7 @@ import { PRIORITY_META } from "@/components/ui/priority-badge";
 import { PriorityMenu } from "./priority-menu";
 import { TaskSourceChips } from "./task-source-chip";
 import { renderInlineMarkdown } from "@/components/ui/inline-markdown";
+import { PRIORITY_CARD_BACKGROUND } from "./priority-card-styles";
 
 interface TaskCardContentProps {
   task: Task;
@@ -213,7 +214,7 @@ export function TaskCardContent({
     <div
       className={cn(
         "group relative flex flex-col gap-1 rounded-lg px-3 py-2 transition-[background-color,box-shadow,opacity] duration-150",
-        "bg-surface hover:bg-surface-hover",
+        PRIORITY_CARD_BACKGROUND[task.priority],
         !isDragging && !isCompleted && "shadow-card",
         "cursor-grab active:cursor-grabbing touch-manipulation select-none",
         isDragging &&

@@ -72,7 +72,10 @@ export function layoutOverlappingItems(
   const flushCluster = () => {
     if (cluster.length === 0) return;
     const placements = packCluster(cluster);
-    const columnCount = Math.max(1, ...placements.map((p) => p.lane + 1));
+    let columnCount = 1;
+    for (const placement of placements) {
+      columnCount = Math.max(columnCount, placement.lane + 1);
+    }
     for (const p of placements) {
       result.set(p.id, { lane: p.lane, columnCount });
     }
@@ -99,24 +102,32 @@ export function layoutOverlappingItems(
  * is ≤ the new item's start.
  */
 function packCluster(items: LayoutItem[]): Array<{ id: string; lane: number }> {
-  // laneEnds[i] = the end-time of the latest item assigned to lane i.
-  const laneEnds: number[] = [];
+  // A minimum-end segment tree finds the lowest available lane in O(log n),
+  // preserving the same lane ordering as a linear scan for dense clusters.
+  let size = 1;
+  while (size < items.length) size *= 2;
+  const minimumEnds = new Float64Array(size * 2);
+  minimumEnds.fill(Infinity);
+  let laneCount = 0;
   const placements: Array<{ id: string; lane: number }> = [];
 
   for (const item of items) {
     const startMs = item.start.getTime();
-    let lane = -1;
-    for (let i = 0; i < laneEnds.length; i++) {
-      if (laneEnds[i]! <= startMs) {
-        lane = i;
-        break;
+    let lane: number;
+    if (minimumEnds[1]! <= startMs) {
+      let node = 1;
+      while (node < size) {
+        node = minimumEnds[node * 2]! <= startMs ? node * 2 : node * 2 + 1;
       }
-    }
-    if (lane === -1) {
-      lane = laneEnds.length;
-      laneEnds.push(item.end.getTime());
+      lane = node - size;
     } else {
-      laneEnds[lane] = item.end.getTime();
+      lane = laneCount++;
+    }
+    let node = size + lane;
+    minimumEnds[node] = item.end.getTime();
+    while (node > 1) {
+      node = Math.floor(node / 2);
+      minimumEnds[node] = Math.min(minimumEnds[node * 2]!, minimumEnds[node * 2 + 1]!);
     }
     placements.push({ id: item.id, lane });
   }

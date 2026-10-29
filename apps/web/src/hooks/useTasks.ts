@@ -17,7 +17,7 @@ import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useUndoRedo } from "@/hooks/useUndoRedo";
 import { trackGoal } from "@/lib/analytics";
-import { taskKeys, timeBlockKeys } from "@/lib/query-keys";
+import { goalKeys, taskKeys, timeBlockKeys } from "@/lib/query-keys";
 
 /**
  * Write an authoritative task into every cache that can hold it: the detail
@@ -53,6 +53,7 @@ function writeTaskToCaches(qc: QueryClient, task: Task) {
 
 /** Refetch the task-related caches after an undo/redo applies a raw change. */
 function invalidateTaskCaches(qc: QueryClient) {
+  qc.invalidateQueries({ queryKey: goalKeys.tasks() });
   qc.invalidateQueries({ queryKey: taskKeys.lists() });
   qc.invalidateQueries({ queryKey: taskKeys.rangeAll() });
   qc.invalidateQueries({ queryKey: ["tasks", "search", "infinite"] });
@@ -325,6 +326,7 @@ export function useCreateTask() {
       });
     },
     onSuccess: (newTask, input, context) => {
+      void queryClient.invalidateQueries({ queryKey: goalKeys.tasks() });
       trackGoal("create_task");
       // Replace optimistic placeholder with real server task.
       if (context?.tempId) {
@@ -475,6 +477,7 @@ export function useUpdateTask() {
       });
     },
     onSuccess: (updatedTask, variables, context) => {
+      void queryClient.invalidateQueries({ queryKey: goalKeys.tasks() });
       // A task's blocks follow it to its new day on the server.
       if (variables.data.scheduledDate !== undefined) {
         queryClient.invalidateQueries({ queryKey: timeBlockKeys.lists() });
@@ -613,6 +616,7 @@ export function useDeleteTask() {
       });
     },
     onSuccess: (_deletedId, id, context) => {
+      void queryClient.invalidateQueries({ queryKey: goalKeys.tasks() });
       // Time blocks may reference this task (calendar shows the title);
       // a single targeted invalidation keeps the calendar honest. The WS
       // echo also covers cross-device.
@@ -905,6 +909,7 @@ export function useCompleteTask() {
       });
     },
     onSuccess: (updatedTask, variables, context) => {
+      void queryClient.invalidateQueries({ queryKey: goalKeys.tasks() });
       if (variables.completed) trackGoal("complete_task");
       writeTaskToCaches(queryClient, updatedTask);
 

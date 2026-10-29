@@ -40,6 +40,7 @@ export type {
 } from "./user.js";
 
 // Task types
+export type { Goal, CreateGoalInput, UpdateGoalInput } from "./goal.js";
 export type {
   Task,
   TaskPriority,

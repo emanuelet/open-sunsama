@@ -56,6 +56,8 @@ import { createAuthApi, type AuthApi } from "./auth.js";
 export { createAuthApi, type AuthApi };
 
 // Tasks API
+import { createGoalsApi, type GoalsApi } from "./goals.js";
+export { createGoalsApi, type GoalsApi };
 import {
   createTasksApi,
   type TasksApi,
@@ -119,6 +121,9 @@ export type {
   ChangePasswordInput,
   // Task types
   Task,
+  Goal,
+  CreateGoalInput,
+  UpdateGoalInput,
   TaskPriority,
   TaskSortBy,
   CreateTaskInput,
@@ -197,6 +202,7 @@ export function createApi(config: ApiClientConfig) {
     auth: createAuthApi(client),
     /** Tasks API methods */
     tasks: createTasksApi(client),
+    goals: createGoalsApi(client),
     /** Subtasks API methods */
     subtasks: createSubtasksApi(client),
     /** Time blocks API methods */

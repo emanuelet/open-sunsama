@@ -16,6 +16,7 @@ export type TaskPriority = "P0" | "P1" | "P2" | "P3";
  * Tasks are the core productivity unit that users create, schedule, and complete.
  */
 export interface Task {
+  goalId?: string | null;
   /** Unique identifier for the task (UUID format) */
   id: string;
 
@@ -115,6 +116,7 @@ export interface Task {
  * Title is the only required field; all others have sensible defaults.
  */
 export interface CreateTaskInput {
+  goalId?: string | null;
   /** Title/description of the task */
   title: string;
 
@@ -141,6 +143,7 @@ export interface CreateTaskInput {
  * Use null to clear optional fields.
  */
 export interface UpdateTaskInput {
+  goalId?: string | null;
   /** Updated title/description */
   title?: string;
 

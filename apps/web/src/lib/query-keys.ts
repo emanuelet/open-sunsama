@@ -53,6 +53,13 @@ export const timerKeys = {
   active: () => ["tasks", "timer", "active"] as const,
 };
 
+export const goalKeys = {
+  all: ["goals"] as const,
+  list: (archived: boolean) => ["goals", "list", archived] as const,
+  tasks: () => ["goals", "tasks"] as const,
+  taskList: (id: string) => ["goals", "tasks", id] as const,
+};
+
 export const timeBlockKeys = {
   all: ["timeBlocks"] as const,
   lists: () => [...timeBlockKeys.all, "list"] as const,

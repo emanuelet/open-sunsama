@@ -16,6 +16,7 @@ import {
   Check,
   Keyboard,
   MessageSquare,
+  Target,
 } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
@@ -94,6 +95,9 @@ export function Header({ className }: HeaderProps) {
             icon={<LayoutGrid className="h-3.5 w-3.5" />}
           >
             Board
+          </NavLink>
+          <NavLink href="/app/goals" icon={<Target className="h-3.5 w-3.5" />}>
+            Goals
           </NavLink>
           <NavLink href="/app/tasks" icon={<List className="h-3.5 w-3.5" />}>
             Tasks
@@ -273,7 +277,8 @@ export function Header({ className }: HeaderProps) {
 }
 
 interface NavLinkProps {
-  href: "/app/board" | "/app/tasks" | "/app/calendar" | "/app/ideas";
+  href:
+    "/app/board" | "/app/tasks" | "/app/calendar" | "/app/ideas" | "/app/goals";
   icon?: React.ReactNode;
   children: React.ReactNode;
 }

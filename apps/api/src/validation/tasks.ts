@@ -19,6 +19,7 @@ export const sortBySchema = z.enum(["priority", "position", "createdAt"]);
  * Schema for creating a task
  */
 export const createTaskSchema = z.object({
+  goalId: uuidSchema.optional().nullable(),
   title: z
     .string({
       error: (issue) =>
@@ -37,6 +38,7 @@ export const createTaskSchema = z.object({
  * Schema for updating a task
  */
 export const updateTaskSchema = z.object({
+  goalId: uuidSchema.optional().nullable(),
   title: z.string().min(1).max(500).optional(),
   notes: z.string().max(5000).optional().nullable(),
   scheduledDate: dateSchema.optional().nullable(),

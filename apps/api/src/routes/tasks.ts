@@ -16,6 +16,7 @@ import {
   asc,
   inArray,
   tasks,
+  goals,
   subtasks,
   taskExternalLinks,
   sql,
@@ -198,6 +199,20 @@ tasksRouter.post(
     const data = c.req.valid("json");
     const db = getDb();
 
+    if (data.goalId) {
+      const [goal] = await db
+        .select()
+        .from(goals)
+        .where(
+          and(
+            eq(goals.id, data.goalId),
+            eq(goals.userId, userId),
+            isNull(goals.archivedAt)
+          )
+        )
+        .limit(1);
+      if (!goal) throw new NotFoundError("Goal", data.goalId);
+    }
     let position = data.position;
     if (position === undefined) {
       const scheduledDate = data.scheduledDate || null;
@@ -220,6 +235,7 @@ tasksRouter.post(
       .values({
         userId,
         title: data.title,
+        goalId: data.goalId ?? null,
         notes: data.notes ?? null,
         scheduledDate: data.scheduledDate ?? null,
         estimatedMins: data.estimatedMins ?? null,
@@ -353,7 +369,22 @@ tasksRouter.patch(
         .limit(1);
       if (!existing) throw new NotFoundError("Task", id);
 
+      if (updates.goalId) {
+        const [goal] = await db
+          .select()
+          .from(goals)
+          .where(
+            and(
+              eq(goals.id, updates.goalId),
+              eq(goals.userId, userId),
+              isNull(goals.archivedAt)
+            )
+          )
+          .limit(1);
+        if (!goal) throw new NotFoundError("Goal", updates.goalId);
+      }
       const updateData: Record<string, unknown> = { updatedAt: new Date() };
+      if (updates.goalId !== undefined) updateData.goalId = updates.goalId;
       if (updates.title !== undefined) updateData.title = updates.title;
       if (updates.notes !== undefined) updateData.notes = updates.notes;
       if (updates.scheduledDate !== undefined)

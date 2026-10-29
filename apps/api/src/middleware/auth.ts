@@ -224,6 +224,7 @@ const OAUTH_ROUTE_SCOPES: Array<{
   write: string | null;
 }> = [
   { path: /^\/tasks(\/|$)/, read: "tasks:read", write: "tasks:write" },
+  { path: /^\/goals(\/|$)/, read: "tasks:read", write: "tasks:write" },
   {
     path: /^\/time-blocks(\/|$)/,
     read: "time-blocks:read",

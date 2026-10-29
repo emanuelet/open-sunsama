@@ -1,4 +1,5 @@
 // Schema exports
+export { goals } from "./goals";
 export { passkeys, passkeyChallenges } from "./passkeys";
 export {
   users,

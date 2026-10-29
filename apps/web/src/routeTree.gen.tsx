@@ -367,6 +367,18 @@ const appIdeasRoute = createRoute({
   }),
 });
 
+const appGoalsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "/goals",
+  component: lazyRouteComponent(() => import("./routes/app/goals")),
+  validateSearch: (
+    search: Record<string, unknown>
+  ): { goal?: string; archived?: boolean } => ({
+    goal: typeof search.goal === "string" ? search.goal : undefined,
+    archived: search.archived === true ? true : undefined,
+  }),
+});
+
 // Build the route tree
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -408,6 +420,7 @@ const routeTree = rootRoute.addChildren([
     appMoreRoute,
     appRoutinesRoute,
     appIdeasRoute,
+    appGoalsRoute,
   ]),
 ]);
 

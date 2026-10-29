@@ -18,6 +18,7 @@ import { timeBlocks } from "./time-blocks";
 import { attachments } from "./attachments";
 import { taskSeries } from "./task-series";
 import { taskExternalLinks } from "./task-external-links";
+import { goals } from "./goals";
 
 export const tasks = pgTable(
   "tasks",
@@ -28,6 +29,9 @@ export const tasks = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     title: varchar("title", { length: 500 }).notNull(),
     notes: text("notes"),
+    goalId: uuid("goal_id").references(() => goals.id, {
+      onDelete: "set null",
+    }),
     scheduledDate: date("scheduled_date"),
     estimatedMins: integer("estimated_mins"),
     actualMins: integer("actual_mins").default(0),
@@ -71,6 +75,7 @@ export const tasks = pgTable(
       .where(sql`${table.completedAt} IS NULL`),
     // Index for finding all instances of a series
     index("tasks_series_idx").on(table.seriesId),
+    index("tasks_goal_idx").on(table.goalId),
     // Unique constraint to prevent duplicate recurring task instances
     // Only applies when seriesId is not null (recurring tasks)
     uniqueIndex("tasks_series_date_unique_idx")

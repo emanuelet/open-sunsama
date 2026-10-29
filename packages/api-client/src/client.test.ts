@@ -9,6 +9,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { createServer, type Server } from "node:http";
 import { createOpenSunsamaClient } from "./client.js";
 import { createAuthApi } from "./auth.js";
+import { ApiError } from "./errors.js";
 
 function jsonResponse(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), {
@@ -16,6 +17,76 @@ function jsonResponse(status: number, body: unknown): Response {
     headers: { "content-type": "application/json" },
   });
 }
+
+describe("createOpenSunsamaClient — HTTP error details", () => {
+  it.each([
+    {
+      status: 503,
+      body: {
+        success: false,
+        error: {
+          code: "PROVIDER_UNAVAILABLE",
+          message: "Calendar temporarily unavailable",
+          details: { provider: "google" },
+        },
+      },
+      expected: {
+        message: "Calendar temporarily unavailable",
+        code: "PROVIDER_UNAVAILABLE",
+        details: { provider: "google" },
+      },
+    },
+    {
+      status: 400,
+      body: {
+        error: {
+          issues: [
+            { message: "Title is required" },
+            { message: "Pick a calendar" },
+          ],
+        },
+      },
+      expected: {
+        message: "Title is required. Pick a calendar",
+        code: "VALIDATION_ERROR",
+      },
+    },
+  ])(
+    "preserves the parsed error body on a $status response",
+    async ({ status, body, expected }) => {
+      const customFetch = vi.fn(async () =>
+        jsonResponse(status, body)
+      ) as unknown as typeof fetch;
+      const onError = vi.fn();
+      const client = createOpenSunsamaClient({
+        baseUrl: "https://api.test",
+        customFetch,
+        onError,
+      });
+      const error = await client
+        .post("calendar-events", {})
+        .catch((error: unknown) => error);
+      expect(error).toBeInstanceOf(ApiError);
+      expect(error).toMatchObject({ status, ...expected });
+      expect(onError).toHaveBeenCalledExactlyOnceWith(error);
+      expect(customFetch).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  it("keeps the HTTP status when the response is not JSON", async () => {
+    const customFetch = vi.fn(
+      async () => new Response("Service unavailable", { status: 503 })
+    ) as unknown as typeof fetch;
+    const client = createOpenSunsamaClient({
+      baseUrl: "https://api.test",
+      customFetch,
+    });
+    await expect(client.post("calendar-events", {})).rejects.toMatchObject({
+      status: 503,
+      message: "Request failed with status 503",
+    });
+  });
+});
 
 describe("createOpenSunsamaClient — 401 auto-refresh", () => {
   it("refreshes the token and retries once on 401, then succeeds", async () => {

@@ -1,15 +1,14 @@
 import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Task, Subtask } from "@open-sunsama/types";
 import { addDays, format, subDays } from "date-fns";
 import { getApi } from "@/lib/api";
-import { taskKeys, subtaskKeys } from "@/lib/query-keys";
+import { taskKeys } from "@/lib/query-keys";
+import {
+  fetchTaskRange,
+  seedDayCaches,
+  seedSubtaskCaches,
+} from "@/lib/kanban-range-seed";
 import { useAuth } from "@/hooks/useAuth";
-
-// The shape the server returns when `includeSubtasks=true` is set. The
-// canonical Task type doesn't carry a `subtasks` field — we strip it back
-// out before seeding the per-day caches so consumers see plain Tasks.
-type TaskWithSubtasks = Task & { subtasks?: Subtask[] };
 
 /**
  * The number of days to prefetch in each direction around the current
@@ -17,48 +16,6 @@ type TaskWithSubtasks = Task & { subtasks?: Subtask[] };
  * are seeded by a single roundtrip.
  */
 const PREFETCH_BUFFER_DAYS = 14;
-
-/**
- * Page size for the range fetch. Must stay at or under the API's `limit` cap
- * for `GET /tasks` (500, `taskFilterSchema` in apps/api); anything higher is
- * rejected with a 400 and the board silently loses the prefetch.
- */
-const RANGE_PAGE_SIZE = 500;
-
-/**
- * Most pages we'll fetch for one range (5,000 tasks). Past this we stop and
- * refuse to seed, because some days inside the range would be truncated and
- * seeding would hide tasks from the user.
- */
-const RANGE_MAX_PAGES = 10;
-
-/**
- * Per-day cache key used by `DayColumn` (`useTasks({ scheduledDate, limit: 200 })`).
- * We reproduce it here so we can seed the cache by hand from the range query.
- */
-function dayCacheKey(dateString: string) {
-  return taskKeys.list({ scheduledDate: dateString, limit: 200 });
-}
-
-/**
- * Cheap reference check by id+updatedAt to avoid re-seeding caches that
- * already hold the equivalent data.
- */
-function tasksAreEqual(a: Task[], b: Task[]): boolean {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) {
-    const x = a[i];
-    const y = b[i];
-    if (!x || !y) return false;
-    if (x.id !== y.id) return false;
-    const xu = x.updatedAt;
-    const yu = y.updatedAt;
-    const xt = xu instanceof Date ? xu.getTime() : String(xu);
-    const yt = yu instanceof Date ? yu.getTime() : String(yu);
-    if (xt !== yt) return false;
-  }
-  return true;
-}
 
 interface RangePrefetchOptions {
   /**
@@ -112,58 +69,12 @@ export function useKanbanRangePrefetch(options: RangePrefetchOptions = {}) {
 
   const query = useQuery({
     queryKey,
-    queryFn: async (): Promise<{
-      tasks: Task[];
-      /**
-       * Plain record, not a Map: this query's result is persisted to
-       * localStorage, and a Map does not survive JSON round-tripping —
-       * it comes back as `{}` and every consumer that iterates it
-       * throws on the next page load.
-       */
-      subtasksByTaskId: Record<string, Subtask[]>;
-      truncated: boolean;
-    }> => {
-      const api = getApi();
-      const fetchPage = (page: number) =>
-        api.tasks.list({
-          scheduledDateFrom: fromString,
-          scheduledDateTo: toString,
-          limit: RANGE_PAGE_SIZE,
-          page,
-          includeSubtasks: true,
-        });
-
-      // Almost every range fits in the first page. Busier ones fetch the
-      // remaining pages in parallel.
-      const first = await fetchPage(1);
-      const total = first.meta?.total ?? first.data?.length ?? 0;
-      const pageCount = Math.min(
-        Math.ceil(total / RANGE_PAGE_SIZE),
-        RANGE_MAX_PAGES
-      );
-      const rest = await Promise.all(
-        Array.from({ length: Math.max(pageCount - 1, 0) }, (_, i) =>
-          fetchPage(i + 2)
-        )
-      );
-      const raw = [first, ...rest].flatMap(
-        (r) => (r.data ?? []) as TaskWithSubtasks[]
-      );
-
-      // Strip subtasks off the task object before we put it in the per-day
-      // cache. We seed the subtask caches separately below.
-      const tasks: Task[] = [];
-      const subtasksByTaskId: Record<string, Subtask[]> = {};
-      for (const t of raw) {
-        const { subtasks: embedded, ...rest } = t;
-        tasks.push(rest as Task);
-        if (embedded) subtasksByTaskId[t.id] = embedded;
-      }
-
-      // A task created or deleted between pages shifts the offsets, so the
-      // count can disagree with `total`; treat any mismatch as truncated.
-      return { tasks, subtasksByTaskId, truncated: total !== tasks.length };
-    },
+    queryFn: () =>
+      fetchTaskRange(
+        (filters) => getApi().tasks.list(filters),
+        fromString,
+        toString
+      ),
     enabled: isAuthenticated,
     staleTime: 30_000,
   });
@@ -191,64 +102,12 @@ export function useKanbanRangePrefetch(options: RangePrefetchOptions = {}) {
     if (fingerprint === seededFingerprintRef.current) return;
     seededFingerprintRef.current = fingerprint;
 
-    const byDate = new Map<string, Task[]>();
-    for (const task of data.tasks) {
-      if (!task.scheduledDate) continue;
-      const arr = byDate.get(task.scheduledDate);
-      if (arr) arr.push(task);
-      else byDate.set(task.scheduledDate, [task]);
-    }
-
-    const rangeFetchedAt =
-      queryClient.getQueryState(queryKey)?.dataUpdatedAt ?? Date.now();
-    const center = new Date(centerString + "T00:00:00");
-
-    for (let i = -bufferDays; i <= bufferDays; i++) {
-      const d = addDays(center, i);
-      const key = format(d, "yyyy-MM-dd");
-      const tasks = byDate.get(key) ?? [];
-      const cacheKey = dayCacheKey(key);
-      const existing = queryClient.getQueryData<Task[]>(cacheKey);
-
-      // Never clobber an in-flight optimistic insert.
-      if (existing && existing.some((t) => t.id.startsWith("optimistic-"))) {
-        continue;
-      }
-
-      // If the per-day query already has data fetched after the range
-      // started, trust it — it's more specific and may include reconciled
-      // mutations that haven't echoed back through this range fetch yet.
-      const dayState = queryClient.getQueryState(cacheKey);
-      if (
-        existing &&
-        dayState?.dataUpdatedAt &&
-        dayState.dataUpdatedAt >= rangeFetchedAt
-      ) {
-        continue;
-      }
-
-      // Skip writes that wouldn't actually change the cache contents.
-      if (existing && tasksAreEqual(existing, tasks)) {
-        continue;
-      }
-
-      queryClient.setQueryData(cacheKey, tasks);
-    }
+    seedDayCaches(queryClient, queryKey, data, { centerString, bufferDays });
 
     // Seed the per-task subtask caches too, so the kanban's subtask
     // batcher never has to fire — `useSubtasks(taskId)` will read from
     // these fresh cache entries (within the 60s default staleTime).
-    // `?? {}` guards a cache entry persisted by an older build, where
-    // this field was a Map and rehydrates as undefined or a bare object.
-    for (const [taskId, list] of Object.entries(data.subtasksByTaskId ?? {})) {
-      const cacheKey = subtaskKeys.list(taskId);
-      const existing = queryClient.getQueryData<Subtask[]>(cacheKey);
-      // Don't clobber a list that contains an in-flight optimistic insert.
-      if (existing && existing.some((s) => s.id.startsWith("optimistic-"))) {
-        continue;
-      }
-      queryClient.setQueryData(cacheKey, list);
-    }
+    seedSubtaskCaches(queryClient, data);
   }, [data, queryClient, queryKey, bufferDays, centerString]);
 
   return query;

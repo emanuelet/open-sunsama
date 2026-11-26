@@ -54,7 +54,7 @@ export const SubtaskAddRow = React.forwardRef<
   };
 
   return (
-    <div
+    <label
       className={cn(
         "group/add -mx-2 flex items-center rounded-md px-2 transition-colors",
         size.row,
@@ -62,16 +62,16 @@ export const SubtaskAddRow = React.forwardRef<
         className
       )}
     >
-      <div
+      <span
         className={cn(
           "flex shrink-0 items-center justify-center rounded-full border-[1.5px] transition-colors",
-          size.check.replace("mt-0.5 ", ""),
-          "border-muted-foreground/30 text-muted-foreground/50",
+          size.check,
+          "border-muted-foreground/30 text-muted-foreground/80",
           "group-focus-within/add:border-primary/60 group-focus-within/add:text-primary"
         )}
       >
         <Plus className={size.checkIcon} strokeWidth={2.5} />
-      </div>
+      </span>
       <input
         ref={inputRef}
         type="text"
@@ -102,7 +102,7 @@ export const SubtaskAddRow = React.forwardRef<
         }}
         onBlur={commit}
         className={cn(
-          "min-w-0 flex-1 border-none bg-transparent p-0 outline-hidden placeholder:text-muted-foreground/50 focus:ring-0",
+          "min-w-0 flex-1 border-none bg-transparent p-0 outline-hidden placeholder:text-muted-foreground focus:ring-0",
           size.text
         )}
       />
@@ -111,6 +111,6 @@ export const SubtaskAddRow = React.forwardRef<
           ↵
         </kbd>
       )}
-    </div>
+    </label>
   );
 });

@@ -12,13 +12,19 @@ export const SubtaskSizeContext = React.createContext<SubtaskSize>("md");
 export const SUBTASK_STYLES = {
   md: {
     row: "min-h-8 gap-2.5 py-1.5",
-    check: "mt-0.5 h-4 w-4",
+    check: "h-4 w-4",
+    checkOffset: "mt-0.5",
+    checkTarget: "",
     checkIcon: "h-2.5 w-2.5",
     text: "text-sm leading-5",
   },
   lg: {
-    row: "min-h-9 gap-3.5 py-1.5",
-    check: "mt-0.5 h-5 w-5",
+    row: "min-h-9 gap-3.5 py-1.5 max-lg:-mr-3 max-lg:min-h-11 max-lg:py-0 max-lg:pr-0",
+    check:
+      "h-5 w-5 max-lg:aria-[checked=false]:border-muted-foreground/75 max-lg:aria-[checked=false]:[&>svg]:invisible",
+    checkOffset: "mt-0.5 max-lg:mt-3",
+    checkTarget:
+      "relative focus-visible:ring-1 focus-visible:ring-ring max-lg:before:absolute max-lg:before:-inset-[13px]",
     checkIcon: "h-3 w-3",
     text: "text-base leading-6",
   },

@@ -159,7 +159,7 @@ export default function FocusPage() {
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Check if we should ignore (typing in input/textarea)
-      if (shouldIgnoreShortcut(e)) return;
+      if (e.defaultPrevented || shouldIgnoreShortcut(e)) return;
 
       // Esc to close focus mode (popovers and menus keep their own Escape)
       if (e.key === "Escape") {
@@ -170,6 +170,7 @@ export default function FocusPage() {
       // Space to toggle timer
       if (
         (e.key === " " || e.code === "Space") &&
+        !(e.target instanceof Element && e.target.closest("button")) &&
         !e.repeat &&
         !e.shiftKey &&
         !e.ctrlKey &&

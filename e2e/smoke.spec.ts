@@ -134,6 +134,221 @@ test("creates a task, adds a subtask and completes it", async ({ page }) => {
   ]);
 });
 
+test("keeps mobile subtasks in one row from creation through timing", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const session = await register();
+  await signInWithToken(page, session);
+  await page.goto("/app");
+  await page.getByRole("button", { name: /^Add task on/ }).click();
+  const composer = page.getByRole("dialog", { name: "New task" });
+  const title = "Plan the studio day";
+  await composer.getByRole("textbox", { name: "Task title" }).fill(title);
+  const add = composer.getByRole("textbox", { name: "Add a subtask" });
+  await add.fill("Gather project ideas");
+  await add.press("Enter");
+  const draftTitle = composer.getByText("Gather project ideas");
+  await expect(draftTitle).toBeVisible();
+  const draftLeft = (await draftTitle.boundingBox())!.x;
+  await composer.getByRole("button", { name: "Add task", exact: true }).click();
+  await expect(composer).toBeHidden();
+  await page.locator("[data-task-id]").filter({ hasText: title }).click();
+
+  const editor = page.getByRole("dialog", { name: title });
+  const row = editor.locator("[data-subtask-id]");
+  const start = row.getByRole("button", { name: "Start subtask timer" });
+  const more = row.getByRole("button", { name: /^More options/ });
+  await expect(more).toBeVisible();
+  expect((await row.boundingBox())!.height).toBeLessThanOrEqual(48);
+  const editTitle = row.getByRole("button", {
+    name: "Edit subtask: Gather project ideas",
+    exact: true,
+  });
+  expect((await editTitle.boundingBox())!.x).toBe(draftLeft);
+  await editTitle.press("Space");
+  const input = row.getByRole("textbox", { name: "Edit subtask" });
+  await input.fill("Review the ideas");
+  await input.press("Enter");
+  const renamed = row.getByRole("button", {
+    name: "Edit subtask: Review the ideas",
+    exact: true,
+  });
+  await expect(renamed).toBeFocused();
+  await renamed.press("Enter");
+  await input.fill("Unsaved change");
+  await input.press("Escape");
+  await expect(renamed).toBeFocused();
+  await more.press("Space");
+  const options = page.getByRole("dialog", { name: "Subtask options" });
+  await options.getByRole("button", { name: /^Planned time/ }).click();
+  await options.getByRole("button", { name: "15 min", exact: true }).click();
+  await expect(options).toBeHidden();
+  await expect(more).toHaveText("0:15");
+  await page.setViewportSize({ width: 320, height: 640 });
+  expect((await row.boundingBox())!.height).toBe(44);
+  await more.click();
+  await expect(
+    options.getByRole("button", { name: /Planned time.*0:15/ })
+  ).toBeVisible();
+  await options.getByRole("button", { name: /^Planned time/ }).click();
+  const planned = options.getByRole("textbox", { name: "Planned" });
+  await planned.fill("24:00");
+  await planned.press("Enter");
+  await expect(options).toBeHidden();
+  await expect(more).toHaveText("24:00");
+  const started = page.waitForResponse((response) =>
+    response.url().endsWith("/timer/start")
+  );
+  await start.click();
+  expect((await started).ok()).toBe(true);
+  const pause = row.getByRole("button", { name: "Stop subtask timer" });
+  await expect(pause).toBeVisible();
+  const titleBox = (await renamed.boundingBox())!;
+  const timerBox = (await pause.boundingBox())!;
+  const moreBox = (await more.boundingBox())!;
+  const estimateBox = (await more
+    .getByText("24:00", { exact: true })
+    .boundingBox())!;
+  const menuIcon = (await more.locator("svg").boundingBox())!;
+  expect(estimateBox.x).toBeGreaterThanOrEqual(moreBox.x);
+  expect(menuIcon.x - estimateBox.x - estimateBox.width).toBeGreaterThanOrEqual(
+    4
+  );
+  expect(titleBox.x + titleBox.width).toBeLessThanOrEqual(timerBox.x);
+  expect(timerBox.x + timerBox.width).toBeLessThanOrEqual(moreBox.x);
+  expect(moreBox.x + moreBox.width).toBeLessThanOrEqual(320);
+  const stopped = page.waitForResponse((response) =>
+    response.url().endsWith("/timer/stop")
+  );
+  await pause.click();
+  expect((await stopped).ok()).toBe(true);
+  await expect(start).toBeVisible();
+  await more.click();
+  await options.getByRole("button", { name: /^Actual time/ }).click();
+  await options.getByRole("button", { name: "5 min", exact: true }).click();
+  await more.click();
+  await expect(
+    options.getByRole("button", { name: /Actual time.*0:05/ })
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(options).toBeHidden();
+  const completed = page.waitForResponse(
+    (response) =>
+      response.request().method() === "PATCH" &&
+      response.url().includes("/subtasks/")
+  );
+  await row.getByRole("checkbox").click();
+  expect((await completed).ok()).toBe(true);
+  await expect(start).toBeHidden();
+  await more.click();
+  await options.getByRole("button", { name: "Delete subtask" }).click();
+  await expect(row).toHaveCount(0);
+});
+
+test("Space picks up and drops a subtask without starting its task timer", async ({
+  page,
+}) => {
+  const session = await register();
+  const task = await api<{ id: string }>(
+    "POST",
+    "/tasks",
+    { title: "Order the checklist" },
+    session.token
+  );
+  const list = `/tasks/${task.id}/subtasks`;
+  for (const [position, title] of ["First item", "Second item"].entries()) {
+    await api("POST", list, { title, position }, session.token);
+  }
+  await signInWithToken(page, session);
+  await page.goto(`/app/focus/${task.id}`);
+  const handle = page.getByRole("button", { name: "Reorder subtask" }).first();
+  const rows = page.locator("[data-subtask-id]");
+  const firstId = await rows.first().getAttribute("data-subtask-id");
+  const secondId = await rows.nth(1).getAttribute("data-subtask-id");
+  const announcement = page
+    .getByRole("status")
+    .filter({ hasText: "Draggable item" });
+  await handle.press("Space", { delay: 80 });
+  await expect(announcement).toContainText(`over droppable area ${firstId}`);
+  await page.keyboard.press("ArrowDown");
+  await expect(announcement).toContainText(`over droppable area ${secondId}`);
+  await page.keyboard.press("Space");
+  await expect
+    .poll(async () =>
+      (
+        await api<{ title: string }[]>("GET", list, undefined, session.token)
+      ).map((item) => item.title)
+    )
+    .toEqual(["Second item", "First item"]);
+  await expect(
+    page.getByRole("button", { name: "Start timer", exact: true })
+  ).toBeVisible();
+});
+
+for (const surface of ["Focus", "desktop editor", "tablet editor"]) {
+  test(`Escape cancels a subtask reorder without closing the ${surface}`, async ({
+    page,
+  }) => {
+    const session = await register();
+    const task = await api<{ id: string; title: string }>(
+      "POST",
+      "/tasks",
+      { title: "Cancel reorder", scheduledDate: today },
+      session.token
+    );
+    const list = `/tasks/${task.id}/subtasks`;
+    for (const [position, title] of [
+      "Gather ideas",
+      "Review ideas",
+    ].entries()) {
+      await api("POST", list, { title, position }, session.token);
+    }
+    await signInWithToken(page, session);
+    if (surface === "tablet editor")
+      await page.setViewportSize({ width: 768, height: 900 });
+    await page.goto("/app");
+    if (surface === "Focus") {
+      await page.goto(`/app/focus/${task.id}`);
+    } else {
+      await page.locator(`[data-task-id="${task.id}"]`).first().click();
+    }
+    if (surface !== "tablet editor") {
+      for (const title of ["Gather ideas", "Review ideas"]) {
+        for (const field of ["Actual", "Planned"]) {
+          await expect(
+            page.getByRole("button", {
+              name: `${field} time for ${title}: none`,
+              exact: true,
+            })
+          ).toBeVisible();
+        }
+      }
+    }
+    const rows = page.locator("[data-subtask-id]");
+    const handle = rows
+      .first()
+      .getByRole("button", { name: "Reorder subtask" });
+    const announcement = page
+      .getByRole("status")
+      .filter({ hasText: "Draggable item" });
+    const secondId = await rows.nth(1).getAttribute("data-subtask-id");
+    await handle.press("Space", { delay: 80 });
+    await page.keyboard.press("ArrowDown");
+    await expect(announcement).toContainText(`over droppable area ${secondId}`);
+    await page.keyboard.press("Escape");
+    await expect(announcement).toContainText("Dragging was cancelled");
+    await expect(handle).toBeFocused();
+    await expect(rows.first().getByRole("checkbox")).toHaveAccessibleName(
+      "Gather ideas"
+    );
+    await page.keyboard.press("Escape");
+    if (surface === "Focus") await expect(page).toHaveURL(/\/app\/?$/);
+    else
+      await expect(page.getByRole("dialog", { name: task.title })).toBeHidden();
+  });
+}
+
 test("shows and resizes a time block on the full calendar", async ({
   page,
 }) => {
@@ -717,6 +932,20 @@ test("mobile subtask titles keep readable width alongside timer controls", async
   await expect(
     row.getByRole("button", { name: "Start subtask timer" })
   ).toBeVisible();
+  await page.setViewportSize({ width: 768, height: 900 });
+  const handle = row.getByRole("button", { name: "Reorder subtask" });
+  await expect(handle).toBeVisible();
+  const handleBox = (await handle.boundingBox())!;
+  const titleBox = (await row
+    .getByText("Check the launch checklist", { exact: true })
+    .boundingBox())!;
+  const timerBox = (await row
+    .getByRole("button", { name: "Start subtask timer" })
+    .boundingBox())!;
+  expect(handleBox.width).toBe(44);
+  expect(handleBox.height).toBe(44);
+  expect(titleBox.x + titleBox.width).toBeLessThanOrEqual(handleBox.x);
+  expect(handleBox.x + handleBox.width).toBeLessThanOrEqual(timerBox.x);
 });
 
 test("completion cannot leave a task or subtask timer running after concurrent starts", async () => {

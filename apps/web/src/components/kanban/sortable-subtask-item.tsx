@@ -17,6 +17,7 @@ export type { Subtask };
 
 interface SortableSubtaskItemProps {
   subtask: Subtask;
+  isMobile: boolean;
   onToggle: () => void;
   onDelete: () => void;
   onUpdate?: (title: string) => void;
@@ -28,6 +29,7 @@ interface SortableSubtaskItemProps {
  */
 export function SortableSubtaskItem({
   subtask,
+  isMobile,
   onToggle,
   onDelete,
   onUpdate,
@@ -35,16 +37,19 @@ export function SortableSubtaskItem({
   const { setHoveredSubtaskId } = useHoveredTask();
   const size = useSubtaskStyles();
   // The large rows (task modal, focus mode) carry times and a timer.
-  const showTiming =
-    useSubtaskSize() === "lg" && !subtask.id.startsWith("optimistic-");
+  const large = useSubtaskSize() === "lg";
+  const showTiming = large && !subtask.id.startsWith("optimistic-");
+  const compactTiming = showTiming && isMobile;
   const [isEditing, setIsEditing] = React.useState(false);
   const [editValue, setEditValue] = React.useState(subtask.title);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const returnFocus = React.useRef(false);
 
   const {
     attributes,
     listeners,
     setNodeRef,
+    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
@@ -77,24 +82,48 @@ export function SortableSubtaskItem({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.nativeEvent.isComposing) return;
     if (e.key === "Enter") {
       e.preventDefault();
+      returnFocus.current = true;
       handleSave();
     } else if (e.key === "Escape") {
+      returnFocus.current = true;
       setEditValue(subtask.title);
       setIsEditing(false);
     }
   };
 
+  const inlineHandle = large && isMobile;
+  const handle = (
+    <button
+      type="button"
+      ref={setActivatorNodeRef}
+      {...attributes}
+      {...listeners}
+      aria-label={`Reorder subtask: ${subtask.title}`}
+      data-escape-local={isDragging || undefined}
+      className={cn(
+        "absolute -left-4 top-1.5 hidden h-5 w-4 items-center justify-center rounded sm:flex",
+        "cursor-grab touch-none text-muted-foreground opacity-0 transition-opacity",
+        "hover:text-foreground group-hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-ring active:cursor-grabbing",
+        inlineHandle &&
+          "sm:max-lg:static sm:max-lg:size-11 sm:max-lg:shrink-0 sm:max-lg:[@media(hover:none)]:opacity-100",
+        isDragging && "opacity-100"
+      )}
+    >
+      <GripVertical className="h-3.5 w-3.5" />
+    </button>
+  );
+
   return (
-    <div
+    <li
       ref={setNodeRef}
       style={style}
       data-subtask-id={subtask.id}
       className={cn(
         "group relative -mx-2 flex items-start rounded-md px-2 transition-colors",
         size.row,
-        showTiming && "max-sm:grid max-sm:grid-cols-[auto_minmax(0,1fr)_auto]",
         "hover:bg-muted/40",
         isEditing && "bg-muted/40",
         isDragging && "z-10 bg-muted/60 shadow-xs"
@@ -102,32 +131,18 @@ export function SortableSubtaskItem({
       onMouseEnter={() => setHoveredSubtaskId(subtask.id)}
       onMouseLeave={() => setHoveredSubtaskId(null)}
     >
-      {/* Drag handle sits in the left gutter so checkboxes line up with the
-          add row. Hidden on touch, where there is no hover to reveal it. */}
-      <button
-        type="button"
-        {...attributes}
-        {...listeners}
-        aria-label="Reorder subtask"
-        className={cn(
-          "absolute -left-4 top-1.5 hidden h-5 w-4 items-center justify-center rounded sm:flex",
-          "cursor-grab touch-none text-muted-foreground/40 opacity-0 transition-opacity",
-          "hover:text-muted-foreground group-hover:opacity-100 focus-visible:opacity-100 active:cursor-grabbing",
-          isDragging && "opacity-100"
-        )}
-      >
-        <GripVertical className="h-3.5 w-3.5" />
-      </button>
-
+      {!inlineHandle && handle}
       <button
         type="button"
         role="checkbox"
         aria-checked={subtask.completed}
-        aria-label={subtask.completed ? "Mark incomplete" : "Mark complete"}
+        aria-label={subtask.title}
         onClick={onToggle}
         className={cn(
           "flex shrink-0 cursor-pointer items-center justify-center rounded-full border-[1.5px] transition-all duration-150 active:scale-90",
           size.check,
+          size.checkOffset,
+          size.checkTarget,
           subtaskCheckState(subtask.completed)
         )}
       >
@@ -143,17 +158,28 @@ export function SortableSubtaskItem({
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
           data-escape-local="true"
-          aria-label="Edit subtask"
+          aria-label={`Edit subtask: ${subtask.title}`}
           className={cn(
             "min-w-0 flex-1 border-none bg-transparent p-0 outline-hidden focus:ring-0",
-            size.text
+            size.text,
+            large && "max-lg:py-2.5"
           )}
         />
       ) : (
-        <span
+        <button
+          type="button"
+          aria-label={`Edit subtask: ${subtask.title}`}
+          ref={(button) => {
+            if (button && returnFocus.current) {
+              returnFocus.current = false;
+              button.focus();
+            }
+          }}
+          disabled={!onUpdate}
           onClick={() => onUpdate && setIsEditing(true)}
           className={cn(
-            "min-w-0 flex-1 break-words transition-colors",
+            "min-w-0 flex-1 break-words rounded-sm text-left transition-colors focus-visible:ring-1 focus-visible:ring-ring",
+            large && "max-lg:py-2.5",
             size.text,
             onUpdate && "cursor-text",
             subtask.completed &&
@@ -161,27 +187,32 @@ export function SortableSubtaskItem({
           )}
         >
           {subtask.title}
-        </span>
+        </button>
       )}
+
+      {inlineHandle && handle}
 
       {showTiming && (
-        <div className="max-sm:col-start-2 max-sm:col-span-2 max-sm:row-start-2">
-          <SubtaskTiming subtask={subtask} />
-        </div>
+        <SubtaskTiming
+          subtask={subtask}
+          onMobileDelete={compactTiming ? onDelete : undefined}
+        />
       )}
 
-      <button
-        type="button"
-        aria-label="Delete subtask"
-        onClick={onDelete}
-        className={cn(
-          "-my-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground/60",
-          "opacity-0 transition-opacity hover:bg-muted hover:text-foreground",
-          "group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
-        )}
-      >
-        <X className="h-3.5 w-3.5" />
-      </button>
-    </div>
+      {!compactTiming && (
+        <button
+          type="button"
+          aria-label={`Delete subtask: ${subtask.title}`}
+          onClick={onDelete}
+          className={cn(
+            "-my-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground/60",
+            "opacity-0 transition-opacity hover:bg-muted hover:text-foreground",
+            "group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
+          )}
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      )}
+    </li>
   );
 }

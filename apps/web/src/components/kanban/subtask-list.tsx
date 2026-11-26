@@ -2,7 +2,11 @@ import * as React from "react";
 import { X, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SubtaskAddRow } from "./subtask-add-row";
-import { useSubtaskStyles, subtaskCheckState } from "./subtask-size";
+import {
+  useSubtaskSize,
+  useSubtaskStyles,
+  subtaskCheckState,
+} from "./subtask-size";
 
 export interface Subtask {
   id: string;
@@ -55,7 +59,7 @@ export function SubtaskList({
   return (
     <div className={className}>
       {subtasks.length > 0 && (
-        <div className="space-y-px">
+        <ul role="list" aria-label="Subtasks" className="space-y-px">
           {subtasks.map((subtask) => (
             <SubtaskItem
               key={subtask.id}
@@ -64,7 +68,7 @@ export function SubtaskList({
               onDelete={() => deleteSubtask(subtask.id)}
             />
           ))}
-        </div>
+        </ul>
       )}
       <SubtaskAddRow ref={addInputRef} onAdd={addSubtasks} />
     </div>
@@ -79,8 +83,9 @@ interface SubtaskItemProps {
 
 function SubtaskItem({ subtask, onToggle, onDelete }: SubtaskItemProps) {
   const size = useSubtaskStyles();
+  const large = useSubtaskSize() === "lg";
   return (
-    <div
+    <li
       className={cn(
         "group -mx-2 flex items-start rounded-md px-2 transition-colors hover:bg-muted/40",
         size.row
@@ -90,11 +95,13 @@ function SubtaskItem({ subtask, onToggle, onDelete }: SubtaskItemProps) {
         type="button"
         role="checkbox"
         aria-checked={subtask.completed}
-        aria-label={subtask.completed ? "Mark incomplete" : "Mark complete"}
+        aria-label={subtask.title}
         onClick={onToggle}
         className={cn(
           "flex shrink-0 cursor-pointer items-center justify-center rounded-full border-[1.5px] transition-all duration-150 active:scale-90",
           size.check,
+          size.checkOffset,
+          size.checkTarget,
           subtaskCheckState(subtask.completed)
         )}
       >
@@ -104,6 +111,7 @@ function SubtaskItem({ subtask, onToggle, onDelete }: SubtaskItemProps) {
         className={cn(
           "min-w-0 flex-1 break-words",
           size.text,
+          large && "max-lg:py-2.5",
           subtask.completed &&
             "text-muted-foreground line-through decoration-muted-foreground/50"
         )}
@@ -112,16 +120,18 @@ function SubtaskItem({ subtask, onToggle, onDelete }: SubtaskItemProps) {
       </span>
       <button
         type="button"
-        aria-label="Delete subtask"
+        aria-label={`Delete subtask: ${subtask.title}`}
         onClick={onDelete}
         className={cn(
           "-my-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground/60",
           "opacity-0 transition-opacity hover:bg-muted hover:text-foreground",
-          "group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
+          "group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100",
+          large &&
+            "max-lg:my-0 max-lg:size-11 max-lg:justify-end max-lg:pr-1.5 max-lg:opacity-100 focus-visible:ring-1 focus-visible:ring-ring"
         )}
       >
         <X className="h-3.5 w-3.5" />
       </button>
-    </div>
+    </li>
   );
 }

@@ -3,7 +3,10 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { currentInstallPlatform, isRunningInstalled } from "@/lib/pwa";
 import { InstallAppSheet } from "./install-app-sheet";
 
-const STORAGE_KEY = "open-sunsama-install-tip";
+// v2: the first version logged a showing the moment the sheet opened, even
+// when nobody saw it (a reload, a hidden tab), so many phones carry a snooze
+// for a guide they never saw. The new key clears those.
+const STORAGE_KEY = "open-sunsama-install-tip-v2";
 const SHOW_AFTER_MS = 8000;
 /** How long the user must have been hands-off before it opens. */
 const IDLE_MS = 4000;
@@ -35,9 +38,9 @@ function shouldOffer(): boolean {
 
 /**
  * Opens the install guide once for phone visitors using the web app in a
- * browser tab, at the first quiet moment after they arrive. Each showing snoozes it for a
- * week, and it stops after three. The guide is always available under
- * More → Add to Home Screen.
+ * browser tab, at the first quiet moment after they arrive. Closing it snoozes
+ * it for a week, and it stops after three. The guide is always available
+ * under More → Add to Home Screen.
  */
 export function InstallAppPrompt() {
   const isMobile = useIsMobile();
@@ -54,6 +57,8 @@ export function InstallAppPrompt() {
     };
     window.addEventListener("pointerdown", onInput, true);
     window.addEventListener("keydown", onInput, true);
+    // Coming back to the tab counts as activity: give them a moment first.
+    document.addEventListener("visibilitychange", onInput);
 
     const startedAt = Date.now();
     const id = window.setInterval(() => {
@@ -68,6 +73,7 @@ export function InstallAppPrompt() {
         (active.isContentEditable ||
           /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName));
       if (
+        document.visibilityState !== "visible" ||
         Date.now() - lastInput < IDLE_MS ||
         typing ||
         document.querySelector("[role=dialog]")
@@ -75,7 +81,6 @@ export function InstallAppPrompt() {
         return;
       }
       window.clearInterval(id);
-      recordShown();
       setOpen(true);
     }, 1000);
 
@@ -83,13 +88,20 @@ export function InstallAppPrompt() {
       window.clearInterval(id);
       window.removeEventListener("pointerdown", onInput, true);
       window.removeEventListener("keydown", onInput, true);
+      document.removeEventListener("visibilitychange", onInput);
     };
   }, [isMobile]);
 
-  return <InstallAppSheet open={open} onOpenChange={setOpen} />;
+  // Snooze only once they close it, so a showing nobody saw doesn't count.
+  const handleOpenChange = (next: boolean) => {
+    if (!next) recordDismissed();
+    setOpen(next);
+  };
+
+  return <InstallAppSheet open={open} onOpenChange={handleOpenChange} />;
 }
 
-function recordShown() {
+function recordDismissed() {
   const { dismissals = 0 } = readState();
   try {
     localStorage.setItem(

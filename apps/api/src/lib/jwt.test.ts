@@ -9,7 +9,9 @@ import type * as JwtModule from "./jwt.js";
 // Pin the secret + leeway BEFORE the module under test is (dynamically)
 // imported so it captures these values at evaluation time.
 const SECRET = "test-secret-key-for-jwt-tests-min-32-chars";
+const NEXT_SECRET = "next-secret-key-for-jwt-rotation-tests-min-32";
 process.env.JWT_SECRET = SECRET;
+delete process.env.JWT_SECRET_NEXT;
 process.env.JWT_REFRESH_LEEWAY_DAYS = "30";
 
 let signToken: typeof JwtModule.signToken;
@@ -30,6 +32,25 @@ describe("signToken / verifyToken", () => {
   it("round-trips a userId through a freshly signed token", () => {
     const token = signToken(USER_ID);
     expect(verifyToken(token).userId).toBe(USER_ID);
+  });
+
+  it("signs with JWT_SECRET when JWT_SECRET_NEXT is unset", () => {
+    const token = signToken(USER_ID);
+    expect((jwt.verify(token, SECRET) as { userId: string }).userId).toBe(
+      USER_ID
+    );
+  });
+
+  it("rejects a token signed with another secret", () => {
+    const forged = jwt.sign({ userId: USER_ID }, NEXT_SECRET);
+    expect(() => verifyToken(forged)).toThrow();
+  });
+
+  it("rejects a validly signed token without a userId, such as an OAuth consent request", () => {
+    const consentRequest = jwt.sign({ req: { clientId: "osc_x" } }, SECRET, {
+      audience: "open-sunsama:oauth-consent",
+    });
+    expect(() => verifyToken(consentRequest)).toThrow("missing userId");
   });
 
   it("rejects an expired token", () => {
@@ -86,5 +107,91 @@ describe("verifyTokenForRefresh — leeway env hardening", () => {
     );
     expect(() => mod.verifyTokenForRefresh(ancient)).toThrow();
     process.env.JWT_REFRESH_LEEWAY_DAYS = "30";
+  });
+});
+
+describe("rotating JWT_SECRET with JWT_SECRET_NEXT", () => {
+  let rotated: typeof JwtModule;
+
+  beforeAll(async () => {
+    vi.resetModules();
+    process.env.JWT_SECRET_NEXT = NEXT_SECRET;
+    rotated = await import("./jwt.js");
+    delete process.env.JWT_SECRET_NEXT;
+  });
+
+  it("keeps accepting sessions signed with the old secret", () => {
+    const oldSession = jwt.sign({ userId: USER_ID }, SECRET, {
+      expiresIn: "7d",
+    });
+    expect(rotated.verifyToken(oldSession).userId).toBe(USER_ID);
+    expect(rotated.verifyTokenForRefresh(oldSession).userId).toBe(USER_ID);
+  });
+
+  it("signs new sessions with the new secret only", () => {
+    const token = rotated.signToken(USER_ID);
+    expect((jwt.verify(token, NEXT_SECRET) as { userId: string }).userId).toBe(
+      USER_ID
+    );
+    expect(() => jwt.verify(token, SECRET)).toThrow();
+    expect(rotated.verifyToken(token).userId).toBe(USER_ID);
+  });
+
+  it("refreshes an old-secret session that expired within the grace window", () => {
+    const lapsed = jwt.sign(
+      { userId: USER_ID, exp: nowSec() - 60 * 60 },
+      SECRET
+    );
+    expect(() => rotated.verifyToken(lapsed)).toThrow("jwt expired");
+    expect(rotated.verifyTokenForRefresh(lapsed).userId).toBe(USER_ID);
+  });
+
+  it("refreshes a new-secret session that expired within the grace window", () => {
+    const lapsed = jwt.sign(
+      { userId: USER_ID, exp: nowSec() - 60 * 60 },
+      NEXT_SECRET
+    );
+    expect(rotated.verifyTokenForRefresh(lapsed).userId).toBe(USER_ID);
+  });
+
+  it("rejects an old-secret session expired beyond the grace window", () => {
+    const longExpired = jwt.sign(
+      { userId: USER_ID, exp: nowSec() - 40 * 24 * 60 * 60 },
+      SECRET
+    );
+    expect(() => rotated.verifyTokenForRefresh(longExpired)).toThrow();
+  });
+
+  it("rejects a token signed with neither secret", () => {
+    const forged = jwt.sign({ userId: USER_ID }, "some-other-secret");
+    expect(() => rotated.verifyToken(forged)).toThrow();
+    expect(() => rotated.verifyTokenForRefresh(forged)).toThrow();
+  });
+});
+
+describe("JWT_SECRET_NEXT configuration edge cases", () => {
+  it("treats an empty JWT_SECRET_NEXT as unset", async () => {
+    vi.resetModules();
+    process.env.JWT_SECRET_NEXT = "";
+    const mod = await import("./jwt.js");
+    delete process.env.JWT_SECRET_NEXT;
+    expect(
+      (jwt.verify(mod.signToken(USER_ID), SECRET) as { userId: string }).userId
+    ).toBe(USER_ID);
+  });
+
+  it("never accepts the public dev default once JWT_SECRET_NEXT is set", async () => {
+    vi.resetModules();
+    delete process.env.JWT_SECRET;
+    process.env.JWT_SECRET_NEXT = NEXT_SECRET;
+    const mod = await import("./jwt.js");
+    process.env.JWT_SECRET = SECRET;
+    delete process.env.JWT_SECRET_NEXT;
+    const devSigned = jwt.sign(
+      { userId: USER_ID },
+      "open-sunsama-dev-secret-change-in-production"
+    );
+    expect(() => mod.verifyToken(devSigned)).toThrow();
+    expect(mod.verifyToken(mod.signToken(USER_ID)).userId).toBe(USER_ID);
   });
 });

@@ -19,11 +19,16 @@ export default defineConfig(
     ],
   },
   {
-    files: ["apps/expo-mobile/{babel,metro}.config.js"],
+    files: [
+      "apps/expo-mobile/{babel,metro}.config.js",
+      "apps/expo-mobile/plugins/*.cjs",
+    ],
     languageOptions: {
       sourceType: "commonjs",
       globals: {
         __dirname: "readonly",
+        module: "writable",
+        require: "readonly",
       },
     },
     rules: {

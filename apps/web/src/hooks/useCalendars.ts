@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  type QueryClient,
+} from "@tanstack/react-query";
 import type {
   CalendarAccount,
   Calendar,
@@ -10,7 +15,10 @@ import type {
 import { isApiError } from "@open-sunsama/api-client";
 import { getApiClient } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { isDeclined } from "@/lib/declined-event";
 import { calendarKeys } from "@/lib/query-keys";
+import { isDesktop } from "@/lib/desktop";
 import { trackGoal } from "@/lib/analytics";
 
 /**
@@ -126,10 +134,18 @@ export function useCalendars() {
   });
 }
 
+function withoutDeclined(events: CalendarEvent[]): CalendarEvent[] {
+  return events.filter((event) => !isDeclined(event));
+}
+
 /**
- * Fetch calendar events for a date range
+ * Fetch calendar events for a date range. Declined meetings are left out
+ * when the user turned off "Show declined events".
  */
 export function useCalendarEvents(from: string, to: string, enabled = true) {
+  const { user } = useAuth();
+  const showDeclined = user?.preferences?.showDeclinedEvents ?? true;
+
   return useQuery({
     queryKey: calendarKeys.events(from, to),
     queryFn: async (): Promise<CalendarEvent[]> => {
@@ -140,6 +156,7 @@ export function useCalendarEvents(from: string, to: string, enabled = true) {
       }>("calendar-events", { searchParams: { from, to } });
       return response.data;
     },
+    select: showDeclined ? undefined : withoutDeclined,
     enabled,
   });
 }
@@ -643,9 +660,21 @@ export function useDeleteCalendarEvent() {
 
 /**
  * Initiate OAuth flow for a calendar provider
- * Calls the API with auth to get the OAuth URL, then redirects
+ * Calls the API with auth to get the OAuth URL, then redirects.
+ *
+ * In the desktop app the provider's sign-in page opens in the system browser:
+ * loading it inside the app's only window left no way back if the user
+ * stopped halfway (#205). The callback saves the account server-side, so the
+ * app just refetches calendars when its window regains focus.
  */
+let focusQueryClient: QueryClient | undefined;
+let stopRefetchOnFocusTimer: ReturnType<typeof setTimeout> | undefined;
+function refetchCalendarsOnFocus() {
+  void focusQueryClient?.invalidateQueries({ queryKey: calendarKeys.all });
+}
+
 export function useInitiateOAuth() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({
       provider,
@@ -663,8 +692,23 @@ export function useInitiateOAuth() {
       );
       return response.data.authUrl;
     },
-    onSuccess: (authUrl) => {
-      // Redirect to the OAuth provider
+    onSuccess: async (authUrl) => {
+      if (isDesktop()) {
+        const { invoke } = await import("@tauri-apps/api/core");
+        await invoke("plugin:shell|open", { path: authUrl });
+        toast({
+          title: "Finish connecting in your browser",
+          description: "Your calendars appear here once you approve access.",
+        });
+        focusQueryClient = queryClient;
+        window.addEventListener("focus", refetchCalendarsOnFocus);
+        clearTimeout(stopRefetchOnFocusTimer);
+        stopRefetchOnFocusTimer = setTimeout(
+          () => window.removeEventListener("focus", refetchCalendarsOnFocus),
+          15 * 60 * 1000
+        );
+        return;
+      }
       window.location.href = authUrl;
     },
     onError: (error) => {

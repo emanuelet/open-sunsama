@@ -8,6 +8,7 @@ import {
 } from "date-fns";
 import type { CalendarEvent } from "@open-sunsama/types";
 import { cn } from "@/lib/utils";
+import { declinedEventClass } from "@/lib/declined-event";
 import { CalendarDays } from "lucide-react";
 import { calculateYFromTime, HOUR_HEIGHT } from "@/hooks/useCalendarDnd";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui";
@@ -186,6 +187,7 @@ export function ExternalEvent({
                 : "cursor-pointer",
             // Touch-drag visual feedback: lift + shadow on mobile.
             isTouchDragging && "opacity-60 scale-[1.02] shadow-lg z-15",
+            declinedEventClass(event),
             className
           )}
           style={{
@@ -349,6 +351,7 @@ export function AllDayEvent({ event, onClick, className }: AllDayEventProps) {
           className={cn(
             "flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium cursor-pointer transition-all",
             "hover:brightness-90",
+            declinedEventClass(event),
             className
           )}
           style={{

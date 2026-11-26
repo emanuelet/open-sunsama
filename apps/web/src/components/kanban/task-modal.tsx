@@ -267,6 +267,8 @@ export function TaskModal({
       // Space to toggle timer (same as focus mode)
       if (
         (e.key === " " || e.code === "Space") &&
+        !e.defaultPrevented &&
+        !(e.target instanceof Element && e.target.closest("button")) &&
         !e.repeat &&
         !e.shiftKey &&
         !e.ctrlKey &&
@@ -1038,6 +1040,14 @@ export function TaskModal({
           <BottomSheetContent
             onDismiss={() => handleOpenChange(false)}
             aria-describedby={undefined}
+            onEscapeKeyDown={(event) => {
+              if (
+                event.target instanceof HTMLElement &&
+                event.target.dataset.escapeLocal === "true"
+              ) {
+                event.preventDefault();
+              }
+            }}
             onOpenAutoFocus={(e) => {
               e.preventDefault();
               if (isCompose) titleRef.current?.focus({ preventScroll: true });

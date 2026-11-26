@@ -3,7 +3,7 @@
  * CIMD client IDs, resource/scope normalization, PKCE, and the consent JWT.
  * The full flow is covered end to end by mcp/tests/oauth-e2e.ts.
  */
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, vi } from "vitest";
 import { createHash } from "node:crypto";
 import type * as ClientsModule from "./clients.js";
 import type * as ConfigModule from "./config.js";
@@ -12,6 +12,7 @@ import type * as ConsentModule from "./consent.js";
 
 process.env.API_URL = "https://api.example.com/";
 process.env.JWT_SECRET = "test-secret-key-for-oauth-tests-min-32-chars";
+delete process.env.JWT_SECRET_NEXT;
 
 let clients: typeof ClientsModule;
 let config: typeof ConfigModule;
@@ -184,16 +185,38 @@ describe("verifyPkceS256", () => {
 });
 
 describe("consent request", () => {
+  const request: ConsentModule.ConsentRequest = {
+    clientId: "osc_x",
+    redirectUri: "https://claude.ai/api/mcp/auth_callback",
+    codeChallenge: "c".repeat(43),
+    scopes: ["tasks:read"],
+    resource: "https://api.example.com/mcp",
+    state: "s",
+  };
+
   it("round-trips and rejects tampering", () => {
-    const signed = consent.signConsentRequest({
-      clientId: "osc_x",
-      redirectUri: "https://claude.ai/api/mcp/auth_callback",
-      codeChallenge: "c".repeat(43),
-      scopes: ["tasks:read"],
-      resource: "https://api.example.com/mcp",
-      state: "s",
-    });
+    const signed = consent.signConsentRequest(request);
     expect(consent.verifyConsentRequest(signed)?.clientId).toBe("osc_x");
     expect(consent.verifyConsentRequest(`${signed}x`)).toBeNull();
+  });
+
+  it("survives a JWT_SECRET rotation: old requests verify, new ones use JWT_SECRET_NEXT", async () => {
+    const signedBefore = consent.signConsentRequest(request);
+    vi.resetModules();
+    process.env.JWT_SECRET_NEXT =
+      "next-secret-key-for-oauth-rotation-tests-min-32";
+    const rotated = await import("./consent.js");
+    const rotatedJwt = await import("../jwt.js");
+    delete process.env.JWT_SECRET_NEXT;
+
+    expect(rotated.verifyConsentRequest(signedBefore)?.clientId).toBe("osc_x");
+    const signedAfter = rotated.signConsentRequest(request);
+    expect(rotated.verifyConsentRequest(signedAfter)?.clientId).toBe("osc_x");
+    // The pre-rotation module only knows JWT_SECRET, so it can't read the new request.
+    expect(consent.verifyConsentRequest(signedAfter)).toBeNull();
+    // A session token is still not a consent request.
+    expect(
+      rotated.verifyConsentRequest(rotatedJwt.signToken("user-1"))
+    ).toBeNull();
   });
 });

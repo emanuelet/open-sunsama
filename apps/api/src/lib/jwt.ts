@@ -4,10 +4,26 @@
  */
 
 import jwt from "jsonwebtoken";
-import type { Secret, SignOptions } from "jsonwebtoken";
+import type {
+  JwtPayload as JwtClaims,
+  Secret,
+  SignOptions,
+  VerifyOptions,
+} from "jsonwebtoken";
 
 const JWT_SECRET: Secret =
   process.env.JWT_SECRET || "open-sunsama-dev-secret-change-in-production";
+/**
+ * Rotates JWT_SECRET without signing anyone out: new tokens are signed with
+ * JWT_SECRET_NEXT, and tokens signed with JWT_SECRET keep verifying. Once the
+ * last JWT_SECRET token can no longer be refreshed (JWT_EXPIRES_IN plus
+ * JWT_REFRESH_LEEWAY_DAYS), move this value into JWT_SECRET and unset it.
+ */
+const JWT_SECRET_NEXT = process.env.JWT_SECRET_NEXT || undefined;
+const SIGNING_SECRET: Secret = JWT_SECRET_NEXT ?? JWT_SECRET;
+const VERIFYING_SECRETS: Secret[] = JWT_SECRET_NEXT
+  ? [JWT_SECRET_NEXT, JWT_SECRET]
+  : [JWT_SECRET];
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 
 /**
@@ -34,6 +50,36 @@ export interface JwtPayload {
   exp?: number;
 }
 
+/** Sign any JWT the API issues (sessions, OAuth consent requests). */
+export function signJwt(payload: object, options: SignOptions): string {
+  return jwt.sign(payload, SIGNING_SECRET, options);
+}
+
+/**
+ * Verify any JWT the API issued, trying JWT_SECRET_NEXT first, then JWT_SECRET.
+ * @throws the verification error (an expired token throws TokenExpiredError)
+ */
+export function verifyJwt(
+  token: string,
+  options?: VerifyOptions & { complete?: false }
+): string | JwtClaims {
+  let lastError: unknown;
+  for (const secret of VERIFYING_SECRETS) {
+    try {
+      return jwt.verify(token, secret, options);
+    } catch (error) {
+      // Expiry is checked only after the signature matched, so another secret can't help.
+      if (
+        error instanceof jwt.TokenExpiredError ||
+        error instanceof jwt.NotBeforeError
+      )
+        throw error;
+      lastError = error;
+    }
+  }
+  throw lastError;
+}
+
 /**
  * Sign a JWT token for a user
  * @param userId - The user ID to include in the token
@@ -45,13 +91,9 @@ export function signToken(
 ): string {
   // Cast to any to bypass strict type checking on expiresIn
   // The string format like '7d' is valid at runtime
-  return jwt.sign(
-    { userId, ...(authTime === undefined ? {} : { authTime }) },
-    JWT_SECRET,
-    {
-      expiresIn: JWT_EXPIRES_IN as string,
-    } as SignOptions
-  );
+  return signJwt({ userId, ...(authTime === undefined ? {} : { authTime }) }, {
+    expiresIn: JWT_EXPIRES_IN as string,
+  } as SignOptions);
 }
 
 /**
@@ -64,7 +106,7 @@ export function verifyToken(token: string): {
   userId: string;
   authTime?: number;
 } {
-  const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+  const decoded = verifyJwt(token) as JwtPayload;
   return { userId: decoded.userId, authTime: decoded.authTime };
 }
 
@@ -88,16 +130,14 @@ export function verifyTokenForRefresh(token: string): {
   let decoded: JwtPayload;
   try {
     // Fast path: a token that is still within its normal lifetime.
-    decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    decoded = verifyJwt(token) as JwtPayload;
   } catch (error) {
     // Only expired tokens are eligible for the grace window. A bad signature
     // or malformed token is never refreshable.
     if (!(error instanceof jwt.TokenExpiredError)) {
       throw error;
     }
-    decoded = jwt.verify(token, JWT_SECRET, {
-      ignoreExpiration: true,
-    }) as JwtPayload;
+    decoded = verifyJwt(token, { ignoreExpiration: true }) as JwtPayload;
     if (typeof decoded.exp !== "number") {
       throw error;
     }

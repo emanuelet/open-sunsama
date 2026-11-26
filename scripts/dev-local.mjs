@@ -47,9 +47,13 @@ function devDatabaseUrl() {
     );
     process.exit(1);
   }
-  const line = out.split("\n").find((l) => l.startsWith("DATABASE_PUBLIC_URL="));
+  const line = out
+    .split("\n")
+    .find((l) => l.startsWith("DATABASE_PUBLIC_URL="));
   if (!line) {
-    console.error("dev-postgres has no DATABASE_PUBLIC_URL in the Railway development environment.");
+    console.error(
+      "dev-postgres has no DATABASE_PUBLIC_URL in the Railway development environment."
+    );
     process.exit(1);
   }
   return line.slice("DATABASE_PUBLIC_URL=".length).trim();
@@ -92,8 +96,10 @@ if (mode === "all" || mode === "api") {
     // Creates or updates tables on start; migrations are idempotent.
     MIGRATE_ON_START: "true",
     MIGRATIONS_DIR: path.join(root, "packages/database/drizzle"),
-    JWT_SECRET: process.env.JWT_SECRET ?? "local-dev-only-jwt-secret-not-for-production",
+    JWT_SECRET:
+      process.env.JWT_SECRET ?? "local-dev-only-jwt-secret-not-for-production",
     // Nothing below may reach production services from a laptop.
+    JWT_SECRET_NEXT: "",
     REDIS_URL: "",
     RESEND_API_KEY: "",
     ROLLOVER_ENABLED: "false",
